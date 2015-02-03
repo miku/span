@@ -128,7 +128,8 @@ func Transform(doc Document) (map[string]interface{}, error) {
 		}
 	}
 
-	allfields := [][]string{authors, doc.Subject, doc.ISSN, doc.Title, doc.Subtitle, doc.ContainerTitle, []string{doc.Publisher, doc.URL}}
+	allfields := [][]string{authors, doc.Subject, doc.ISSN, doc.Title,
+		doc.Subtitle, doc.ContainerTitle, []string{doc.Publisher, doc.URL}}
 
 	var buf bytes.Buffer
 	for _, f := range allfields {
