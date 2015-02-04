@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
@@ -40,14 +39,10 @@ func main() {
 			if inElement == "holding" {
 				var item holdings.Holding
 				decoder.DecodeElement(&item, &se)
-				// fmt.Printf("%+v\n", item)
-				for _, ent := range item.Entitlements {
-					obj := make(map[string]interface{})
-					obj["pissn"] = item.PISSN
-					obj["eissn"] = item.EISSN
-					obj["status"] = ent.Status
-					b, _ := json.Marshal(obj)
-					fmt.Println(string(b))
+				// b, _ := json.Marshal(item)
+				// fmt.Printf("%s\n", string(b))
+				for _, e := range item.Entitlements {
+					fmt.Println(e.String())
 				}
 			}
 		default:
