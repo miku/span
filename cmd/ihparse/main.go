@@ -2,8 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
-	"encoding/xml"
 	"flag"
 	"fmt"
 	"log"
@@ -25,25 +23,7 @@ func main() {
 	}
 	reader := bufio.NewReader(ff)
 
-	// XML decoder
-	decoder := xml.NewDecoder(reader)
-	var inElement string
-
-	for {
-		t, _ := decoder.Token()
-		if t == nil {
-			break
-		}
-		switch se := t.(type) {
-		case xml.StartElement:
-			inElement = se.Name.Local
-			if inElement == "holding" {
-				var item holdings.Holding
-				decoder.DecodeElement(&item, &se)
-				b, _ := json.Marshal(item)
-				fmt.Printf("%s\n", string(b))
-			}
-		default:
-		}
+	for issn, _ := range holdings.ISSNSet(reader) {
+		fmt.Println(issn)
 	}
 }
