@@ -1,5 +1,6 @@
 package finc
 
+// Schema represents a finc schema, evolving as needed
 type Schema struct {
 	RecordType           string   `json:"recordtype"`
 	ID                   string   `json:"id"`
