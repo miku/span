@@ -76,7 +76,7 @@ func main() {
 		go Worker(batches, docs, &wg)
 	}
 
-	counter := 0
+	i := 0
 	batch := make([]string, *batchSize)
 	for {
 		line, err := reader.ReadString('\n')
@@ -87,12 +87,12 @@ func main() {
 			log.Fatal(err)
 		}
 		batch = append(batch, line)
-		if counter == *batchSize-1 {
+		if i == *batchSize-1 {
 			batches <- batch
 			batch = batch[:0]
-			counter = 0
+			i = 0
 		}
-		counter++
+		i++
 	}
 	batches <- batch
 	close(batches)
