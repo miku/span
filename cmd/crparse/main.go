@@ -44,6 +44,7 @@ func main() {
 		fmt.Printf("%+v\n", doc)
 		fmt.Printf("%+v\n", doc.Issued)
 		fmt.Printf("%+v\n", doc.Issued.Date())
+		fmt.Printf("%s-%s\n", doc.StartPage(), doc.EndPage())
 	}
 
 }
