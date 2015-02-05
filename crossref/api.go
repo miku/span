@@ -90,6 +90,30 @@ func (d *DateField) Date() (t time.Time) {
 	return t
 }
 
+// StartPage returns the first page as string
+func (d *Document) StartPage() (p string) {
+	parts := strings.Split(d.Page, "-")
+	switch len(parts) {
+	case 1:
+		p = parts[0]
+	case 2:
+		p = parts[0]
+	}
+	return
+}
+
+// StartPage returns the last page as string
+func (d *Document) EndPage() (p string) {
+	parts := strings.Split(d.Page, "-")
+	switch len(parts) {
+	case 1:
+		p = parts[0]
+	case 2:
+		p = parts[1]
+	}
+	return
+}
+
 // CombinedTitle returns a longish title
 func (d *Document) CombinedTitle() string {
 	if len(d.Title) > 0 {
