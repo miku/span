@@ -77,19 +77,32 @@ func main() {
 		}
 		err = json.Unmarshal([]byte(line), &doc)
 		if err != nil {
-			log.Println(line)
 			log.Fatal(err)
 		}
 		for _, issn := range doc.ISSN {
-			_, ok := hmap[issn]
+			h, ok := hmap[issn]
 			if ok {
-				fmt.Println(issn)
-			} else {
-				fmt.Println("miss")
+				// check subscription ranges
+				for _, e := range h.Entitlements {
+					if e.FromYear != 0 && e.FromYear > doc.Issued.Year() {
+						fmt.Printf("%s MISS-FROMYEAR %d %d\n", issn, e.FromYear, doc.Issued.Year())
+						continue
+					}
+					if e.ToYear != 0 && e.ToYear < doc.Issued.Year() {
+						fmt.Printf("%s MISS-TOYEAR %d %d\n", issn, e.ToYear, doc.Issued.Year())
+						continue
+					}
+					effective, err := e.Effective()
+					if err != nil {
+						log.Fatal(err)
+					}
+					if doc.Issued.Date().After(effective) {
+						fmt.Printf("%s MISS-WALL: %s %s\n", issn, effective, doc.Issued.Date())
+						continue
+					}
+					fmt.Printf("%s HIT\n", issn)
+				}
 			}
 		}
-		// fmt.Printf("%s\t%s\t%s\t%s\t%s\n", strings.Join(doc.ISSN, "|"),
-		// 	doc.Issued.Date().Format("2006-01-02"), doc.Volume, doc.Issue, doc.URL)
 	}
-
 }
