@@ -6,15 +6,40 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/pprof"
 
+	"github.com/miku/span"
 	"github.com/miku/span/holdings"
 )
 
 func main() {
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	version := flag.Bool("v", false, "prints current program version")
+
+	PrintUsage := func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] OVID.XML\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 
-	if flag.NArg() < 1 {
-		log.Fatal("input XML (ovid) required")
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
+	if *version {
+		fmt.Println(span.Version)
+		os.Exit(0)
+	}
+
+	if flag.NArg() == 0 {
+		PrintUsage()
+		os.Exit(1)
 	}
 
 	ff, err := os.Open(flag.Arg(0))
