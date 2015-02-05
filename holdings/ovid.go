@@ -41,7 +41,8 @@ func (e *Entitlement) String() string {
 	unescaped, _ := url.QueryUnescape(e.URL)
 	effective, _ := e.Effective()
 	return fmt.Sprintf("<Entitlement status=%s url=%s range=%d/%d/%d-%d/%d/%d effective=%s delay=%0.2f>",
-		e.Status, unescaped, e.FromYear, e.FromVolume, e.FromIssue, e.ToYear, e.ToVolume, e.ToIssue, effective, delay.Hours())
+		e.Status, unescaped, e.FromYear, e.FromVolume, e.FromIssue, e.ToYear, e.ToVolume, e.ToIssue,
+		effective, delay.Hours())
 }
 
 // Parse '1M', '3Y', ... into a duration
