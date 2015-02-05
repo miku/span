@@ -85,6 +85,7 @@ func (d *Document) ShortTitle() string {
 	}
 }
 
+// Transform converts a single crossref document into a finc.Schema
 func Transform(doc Document) (finc.Schema, error) {
 	var output finc.Schema
 
