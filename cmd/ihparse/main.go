@@ -48,7 +48,7 @@ func main() {
 	}
 	reader := bufio.NewReader(ff)
 
-	for issn, _ := range holdings.ISSNSet(reader) {
+	for issn, _ := range holdings.HoldingsMap(reader) {
 		fmt.Println(issn)
 	}
 }
