@@ -24,5 +24,6 @@ _testmain.go
 *.prof
 
 /ihparse
+/crparse
 /span
 /fixtures
