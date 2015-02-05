@@ -76,14 +76,14 @@ func (d *DateField) Date() (t time.Time) {
 	if len(d.DateParts) == 0 {
 		t, _ = time.Parse("2006-01-02", "0000-00-00")
 	}
-	parts := d.DateParts[0]
-	switch len(parts) {
+	p := d.DateParts[0]
+	switch len(p) {
 	case 1:
-		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%d-01-01", parts[0]))
+		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%04d-01-01", p[0]))
 	case 2:
-		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%d-%d-01", parts[0], parts[1]))
+		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-01", p[0], p[1]))
 	case 3:
-		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%d-%d-%d", parts[0], parts[1], parts[2]))
+		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", p[0], p[1], p[2]))
 	default:
 		t, _ = time.Parse("2006-01-02", "1970-01-01")
 	}
