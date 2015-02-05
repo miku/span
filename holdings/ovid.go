@@ -62,7 +62,7 @@ func ParseDelay(s string) (d time.Duration, err error) {
 			return d, fmt.Errorf("unknown unit: %s", ms[2])
 		}
 	}
-	return d, err
+	return d, fmt.Errorf("unknown format: %s", s)
 }
 
 // Delay returns the specified delay as `time.Duration`
