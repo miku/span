@@ -60,6 +60,7 @@ type Document struct {
 	DOI            string    `json:"DOI"`
 }
 
+// Year returns the *first* year found inside a DateField
 func (d *DateField) Year() int {
 	parts := d.DateParts
 	if len(parts) >= 1 {
