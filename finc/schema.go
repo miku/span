@@ -1,6 +1,7 @@
 package finc
 
 type Schema struct {
+	RecordType           string   `json:"recordtype"`
 	ID                   string   `json:"id"`
 	ISSN                 []string `json:"issn"`
 	Publisher            string   `json:"publisher"`

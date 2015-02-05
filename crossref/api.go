@@ -98,6 +98,7 @@ func Transform(doc Document) (finc.Schema, error) {
 	output.ISSN = doc.ISSN
 	output.Publisher = doc.Publisher
 	output.SourceID = "49"
+	output.RecordType = "ai"
 	output.Title = doc.CombinedTitle()
 	output.TitleFull = doc.FullTitle()
 	output.TitleShort = doc.ShortTitle()
