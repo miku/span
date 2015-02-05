@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/miku/span/finc"
 )
@@ -30,28 +31,62 @@ func (author *Author) String() string {
 // DatePart consists of up to three int, representing year, month, day
 type DatePart []int
 
+type DateField struct {
+	Timestamp int64      `json:"timestamp"`
+	DateParts []DatePart `json:"date-parts"`
+}
+
 // Document is a example API response
 type Document struct {
-	Prefix         string     `json:"prefix"`
-	Type           string     `json:"type"`
-	Volume         string     `json:"volume"`
-	Deposited      []DatePart `json:"deposited"`
-	Source         string     `json:"source"`
-	Authors        []Author   `json:"author"`
-	Score          int        `json:"score"`
-	Page           string     `json:"page"`
-	Subject        []string   `json:"subject"`
-	Title          []string   `json:"title"`
-	Publisher      string     `json:"publisher"`
-	ISSN           []string   `json:"ISSN"`
-	Indexed        []DatePart `json:"indexed"`
-	Issued         []DatePart `json:"issued"`
-	Subtitle       []string   `json:"subtitle"`
-	URL            string     `json:"URL"`
-	Issue          string     `json:"issue"`
-	ContainerTitle []string   `json:"container-title"`
-	ReferenceCount int        `json:"reference-count"`
-	DOI            string     `json:"DOI"`
+	Prefix         string    `json:"prefix"`
+	Type           string    `json:"type"`
+	Volume         string    `json:"volume"`
+	Deposited      DateField `json:"deposited"`
+	Source         string    `json:"source"`
+	Authors        []Author  `json:"author"`
+	Score          float64   `json:"score"`
+	Page           string    `json:"page"`
+	Subject        []string  `json:"subject"`
+	Title          []string  `json:"title"`
+	Publisher      string    `json:"publisher"`
+	ISSN           []string  `json:"ISSN"`
+	Indexed        DateField `json:"indexed"`
+	Issued         DateField `json:"issued"`
+	Subtitle       []string  `json:"subtitle"`
+	URL            string    `json:"URL"`
+	Issue          string    `json:"issue"`
+	ContainerTitle []string  `json:"container-title"`
+	ReferenceCount int       `json:"reference-count"`
+	DOI            string    `json:"DOI"`
+}
+
+func (d *DateField) Year() int {
+	parts := d.DateParts
+	if len(parts) >= 1 {
+		if len(parts[0]) > 0 {
+			return parts[0][0]
+		}
+	}
+	return 0
+}
+
+// Date returns a time.Date in a best effort way
+func (d *DateField) Date() (t time.Time) {
+	if len(d.DateParts) == 0 {
+		t, _ = time.Parse("2006-01-02", "0000-00-00")
+	}
+	parts := d.DateParts[0]
+	switch len(parts) {
+	case 1:
+		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%d-01-01", parts[0]))
+	case 2:
+		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%d-%d-01", parts[0], parts[1]))
+	case 3:
+		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%d-%d-%d", parts[0], parts[1], parts[2]))
+	default:
+		t, _ = time.Parse("2006-01-02", "1970-01-01")
+	}
+	return t
 }
 
 // CombinedTitle returns a longish title
@@ -117,10 +152,8 @@ func Transform(doc Document) (finc.Schema, error) {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
 	}
 
-	if len(doc.Issued) > 0 {
-		if len(doc.Issued[0]) > 0 {
-			output.PublishDateSort = doc.Issued[0][0]
-		}
+	if doc.Issued.Year() > 0 {
+		output.PublishDateSort = doc.Issued.Year()
 	}
 
 	allfields := [][]string{output.SecondaryAuthors, doc.Subject, doc.ISSN, doc.Title,
