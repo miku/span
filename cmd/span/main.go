@@ -3,14 +3,17 @@ package main
 import (
 	"bufio"
 
+	"github.com/miku/span"
 	"github.com/miku/span/crossref"
 
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
 	"runtime"
+	"runtime/pprof"
 	"sync"
 )
 
@@ -46,15 +49,37 @@ func Collector(docs chan []byte, done chan bool) {
 }
 
 func main() {
-
-	numWorkers := flag.Int("w", runtime.NumCPU(), "workers")
 	batchSize := flag.Int("b", 25000, "batch size")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	numWorkers := flag.Int("w", runtime.NumCPU(), "workers")
+	version := flag.Bool("v", false, "prints current program version")
+
+	PrintUsage := func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
 	flag.Parse()
+
 	runtime.GOMAXPROCS(*numWorkers)
 
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
+	if *version {
+		fmt.Println(span.Version)
+		os.Exit(0)
+	}
+
 	if flag.NArg() == 0 {
-		log.Fatal("input file required")
+		PrintUsage()
+		os.Exit(1)
 	}
 
 	ff, err := os.Open(flag.Arg(0))
