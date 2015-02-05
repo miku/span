@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/miku/span/crossref"
 )
@@ -41,10 +42,8 @@ func main() {
 			log.Println(line)
 			log.Fatal(err)
 		}
-		fmt.Printf("%+v\n", doc)
-		fmt.Printf("%+v\n", doc.Issued)
-		fmt.Printf("%+v\n", doc.Issued.Date())
-		fmt.Printf("%s-%s\n", doc.StartPage(), doc.EndPage())
+		fmt.Printf("%s\t%s\t%s\t%s\t%s\n", strings.Join(doc.ISSN, "|"),
+			doc.Issued.Date().Format("2006-01-02"), doc.Volume, doc.Issue, doc.URL)
 	}
 
 }
