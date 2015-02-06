@@ -83,7 +83,7 @@ func main() {
 			h, ok := hmap[issn]
 			if ok {
 				for _, entitlement := range h.Entitlements {
-					_, err := doc.CoveredBy(entitlement)
+					err := doc.CoveredBy(entitlement)
 					if err != nil {
 						fmt.Println(err)
 					}
