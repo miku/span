@@ -5,6 +5,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/crossref"
+	"github.com/miku/span/holdings"
 
 	"encoding/json"
 	"flag"
@@ -17,14 +18,18 @@ import (
 	"sync"
 )
 
+type Options struct {
+	Holdings map[string]map[string]holdings.Holding
+}
+
 // Worker receives batches of strings, parses, transforms and serializes them
-func Worker(batches chan []string, out chan []byte, wg *sync.WaitGroup) {
+func Worker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var doc crossref.Document
 	for batch := range batches {
 		for _, line := range batch {
 			json.Unmarshal([]byte(line), &doc)
-			output, err := crossref.Transform(doc)
+			output, err := doc.TransformInstitution(options.Holdings["DE-15"])
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -54,6 +59,8 @@ func main() {
 	numWorkers := flag.Int("w", runtime.NumCPU(), "workers")
 	version := flag.Bool("v", false, "prints current program version")
 
+	hfile := flag.String("hfile", "", "path to a single ovid style holdings file fixed for DE-15")
+
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
 		flag.PrintDefaults()
@@ -82,6 +89,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	var options Options
+	if *hfile != "" {
+		file, err := os.Open(*hfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		reader := bufio.NewReader(file)
+		hmap := holdings.HoldingsMap(reader)
+		options.Holdings = make(map[string]map[string]holdings.Holding)
+		options.Holdings["DE-15"] = hmap
+	}
+
 	ff, err := os.Open(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
@@ -98,7 +118,7 @@ func main() {
 	var wg sync.WaitGroup
 	for i := 0; i < runtime.NumCPU(); i++ {
 		wg.Add(1)
-		go Worker(batches, docs, &wg)
+		go Worker(batches, docs, options, &wg)
 	}
 
 	i := 0

@@ -147,99 +147,99 @@ func (d *Document) ShortTitle() string {
 	}
 }
 
-// CoveredBy returns true, if given entitlement covers the current document
-func (d *Document) CoveredBy(e holdings.Entitlement) (bool, error) {
+// CoveredBy returns nil, if given entitlement covers the current document
+func (d *Document) CoveredBy(e holdings.Entitlement) error {
 	if e.FromYear != 0 && e.FromYear > d.Issued.Year() {
-		return false, fmt.Errorf("from-year %d > %d", e.FromYear, d.Issued.Year())
+		return fmt.Errorf("from-year %d > %d", e.FromYear, d.Issued.Year())
 	}
 	if e.FromYear == d.Issued.Year() {
 		volume, err := strconv.Atoi(d.Volume)
 		if err != nil {
-			return false, err
+			return err
 		}
 		if e.FromVolume != 0 && e.FromVolume > volume {
-			return false, fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
+			return fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
 		}
 		if e.FromVolume == volume {
 			issue, err := strconv.Atoi(d.Issue)
 			if err != nil {
-				return false, err
+				return err
 			}
 			if e.FromIssue != 0 && e.FromIssue > issue {
-				return false, fmt.Errorf("from-issue %d > %d", e.FromIssue, issue)
+				return fmt.Errorf("from-issue %d > %d", e.FromIssue, issue)
 			}
 		}
 	}
 	if e.ToYear != 0 && e.ToYear < d.Issued.Year() {
-		return false, fmt.Errorf("to-year %d < %d", e.ToYear, d.Issued.Year())
+		return fmt.Errorf("to-year %d < %d", e.ToYear, d.Issued.Year())
 	}
 	if e.ToYear == d.Issued.Year() {
 		volume, err := strconv.Atoi(d.Volume)
 		if err != nil {
-			return false, err
+			return err
 		}
 		if e.ToVolume != 0 && e.ToVolume < volume {
-			return false, fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
+			return fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
 		}
 		if e.ToVolume == volume {
 			issue, err := strconv.Atoi(d.Issue)
 			if err != nil {
-				return false, err
+				return err
 			}
 			if e.ToIssue != 0 && e.ToIssue < issue {
-				return false, fmt.Errorf("to-issue %d < %d", e.ToIssue, issue)
+				return fmt.Errorf("to-issue %d < %d", e.ToIssue, issue)
 			}
 		}
 	}
 	effective, err := e.Effective()
 	if err != nil {
-		return false, err
+		return err
 	}
 	if d.Issued.Date().After(effective) {
-		return false, fmt.Errorf("moving-wall %s %s", effective, d.Issued.Date())
+		return fmt.Errorf("moving-wall %s %s", effective, d.Issued.Date())
 	}
-	return true, nil
+	return nil
 
 }
 
 // Transform converts a single crossref document into a finc.Schema
-func Transform(doc Document) (finc.Schema, error) {
+func (d Document) Transform() (finc.Schema, error) {
 	var output finc.Schema
 
-	if doc.URL == "" {
+	if d.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
 
-	encoded := base64.StdEncoding.EncodeToString([]byte(doc.URL))
+	encoded := base64.StdEncoding.EncodeToString([]byte(d.URL))
 	output.ID = fmt.Sprintf("ai049%s", encoded)
-	output.ISSN = doc.ISSN
-	output.Publisher = doc.Publisher
+	output.ISSN = d.ISSN
+	output.Publisher = d.Publisher
 	output.SourceID = "49"
 	output.RecordType = "ai"
-	output.Title = doc.CombinedTitle()
-	output.TitleFull = doc.FullTitle()
-	output.TitleShort = doc.ShortTitle()
-	output.Topic = doc.Subject
-	output.URL = doc.URL
+	output.Title = d.CombinedTitle()
+	output.TitleFull = d.FullTitle()
+	output.TitleShort = d.ShortTitle()
+	output.Topic = d.Subject
+	output.URL = d.URL
 
-	if len(doc.ContainerTitle) > 0 {
-		output.HierarchyParentTitle = doc.ContainerTitle[0]
+	if len(d.ContainerTitle) > 0 {
+		output.HierarchyParentTitle = d.ContainerTitle[0]
 	}
 
-	if doc.Type == "journal-article" {
+	if d.Type == "journal-article" {
 		output.Format = "ElectronicArticle"
 	}
 
-	for _, author := range doc.Authors {
+	for _, author := range d.Authors {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
 	}
 
-	if doc.Issued.Year() > 0 {
-		output.PublishDateSort = doc.Issued.Year()
+	if d.Issued.Year() > 0 {
+		output.PublishDateSort = d.Issued.Year()
 	}
 
-	allfields := [][]string{output.SecondaryAuthors, doc.Subject, doc.ISSN, doc.Title,
-		doc.Subtitle, doc.ContainerTitle, []string{doc.Publisher, doc.URL}}
+	allfields := [][]string{output.SecondaryAuthors, d.Subject, d.ISSN, d.Title,
+		d.Subtitle, d.ContainerTitle, []string{d.Publisher, d.URL}}
 
 	var buf bytes.Buffer
 	for _, f := range allfields {
@@ -251,4 +251,23 @@ func Transform(doc Document) (finc.Schema, error) {
 
 	output.Allfields = buf.String()
 	return output, nil
+}
+
+// TransformInstitution also considers information about holdings
+func (d *Document) TransformInstitution(hmap map[string]holdings.Holding) (finc.Schema, error) {
+	output, err := d.Transform()
+	for _, issn := range d.ISSN {
+		h, ok := hmap[issn]
+		if ok {
+			for _, entitlement := range h.Entitlements {
+				err := d.CoveredBy(entitlement)
+				if err == nil {
+					output.Institution = append(output.Institution, "DE-15")
+				} else {
+					fmt.Println("MISS")
+				}
+			}
+		}
+	}
+	return output, err
 }
