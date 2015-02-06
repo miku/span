@@ -256,16 +256,23 @@ func (d Document) Transform() (finc.Schema, error) {
 // TransformInstitution also considers information about holdings
 func (d *Document) TransformInstitution(hmap map[string]holdings.Holding) (finc.Schema, error) {
 	output, err := d.Transform()
+	covered := false
 	for _, issn := range d.ISSN {
 		h, ok := hmap[issn]
 		if ok {
 			for _, entitlement := range h.Entitlements {
 				err := d.CoveredBy(entitlement)
 				if err == nil {
-					output.Institution = append(output.Institution, "DE-15")
+					covered = true
 				}
 			}
 		}
+		if covered {
+			break
+		}
+	}
+	if covered {
+		output.AddInstitution("DE-15")
 	}
 	return output, err
 }

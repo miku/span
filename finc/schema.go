@@ -19,3 +19,12 @@ type Schema struct {
 	Allfields            string   `json:"allfields"`
 	Institution          []string `json:"institution"`
 }
+
+func (s *Schema) AddInstitution(isil string) {
+	for _, institution := range s.Institution {
+		if institution == isil {
+			return
+		}
+	}
+	s.Institution = append(s.Institution, isil)
+}
