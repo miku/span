@@ -263,8 +263,6 @@ func (d *Document) TransformInstitution(hmap map[string]holdings.Holding) (finc.
 				err := d.CoveredBy(entitlement)
 				if err == nil {
 					output.Institution = append(output.Institution, "DE-15")
-				} else {
-					fmt.Println("MISS")
 				}
 			}
 		}
