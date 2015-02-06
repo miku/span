@@ -7,10 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/miku/span/finc"
+	"github.com/miku/span/holdings"
 )
 
 // Author is given by family and given name
@@ -143,6 +145,61 @@ func (d *Document) ShortTitle() string {
 	} else {
 		return ""
 	}
+}
+
+// CoveredBy returns true, if given entitlement covers the current document
+func (d *Document) CoveredBy(e holdings.Entitlement) (bool, error) {
+	if e.FromYear != 0 && e.FromYear > d.Issued.Year() {
+		return false, fmt.Errorf("from-year %d > %d", e.FromYear, d.Issued.Year())
+	}
+	if e.FromYear == d.Issued.Year() {
+		volume, err := strconv.Atoi(d.Volume)
+		if err != nil {
+			return false, err
+		}
+		if e.FromVolume != 0 && e.FromVolume > volume {
+			return false, fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
+		}
+		if e.FromVolume == volume {
+			issue, err := strconv.Atoi(d.Issue)
+			if err != nil {
+				return false, err
+			}
+			if e.FromIssue != 0 && e.FromIssue > issue {
+				return false, fmt.Errorf("from-issue %d > %d", e.FromIssue, issue)
+			}
+		}
+	}
+	if e.ToYear != 0 && e.ToYear < d.Issued.Year() {
+		return false, fmt.Errorf("to-year %d < %d", e.ToYear, d.Issued.Year())
+	}
+	if e.ToYear == d.Issued.Year() {
+		volume, err := strconv.Atoi(d.Volume)
+		if err != nil {
+			return false, err
+		}
+		if e.ToVolume != 0 && e.ToVolume < volume {
+			return false, fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
+		}
+		if e.ToVolume == volume {
+			issue, err := strconv.Atoi(d.Issue)
+			if err != nil {
+				return false, err
+			}
+			if e.ToIssue != 0 && e.ToIssue < issue {
+				return false, fmt.Errorf("to-issue %d < %d", e.ToIssue, issue)
+			}
+		}
+	}
+	effective, err := e.Effective()
+	if err != nil {
+		return false, err
+	}
+	if d.Issued.Date().After(effective) {
+		return false, fmt.Errorf("moving-wall %s %s", effective, d.Issued.Date())
+	}
+	return true, nil
+
 }
 
 // Transform converts a single crossref document into a finc.Schema

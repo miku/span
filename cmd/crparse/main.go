@@ -82,25 +82,11 @@ func main() {
 		for _, issn := range doc.ISSN {
 			h, ok := hmap[issn]
 			if ok {
-				// check subscription ranges
-				for _, e := range h.Entitlements {
-					if e.FromYear != 0 && e.FromYear > doc.Issued.Year() {
-						fmt.Printf("%s MISS-FROMYEAR %d %d\n", issn, e.FromYear, doc.Issued.Year())
-						continue
-					}
-					if e.ToYear != 0 && e.ToYear < doc.Issued.Year() {
-						fmt.Printf("%s MISS-TOYEAR %d %d\n", issn, e.ToYear, doc.Issued.Year())
-						continue
-					}
-					effective, err := e.Effective()
+				for _, entitlement := range h.Entitlements {
+					_, err := doc.CoveredBy(entitlement)
 					if err != nil {
-						log.Fatal(err)
+						fmt.Println(err)
 					}
-					if doc.Issued.Date().After(effective) {
-						fmt.Printf("%s MISS-WALL: %s %s\n", issn, effective, doc.Issued.Date())
-						continue
-					}
-					fmt.Printf("%s HIT\n", issn)
 				}
 			}
 		}
