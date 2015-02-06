@@ -17,4 +17,5 @@ type Schema struct {
 	SecondaryAuthors     []string `json:"author2"`
 	PublishDateSort      int      `json:"publishDateSort"`
 	Allfields            string   `json:"allfields"`
+	Institution          []string `json:"institution"`
 }
