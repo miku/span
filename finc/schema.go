@@ -20,6 +20,7 @@ type Schema struct {
 	Institution          []string `json:"institution"`
 }
 
+// AddInstitution adds isil, if it's not already there
 func (s *Schema) AddInstitution(isil string) {
 	for _, institution := range s.Institution {
 		if institution == isil {
