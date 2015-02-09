@@ -88,35 +88,6 @@ func (e *Entitlement) Effective() (d time.Time, err error) {
 	return time.Now().Add(delay), nil
 }
 
-// ISSNSet returns the ISSNs contained in an OVID holding file
-func ISSNSet(reader io.Reader) map[string]bool {
-	issns := make(map[string]bool)
-	decoder := xml.NewDecoder(reader)
-	var tag string
-	for {
-		t, _ := decoder.Token()
-		if t == nil {
-			break
-		}
-		switch se := t.(type) {
-		case xml.StartElement:
-			tag = se.Name.Local
-			if tag == "holding" {
-				var item Holding
-				decoder.DecodeElement(&item, &se)
-				for _, id := range item.EISSN {
-					issns[id] = true
-				}
-				for _, id := range item.PISSN {
-					issns[id] = true
-				}
-			}
-		default:
-		}
-	}
-	return issns
-}
-
 // HoldingsMap returns a map from ISSN to a Holding struct
 func HoldingsMap(reader io.Reader) map[string]Holding {
 	holdings := make(map[string]Holding)
