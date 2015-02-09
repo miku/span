@@ -6,3 +6,6 @@ all:
 
 clean:
 	rm -f span ihparse crparse
+
+test:
+	go test -cover ./...
