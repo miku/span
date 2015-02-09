@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var DelayPattern = regexp.MustCompile(`^-(\d+)(M|Y)$`)
+
 // Holding contains a single holding
 type Holding struct {
 	EZBID        int           `xml:"ezb_id,attr"`
@@ -47,8 +49,7 @@ func (e *Entitlement) String() string {
 
 // Parse '-1M', '-3Y', ... into a duration
 func ParseDelay(s string) (d time.Duration, err error) {
-	r := regexp.MustCompile(`^-(\d+)(M|Y)$`)
-	ms := r.FindStringSubmatch(s)
+	ms := DelayPattern.FindStringSubmatch(s)
 	if len(ms) == 3 {
 		value, err := strconv.Atoi(ms[1])
 		if err != nil {
