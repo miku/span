@@ -233,7 +233,7 @@ func (d Document) ToSchema() (output finc.Schema, err error) {
 
 // Institutions returns a slice of ISILs for which this document finds
 // valid entitlements in a IsilIssnHolding map
-func (d *Document) Institutions(iih span.IsilIssnHolding) []string {
+func (d *Document) Institutions(iih holdings.IsilIssnHolding) []string {
 	isils := span.NewStringSet()
 	for _, isil := range iih.Isils() {
 		covered := false

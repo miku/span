@@ -20,7 +20,7 @@ import (
 
 // Options for worker
 type Options struct {
-	Holdings span.IsilIssnHolding
+	Holdings holdings.IsilIssnHolding
 }
 
 // Worker receives batches of strings, parses, transforms and serializes them
@@ -100,7 +100,7 @@ func main() {
 		defer file.Close()
 		reader := bufio.NewReader(file)
 		hmap := holdings.HoldingsMap(reader)
-		options.Holdings = make(span.IsilIssnHolding)
+		options.Holdings = make(holdings.IsilIssnHolding)
 		options.Holdings["DE-15"] = hmap
 	}
 

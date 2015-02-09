@@ -49,6 +49,21 @@ func (e *Entitlement) String() string {
 		boundary, delay.Hours())
 }
 
+// IssnHolding maps an ISSN to a holdings.Holding struct
+type IssnHolding map[string]Holding
+
+// IsilIssnHolding maps an ISIL to an IssnHolding map
+type IsilIssnHolding map[string]IssnHolding
+
+// Isils returns available ISILs in this IsilIssnHolding map
+func (iih *IsilIssnHolding) Isils() []string {
+	var keys []string
+	for k, _ := range *iih {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 // ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration
 func ParseDelay(s string) (d time.Duration, err error) {
 	ms := DelayPattern.FindStringSubmatch(s)
@@ -92,8 +107,8 @@ func (e *Entitlement) Boundary() (d time.Time, err error) {
 }
 
 // HoldingsMap creates an ISSN[Holding] struct from a reader
-func HoldingsMap(reader io.Reader) (holdings map[string]Holding) {
-	holdings = make(map[string]Holding)
+func HoldingsMap(reader io.Reader) (h IssnHolding) {
+	h = make(map[string]Holding)
 	decoder := xml.NewDecoder(reader)
 	var tag string
 	for {
@@ -108,13 +123,13 @@ func HoldingsMap(reader io.Reader) (holdings map[string]Holding) {
 				var item Holding
 				decoder.DecodeElement(&item, &se)
 				for _, id := range item.EISSN {
-					holdings[id] = item
+					h[id] = item
 				}
 				for _, id := range item.PISSN {
-					holdings[id] = item
+					h[id] = item
 				}
 			}
 		}
 	}
-	return holdings
+	return h
 }

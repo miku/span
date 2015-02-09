@@ -1,7 +1,5 @@
 package span
 
-import "github.com/miku/span/holdings"
-
 const Version = "0.1.0"
 
 // StringSet is map disguised as set
@@ -38,19 +36,4 @@ func (set *StringSet) Values() (values []string) {
 		values = append(values, k)
 	}
 	return values
-}
-
-// IssnHolding maps an ISSN to a holdings.Holding struct
-type IssnHolding map[string]holdings.Holding
-
-// IsilIssnHolding maps an ISIL to an IssnHolding map
-type IsilIssnHolding map[string]IssnHolding
-
-// Isils returns available ISILs in this IsilIssnHolding map
-func (iih *IsilIssnHolding) Isils() []string {
-	var keys []string
-	for k, _ := range *iih {
-		keys = append(keys, k)
-	}
-	return keys
 }
