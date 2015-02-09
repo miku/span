@@ -191,12 +191,12 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 			}
 		}
 	}
-	effective, err := e.Effective()
+	boundary, err := e.Boundary()
 	if err != nil {
 		return err
 	}
-	if d.Issued.Date().After(effective) {
-		return fmt.Errorf("moving-wall %s %s", effective, d.Issued.Date())
+	if d.Issued.Date().After(boundary) {
+		return fmt.Errorf("moving-wall %s %s", boundary, d.Issued.Date())
 	}
 	return nil
 
