@@ -47,7 +47,7 @@ func (e *Entitlement) String() string {
 		boundary, delay.Hours())
 }
 
-// Parse '-1M', '-3Y', ... into a duration
+// ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration
 func ParseDelay(s string) (d time.Duration, err error) {
 	ms := DelayPattern.FindStringSubmatch(s)
 	if len(ms) == 3 {
