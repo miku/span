@@ -114,5 +114,4 @@ func HoldingsMap(reader io.Reader) (holdings map[string]Holding) {
 		}
 	}
 	return holdings
-
 }
