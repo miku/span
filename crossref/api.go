@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
 )
@@ -203,9 +204,7 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 }
 
 // Transform converts a single crossref document into a finc.Schema
-func (d Document) Transform() (finc.Schema, error) {
-	var output finc.Schema
-
+func (d Document) ToSchema() (output finc.Schema, err error) {
 	if d.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
@@ -219,7 +218,7 @@ func (d Document) Transform() (finc.Schema, error) {
 	output.Title = d.CombinedTitle()
 	output.TitleFull = d.FullTitle()
 	output.TitleShort = d.ShortTitle()
-	output.Topic = d.Subject
+	output.Topics = d.Subject
 	output.URL = d.URL
 
 	if len(d.ContainerTitle) > 0 {
@@ -253,26 +252,32 @@ func (d Document) Transform() (finc.Schema, error) {
 	return output, nil
 }
 
-// TransformInstitution also considers information about holdings
-func (d *Document) TransformInstitution(hmap map[string]holdings.Holding) (finc.Schema, error) {
-	output, err := d.Transform()
-	covered := false
-	for _, issn := range d.ISSN {
-		h, ok := hmap[issn]
-		if ok {
-			for _, entitlement := range h.Entitlements {
-				err := d.CoveredBy(entitlement)
-				if err == nil {
-					covered = true
+// Institutions returns a slice of ISILs for which this document finds
+// valid entitlements in a IsilIssnHolding map
+func (d *Document) Institutions(iih span.IsilIssnHolding) []string {
+	isils := span.NewStringSet()
+	for _, isil := range iih.Isils() {
+		covered := false
+		for _, issn := range d.ISSN {
+			h, ok := iih[isil][issn]
+			if ok {
+				for _, entitlement := range h.Entitlements {
+					err := d.CoveredBy(entitlement)
+					if err == nil {
+						covered = true
+					}
+					if covered {
+						break
+					}
 				}
+			}
+			if covered {
+				break
 			}
 		}
 		if covered {
-			break
+			isils.Add(isil)
 		}
 	}
-	if covered {
-		output.AddInstitution("DE-15")
-	}
-	return output, err
+	return isils.Values()
 }

@@ -19,7 +19,7 @@ import (
 )
 
 type Options struct {
-	Holdings map[string]map[string]holdings.Holding
+	Holdings span.IsilIssnHolding
 }
 
 // Worker receives batches of strings, parses, transforms and serializes them
@@ -29,11 +29,12 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 	for batch := range batches {
 		for _, line := range batch {
 			json.Unmarshal([]byte(line), &doc)
-			output, err := doc.TransformInstitution(options.Holdings["DE-15"])
+			schema, err := doc.ToSchema()
 			if err != nil {
 				log.Fatal(err)
 			}
-			b, err := json.Marshal(output)
+			schema.Institutions = doc.Institutions(options.Holdings)
+			b, err := json.Marshal(schema)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -98,7 +99,7 @@ func main() {
 		defer file.Close()
 		reader := bufio.NewReader(file)
 		hmap := holdings.HoldingsMap(reader)
-		options.Holdings = make(map[string]map[string]holdings.Holding)
+		options.Holdings = make(span.IsilIssnHolding)
 		options.Holdings["DE-15"] = hmap
 	}
 
