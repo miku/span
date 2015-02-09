@@ -45,7 +45,7 @@ func (e *Entitlement) String() string {
 		effective, delay.Hours())
 }
 
-// Parse '1M', '3Y', ... into a duration
+// Parse '-1M', '-3Y', ... into a duration
 func ParseDelay(s string) (d time.Duration, err error) {
 	r := regexp.MustCompile(`(\d+)(M|Y)`)
 	ms := r.FindStringSubmatch(s)
