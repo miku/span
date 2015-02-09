@@ -1,3 +1,4 @@
+// Package holdings contains wrappers for various holding file formats.
 package holdings
 
 import (
@@ -10,6 +11,7 @@ import (
 	"time"
 )
 
+// DelayPattern is how moving walls are expressed in OVID format
 var DelayPattern = regexp.MustCompile(`^-(\d+)(M|Y)$`)
 
 // Holding contains a single holding

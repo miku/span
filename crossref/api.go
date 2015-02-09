@@ -1,4 +1,6 @@
-// crossref implements crossref related structs and transformations
+// Package crossref implements crossref related structs and transformations.
+//
+// API endpoint/documentation: http://api.crossref.org
 package crossref
 
 import (
@@ -34,6 +36,7 @@ func (author *Author) String() string {
 // DatePart consists of up to three int, representing year, month, day
 type DatePart []int
 
+// DateField contains two representations of one value
 type DateField struct {
 	Timestamp int64      `json:"timestamp"`
 	DateParts []DatePart `json:"date-parts"`
@@ -91,30 +94,6 @@ func (d *DateField) Date() (t time.Time) {
 		t, _ = time.Parse("2006-01-02", "1970-01-01")
 	}
 	return t
-}
-
-// StartPage returns the first page as string
-func (d *Document) StartPage() (p string) {
-	parts := strings.Split(d.Page, "-")
-	switch len(parts) {
-	case 1:
-		p = parts[0]
-	case 2:
-		p = parts[0]
-	}
-	return
-}
-
-// StartPage returns the last page as string
-func (d *Document) EndPage() (p string) {
-	parts := strings.Split(d.Page, "-")
-	switch len(parts) {
-	case 1:
-		p = parts[0]
-	case 2:
-		p = parts[1]
-	}
-	return
 }
 
 // CombinedTitle returns a longish title
@@ -203,7 +182,7 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 
 }
 
-// Transform converts a single crossref document into a finc.Schema
+// ToSchema converts a single crossref document into a basic finc.Schema
 func (d Document) ToSchema() (output finc.Schema, err error) {
 	if d.URL == "" {
 		return output, errors.New("input document has no URL")

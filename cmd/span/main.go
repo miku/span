@@ -18,6 +18,7 @@ import (
 	"sync"
 )
 
+// Options for worker
 type Options struct {
 	Holdings span.IsilIssnHolding
 }

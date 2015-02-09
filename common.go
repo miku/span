@@ -32,6 +32,7 @@ func (set *StringSet) Size() int {
 	return len(set.set)
 }
 
+// Values returns the set values as a string slice
 func (set *StringSet) Values() (values []string) {
 	for k, _ := range set.set {
 		values = append(values, k)
