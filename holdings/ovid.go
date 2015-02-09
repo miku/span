@@ -88,9 +88,9 @@ func (e *Entitlement) Effective() (d time.Time, err error) {
 	return time.Now().Add(delay), nil
 }
 
-// HoldingsMap returns a map from ISSN to a Holding struct
-func HoldingsMap(reader io.Reader) map[string]Holding {
-	holdings := make(map[string]Holding)
+// HoldingsMap creates an ISSN[Holding] struct from a reader
+func HoldingsMap(reader io.Reader) (holdings map[string]Holding) {
+	holdings = make(map[string]Holding)
 	decoder := xml.NewDecoder(reader)
 	var tag string
 	for {
