@@ -111,7 +111,6 @@ func HoldingsMap(reader io.Reader) (holdings map[string]Holding) {
 					holdings[id] = item
 				}
 			}
-		default:
 		}
 	}
 	return holdings
