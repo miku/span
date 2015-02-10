@@ -19,6 +19,7 @@ type Schema struct {
 	PublishDateSort      int      `json:"publishDateSort"`
 	Allfields            string   `json:"allfields"`
 	Institutions         []string `json:"institution"`
+	MegaCollection       string   `json:"mega_collection"`
 }
 
 // AddInstitution adds isil, if it's not already there
