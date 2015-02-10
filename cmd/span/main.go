@@ -35,6 +35,9 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 				log.Fatal(err)
 			}
 			schema.Institutions = doc.Institutions(options.Holdings)
+			if schema.Institutions == nil {
+				continue
+			}
 			b, err := json.Marshal(schema)
 			if err != nil {
 				log.Fatal(err)
