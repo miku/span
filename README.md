@@ -25,7 +25,7 @@ Inputs:
 
 One can transform the documents via `span`:
 
-	span -holdings DE-15 file.xml -h DE-10 other.xml crossref.ldj
+	span -holdings DE-15 file.xml DE-10 other.xml crossref.ldj
 
 Additionally, if one has a cached file of members API responses, one can
 use it as input, so the API does not need to be called at all:
