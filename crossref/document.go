@@ -183,6 +183,7 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 	return nil
 }
 
+// ParseMemberID extracts the numeric member id.
 func (d *Document) ParseMemberID() (int, error) {
 	fields := strings.Split(d.Member, "/")
 	if len(fields) > 0 {

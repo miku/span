@@ -22,7 +22,7 @@ type Schema struct {
 	MegaCollection       []string `json:"mega_collection"`
 }
 
-// AddInstitution adds isil, if it's not already there
+// AddInstitution adds an isil, if it is not already there.
 func (s *Schema) AddInstitution(isil string) {
 	for _, institution := range s.Institutions {
 		if institution == isil {
@@ -32,7 +32,7 @@ func (s *Schema) AddInstitution(isil string) {
 	s.Institutions = append(s.Institutions, isil)
 }
 
-// AddMegaCollection adds isil, if it's not already there
+// AddMegaCollection adds isil, if it is not already there.
 func (s *Schema) AddMegaCollection(collection string) {
 	for _, c := range s.MegaCollection {
 		if c == collection {
