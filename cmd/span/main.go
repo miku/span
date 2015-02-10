@@ -64,7 +64,7 @@ func main() {
 	numWorkers := flag.Int("w", runtime.NumCPU(), "workers")
 	version := flag.Bool("v", false, "prints current program version")
 
-	hspec := flag.String("holdings", "", "ISIL PATH pairs")
+	hspec := flag.String("hspec", "", "ISIL PATH pairs")
 
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
