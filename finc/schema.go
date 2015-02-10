@@ -19,7 +19,7 @@ type Schema struct {
 	PublishDateSort      int      `json:"publishDateSort"`
 	Allfields            string   `json:"allfields"`
 	Institutions         []string `json:"institution"`
-	MegaCollection       string   `json:"mega_collection"`
+	MegaCollection       []string `json:"mega_collection"`
 }
 
 // AddInstitution adds isil, if it's not already there
@@ -30,4 +30,14 @@ func (s *Schema) AddInstitution(isil string) {
 		}
 	}
 	s.Institutions = append(s.Institutions, isil)
+}
+
+// AddMegaCollection adds isil, if it's not already there
+func (s *Schema) AddMegaCollection(collection string) {
+	for _, c := range s.MegaCollection {
+		if c == collection {
+			return
+		}
+	}
+	s.MegaCollection = append(s.MegaCollection, collection)
 }

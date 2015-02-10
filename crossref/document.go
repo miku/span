@@ -181,11 +181,22 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 		return fmt.Errorf("moving-wall %s %s", boundary, d.Issued.Date())
 	}
 	return nil
+}
 
+func (d *Document) ParseMemberID() (int, error) {
+	fields := strings.Split(d.Member, "/")
+	if len(fields) > 0 {
+		id, err := strconv.Atoi(fields[len(fields)-1])
+		if err != nil {
+			return 0, fmt.Errorf("invalid member: %s", d.Member)
+		}
+		return id, nil
+	}
+	return 0, fmt.Errorf("invalid member: %s", d.Member)
 }
 
 // ToSchema converts a single crossref document into a basic finc schema.
-func (d Document) ToSchema() (output finc.Schema, err error) {
+func (d *Document) ToSchema() (output finc.Schema, err error) {
 	if d.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
@@ -231,21 +242,17 @@ func (d Document) ToSchema() (output finc.Schema, err error) {
 
 	output.Allfields = buf.String()
 
-	fields := strings.Split(d.Member, "/")
-	if len(fields) > 0 {
-		id, err := strconv.Atoi(fields[len(fields)-1])
+	id, err := d.ParseMemberID()
+	if err != nil {
+		log.Println(err)
+	} else {
+		member, err := LookupMember(id)
 		if err != nil {
-			log.Printf("invalid member: %s", d.Member)
+			log.Println(err)
 		} else {
-			member, err := LookupMember(id)
-			if err != nil {
-				log.Println(err)
-			} else {
-				output.MegaCollection = fmt.Sprintf("%s (CrossRef)", member.PrimaryName)
-			}
+			output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", member.PrimaryName))
 		}
 	}
-
 	return output, nil
 }
 
