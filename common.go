@@ -1,5 +1,10 @@
 package span
 
+import (
+	"fmt"
+	"strings"
+)
+
 const Version = "0.1.0"
 
 // StringSet is map disguised as set
@@ -36,4 +41,19 @@ func (set *StringSet) Values() (values []string) {
 		values = append(values, k)
 	}
 	return values
+}
+
+// ParseHoldingPairs parses a holdings flag value into a map
+func ParseHoldingSpec(s string) (map[string]string, error) {
+	fields := strings.Split(s, ",")
+	pathmap := make(map[string]string)
+	for _, f := range fields {
+		parts := strings.Split(f, ":")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid spec: %s", f)
+		}
+		pathmap[parts[0]] = parts[1]
+
+	}
+	return pathmap, nil
 }

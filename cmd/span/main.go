@@ -61,7 +61,7 @@ func main() {
 	numWorkers := flag.Int("w", runtime.NumCPU(), "workers")
 	version := flag.Bool("v", false, "prints current program version")
 
-	hfile := flag.String("hfile", "", "path to a single ovid style holdings file fixed for DE-15")
+	hspec := flag.String("holdings", "", "ISIL PATH pairs")
 
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
@@ -92,16 +92,23 @@ func main() {
 	}
 
 	var options Options
-	if *hfile != "" {
-		file, err := os.Open(*hfile)
+	options.Holdings = make(holdings.IsilIssnHolding)
+
+	if *hspec != "" {
+		pathmap, err := span.ParseHoldingSpec(*hspec)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer file.Close()
-		reader := bufio.NewReader(file)
-		hmap := holdings.HoldingsMap(reader)
-		options.Holdings = make(holdings.IsilIssnHolding)
-		options.Holdings["DE-15"] = hmap
+		for isil, path := range pathmap {
+			log.Printf("loading holdings for %s from %s", isil, path)
+			file, err := os.Open(path)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+			reader := bufio.NewReader(file)
+			options.Holdings[isil] = holdings.HoldingsMap(reader)
+		}
 	}
 
 	ff, err := os.Open(flag.Arg(0))
