@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-const Version = "0.1.0"
+const Version = "0.1.1"
 
 // StringSet is map disguised as set.
 type StringSet struct {
