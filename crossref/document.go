@@ -128,6 +128,36 @@ func (d *Document) ShortTitle() string {
 	}
 }
 
+// Allfields returns a combination of various fields.
+func (doc *Document) Allfields() string {
+	var authors []string
+	for _, author := range doc.Authors {
+		authors = append(authors, author.String())
+	}
+
+	fields := [][]string{authors,
+		doc.Subject, doc.ISSN, doc.Title, doc.Subtitle, doc.ContainerTitle,
+		[]string{doc.Publisher, doc.URL}}
+
+	var buf bytes.Buffer
+	for _, f := range fields {
+		_, err := buf.WriteString(fmt.Sprintf("%s ", strings.Join(f, " ")))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return buf.String()
+}
+
+func (doc *Document) MemberName() (name string, err error) {
+	id, err := doc.ParseMemberID()
+	if err != nil {
+		return
+	}
+	name, err = LookupMemberName(id)
+	return
+}
+
 // CoveredBy returns nil, if a given entitlement covers the current document.
 func (d *Document) CoveredBy(e holdings.Entitlement) error {
 	if e.FromYear != 0 && e.FromYear > d.Issued.Year() {
@@ -229,30 +259,15 @@ func (d *Document) ToSchema() (output finc.Schema, err error) {
 		output.PublishDateSort = d.Issued.Year()
 	}
 
-	allfields := [][]string{output.SecondaryAuthors, d.Subject, d.ISSN, d.Title,
-		d.Subtitle, d.ContainerTitle, []string{d.Publisher, d.URL}}
+	output.Allfields = d.Allfields()
 
-	var buf bytes.Buffer
-	for _, f := range allfields {
-		_, err := buf.WriteString(fmt.Sprintf("%s ", strings.Join(f, " ")))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	output.Allfields = buf.String()
-
-	id, err := d.ParseMemberID()
+	name, err := d.MemberName()
 	if err != nil {
 		log.Println(err)
 	} else {
-		name, err := LookupMemberName(id)
-		if err != nil {
-			log.Println(err)
-		} else {
-			output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
-		}
+		output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
 	}
+
 	return output, nil
 }
 
