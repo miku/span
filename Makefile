@@ -27,3 +27,6 @@ rpm: $(TARGETS)
 	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
 	./packaging/rpm/buildrpm.sh span
 	cp $(HOME)/rpmbuild/RPMS/x86_64/span*.rpm .
+
+cloc:
+	cloc --max-file-size 1 -not-match-f ".*_test.go" .
