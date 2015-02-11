@@ -247,11 +247,11 @@ func (d *Document) ToSchema() (output finc.Schema, err error) {
 	if err != nil {
 		log.Println(err)
 	} else {
-		member, err := LookupMember(id)
+		name, err := LookupMemberName(id)
 		if err != nil {
 			log.Println(err)
 		} else {
-			output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", member.PrimaryName))
+			output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
 		}
 	}
 	return output, nil

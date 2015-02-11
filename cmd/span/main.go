@@ -65,6 +65,7 @@ func main() {
 	version := flag.Bool("v", false, "prints current program version")
 
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
+	members := flag.String("members", "", "path to LDJ file, one member per line")
 
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
@@ -103,7 +104,6 @@ func main() {
 			log.Fatal(err)
 		}
 		for isil, path := range pathmap {
-			log.Printf("loading holdings for %s from %s", isil, path)
 			file, err := os.Open(path)
 			if err != nil {
 				log.Fatal(err)
@@ -111,6 +111,13 @@ func main() {
 			defer file.Close()
 			reader := bufio.NewReader(file)
 			options.Holdings[isil] = holdings.HoldingsMap(reader)
+		}
+	}
+
+	if *members != "" {
+		err := crossref.PopulateMemberNameCache(*members)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 
