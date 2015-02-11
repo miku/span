@@ -141,12 +141,16 @@ func (doc *Document) Allfields() string {
 
 	var buf bytes.Buffer
 	for _, f := range fields {
-		_, err := buf.WriteString(fmt.Sprintf("%s ", strings.Join(f, " ")))
-		if err != nil {
-			log.Fatal(err)
+		for _, value := range f {
+			for _, token := range strings.Fields(value) {
+				_, err := buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
 		}
 	}
-	return buf.String()
+	return strings.TrimSpace(buf.String())
 }
 
 func (doc *Document) MemberName() (name string, err error) {
