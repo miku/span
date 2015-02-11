@@ -153,6 +153,7 @@ func (doc *Document) Allfields() string {
 	return strings.TrimSpace(buf.String())
 }
 
+// MemberName resolves the primary name of the member.
 func (doc *Document) MemberName() (name string, err error) {
 	id, err := doc.ParseMemberID()
 	if err != nil {
