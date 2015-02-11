@@ -129,7 +129,6 @@ func (d *Document) ShortTitle() string {
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
-// Otherwise the error con
 func (d *Document) CoveredBy(e holdings.Entitlement) error {
 	if e.FromYear != 0 && e.FromYear > d.Issued.Year() {
 		return fmt.Errorf("from-year %d > %d", e.FromYear, d.Issued.Year())
