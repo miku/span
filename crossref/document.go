@@ -98,16 +98,16 @@ func (d *DateField) Date() (t time.Time) {
 }
 
 // CombinedTitle returns a longish title.
-func (d *Document) CombinedTitle() string {
-	if len(d.Title) > 0 {
-		if len(d.Subtitle) > 0 {
-			return fmt.Sprintf("%s : %s", d.Title[0], d.Subtitle[0])
+func (doc *Document) CombinedTitle() string {
+	if len(doc.Title) > 0 {
+		if len(doc.Subtitle) > 0 {
+			return fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0])
 		} else {
-			return d.Title[0]
+			return doc.Title[0]
 		}
 	} else {
-		if len(d.Subtitle) > 0 {
-			return d.Subtitle[0]
+		if len(doc.Subtitle) > 0 {
+			return doc.Subtitle[0]
 		} else {
 			return ""
 		}
@@ -115,14 +115,14 @@ func (d *Document) CombinedTitle() string {
 }
 
 // FullTitle returns everything title.
-func (d *Document) FullTitle() string {
-	return strings.Join(append(d.Title, d.Subtitle...), " ")
+func (doc *Document) FullTitle() string {
+	return strings.Join(append(doc.Title, doc.Subtitle...), " ")
 }
 
 // ShortTitle returns the first main title only.
-func (d *Document) ShortTitle() string {
-	if len(d.Title) > 0 {
-		return d.Title[0]
+func (doc *Document) ShortTitle() string {
+	if len(doc.Title) > 0 {
+		return doc.Title[0]
 	} else {
 		return ""
 	}
@@ -159,12 +159,12 @@ func (doc *Document) MemberName() (name string, err error) {
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
-func (d *Document) CoveredBy(e holdings.Entitlement) error {
-	if e.FromYear != 0 && e.FromYear > d.Issued.Year() {
-		return fmt.Errorf("from-year %d > %d", e.FromYear, d.Issued.Year())
+func (doc *Document) CoveredBy(e holdings.Entitlement) error {
+	if e.FromYear != 0 && e.FromYear > doc.Issued.Year() {
+		return fmt.Errorf("from-year %d > %d", e.FromYear, doc.Issued.Year())
 	}
-	if e.FromYear == d.Issued.Year() {
-		volume, err := strconv.Atoi(d.Volume)
+	if e.FromYear == doc.Issued.Year() {
+		volume, err := strconv.Atoi(doc.Volume)
 		if err != nil {
 			return err
 		}
@@ -172,7 +172,7 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 			return fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
 		}
 		if e.FromVolume == volume {
-			issue, err := strconv.Atoi(d.Issue)
+			issue, err := strconv.Atoi(doc.Issue)
 			if err != nil {
 				return err
 			}
@@ -181,11 +181,11 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 			}
 		}
 	}
-	if e.ToYear != 0 && e.ToYear < d.Issued.Year() {
-		return fmt.Errorf("to-year %d < %d", e.ToYear, d.Issued.Year())
+	if e.ToYear != 0 && e.ToYear < doc.Issued.Year() {
+		return fmt.Errorf("to-year %d < %d", e.ToYear, doc.Issued.Year())
 	}
-	if e.ToYear == d.Issued.Year() {
-		volume, err := strconv.Atoi(d.Volume)
+	if e.ToYear == doc.Issued.Year() {
+		volume, err := strconv.Atoi(doc.Volume)
 		if err != nil {
 			return err
 		}
@@ -193,7 +193,7 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 			return fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
 		}
 		if e.ToVolume == volume {
-			issue, err := strconv.Atoi(d.Issue)
+			issue, err := strconv.Atoi(doc.Issue)
 			if err != nil {
 				return err
 			}
@@ -206,62 +206,62 @@ func (d *Document) CoveredBy(e holdings.Entitlement) error {
 	if err != nil {
 		return err
 	}
-	if d.Issued.Date().After(boundary) {
-		return fmt.Errorf("moving-wall %s %s", boundary, d.Issued.Date())
+	if doc.Issued.Date().After(boundary) {
+		return fmt.Errorf("moving-wall %s %s", boundary, doc.Issued.Date())
 	}
 	return nil
 }
 
 // ParseMemberID extracts the numeric member id.
-func (d *Document) ParseMemberID() (int, error) {
-	fields := strings.Split(d.Member, "/")
+func (doc *Document) ParseMemberID() (int, error) {
+	fields := strings.Split(doc.Member, "/")
 	if len(fields) > 0 {
 		id, err := strconv.Atoi(fields[len(fields)-1])
 		if err != nil {
-			return 0, fmt.Errorf("invalid member: %s", d.Member)
+			return 0, fmt.Errorf("invalid member: %s", doc.Member)
 		}
 		return id, nil
 	}
-	return 0, fmt.Errorf("invalid member: %s", d.Member)
+	return 0, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
 // ToSchema converts a single crossref document into a basic finc schema.
-func (d *Document) ToSchema() (output finc.Schema, err error) {
-	if d.URL == "" {
+func (doc *Document) ToSchema() (output finc.Schema, err error) {
+	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
 
-	encoded := base64.StdEncoding.EncodeToString([]byte(d.URL))
+	encoded := base64.StdEncoding.EncodeToString([]byte(doc.URL))
 	output.ID = fmt.Sprintf("ai049%s", encoded)
-	output.ISSN = d.ISSN
-	output.Publisher = d.Publisher
+	output.ISSN = doc.ISSN
+	output.Publisher = doc.Publisher
 	output.SourceID = "49"
 	output.RecordType = "ai"
-	output.Title = d.CombinedTitle()
-	output.TitleFull = d.FullTitle()
-	output.TitleShort = d.ShortTitle()
-	output.Topics = d.Subject
-	output.URL = d.URL
+	output.Title = doc.CombinedTitle()
+	output.TitleFull = doc.FullTitle()
+	output.TitleShort = doc.ShortTitle()
+	output.Topics = doc.Subject
+	output.URL = doc.URL
 
-	if len(d.ContainerTitle) > 0 {
-		output.HierarchyParentTitle = d.ContainerTitle[0]
+	if len(doc.ContainerTitle) > 0 {
+		output.HierarchyParentTitle = doc.ContainerTitle[0]
 	}
 
-	if d.Type == "journal-article" {
+	if doc.Type == "journal-article" {
 		output.Format = "ElectronicArticle"
 	}
 
-	for _, author := range d.Authors {
+	for _, author := range doc.Authors {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
 	}
 
-	if d.Issued.Year() > 0 {
-		output.PublishDateSort = d.Issued.Year()
+	if doc.Issued.Year() > 0 {
+		output.PublishDateSort = doc.Issued.Year()
 	}
 
-	output.Allfields = d.Allfields()
+	output.Allfields = doc.Allfields()
 
-	name, err := d.MemberName()
+	name, err := doc.MemberName()
 	if err != nil {
 		log.Println(err)
 	} else {
@@ -273,16 +273,16 @@ func (d *Document) ToSchema() (output finc.Schema, err error) {
 
 // Institutions returns a slice of ISILs for which this document finds
 // valid entitlements in a IsilIssnHolding map.
-func (d *Document) Institutions(iih holdings.IsilIssnHolding) []string {
+func (doc *Document) Institutions(iih holdings.IsilIssnHolding) []string {
 	isils := span.NewStringSet()
 	for _, isil := range iih.Isils() {
-		for _, issn := range d.ISSN {
+		for _, issn := range doc.ISSN {
 			h, exists := iih[isil][issn]
 			if !exists {
 				continue
 			}
 			for _, entitlement := range h.Entitlements {
-				err := d.CoveredBy(entitlement)
+				err := doc.CoveredBy(entitlement)
 				if err != nil {
 					continue
 				}
