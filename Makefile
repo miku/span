@@ -10,6 +10,7 @@ clean:
 	rm -f $(TARGETS)
 	rm -f span_*deb
 	rm -f span-*rpm
+	rm -rf ./packaging/deb/span/usr
 
 test:
 	go test -cover ./...
