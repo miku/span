@@ -10,7 +10,6 @@ Formats
 
 * CrossRef
 * Finc
-* Google Holdings
 * OVID
 
 ----
