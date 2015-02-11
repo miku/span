@@ -262,26 +262,19 @@ func (d *Document) ToSchema() (output finc.Schema, err error) {
 func (d *Document) Institutions(iih holdings.IsilIssnHolding) []string {
 	isils := span.NewStringSet()
 	for _, isil := range iih.Isils() {
-		covered := false
 		for _, issn := range d.ISSN {
-			h, ok := iih[isil][issn]
-			if ok {
-				for _, entitlement := range h.Entitlements {
-					err := d.CoveredBy(entitlement)
-					if err == nil {
-						covered = true
-					}
-					if covered {
-						break
-					}
-				}
+			h, exists := iih[isil][issn]
+			if !exists {
+				continue
 			}
-			if covered {
+			for _, entitlement := range h.Entitlements {
+				err := d.CoveredBy(entitlement)
+				if err != nil {
+					continue
+				}
+				isils.Add(isil)
 				break
 			}
-		}
-		if covered {
-			isils.Add(isil)
 		}
 	}
 	return isils.Values()
