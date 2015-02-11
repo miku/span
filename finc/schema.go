@@ -6,13 +6,13 @@ type Schema struct {
 	RecordType           string   `json:"recordtype"`
 	ID                   string   `json:"id"`
 	ISSN                 []string `json:"issn"`
-	Publisher            string   `json:"publisher"`
 	SourceID             string   `json:"source_id"`
 	Title                string   `json:"title"`
 	TitleFull            string   `json:"title_full"`
 	TitleShort           string   `json:"title_short"`
 	Topics               []string `json:"topic"`
 	URL                  string   `json:"url"`
+	Publisher            string   `json:"publisher"`
 	HierarchyParentTitle string   `json:"hierarchy_parent_title"`
 	Format               string   `json:"format"`
 	SecondaryAuthors     []string `json:"author2"`

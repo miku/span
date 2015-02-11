@@ -28,9 +28,8 @@ type Author struct {
 func (author *Author) String() string {
 	if author.Given != "" {
 		return fmt.Sprintf("%s, %s", author.Family, author.Given)
-	} else {
-		return author.Family
 	}
+	return author.Family
 }
 
 // DatePart consists of up to three int, representing year, month, day
@@ -38,47 +37,45 @@ type DatePart []int
 
 // DateField contains two representations of one value
 type DateField struct {
-	Timestamp int64      `json:"timestamp"`
 	DateParts []DatePart `json:"date-parts"`
+	Timestamp int64      `json:"timestamp"`
 }
 
-// Document is a example API response
+// Document is a example works API response
 type Document struct {
-	Prefix         string    `json:"prefix"`
-	Type           string    `json:"type"`
-	Volume         string    `json:"volume"`
-	Deposited      DateField `json:"deposited"`
-	Source         string    `json:"source"`
 	Authors        []Author  `json:"author"`
-	Score          float64   `json:"score"`
-	Page           string    `json:"page"`
-	Subject        []string  `json:"subject"`
-	Title          []string  `json:"title"`
-	Publisher      string    `json:"publisher"`
-	ISSN           []string  `json:"ISSN"`
-	Indexed        DateField `json:"indexed"`
-	Issued         DateField `json:"issued"`
-	Subtitle       []string  `json:"subtitle"`
-	URL            string    `json:"URL"`
-	Issue          string    `json:"issue"`
 	ContainerTitle []string  `json:"container-title"`
-	ReferenceCount int       `json:"reference-count"`
+	Deposited      DateField `json:"deposited"`
 	DOI            string    `json:"DOI"`
+	Indexed        DateField `json:"indexed"`
+	ISSN           []string  `json:"ISSN"`
+	Issue          string    `json:"issue"`
+	Issued         DateField `json:"issued"`
 	Member         string    `json:"member"`
+	Page           string    `json:"page"`
+	Prefix         string    `json:"prefix"`
+	Publisher      string    `json:"publisher"`
+	ReferenceCount int       `json:"reference-count"`
+	Score          float64   `json:"score"`
+	Source         string    `json:"source"`
+	Subject        []string  `json:"subject"`
+	Subtitle       []string  `json:"subtitle"`
+	Title          []string  `json:"title"`
+	Type           string    `json:"type"`
+	URL            string    `json:"URL"`
+	Volume         string    `json:"volume"`
 }
 
 // Year returns the first year found inside a DateField.
 func (d *DateField) Year() int {
-	parts := d.DateParts
-	if len(parts) >= 1 {
-		if len(parts[0]) > 0 {
-			return parts[0][0]
-		}
+	if len(d.DateParts) >= 1 && len(d.DateParts[0]) > 0 {
+		return d.DateParts[0][0]
 	}
 	return 0
 }
 
 // Date returns a time.Date in a best effort way.
+// TODO(miku): check if timestamps are always there and if so, use them.
 func (d *DateField) Date() (t time.Time) {
 	if len(d.DateParts) == 0 {
 		t, _ = time.Parse("2006-01-02", "0000-00-00")
