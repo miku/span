@@ -212,7 +212,6 @@ func (doc *Document) CoveredBy(e holdings.Entitlement) error {
 		return err
 	}
 	if doc.Issued.Date().After(boundary) {
-		// return fmt.Errorf("moving-wall %s %s", boundary, doc.Issued.Date())
 		return fmt.Errorf("moving-wall violation")
 	}
 	return nil
