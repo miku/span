@@ -1,0 +1,9 @@
+Package: span
+Version: 0.1.2
+Section: utils
+Priority: optional
+Architecture: amd64
+Essential: no
+Depends: libc6 (>= 2.12)
+Maintainer: Martin Czygan
+Description: Library data conversions.
