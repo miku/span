@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
-	"net/url"
 	"regexp"
 	"strconv"
 	"time"
@@ -37,16 +36,6 @@ type Entitlement struct {
 	ToVolume   int    `xml:"end>volume" json:"to-volume"`
 	ToIssue    int    `xml:"end>issue" json:"to-issue"`
 	ToDelay    string `xml:"end>delay" json:"to-delay"`
-}
-
-// String returns a string representation of an Entitlement
-func (e *Entitlement) String() string {
-	delay, _ := e.Delay()
-	unescaped, _ := url.QueryUnescape(e.URL)
-	boundary, _ := e.Boundary()
-	return fmt.Sprintf("<Entitlement status=%s url=%s range=%d/%d/%d-%d/%d/%d boundary=%s delay=%0.2f>",
-		e.Status, unescaped, e.FromYear, e.FromVolume, e.FromIssue, e.ToYear, e.ToVolume, e.ToIssue,
-		boundary, delay.Hours())
 }
 
 // IssnHolding maps an ISSN to a holdings.Holding struct
