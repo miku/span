@@ -1,5 +1,12 @@
 TARGETS = span
 
+# http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
+test:
+	go get -d && go test -v
+
+cover:
+	go test -cover ./...
+
 span: imports
 	go build -o span cmd/span/main.go
 
@@ -11,9 +18,6 @@ clean:
 	rm -f span_*deb
 	rm -f span-*rpm
 	rm -rf ./packaging/deb/span/usr
-
-test:
-	go test -cover ./...
 
 deb: $(TARGETS)
 	mkdir -p packaging/deb/span/usr/sbin
