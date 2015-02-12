@@ -65,6 +65,7 @@ func main() {
 	version := flag.Bool("v", false, "prints current program version")
 
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
+	hspecExport := flag.Bool("hspec-export", false, "export a single combined holdings map as JSON")
 	members := flag.String("members", "", "path to LDJ file, one member per line")
 
 	PrintUsage := func() {
@@ -90,11 +91,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	if flag.NArg() == 0 {
-		PrintUsage()
-		os.Exit(1)
-	}
-
 	var options Options
 	options.Holdings = make(holdings.IsilIssnHolding)
 
@@ -112,6 +108,20 @@ func main() {
 			reader := bufio.NewReader(file)
 			options.Holdings[isil] = holdings.HoldingsMap(reader)
 		}
+	}
+
+	if *hspecExport {
+		b, err := json.Marshal(options.Holdings)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(b))
+		os.Exit(0)
+	}
+
+	if flag.NArg() == 0 {
+		PrintUsage()
+		os.Exit(1)
 	}
 
 	if *members != "" {
