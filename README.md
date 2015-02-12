@@ -3,7 +3,9 @@ Span
 
 Span formats.
 
-Godocs: http://godoc.org/github.com/miku/span
+Docs: http://godoc.org/github.com/miku/span
+
+[![Build Status](https://travis-ci.org/miku/span.svg?branch=master)](https://travis-ci.org/miku/span)
 
 Formats
 -------
