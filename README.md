@@ -12,10 +12,19 @@ Formats
 * Finc
 * OVID
 
-----
+Usage
+-----
 
-Work-in-progress
-----------------
+    $ span
+    Usage: span [OPTIONS] CROSSREF.LDJ
+      -b=25000: batch size
+      -cpuprofile="": write cpu profile to file
+      -hspec="": ISIL PATH pairs
+      -members="": path to LDJ file, one member per line
+      -v=false: prints current program version
+      -w=4: workers
+
+----
 
 Inputs:
 
