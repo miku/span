@@ -8,9 +8,9 @@ Godocs: http://godoc.org/github.com/miku/span
 Formats
 -------
 
-* CrossRef
+* [CrossRef API](http://api.crossref.org/)
+* [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd)
 * Finc
-* OVID
 
 Usage
 -----
@@ -26,12 +26,18 @@ Usage
 
 ----
 
-Inputs:
+**Inputs**
 
-* an input LDJ containing all crossref works metadata as [crossref.Document](https://github.com/miku/span/blob/5585dc500d82fcab9c783937d7d567fdffb71fde/crossref/document.go#L46)
-* a number of XML files, containing holdings information for various institutions
+* an input LDJ containing all crossref works metadata as [crossref.Document](https://github.com/miku/span/blob/5585dc500d82fcab9c783937d7d567fdffb71fde/crossref/document.go#L46), [example document](http://api.crossref.org/works/56)
 
-One can transform the documents via `span`:
+Optionally:
+
+* a number of XML files, containing holdings information for various institutions in [ovid format](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd)
+* a file containing information about members, in LDJ format ([example document](http://api.crossref.org/members/56))
+
+The current implementation will not emit documents without any institiution.
+
+One can transform the documents with the `span` tool:
 
     span -hspec DE-15:file.xml,DE-20:other.xml crossref.ldj
 
