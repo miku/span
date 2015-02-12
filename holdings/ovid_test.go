@@ -74,7 +74,7 @@ func TestDelay(t *testing.T) {
 }
 
 func TestBoundary(t *testing.T) {
-	margin := 10 * time.Microsecond
+	margin := 100 * time.Microsecond
 	var tests = []struct {
 		e   Entitlement
 		d   time.Time
