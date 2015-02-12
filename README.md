@@ -28,14 +28,14 @@ Usage
 
 **Inputs**
 
-* an input LDJ containing all crossref works metadata as [crossref.Document](https://github.com/miku/span/blob/5585dc500d82fcab9c783937d7d567fdffb71fde/crossref/document.go#L46), [example document](http://api.crossref.org/works/56)
+* An input LDJ containing all crossref works metadata as [crossref.Document](https://github.com/miku/span/blob/5585dc500d82fcab9c783937d7d567fdffb71fde/crossref/document.go#L46). [http://api.crossref.org/works/56](http://api.crossref.org/works/56).
 
 Optionally:
 
-* a number of XML files, containing holdings information for various institutions in [ovid format](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd)
-* a file containing information about members, in LDJ format ([example document](http://api.crossref.org/members/56))
+* A number of XML files, containing holdings information for various institutions in [ovid format](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd).
+* A file containing information about members, in LDJ format. [http://api.crossref.org/members/56](http://api.crossref.org/members/56)).
 
-The current implementation will not emit documents without any institiution.
+The [current implementation](https://github.com/miku/span/blob/318c85e649880efb02dacb75a7d5ecb010a1b979/cmd/span/main.go#L38) will not emit documents without any institiution.
 
 One can transform the documents with the `span` tool:
 
