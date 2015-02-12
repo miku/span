@@ -11,7 +11,7 @@ import (
 )
 
 // DelayPattern is how moving walls are expressed in OVID format
-var DelayPattern = regexp.MustCompile(`^-(\d+)(M|Y)$`)
+var DelayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
 
 // Holding contains a single holding
 type Holding struct {
@@ -63,9 +63,9 @@ func ParseDelay(s string) (d time.Duration, err error) {
 		}
 		switch {
 		case ms[2] == "Y":
-			d, err = time.ParseDuration(fmt.Sprintf("-%dh", value*8760))
+			d, err = time.ParseDuration(fmt.Sprintf("%dh", value*8760))
 		case ms[2] == "M":
-			d, err = time.ParseDuration(fmt.Sprintf("-%dh", value*720))
+			d, err = time.ParseDuration(fmt.Sprintf("%dh", value*720))
 		default:
 			return d, fmt.Errorf("unknown unit: %s", ms[2])
 		}
