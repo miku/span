@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -293,5 +294,7 @@ func (doc *Document) Institutions(iih holdings.IsilIssnHolding) []string {
 			}
 		}
 	}
-	return isils.Values()
+	values := isils.Values()
+	sort.Strings(values)
+	return values
 }
