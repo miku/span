@@ -7,11 +7,15 @@ import (
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
 // DelayPattern is how moving walls are expressed in OVID format
 var DelayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
+
+// ISSNPattern is the canonical form of an ISSN.
+var ISSNPattern = regexp.MustCompile(`^\d\d\d\d-\d\d\d\d$`)
 
 // Holding contains a single holding
 type Holding struct {
@@ -112,10 +116,16 @@ func HoldingsMap(reader io.Reader) (h IssnHolding) {
 				var item Holding
 				decoder.DecodeElement(&item, &se)
 				for _, id := range item.EISSN {
-					h[id] = item
+					tid := strings.TrimSpace(id)
+					if ISSNPattern.MatchString(tid) {
+						h[tid] = item
+					}
 				}
 				for _, id := range item.PISSN {
-					h[id] = item
+					tid := strings.TrimSpace(id)
+					if ISSNPattern.MatchString(tid) {
+						h[tid] = item
+					}
 				}
 			}
 		}
