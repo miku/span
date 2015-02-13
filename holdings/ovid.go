@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// DelayPattern is how moving walls are expressed in OVID format
+// DelayPattern is how moving walls are expressed in OVID format.
 var DelayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
 
 // ISSNPattern is the canonical form of an ISSN.
@@ -27,7 +27,7 @@ type Holding struct {
 	Entitlements []Entitlement `xml:"entitlements>entitlement" json:"entitlements"`
 }
 
-// Entitlement holds a single OVID entitlement
+// Entitlement holds a single OVID entitlement.
 type Entitlement struct {
 	Status     string `xml:"status,attr" json:"status"`
 	URL        string `xml:"url" json:"url"`
@@ -42,13 +42,13 @@ type Entitlement struct {
 	ToDelay    string `xml:"end>delay" json:"to-delay"`
 }
 
-// IssnHolding maps an ISSN to a holdings.Holding struct
+// IssnHolding maps an ISSN to a holdings.Holding struct.
 type IssnHolding map[string]Holding
 
-// IsilIssnHolding maps an ISIL to an IssnHolding map
+// IsilIssnHolding maps an ISIL to an IssnHolding map.
 type IsilIssnHolding map[string]IssnHolding
 
-// Isils returns available ISILs in this IsilIssnHolding map
+// Isils returns available ISILs in this IsilIssnHolding map.
 func (iih *IsilIssnHolding) Isils() []string {
 	var keys []string
 	for k, _ := range *iih {
@@ -57,7 +57,7 @@ func (iih *IsilIssnHolding) Isils() []string {
 	return keys
 }
 
-// ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration
+// ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
 func ParseDelay(s string) (d time.Duration, err error) {
 	ms := DelayPattern.FindStringSubmatch(s)
 	if len(ms) == 3 {
@@ -90,7 +90,7 @@ func (e *Entitlement) Delay() (d time.Duration, err error) {
 	return d, nil
 }
 
-// Boundary returns the last date before the moving wall restriction becomes effective
+// Boundary returns the last date before the moving wall restriction becomes effective.
 func (e *Entitlement) Boundary() (d time.Time, err error) {
 	delay, err := e.Delay()
 	if err != nil {
@@ -99,7 +99,7 @@ func (e *Entitlement) Boundary() (d time.Time, err error) {
 	return time.Now().Add(delay), nil
 }
 
-// HoldingsMap creates an ISSN[Holding] struct from a reader
+// HoldingsMap creates an ISSN[Holding] struct from a reader.
 func HoldingsMap(reader io.Reader) (h IssnHolding) {
 	h = make(map[string]Holding)
 	decoder := xml.NewDecoder(reader)
