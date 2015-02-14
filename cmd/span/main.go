@@ -26,9 +26,9 @@ type Options struct {
 // Worker receives batches of strings, parses, transforms and serializes them
 func Worker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var doc crossref.Document
 	for batch := range batches {
 		for _, line := range batch {
+			doc := new(crossref.Document)
 			json.Unmarshal([]byte(line), &doc)
 			schema, err := doc.ToSchema()
 			if err != nil {
