@@ -243,7 +243,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	output.Title = doc.CombinedTitle()
 	output.TitleFull = doc.FullTitle()
 	output.TitleShort = doc.ShortTitle()
-	output.Topics = doc.Subject
+	copy(output.Topics, doc.Subject)
 	output.URL = doc.URL
 
 	if len(doc.ContainerTitle) > 0 {
