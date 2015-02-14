@@ -20,7 +20,9 @@ import (
 
 // Options for worker
 type Options struct {
-	Holdings holdings.IsilIssnHolding
+	Holdings     holdings.IsilIssnHolding
+	IgnoreErrors bool
+	Verbose      bool
 }
 
 // Worker receives batches of strings, parses, transforms and serializes them
@@ -32,7 +34,12 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 			json.Unmarshal([]byte(line), &doc)
 			schema, err := doc.ToSchema()
 			if err != nil {
-				log.Fatal(err)
+				if options.Verbose {
+					log.Println(err)
+				}
+				if options.IgnoreErrors {
+					continue
+				}
 			}
 			schema.Institutions = doc.Institutions(options.Holdings)
 			if schema.Institutions == nil {
@@ -68,6 +75,9 @@ func main() {
 	hspecExport := flag.Bool("hspec-export", false, "export a single combined holdings map as JSON")
 	members := flag.String("members", "", "path to LDJ file, one member per line")
 
+	ignoreErrors := flag.Bool("ignore", false, "skip broken input record")
+	verbose := flag.Bool("verbose", false, "print debug messages")
+
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
 		flag.PrintDefaults()
@@ -91,8 +101,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	var options Options
-	options.Holdings = make(holdings.IsilIssnHolding)
+	options := Options{
+		Holdings:     make(holdings.IsilIssnHolding),
+		IgnoreErrors: *ignoreErrors,
+		Verbose:      *verbose,
+	}
 
 	if *hspec != "" {
 		pathmap, err := span.ParseHoldingSpec(*hspec)
