@@ -264,10 +264,9 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 
 	output.Allfields = doc.Allfields()
 
+	// non-critical error, do not pollute the logs for now
 	name, err := doc.MemberName()
-	if err != nil {
-		log.Println(err)
-	} else {
+	if err == nil {
 		output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
 	}
 
