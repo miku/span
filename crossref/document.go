@@ -262,7 +262,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 		output.PublishDateSort = doc.Issued.Year()
 	}
 
-	copy(output.Allfields, doc.Allfields())
+	output.Allfields = doc.Allfields()
 
 	// non-critical error, do not pollute the logs for now
 	name, err := doc.MemberName()
