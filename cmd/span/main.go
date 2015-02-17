@@ -20,9 +20,10 @@ import (
 
 // Options for worker
 type Options struct {
-	Holdings     holdings.IsilIssnHolding
-	IgnoreErrors bool
-	Verbose      bool
+	Holdings               holdings.IsilIssnHolding
+	IgnoreErrors           bool
+	Verbose                bool
+	AllowEmptyInstitutions bool
 }
 
 // Worker receives batches of strings, parses, transforms and serializes them
@@ -42,7 +43,7 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 				}
 			}
 			copy(schema.Institutions, doc.Institutions(options.Holdings))
-			if schema.Institutions == nil {
+			if schema.Institutions == nil && !options.AllowEmptyInstitutions {
 				continue
 			}
 			b, err := json.Marshal(schema)
@@ -77,6 +78,7 @@ func main() {
 
 	ignoreErrors := flag.Bool("ignore", false, "skip broken input record")
 	verbose := flag.Bool("verbose", false, "print debug messages")
+	allowEmptyInstitutions := flag.Bool("allow-empty-institutions", false, "keep records, even if no institutions is using it")
 
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
@@ -102,9 +104,10 @@ func main() {
 	}
 
 	options := Options{
-		Holdings:     make(holdings.IsilIssnHolding),
-		IgnoreErrors: *ignoreErrors,
-		Verbose:      *verbose,
+		Holdings:               make(holdings.IsilIssnHolding),
+		IgnoreErrors:           *ignoreErrors,
+		Verbose:                *verbose,
+		AllowEmptyInstitutions: *allowEmptyInstitutions,
 	}
 
 	if *hspec != "" {
