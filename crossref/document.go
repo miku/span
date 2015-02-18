@@ -80,6 +80,7 @@ func (d *DateField) Year() int {
 func (d *DateField) Date() (t time.Time) {
 	if len(d.DateParts) == 0 {
 		t, _ = time.Parse("2006-01-02", "0000-00-00")
+		return t
 	}
 	p := d.DateParts[0]
 	switch len(p) {
