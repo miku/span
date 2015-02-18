@@ -164,48 +164,54 @@ func (doc *Document) MemberName() (name string, err error) {
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
 func (doc *Document) CoveredBy(e holdings.Entitlement) error {
-	if e.FromYear != 0 && e.FromYear > doc.Issued.Year() {
-		return fmt.Errorf("from-year %d > %d", e.FromYear, doc.Issued.Year())
-	}
-	if e.FromYear == doc.Issued.Year() {
-		volume, err := strconv.Atoi(doc.Volume)
-		if err != nil {
-			return err
+	if e.FromYear != 0 && doc.Issued.Year() != 0 {
+		if e.FromYear > doc.Issued.Year() {
+			return fmt.Errorf("from-year %d > %d", e.FromYear, doc.Issued.Year())
 		}
-		if e.FromVolume != 0 && e.FromVolume > volume {
-			return fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
-		}
-		if e.FromVolume == volume {
-			issue, err := strconv.Atoi(doc.Issue)
+		if e.FromYear == doc.Issued.Year() {
+			volume, err := strconv.Atoi(doc.Volume)
 			if err != nil {
 				return err
 			}
-			if e.FromIssue != 0 && e.FromIssue > issue {
-				return fmt.Errorf("from-issue %d > %d", e.FromIssue, issue)
+			if e.FromVolume != 0 && e.FromVolume > volume {
+				return fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
+			}
+			if e.FromVolume == volume {
+				issue, err := strconv.Atoi(doc.Issue)
+				if err != nil {
+					return err
+				}
+				if e.FromIssue != 0 && e.FromIssue > issue {
+					return fmt.Errorf("from-issue %d > %d", e.FromIssue, issue)
+				}
 			}
 		}
 	}
-	if e.ToYear != 0 && e.ToYear < doc.Issued.Year() {
-		return fmt.Errorf("to-year %d < %d", e.ToYear, doc.Issued.Year())
-	}
-	if e.ToYear == doc.Issued.Year() {
-		volume, err := strconv.Atoi(doc.Volume)
-		if err != nil {
-			return err
+
+	if e.ToYear != 0 && doc.Issued.Year() != 0 {
+		if e.ToYear < doc.Issued.Year() {
+			return fmt.Errorf("to-year %d < %d", e.ToYear, doc.Issued.Year())
 		}
-		if e.ToVolume != 0 && e.ToVolume < volume {
-			return fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
-		}
-		if e.ToVolume == volume {
-			issue, err := strconv.Atoi(doc.Issue)
+		if e.ToYear == doc.Issued.Year() {
+			volume, err := strconv.Atoi(doc.Volume)
 			if err != nil {
 				return err
 			}
-			if e.ToIssue != 0 && e.ToIssue < issue {
-				return fmt.Errorf("to-issue %d < %d", e.ToIssue, issue)
+			if e.ToVolume != 0 && e.ToVolume < volume {
+				return fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
+			}
+			if e.ToVolume == volume {
+				issue, err := strconv.Atoi(doc.Issue)
+				if err != nil {
+					return err
+				}
+				if e.ToIssue != 0 && e.ToIssue < issue {
+					return fmt.Errorf("to-issue %d < %d", e.ToIssue, issue)
+				}
 			}
 		}
 	}
+
 	boundary, err := e.Boundary()
 	if err != nil {
 		return err
