@@ -119,7 +119,7 @@ func (doc *Document) EndPage() string {
 	if err != nil {
 		return ""
 	}
-	return parts[0]
+	return parts[1]
 }
 
 func (doc *Document) PageCount() string {
