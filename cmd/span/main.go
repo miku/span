@@ -121,8 +121,7 @@ func main() {
 				log.Fatal(err)
 			}
 			defer file.Close()
-			reader := bufio.NewReader(file)
-			options.Holdings[isil] = holdings.HoldingsMap(reader)
+			options.Holdings[isil] = holdings.HoldingsMap(bufio.NewReader(file))
 		}
 	}
 
