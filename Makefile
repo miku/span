@@ -33,4 +33,4 @@ rpm: $(TARGETS)
 	cp $(HOME)/rpmbuild/RPMS/x86_64/span*.rpm .
 
 cloc:
-	cloc --max-file-size 1 -not-match-f ".*_test.go" .
+	cloc --max-file-size 1 .
