@@ -7,13 +7,13 @@ import (
 
 func TestAddInstitution(t *testing.T) {
 	var tests = []struct {
-		schema      Schema
+		schema      SolrSchema
 		institution string
-		expected    Schema
+		expected    SolrSchema
 	}{
-		{schema: Schema{},
+		{schema: SolrSchema{},
 			institution: "X",
-			expected:    Schema{Institutions: []string{"X"}}},
+			expected:    SolrSchema{Institutions: []string{"X"}}},
 	}
 
 	for _, tt := range tests {

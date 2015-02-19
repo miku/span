@@ -1,8 +1,8 @@
-// Package finc holds finc Schema (SOLR) related types and methods.
+// Package finc holds finc SolrSchema (SOLR) related types and methods.
 package finc
 
 // Schema represents a finc schema, evolving as needed
-type Schema struct {
+type SolrSchema struct {
 	RecordType           string   `json:"recordtype"`
 	ID                   string   `json:"id"`
 	ISSN                 []string `json:"issn"`
@@ -24,7 +24,7 @@ type Schema struct {
 }
 
 // AddInstitution adds an isil, if it is not already there.
-func (s *Schema) AddInstitution(isil string) {
+func (s *SolrSchema) AddInstitution(isil string) {
 	for _, institution := range s.Institutions {
 		if institution == isil {
 			return
@@ -34,7 +34,7 @@ func (s *Schema) AddInstitution(isil string) {
 }
 
 // AddMegaCollection adds isil, if it is not already there.
-func (s *Schema) AddMegaCollection(collection string) {
+func (s *SolrSchema) AddMegaCollection(collection string) {
 	for _, c := range s.MegaCollection {
 		if c == collection {
 			return
