@@ -21,6 +21,7 @@ type SolrSchema struct {
 	Allfields            string   `json:"allfields"`
 	Institutions         []string `json:"institution"`
 	MegaCollection       []string `json:"mega_collection"`
+	Fullrecord           string   `json:"fullrecord"`
 }
 
 // AddInstitution adds an isil, if it is not already there.
@@ -41,4 +42,62 @@ func (s *SolrSchema) AddMegaCollection(collection string) {
 		}
 	}
 	s.MegaCollection = append(s.MegaCollection, collection)
+}
+
+type Author struct {
+	ID           string `json:"id"`
+	Name         string `json:"rft.au"`
+	LastName     string `json:"rft.aulast"`
+	FirstName    string `json:"rft.aufirst"`
+	Initial      string `json:"rft.init"`
+	FirstInitial string `json:"rft.init1"`
+	MiddleName   string `json:"rft.auinitm"`
+	Suffix       string `json:"rft.ausuffix"`
+	Corporation  string `json:"rft.aucorp"`
+}
+
+// Schema is an intermediate format inspired by a few existing formats
+type Schema struct {
+	RecordID       string `json:finc.record_id`
+	SourceID       string `json:finc.source_id`
+	MegaCollection string `json:finc.mega_collection`
+
+	Genre  string `json:"rft.genre"`
+	Type   string `json:"ris.type"`
+	Format string `json:"finc.format"`
+
+	ArticleTitle string `json:"rft.atitle"`
+	BookTitle    string `json:"rft.btitle"`
+	JournalTitle string `json:"rft.jtitle"`
+	SeriesTitle  string `json:"rft.stitle"`
+
+	Series string `json:"rft.series"`
+
+	Database     string `json:"ris.db"`
+	DataProvider string `json:"ris.dp"`
+
+	Date          string `json:"rft.date"`
+	Place         string `json:"rft.place"`
+	Publisher     string `json:"rft.pub"`
+	Edition       string `json:"rft.edition"`
+	Chronology    string `json:"rft.chron"`
+	Season        string `json:"rft.ssn"`
+	Quarter       string `json:"rft.quarter"`
+	Volume        string `json:"rft.volume"`
+	Issue         string `json:"rft.issue"`
+	Part          string `json:"rft.part"`
+	StartPage     string `json:"rft.spage"`
+	EndPage       string `json:"rft.epage"`
+	Pages         string `json:"rft.pages"`
+	PageCount     string `json:"rft.tpages"`
+	ArticleNumber string `json:"rft.artnum"`
+	ISSN          string `json:"rft.issn"`
+	EISSN         string `json:"rft.eissn"`
+	ISBN          string `json:"rft.isbn"`
+
+	DOI      string   `json:"doi"`
+	URL      string   `json:"url"`
+	Authors  []Author `json:"authors"`
+	Language string   `json:"language"`
+	Abstract string   `json:"abstract"`
 }

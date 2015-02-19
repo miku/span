@@ -96,6 +96,52 @@ func (d *DateField) Date() (t time.Time) {
 	return t
 }
 
+// StartPage returns the first page of the article.
+func (doc *Document) StartPage() string {
+	parts := strings.Split(doc.Page, "-")
+	if len(parts) != 2 {
+		return ""
+	}
+	_, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return ""
+	}
+	return parts[0]
+}
+
+// EndPage returns the last page of the article.
+func (doc *Document) EndPage() string {
+	parts := strings.Split(doc.Page, "-")
+	if len(parts) != 2 {
+		return ""
+	}
+	_, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return ""
+	}
+	return parts[0]
+}
+
+func (doc *Document) PageCount() string {
+	start := doc.StartPage()
+	end := doc.EndPage()
+	if start != "" && end != "" {
+		s, err := strconv.Atoi(start)
+		if err != nil {
+			return ""
+		}
+		e, err := strconv.Atoi(end)
+		if err != nil {
+			return ""
+		}
+		if e-s < 0 {
+			return ""
+		}
+		return strconv.Itoa(e - s)
+	}
+	return ""
+}
+
 // CombinedTitle returns a longish title.
 func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
@@ -233,6 +279,44 @@ func (doc *Document) ParseMemberID() (int, error) {
 		return id, nil
 	}
 	return 0, fmt.Errorf("invalid member: %s", doc.Member)
+}
+
+func (doc *Document) ToSchema() (output finc.Schema, err error) {
+	if doc.URL == "" {
+		return output, errors.New("input document has no URL")
+	}
+
+	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+
+	// output.ISSN = doc.ISSN
+	output.Publisher = doc.Publisher
+	output.SourceID = "49"
+	output.ArticleTitle = doc.CombinedTitle()
+	output.URL = doc.URL
+	output.DOI = doc.DOI
+	output.Issue = doc.Issue
+	output.Volume = doc.Volume
+
+	if len(doc.ContainerTitle) > 0 {
+		output.JournalTitle = doc.ContainerTitle[0]
+	}
+
+	for _, author := range doc.Authors {
+		output.Authors = append(output.Authors, finc.Author{FirstName: author.Given, LastName: author.Family})
+	}
+
+	output.StartPage = doc.StartPage()
+	output.EndPage = doc.EndPage()
+	output.Pages = doc.Page
+	output.PageCount = doc.PageCount()
+	output.Date = doc.Issued.Date().Format("2006-01-02")
+
+	// non-critical error, do not pollute the logs for now
+	name, err := doc.MemberName()
+	if err == nil {
+		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
+	}
+	return output, nil
 }
 
 // ToSolrSchema converts a single crossref document into a basic finc schema.
