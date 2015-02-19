@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.6
+Version:    0.1.7
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -46,6 +46,11 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+
+* Thu Feb 19 2015 Martin Czygan
+- 0.1.7 release
+- first appearance of an intermediate format
+
 * Wed Feb 11 2015 Martin Czygan
 - 0.1.2 release
 - initial release
