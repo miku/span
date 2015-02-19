@@ -20,13 +20,13 @@ import (
 	"github.com/miku/span/holdings"
 )
 
-// Author is given by family and given name
+// Author is given by family and given name.
 type Author struct {
 	Family string `json:"family"`
 	Given  string `json:"given"`
 }
 
-// String pretty print the author
+// String pretty prints the author.
 func (author *Author) String() string {
 	if author.Given != "" {
 		return fmt.Sprintf("%s, %s", author.Family, author.Given)
@@ -34,16 +34,16 @@ func (author *Author) String() string {
 	return author.Family
 }
 
-// DatePart consists of up to three int, representing year, month, day
+// DatePart consists of up to three int, representing year, month, day.
 type DatePart []int
 
-// DateField contains two representations of one value
+// DateField contains two representations of one value.
 type DateField struct {
 	DateParts []DatePart `json:"date-parts"`
 	Timestamp int64      `json:"timestamp"`
 }
 
-// Document is a example works API response
+// Document is a example works API response.
 type Document struct {
 	Authors        []Author  `json:"author"`
 	ContainerTitle []string  `json:"container-title"`
