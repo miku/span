@@ -33,7 +33,7 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 		for _, line := range batch {
 			doc := new(crossref.Document)
 			json.Unmarshal([]byte(line), &doc)
-			schema, err := doc.ToSchema()
+			schema, err := doc.ToSolrSchema()
 			if err != nil {
 				if options.Verbose {
 					log.Println(err)

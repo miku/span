@@ -235,8 +235,8 @@ func (doc *Document) ParseMemberID() (int, error) {
 	return 0, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
-// ToSchema converts a single crossref document into a basic finc schema.
-func (doc *Document) ToSchema() (output finc.SolrSchema, err error) {
+// ToSolrSchema converts a single crossref document into a basic finc schema.
+func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
