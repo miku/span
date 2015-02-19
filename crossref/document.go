@@ -76,8 +76,9 @@ func (d *DateField) Year() int {
 	return 0
 }
 
-// Date returns a time.Date in a best effort way.
-// TODO(miku): check if timestamps are always there and if so, use them.
+// Date returns a time.Date in a best effort way. Date parts are always
+// present in the source document, while timestamp is only present if
+// dateparts consist of year, month and day.
 func (d *DateField) Date() (t time.Time) {
 	if len(d.DateParts) == 0 {
 		t, _ = time.Parse("2006-01-02", "0000-00-00")
@@ -123,6 +124,7 @@ func (doc *Document) EndPage() string {
 	return parts[1]
 }
 
+// PageCount returns the number of pages in a crossref document.
 func (doc *Document) PageCount() string {
 	start := doc.StartPage()
 	end := doc.EndPage()
@@ -282,6 +284,7 @@ func (doc *Document) ParseMemberID() (int, error) {
 	return 0, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
+// ToSchema converts a crossref document into an intermediate schema.
 func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
@@ -320,7 +323,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	return output, nil
 }
 
-// ToSolrSchema converts a single crossref document into a basic finc schema.
+// ToSolrSchema converts a single crossref document into a basic finc solr schema.
 func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")

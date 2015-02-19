@@ -1,7 +1,7 @@
 // Package finc holds finc SolrSchema (SOLR) related types and methods.
 package finc
 
-// Schema represents a finc schema, evolving as needed
+// SolrSchema represents a finc schema, evolving as needed.
 type SolrSchema struct {
 	RecordType           string   `json:"recordtype"`
 	ID                   string   `json:"id"`
@@ -44,6 +44,7 @@ func (s *SolrSchema) AddMegaCollection(collection string) {
 	s.MegaCollection = append(s.MegaCollection, collection)
 }
 
+// Author representes an author, inspired by OpenURL.
 type Author struct {
 	ID           string `json:"id"`
 	Name         string `json:"rft.au"`
@@ -56,7 +57,7 @@ type Author struct {
 	Corporation  string `json:"rft.aucorp"`
 }
 
-// Schema is an intermediate format inspired by a few existing formats
+// Schema is an intermediate format inspired by a few existing formats, e.g. OpenURL.
 type Schema struct {
 	RecordID       string `json:"finc.record_id"`
 	SourceID       string `json:"finc.source_id"`
