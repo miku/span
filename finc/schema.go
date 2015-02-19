@@ -58,9 +58,9 @@ type Author struct {
 
 // Schema is an intermediate format inspired by a few existing formats
 type Schema struct {
-	RecordID       string `json:finc.record_id`
-	SourceID       string `json:finc.source_id`
-	MegaCollection string `json:finc.mega_collection`
+	RecordID       string `json:"finc.record_id"`
+	SourceID       string `json:"finc.source_id"`
+	MegaCollection string `json:"finc.mega_collection"`
 
 	Genre  string `json:"rft.genre"`
 	Type   string `json:"ris.type"`
