@@ -15,6 +15,7 @@ type Schema struct {
 	Publisher            string   `json:"publisher"`
 	HierarchyParentTitle string   `json:"hierarchy_parent_title"`
 	Format               string   `json:"format"`
+	Author               string   `json:"author"`
 	SecondaryAuthors     []string `json:"author2"`
 	PublishDateSort      int      `json:"publishDateSort"`
 	Allfields            string   `json:"allfields"`

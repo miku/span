@@ -265,6 +265,10 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
 	}
 
+	if len(output.SecondaryAuthors) > 1 {
+		output.Author = output.SecondaryAuthors[0]
+	}
+
 	if doc.Issued.Year() > 0 {
 		output.PublishDateSort = doc.Issued.Year()
 	}
