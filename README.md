@@ -45,13 +45,14 @@ And, optionally:
 * A number of XML files, containing holdings information for various institutions in [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) format.
 * A file containing information about [members](https://github.com/miku/span/blob/aa59d6468bad530fbf680c529e341b76e033386c/crossref/api.go#L23), in LDJ format. [Example API response](http://api.crossref.org/members/56). The [CrossrefGenericItems](https://github.com/miku/siskin/blob/75bd2e51de9a38c9c6b5fd9dd611f1a23c866cc2/siskin/sources/crossref.py#L331) can create such an output.
 
-One can transform the documents with the `span` tool:
+Example usage with two institutional holding files:
 
-    span -hspec DE-15:file.xml,DE-20:other.xml crossref.ldj
+    $ span -hspec DE-15:file.xml,DE-20:other.xml crossref.ldj
 
 Additionally, if one has a cached file of members API responses, one can
 use it as input. This way the API does not need to be called at all:
 
-    span -hspec DE-15:file.xml,DE-10:other.xml -members members.ldj crossref.ldj
+    $ span -hspec DE-15:file.xml,DE-10:other.xml -members members.ldj crossref.ldj
 
-The output is an LDJ in [finc.SolrSchema](https://github.com/miku/span/blob/aa59d6468bad530fbf680c529e341b76e033386c/finc/schema.go#L5).
+The output is an LDJ in [finc.SolrSchema](https://github.com/miku/span/blob/aa59d6468bad530fbf680c529e341b76e033386c/finc/schema.go#L5),
+which can be indexed into SOLR either via JSON update URL or with tools like [solrbulk](https://github.com/miku/solrbulk).
