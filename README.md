@@ -7,12 +7,15 @@ Docs: http://godoc.org/github.com/miku/span
 
 [![Build Status](https://travis-ci.org/miku/span.svg?branch=master)](https://travis-ci.org/miku/span)
 
+The `span` tools aims at high performance, versatile document conversions between a series of metadata formats.
+
 Formats
 -------
 
-* [CrossRef API](http://api.crossref.org/)
-* [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd)
-* Finc
+* [CrossRef API](http://api.crossref.org/), works and members
+* [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
+* FINC Intermediate Format
+* FINC SOLR Schema
 
 Usage
 -----
@@ -33,7 +36,7 @@ Usage
 Inputs and Outputs
 ------------------
 
-The span tools recognizes the following inputs at the moment:
+The `span` tools recognizes the following inputs at the moment:
 
 * An input LDJ containing all crossref works metadata, one [crossref.Document](https://github.com/miku/span/blob/5585dc500d82fcab9c783937d7d567fdffb71fde/crossref/document.go#L46) per line. [Example API response](http://api.crossref.org/works/56). The [CrossrefItems](https://github.com/miku/siskin/blob/75bd2e51de9a38c9c6b5fd9dd611f1a23c866cc2/siskin/sources/crossref.py#L126) task creates such an output.
 
