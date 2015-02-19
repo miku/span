@@ -14,8 +14,8 @@ Formats
 
 * [CrossRef API](http://api.crossref.org/), works and members
 * [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
-* FINC Intermediate Format
-* FINC SOLR Schema
+* FINC [Intermediate Format](https://github.com/miku/span/blob/4baf2a67fb057ac37edc2f12f05ece7b93190373/finc/schema.go#L61)
+* FINC [SOLR Schema](https://github.com/miku/span/blob/4baf2a67fb057ac37edc2f12f05ece7b93190373/finc/schema.go#L5)
 
 Usage
 -----
