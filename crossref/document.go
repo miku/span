@@ -6,6 +6,7 @@ package crossref
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -364,6 +365,18 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 	if err == nil {
 		output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
 	}
+
+	// marshal additional info into fullrecord
+	schema, err := doc.ToSchema()
+	if err != nil {
+		return output, err
+	}
+
+	b, err := json.Marshal(schema)
+	if err != nil {
+		return output, err
+	}
+	output.Fullrecord = string(b)
 
 	return output, nil
 }
