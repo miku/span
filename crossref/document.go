@@ -29,7 +29,11 @@ type Author struct {
 // String pretty prints the author.
 func (author *Author) String() string {
 	if author.Given != "" {
-		return fmt.Sprintf("%s, %s", author.Family, author.Given)
+		if author.Family != "" {
+			return fmt.Sprintf("%s, %s", author.Family, author.Given)
+		} else {
+			return author.Given
+		}
 	}
 	return author.Family
 }
