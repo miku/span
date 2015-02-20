@@ -287,10 +287,10 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	}
 
 	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
-	output.URL = doc.URL
+	output.URL = append(output.URL, doc.URL)
 	output.DOI = doc.DOI
 	output.SourceID = "49"
-	output.Publisher = doc.Publisher
+	output.Publisher = append(output.Publisher, doc.Publisher)
 	output.ArticleTitle = doc.CombinedTitle()
 	output.Issue = doc.Issue
 	output.Volume = doc.Volume

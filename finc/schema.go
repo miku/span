@@ -77,27 +77,28 @@ type Schema struct {
 	Database     string `json:"ris.db"`
 	DataProvider string `json:"ris.dp"`
 
-	Date          string `json:"rft.date"`
-	Place         string `json:"rft.place"`
-	Publisher     string `json:"rft.pub"`
-	Edition       string `json:"rft.edition"`
-	Chronology    string `json:"rft.chron"`
-	Season        string `json:"rft.ssn"`
-	Quarter       string `json:"rft.quarter"`
-	Volume        string `json:"rft.volume"`
-	Issue         string `json:"rft.issue"`
-	Part          string `json:"rft.part"`
-	StartPage     string `json:"rft.spage"`
-	EndPage       string `json:"rft.epage"`
-	Pages         string `json:"rft.pages"`
-	PageCount     string `json:"rft.tpages"`
-	ArticleNumber string `json:"rft.artnum"`
-	ISSN          string `json:"rft.issn"`
-	EISSN         string `json:"rft.eissn"`
-	ISBN          string `json:"rft.isbn"`
+	Date          string   `json:"rft.date"`
+	Place         []string `json:"rft.place"`
+	Publisher     []string `json:"rft.pub"`
+	Edition       string   `json:"rft.edition"`
+	Chronology    string   `json:"rft.chron"`
+	Season        string   `json:"rft.ssn"`
+	Quarter       string   `json:"rft.quarter"`
+	Volume        string   `json:"rft.volume"`
+	Issue         string   `json:"rft.issue"`
+	Part          string   `json:"rft.part"`
+	StartPage     string   `json:"rft.spage"`
+	EndPage       string   `json:"rft.epage"`
+	Pages         string   `json:"rft.pages"`
+	PageCount     string   `json:"rft.tpages"`
+	ArticleNumber string   `json:"rft.artnum"`
+	ISSN          []string `json:"rft.issn"`
+	EISSN         []string `json:"rft.eissn"`
+	ISBN          string   `json:"rft.isbn"`
+	EISBN         []string `json:"rft.isbn"`
 
 	DOI      string   `json:"doi"`
-	URL      string   `json:"url"`
+	URL      []string `json:"url"`
 	Authors  []Author `json:"authors"`
 	Language string   `json:"language"`
 	Abstract string   `json:"abstract"`
