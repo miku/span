@@ -288,12 +288,14 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 
 	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
 
+	// TODO(miku): how to handle multiple ISSNs?
 	// output.ISSN = doc.ISSN
-	output.Publisher = doc.Publisher
-	output.SourceID = "49"
-	output.ArticleTitle = doc.CombinedTitle()
+
 	output.URL = doc.URL
 	output.DOI = doc.DOI
+	output.SourceID = "49"
+	output.Publisher = doc.Publisher
+	output.ArticleTitle = doc.CombinedTitle()
 	output.Issue = doc.Issue
 	output.Volume = doc.Volume
 
@@ -301,6 +303,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 		output.JournalTitle = doc.ContainerTitle[0]
 	}
 
+	// authors
 	for _, author := range doc.Authors {
 		output.Authors = append(output.Authors, finc.Author{FirstName: author.Given, LastName: author.Family})
 	}
@@ -312,9 +315,9 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
+	// date
 	output.Date = doc.Issued.Date().Format("2006-01-02")
 
-	// non-critical error, do not pollute the logs for now
 	name, err := doc.MemberName()
 	if err == nil {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
