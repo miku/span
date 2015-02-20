@@ -331,8 +331,7 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 		return output, errors.New("input document has no URL")
 	}
 
-	encoded := base64.StdEncoding.EncodeToString([]byte(doc.URL))
-	output.ID = fmt.Sprintf("ai049%s", encoded)
+	output.ID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
 	output.ISSN = doc.ISSN
 	output.Publisher = doc.Publisher
 	output.SourceID = "49"
@@ -365,13 +364,13 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 
 	output.Allfields = doc.Allfields()
 
-	// non-critical error, do not pollute the logs for now
 	name, err := doc.MemberName()
 	if err == nil {
 		output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
 	}
 
-	// marshal additional info into fullrecord
+	// marshal additional/intermediate representation info into fullrecord
+	// TODO(miku): find a less ugly way, e.g. external storage?
 	schema, err := doc.ToSchema()
 	if err != nil {
 		return output, err
