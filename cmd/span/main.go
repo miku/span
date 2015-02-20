@@ -160,7 +160,7 @@ func main() {
 	go Collector(docs, done)
 
 	var wg sync.WaitGroup
-	for i := 0; i < runtime.NumCPU(); i++ {
+	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
 		go Worker(batches, docs, options, &wg)
 	}
