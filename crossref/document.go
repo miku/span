@@ -91,9 +91,9 @@ func (pi *PageInfo) PageCount() int {
 }
 
 // ParsePageValue parses a page specfication in a best effort manner into a PageInfo struct.
-func ParsePageInfo(s string) PageInfo {
-	pi := PageInfo{RawMessage: s}
-	parts := strings.Split(s, "-")
+func (doc *Document) PageInfo() PageInfo {
+	pi := PageInfo{RawMessage: doc.Page}
+	parts := strings.Split(doc.Page, "-")
 	if len(parts) != 2 {
 		return pi
 	}
@@ -309,7 +309,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	}
 
 	// pages
-	pi := ParsePageInfo(doc.Page)
+	pi := doc.PageInfo()
 	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
 	output.EndPage = fmt.Sprintf("%d", pi.EndPage)
 	output.Pages = pi.RawMessage
