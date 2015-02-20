@@ -42,7 +42,7 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 					continue
 				}
 			}
-			copy(schema.Institutions, doc.Institutions(options.Holdings))
+			schema.Institutions = doc.Institutions(options.Holdings)
 			if schema.Institutions == nil && !options.AllowEmptyInstitutions {
 				continue
 			}

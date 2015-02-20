@@ -294,7 +294,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	output.ArticleTitle = doc.CombinedTitle()
 	output.Issue = doc.Issue
 	output.Volume = doc.Volume
-	copy(output.ISSN, doc.ISSN)
+	output.ISSN = doc.ISSN
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = doc.ContainerTitle[0]
@@ -336,7 +336,7 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 	output.Title = doc.CombinedTitle()
 	output.TitleFull = doc.FullTitle()
 	output.TitleShort = doc.ShortTitle()
-	copy(output.Topics, doc.Subject)
+	output.Topics = doc.Subject
 	output.URL = doc.URL
 
 	if len(doc.ContainerTitle) > 0 {
