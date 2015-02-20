@@ -72,6 +72,45 @@ type Document struct {
 	Volume         string    `json:"volume"`
 }
 
+// PageInfo holds various page related data.
+type PageInfo struct {
+	RawMessage string
+	StartPage  int
+	EndPage    int
+}
+
+// PageCount returns the number of pages, or zero if this cannot be determined.
+func (pi *PageInfo) PageCount() int {
+	if pi.StartPage != 0 && pi.EndPage != 0 {
+		count := pi.EndPage - pi.StartPage
+		if count > 0 {
+			return count
+		}
+	}
+	return 0
+}
+
+// ParsePageValue parses a page specfication in a best effort manner into a PageInfo struct.
+func ParsePageInfo(s string) PageInfo {
+	pi := PageInfo{RawMessage: s}
+	parts := strings.Split(s, "-")
+	if len(parts) != 2 {
+		return pi
+	}
+	spage, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return pi
+	}
+	pi.StartPage = spage
+
+	epage, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return pi
+	}
+	pi.EndPage = epage
+	return pi
+}
+
 // Year returns the first year found inside a DateField.
 func (d *DateField) Year() int {
 	if len(d.DateParts) >= 1 && len(d.DateParts[0]) > 0 {
@@ -100,53 +139,6 @@ func (d *DateField) Date() (t time.Time) {
 		t, _ = time.Parse("2006-01-02", "1970-01-01")
 	}
 	return t
-}
-
-// StartPage returns the first page of the article.
-func (doc *Document) StartPage() string {
-	parts := strings.Split(doc.Page, "-")
-	if len(parts) != 2 {
-		return ""
-	}
-	_, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return ""
-	}
-	return parts[0]
-}
-
-// EndPage returns the last page of the article.
-func (doc *Document) EndPage() string {
-	parts := strings.Split(doc.Page, "-")
-	if len(parts) != 2 {
-		return ""
-	}
-	_, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return ""
-	}
-	return parts[1]
-}
-
-// PageCount returns the number of pages in a crossref document.
-func (doc *Document) PageCount() string {
-	start := doc.StartPage()
-	end := doc.EndPage()
-	if start != "" && end != "" {
-		s, err := strconv.Atoi(start)
-		if err != nil {
-			return ""
-		}
-		e, err := strconv.Atoi(end)
-		if err != nil {
-			return ""
-		}
-		if e-s < 0 {
-			return ""
-		}
-		return strconv.Itoa(e - s)
-	}
-	return ""
 }
 
 // CombinedTitle returns a longish title.
@@ -313,10 +305,13 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 		output.Authors = append(output.Authors, finc.Author{FirstName: author.Given, LastName: author.Family})
 	}
 
-	output.StartPage = doc.StartPage()
-	output.EndPage = doc.EndPage()
-	output.Pages = doc.Page
-	output.PageCount = doc.PageCount()
+	// pages
+	pi := ParsePageInfo(doc.Page)
+	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
+	output.EndPage = fmt.Sprintf("%d", pi.EndPage)
+	output.Pages = pi.RawMessage
+	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
+
 	output.Date = doc.Issued.Date().Format("2006-01-02")
 
 	// non-critical error, do not pollute the logs for now
