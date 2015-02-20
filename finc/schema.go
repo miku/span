@@ -50,8 +50,8 @@ type Author struct {
 	Name         string `json:"rft.au"`
 	LastName     string `json:"rft.aulast"`
 	FirstName    string `json:"rft.aufirst"`
-	Initial      string `json:"rft.init"`
-	FirstInitial string `json:"rft.init1"`
+	Initial      string `json:"rft.auinit"`
+	FirstInitial string `json:"rft.auinit1"`
 	MiddleName   string `json:"rft.auinitm"`
 	Suffix       string `json:"rft.ausuffix"`
 	Corporation  string `json:"rft.aucorp"`
