@@ -287,10 +287,6 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	}
 
 	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
-
-	// TODO(miku): how to handle multiple ISSNs?
-	// output.ISSN = doc.ISSN
-
 	output.URL = doc.URL
 	output.DOI = doc.DOI
 	output.SourceID = "49"
@@ -298,6 +294,7 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 	output.ArticleTitle = doc.CombinedTitle()
 	output.Issue = doc.Issue
 	output.Volume = doc.Volume
+	copy(output.ISSN, doc.ISSN)
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = doc.ContainerTitle[0]
