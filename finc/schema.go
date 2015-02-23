@@ -1,4 +1,4 @@
-// Package finc holds finc SolrSchema (SOLR) related types and methods.
+// Package finc holds finc SolrSchema (SOLR) and intermediate schema related types and methods.
 package finc
 
 // SolrSchema represents a finc schema, evolving as needed.

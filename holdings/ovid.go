@@ -1,4 +1,3 @@
-// Package holdings contains wrappers for various holding file formats.
 package holdings
 
 import (
