@@ -3,9 +3,7 @@ Span
 
 Span formats.
 
-Docs: http://godoc.org/github.com/miku/span
-
-[![Build Status](https://travis-ci.org/miku/span.svg?branch=master)](https://travis-ci.org/miku/span)
+[![Build Status](https://travis-ci.org/miku/span.svg?branch=master)](https://travis-ci.org/miku/span) [![GoDoc](https://godoc.org/github.com/miku/span?status.svg)](https://godoc.org/github.com/miku/span)
 
 The `span` tools aims at high performance, versatile document conversions between a series of metadata formats.
 
