@@ -1,28 +1,41 @@
 package jats
 
+import "encoding/xml"
+
 type ISSN struct {
 	ID   string `xml:",chardata"`
 	Type string `xml:"pub-type,attr"`
 }
 
+type AbbreviatedTitle struct {
+	Title string `xml:",chardata"`
+	Type  string `xml:"abbrev-type,attr"`
+}
+
+type JournalTitleGroup struct {
+	AbbreviatedTitle AbbreviatedTitle `xml:"abbrev-journal-title"`
+}
+
+type JournalID struct {
+	ID   string `xml:",chardata"`
+	Type string `xml:"journal-id-type,attr"`
+}
+
 type JournalMeta struct {
-	ID         string   `xml:"journal-id"`
-	Type       string   `xml:"journal-id-type,attr"`
-	ISSN       []ISSN   `xml:"issn"`
-	Title      string   `xml:"journal-title-group>abbrev-journal-title,chardata"`
-	TitleType  string   `xml:"journal-title-group>abbrev-journal-title>abbrev-type,attr"`
-	Publishers []string `xml:"publisher>publisher-name,chardata"`
+	IDList     []JournalID       `xml:"journal-id"`
+	ISSN       []ISSN            `xml:"issn"`
+	TitleGroup JournalTitleGroup `xml:"journal-title-group"`
 }
 
 type ArticleID struct {
-	ID   string `xml:"article-id,chardata"`
-	Type string `xml:"pib-id-type,attr"`
+	ID   string `xml:",chardata"`
+	Type string `xml:"pub-id-type,attr"`
 }
 
 type ArticleMeta struct {
 	IDList   []ArticleID `xml:"article-id"`
-	Title    string      `xml:"title-group>article-title,chardata"`
-	Subtitle string      `xml:"title-group>subtitle,chardata"`
+	Title    string      `xml:"title-group>article-title>text"`
+	Subtitle string      `xml:"title-group>subtitle>text"`
 }
 
 type Meta struct {
@@ -34,6 +47,7 @@ type Body struct {
 }
 
 type Document struct {
-	Meta Meta `xml:"article>front"`
-	Body Body `xml:"article>body"`
+	XMLName xml.Name `xml:"article"`
+	Meta    Meta     `xml:"front"`
+	Body    Body     `xml:"body"`
 }
