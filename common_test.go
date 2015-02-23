@@ -14,6 +14,7 @@ func TestParseHoldingSpec(t *testing.T) {
 	}{
 		{spec: "", result: nil, err: fmt.Errorf("invalid spec: ")},
 		{spec: "X:Z", result: map[string]string{"X": "Z"}, err: nil},
+		{spec: "X:Z,A:b", result: map[string]string{"X": "Z", "A": "b"}, err: nil},
 	}
 
 	for _, tt := range tests {
