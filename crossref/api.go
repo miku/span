@@ -68,7 +68,7 @@ func FetchMember(id int) (Member, error) {
 }
 
 // cache holds member ids and their primary names
-var cache IntStringCache = NewIntStringCache()
+var cache = NewIntStringCache()
 
 // LookupMemberName returns the primary name for a member given by its ID.
 // Example URL: http://api.crossref.org/members/56

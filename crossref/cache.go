@@ -2,13 +2,13 @@ package crossref
 
 import "sync"
 
-// Cache for int keys and string values with a thread-safe setter.
+// IntStringCache for int keys and string values with a thread-safe setter.
 type IntStringCache struct {
 	mu      *sync.RWMutex
 	Entries map[int]string
 }
 
-// NewMemberCache creates a new in memory members cache.
+// NewIntStringCache creates a new in memory members cache.
 func NewIntStringCache() IntStringCache {
 	return IntStringCache{Entries: make(map[int]string), mu: new(sync.RWMutex)}
 }

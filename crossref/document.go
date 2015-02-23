@@ -28,9 +28,8 @@ func (author *Author) String() string {
 	if author.Given != "" {
 		if author.Family != "" {
 			return fmt.Sprintf("%s, %s", author.Family, author.Given)
-		} else {
-			return author.Given
 		}
+		return author.Given
 	}
 	return author.Family
 }
@@ -143,15 +142,13 @@ func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
 		if len(doc.Subtitle) > 0 {
 			return fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0])
-		} else {
-			return doc.Title[0]
 		}
+		return doc.Title[0]
 	} else {
 		if len(doc.Subtitle) > 0 {
 			return doc.Subtitle[0]
-		} else {
-			return ""
 		}
+		return ""
 	}
 }
 
@@ -164,9 +161,8 @@ func (doc *Document) FullTitle() string {
 func (doc *Document) ShortTitle() string {
 	if len(doc.Title) > 0 {
 		return doc.Title[0]
-	} else {
-		return ""
 	}
+	return ""
 }
 
 // Allfields returns a combination of various fields.
