@@ -144,12 +144,11 @@ func (doc *Document) CombinedTitle() string {
 			return fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0])
 		}
 		return doc.Title[0]
-	} else {
-		if len(doc.Subtitle) > 0 {
-			return doc.Subtitle[0]
-		}
-		return ""
 	}
+	if len(doc.Subtitle) > 0 {
+		return doc.Subtitle[0]
+	}
+	return ""
 }
 
 // FullTitle returns everything title.
