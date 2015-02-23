@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Version of span
 const Version = "0.1.7"
 
 // StringSet is map disguised as set.
@@ -37,13 +38,13 @@ func (set *StringSet) Size() int {
 
 // Values returns the set values as a string slice.
 func (set *StringSet) Values() (values []string) {
-	for k, _ := range set.set {
+	for k := range set.set {
 		values = append(values, k)
 	}
 	return values
 }
 
-// ParseHoldingPairs parses a holdings flag value into a map.
+// ParseHoldingSpec parses a holdings flag value into a map.
 func ParseHoldingSpec(s string) (map[string]string, error) {
 	fields := strings.Split(s, ",")
 	pathmap := make(map[string]string)

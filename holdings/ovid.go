@@ -50,7 +50,7 @@ type IsilIssnHolding map[string]IssnHolding
 // Isils returns available ISILs in this IsilIssnHolding map.
 func (iih *IsilIssnHolding) Isils() []string {
 	var keys []string
-	for k, _ := range *iih {
+	for k := range *iih {
 		keys = append(keys, k)
 	}
 	return keys
