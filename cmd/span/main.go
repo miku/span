@@ -18,7 +18,7 @@ import (
 	"sync"
 )
 
-// Options for worker
+// Options for worker.
 type Options struct {
 	Holdings               holdings.IsilIssnHolding
 	IgnoreErrors           bool
@@ -26,7 +26,7 @@ type Options struct {
 	AllowEmptyInstitutions bool
 }
 
-// Worker receives batches of strings, parses, transforms and serializes them
+// Worker receives batches of strings, parses, transforms and serializes them.
 func Worker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range batches {
@@ -55,7 +55,7 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 	}
 }
 
-// Collector collects docs and writes them out to stdout
+// Collector collects docs and writes them out to stdout.
 func Collector(docs chan []byte, done chan bool) {
 	f := bufio.NewWriter(os.Stdout)
 	defer f.Flush()

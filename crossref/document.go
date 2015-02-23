@@ -1,6 +1,3 @@
-// Package crossref implements crossref related structs and transformations.
-//
-// API endpoint/documentation: http://api.crossref.org
 package crossref
 
 import (
@@ -47,7 +44,7 @@ type DateField struct {
 	Timestamp int64      `json:"timestamp"`
 }
 
-// Document is a example works API response.
+// Document is a example 'works' API response.
 type Document struct {
 	Authors        []Author  `json:"author"`
 	ContainerTitle []string  `json:"container-title"`
@@ -90,7 +87,7 @@ func (pi *PageInfo) PageCount() int {
 	return 0
 }
 
-// ParsePageValue parses a page specfication in a best effort manner into a PageInfo struct.
+// PageInfo parses a page specfication in a best effort manner into a PageInfo struct.
 func (doc *Document) PageInfo() PageInfo {
 	pi := PageInfo{RawMessage: doc.Page}
 	parts := strings.Split(doc.Page, "-")
@@ -119,9 +116,9 @@ func (d *DateField) Year() int {
 	return 0
 }
 
-// Date returns a time.Date in a best effort way. Date parts are always
+// Date returns a time.Date in a best effort manner. Date parts seem to be always
 // present in the source document, while timestamp is only present if
-// dateparts consist of year, month and day.
+// dateparts consist of all three: year, month and day.
 func (d *DateField) Date() (t time.Time) {
 	if len(d.DateParts) == 0 {
 		t, _ = time.Parse("2006-01-02", "0000-00-00")
@@ -208,6 +205,9 @@ func (doc *Document) MemberName() (name string, err error) {
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
+// If the given entitlement does not cover the document, the error returned
+// will contain the reason as message.
+// TODO(miku): better handling of 'unparseable' volume or issue strings
 func (doc *Document) CoveredBy(e holdings.Entitlement) error {
 	if e.FromYear != 0 && doc.Issued.Year() != 0 {
 		if e.FromYear > doc.Issued.Year() {
@@ -300,19 +300,16 @@ func (doc *Document) ToSchema() (output finc.Schema, err error) {
 		output.JournalTitle = doc.ContainerTitle[0]
 	}
 
-	// authors
 	for _, author := range doc.Authors {
 		output.Authors = append(output.Authors, finc.Author{FirstName: author.Given, LastName: author.Family})
 	}
 
-	// pages
 	pi := doc.PageInfo()
 	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
 	output.EndPage = fmt.Sprintf("%d", pi.EndPage)
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
-	// date
 	output.Date = doc.Issued.Date().Format("2006-01-02")
 
 	name, err := doc.MemberName()
@@ -367,7 +364,7 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 	}
 
 	// marshal additional/intermediate representation info into fullrecord
-	// TODO(miku): find a less ugly way, e.g. external storage?
+	// TODO(miku): find a less ugly way, e.g. external storage or search index with nested docs support?
 	schema, err := doc.ToSchema()
 	if err != nil {
 		return output, err
