@@ -65,7 +65,9 @@ func TestSchema(t *testing.T) {
 					IDList:     []JournalID{JournalID{ID: "AKG", Type: "publisher-id"}},
 					ISSN:       []ISSN{ISSN{ID: "2194-3958", Type: "epub"}, ISSN{ID: "0003-9233", Type: "ppub"}}},
 				Article: ArticleMeta{
-					IDList: []ArticleID{ArticleID{ID: "akg.1969.51.2.183", Type: "publisher-id"}, ArticleID{ID: "10.7788/akg.1969.51.2.183", Type: "doi"}}}}}},
+					IDList: []ArticleID{ArticleID{ID: "akg.1969.51.2.183", Type: "publisher-id"}, ArticleID{ID: "10.7788/akg.1969.51.2.183", Type: "doi"}},
+					TitleGroup: ArticleTitleGroup{Title: ArticleTitle{Title: "Die frühe Friesen- und Sachsenmission aus northumbrischer Sich"},
+						Subtitle: ArticleSubtitle{Subtitle: "Das Zeugnisdes Baeda"}}}}}},
 	}
 
 	for _, tt := range tests {

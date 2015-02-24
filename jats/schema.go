@@ -32,10 +32,22 @@ type ArticleID struct {
 	Type string `xml:"pub-id-type,attr"`
 }
 
+type ArticleTitle struct {
+	Title string `xml:",chardata"`
+}
+
+type ArticleSubtitle struct {
+	Subtitle string `xml:",chardata"`
+}
+
+type ArticleTitleGroup struct {
+	Title    ArticleTitle    `xml:"article-title"`
+	Subtitle ArticleSubtitle `xml:"subtitle"`
+}
+
 type ArticleMeta struct {
-	IDList   []ArticleID `xml:"article-id"`
-	Title    string      `xml:"title-group>article-title>text"`
-	Subtitle string      `xml:"title-group>subtitle>text"`
+	IDList     []ArticleID       `xml:"article-id"`
+	TitleGroup ArticleTitleGroup `xml:"title-group"`
 }
 
 type Meta struct {
