@@ -65,6 +65,9 @@ func TestSchema(t *testing.T) {
 	if article.Front.ArticleMeta.PubDate.Year.Value != "1969" {
 		t.Errorf("got %s, want %s", article.Front.ArticleMeta.PubDate.Year.Value, 1969)
 	}
+	if article.Front.ArticleMeta.TitleGroup.Subtitle.Value != "Das Zeugnisdes Baeda" {
+		t.Errorf("got %s, want %s", article.Front.ArticleMeta.TitleGroup.Subtitle.Value, "Das Zeugnisdes Baeda")
+	}
 	if article.Front.ArticleMeta.Issue.Value != "2" {
 		t.Errorf("got %s, want %s", article.Front.ArticleMeta.Issue.Value, 2)
 	}
