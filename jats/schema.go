@@ -72,6 +72,14 @@ type Article struct {
 			LastPage struct {
 				Value string `xml:",chardata"`
 			} `xml:"lpage"`
+			Permissions struct {
+				CopyrightYear struct {
+					Value string `xml:",chardata"`
+				} `xml:"copyright-year"`
+				CopyrightStatement struct {
+					Value string `xml:",chardata"`
+				} `xml:"copyright-statement"`
+			} `xml:"permissions"`
 		} `xml:"article-meta"`
 	} `xml:"front"`
 }

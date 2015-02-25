@@ -71,4 +71,7 @@ func TestSchema(t *testing.T) {
 	if article.Front.ArticleMeta.Volume.Value != "51" {
 		t.Errorf("got %s, want %s", article.Front.ArticleMeta.Volume.Value, 51)
 	}
+	if article.Front.ArticleMeta.Permissions.CopyrightYear.Value != "2013" {
+		t.Errorf("got %s, want %s", article.Front.ArticleMeta.Permissions.CopyrightYear.Value, "2013")
+	}
 }
