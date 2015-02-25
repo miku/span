@@ -2,72 +2,76 @@ package jats
 
 import "encoding/xml"
 
-type ISSN struct {
-	ID   string `xml:",chardata"`
-	Type string `xml:"pub-type,attr"`
-}
-
-type AbbreviatedTitle struct {
-	Title string `xml:",chardata"`
-	Type  string `xml:"abbrev-type,attr"`
-}
-
-type JournalTitleGroup struct {
-	AbbreviatedTitle AbbreviatedTitle `xml:"abbrev-journal-title"`
-}
-
-type JournalID struct {
-	ID   string `xml:",chardata"`
-	Type string `xml:"journal-id-type,attr"`
-}
-
-type JournalMeta struct {
-	IDList     []JournalID       `xml:"journal-id"`
-	ISSN       []ISSN            `xml:"issn"`
-	TitleGroup JournalTitleGroup `xml:"journal-title-group"`
-}
-
-type ArticleID struct {
-	ID   string `xml:",chardata"`
-	Type string `xml:"pub-id-type,attr"`
-}
-
-// type ArticleTitle struct {
-// 	Title string `xml:",chardata"`
-// }
-
-// type ArticleSubtitle struct {
-// 	Subtitle string `xml:",chardata"`
-// }
-
-type ArticleTitleGroup struct {
-	Title struct {
-		Value string `xml:",chardata"`
-	} `xml:"article-title"`
-
-	Subtitle struct {
-		Value string `xml:",chardata"`
-	} `xml:"subtitle"`
-
-	// Title    ArticleTitle    `xml:"article-title"`
-	// Subtitle ArticleSubtitle `xml:"subtitle"`
-}
-
-type ArticleMeta struct {
-	IDList     []ArticleID       `xml:"article-id"`
-	TitleGroup ArticleTitleGroup `xml:"title-group"`
-}
-
-type Meta struct {
-	Journal JournalMeta `xml:"journal-meta"`
-	Article ArticleMeta `xml:"article-meta"`
-}
-
-type Body struct {
-}
-
-type Document struct {
+// Article mirrors a JATS article element. Some elements, such as
+// article categories are not implmented yet.
+type Article struct {
 	XMLName xml.Name `xml:"article"`
-	Meta    Meta     `xml:"front"`
-	Body    Body     `xml:"body"`
+	Front   struct {
+		JournalMeta struct {
+			JournalID struct {
+				Type string `xml:"journal-id-type,attr"`
+				ID   string `xml:",chardata"`
+			} `xml:"journal-id"`
+			ISSN []struct {
+				Type  string `xml:"pub-type,attr"`
+				Value string `xml:",chardata"`
+			} `xml:"issn"`
+			Publisher struct {
+				Name struct {
+					Value string `xml:",chardata"`
+				} `xml:"publisher-name"`
+			} `xml:"publisher"`
+		} `xml:"journal-meta"`
+		ArticleMeta struct {
+			ArticleID []struct {
+				Type  string `xml:"pub-id-type,attr"`
+				Value string `xml:",chardata"`
+			} `xml:"article-id"`
+			TitleGroup struct {
+				Title struct {
+					Value string `xml:",chardata"`
+				} `xml:"article-title"`
+				Subtitle struct {
+					Value string `xml:",chardata"`
+				} `xml:"subtitle"`
+			} `xml:"title-group"`
+			ContribGroup struct {
+				Contrib []struct {
+					Type string `xml:"contrib-type,attr"`
+					Name struct {
+						Surname struct {
+							Value string `xml:",chardata"`
+						} `xml:"surname"`
+						GivenNames struct {
+							Value string `xml:",chardata"`
+						} `xml:"given-names"`
+					} `xml:"name"`
+				} `xml:"contrib"`
+			} `xml:"contrib-group"`
+			PubDate struct {
+				Type  string `xml:"pub-type,attr"`
+				Month struct {
+					Value string `xml:",chardata"`
+				} `xml:"month"`
+				Year struct {
+					Value string `xml:",chardata"`
+				} `xml:"year"`
+				Day struct {
+					Value string `xml:",chardata"`
+				} `xml:"day"`
+			} `xml:"pub-date"`
+			Volume struct {
+				Value string `xml:",chardata"`
+			} `xml:"volume"`
+			Issue struct {
+				Value string `xml:",chardata"`
+			} `xml:"issue"`
+			FirstPage struct {
+				Value string `xml:",chardata"`
+			} `xml:"fpage"`
+			LastPage struct {
+				Value string `xml:",chardata"`
+			} `xml:"lpage"`
+		} `xml:"article-meta"`
+	} `xml:"front"`
 }
