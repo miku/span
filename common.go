@@ -8,43 +8,11 @@ import (
 // Version of span
 const Version = "0.1.7"
 
-// StringSet is map disguised as set.
-type StringSet struct {
-	set map[string]struct{}
 // FincConverter for finc.Schema output format.
 type FincConverter interface {
 	ToSchema() (finc.Schema, error)
 }
 
-// NewStringSet returns an empty set.
-func NewStringSet() *StringSet {
-	return &StringSet{set: make(map[string]struct{})}
-}
-
-// Add adds a string to a set, returns true if added, false it it already existed (noop).
-func (set *StringSet) Add(s string) bool {
-	_, found := set.set[s]
-	set.set[s] = struct{}{}
-	return !found // False if it existed already
-}
-
-// Contains returns true if given string is in the set, false otherwise.
-func (set *StringSet) Contains(s string) bool {
-	_, found := set.set[s]
-	return found
-}
-
-// Size returns current number of elements in the set.
-func (set *StringSet) Size() int {
-	return len(set.set)
-}
-
-// Values returns the set values as a string slice.
-func (set *StringSet) Values() (values []string) {
-	for k := range set.set {
-		values = append(values, k)
-	}
-	return values
 // FincSolrConverter for finc.SolrSchema output format.
 type FincSolrConverter interface {
 	ToSolrSchema() (finc.SolrSchema, error)

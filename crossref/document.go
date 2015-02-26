@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/miku/span"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
+	"github.com/miku/span/sets"
 )
 
 // Author is given by family and given name.
@@ -377,7 +377,7 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 // Institutions returns a slice of ISILs for which this document finds
 // valid entitlements in a IsilIssnHolding map.
 func (doc *Document) Institutions(iih holdings.IsilIssnHolding) []string {
-	isils := span.NewStringSet()
+	isils := sets.NewString()
 	for _, isil := range iih.Isils() {
 		for _, issn := range doc.ISSN {
 			h, exists := iih[isil][issn]
