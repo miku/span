@@ -11,6 +11,9 @@ const Version = "0.1.7"
 // StringSet is map disguised as set.
 type StringSet struct {
 	set map[string]struct{}
+// FincConverter for finc.Schema output format.
+type FincConverter interface {
+	ToSchema() (finc.Schema, error)
 }
 
 // NewStringSet returns an empty set.
@@ -42,6 +45,9 @@ func (set *StringSet) Values() (values []string) {
 		values = append(values, k)
 	}
 	return values
+// FincSolrConverter for finc.SolrSchema output format.
+type FincSolrConverter interface {
+	ToSolrSchema() (finc.SolrSchema, error)
 }
 
 // ParseHoldingSpec parses a holdings flag value into a map.
