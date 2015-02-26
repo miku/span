@@ -3,6 +3,8 @@ package span
 import (
 	"fmt"
 	"strings"
+
+	"github.com/miku/span/finc"
 )
 
 // Version of span
