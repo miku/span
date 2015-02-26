@@ -1,6 +1,8 @@
 // Package finc holds finc SolrSchema (SOLR) and intermediate schema related types and methods.
 package finc
 
+import "fmt"
+
 // SolrSchema represents a finc schema, evolving as needed.
 type SolrSchema struct {
 	RecordType           string   `json:"recordtype"`
@@ -55,6 +57,18 @@ type Author struct {
 	MiddleName   string `json:"rft.auinitm"`
 	Suffix       string `json:"rft.ausuffix"`
 	Corporation  string `json:"rft.aucorp"`
+}
+
+// String returns a formatted author string.
+// TODO(miku): make this complete.
+func (author *Author) String() string {
+	if author.LastName != "" {
+		if author.FirstName != "" {
+			return fmt.Sprintf("%s, %s", author.LastName, author.FirstName)
+		}
+		return author.LastName
+	}
+	return author.ID
 }
 
 // Schema is an intermediate format inspired by a few existing formats, e.g. OpenURL.

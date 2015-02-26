@@ -1,11 +1,14 @@
 package jats
 
 import (
+	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/miku/span/finc"
@@ -99,14 +102,14 @@ type Article struct {
 	} `xml:"front"`
 }
 
-func (article *Article) Authors() []string {
-	var authors []string
+func (article *Article) Authors() []finc.Author {
+	var authors []finc.Author
 	group := article.Front.ArticleMeta.ContribGroup
 	for _, contrib := range group.Contrib {
 		if contrib.Type != "author" {
 			continue
 		}
-		authors = append(authors, fmt.Sprintf("%s, %s", contrib.Name.Surname.Value, contrib.Name.GivenNames.Value))
+		authors = append(authors, finc.Author{LastName: contrib.Name.Surname.Value, FirstName: contrib.Name.GivenNames.Value})
 	}
 	return authors
 }
@@ -121,9 +124,13 @@ func (article *Article) CombinedTitle() string {
 		return group.Title.Value
 	}
 	if group.Subtitle.Value != "" {
-		group.Subtitle.Value
+		return group.Subtitle.Value
 	}
 	return ""
+}
+
+func (article *Article) ShortTitle() string {
+	return article.CombinedTitle()
 }
 
 func (article *Article) DOI() (string, error) {
@@ -167,9 +174,9 @@ func defaultString(s, defaultValue string) string {
 
 func (article *Article) Date() time.Time {
 	pubdate := article.Front.ArticleMeta.PubDate
-	day := defaultString(pubdate.Day, "01")
-	month := defaultString(pubdate.Month, "01")
-	year := defaultString(pubdate.Year, "1970")
+	day := defaultString(pubdate.Day.Value, "01")
+	month := defaultString(pubdate.Month.Value, "01")
+	year := defaultString(pubdate.Year.Value, "1970")
 	t, err := time.Parse("2006-01-02", fmt.Sprintf("%s-%s-%s", year, month, day))
 	if err != nil {
 		log.Fatal(err)
@@ -177,9 +184,40 @@ func (article *Article) Date() time.Time {
 	return t
 }
 
+func (article *Article) Year() int {
+	year, err := strconv.Atoi(article.Front.ArticleMeta.PubDate.Year.Value)
+	if err != nil {
+		return 0
+	}
+	return year
+}
+
+func (article *Article) Allfields() string {
+	doi, _ := article.DOI()
+	var authors []string
+	for _, author := range article.Authors() {
+		authors = append(authors, author.String())
+	}
+	fields := [][]string{article.ISSN(), authors, []string{article.CombinedTitle(),
+		doi, article.Front.JournalMeta.JournalTitleGroup.AbbreviatedJournalTitle.Value,
+		article.Front.ArticleMeta.Volume.Value, article.Front.ArticleMeta.Issue.Value}}
+
+	var buf bytes.Buffer
+	for _, f := range fields {
+		for _, value := range f {
+			for _, token := range strings.Fields(value) {
+				_, err := buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
+	}
+	return strings.TrimSpace(buf.String())
+}
+
 // ToSchema converts a jats article into an intermediate schema.
 func (article *Article) ToSchema() (output finc.Schema, err error) {
-
 	doi, err := article.DOI()
 	if err != nil {
 		return output, err
@@ -200,12 +238,65 @@ func (article *Article) ToSchema() (output finc.Schema, err error) {
 	output.Authors = article.Authors()
 
 	output.StartPage = article.Front.ArticleMeta.FirstPage.Value
-	output.EndPage = article.Front.ArticleMeta.EndPage.Value
+	output.EndPage = article.Front.ArticleMeta.LastPage.Value
 	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
 	output.PageCount = article.PageCount()
 
 	output.Date = article.Date().Format("2006-01-02")
 
 	output.MegaCollection = "DeGruyter SSH"
+	return output, nil
+}
+
+// ToSolrSchema converts a single jats article into a basic finc solr schema.
+func (article *Article) ToSolrSchema() (output finc.SolrSchema, err error) {
+	doi, err := article.DOI()
+	if err != nil {
+		return output, err
+	}
+	articleURL := fmt.Sprintf("http://dx.doi.org/%s", doi)
+
+	output.ID = fmt.Sprintf("ai050%s", base64.StdEncoding.EncodeToString([]byte(articleURL)))
+	output.ISSN = article.ISSN()
+	output.Publisher = article.Front.JournalMeta.Publisher.Name.Value
+	output.SourceID = "50"
+	output.RecordType = "ai"
+	output.Title = article.CombinedTitle()
+
+	output.TitleFull = article.CombinedTitle()
+	output.TitleShort = article.Front.ArticleMeta.TitleGroup.Title.Value
+	// output.Topics = doc.Subject // TODO(miku): article-categories
+	output.URL = articleURL
+
+	output.HierarchyParentTitle = article.Front.JournalMeta.JournalTitleGroup.AbbreviatedJournalTitle.Value
+	output.Format = "ElectronicArticle"
+
+	if len(article.Authors()) > 0 {
+		output.Author = article.Authors()[0].String()
+		for _, author := range article.Authors() {
+			output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
+		}
+	}
+
+	if article.Year() > 0 {
+		output.PublishDateSort = article.Year()
+	}
+
+	output.Allfields = article.Allfields()
+	output.MegaCollection = []string{"DeGruyter SSH"}
+
+	// marshal additional/intermediate representation info into fullrecord
+	// TODO(miku): find a less ugly way, e.g. external storage or search index with nested docs support?
+	schema, err := article.ToSchema()
+	if err != nil {
+		return output, err
+	}
+
+	b, err := json.Marshal(schema)
+	if err != nil {
+		return output, err
+	}
+	output.Fullrecord = string(b)
+
 	return output, nil
 }
