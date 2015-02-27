@@ -3,7 +3,6 @@ package jats
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"log"
@@ -284,19 +283,7 @@ func (article *Article) ToSolrSchema() (output finc.SolrSchema, err error) {
 
 	output.Allfields = article.Allfields()
 	output.MegaCollection = []string{"DeGruyter SSH"}
-
-	// marshal additional/intermediate representation info into fullrecord
-	// TODO(miku): find a less ugly way, e.g. external storage or search index with nested docs support?
-	schema, err := article.ToSchema()
-	if err != nil {
-		return output, err
-	}
-
-	b, err := json.Marshal(schema)
-	if err != nil {
-		return output, err
-	}
-	output.Fullrecord = string(b)
+	output.Fullrecord = "blob://id/" + output.ID
 
 	return output, nil
 }

@@ -3,7 +3,6 @@ package crossref
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -358,18 +357,7 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 		output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
 	}
 
-	// marshal additional/intermediate representation info into fullrecord
-	// TODO(miku): find a less ugly way, e.g. external storage or search index with nested docs support?
-	schema, err := doc.ToSchema()
-	if err != nil {
-		return output, err
-	}
-
-	b, err := json.Marshal(schema)
-	if err != nil {
-		return output, err
-	}
-	output.Fullrecord = string(b)
+	output.Fullrecord = "blob://id/" + output.ID
 
 	return output, nil
 }
