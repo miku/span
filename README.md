@@ -55,3 +55,15 @@ use it as input. This way the API does not need to be called at all:
 
 The output is an LDJ in [finc.SolrSchema](https://github.com/miku/span/blob/aa59d6468bad530fbf680c529e341b76e033386c/finc/schema.go#L5),
 which can be indexed into SOLR either via JSON update URL or with tools like [solrbulk](https://github.com/miku/solrbulk).
+
+Notes
+-----
+
+Two separate problems: wrapping formats and processing them. Wrapping formats could be factored out into an own package.
+
+The command line interface should accept input and output types:
+
+    $ span -f crossref -t finc.schema -hspec ... -members ... crossref.ldj > output.ldj
+    $ span -f jats -t finc.schema in.xml > output.ldj
+
+The input type must have a To[OutputSchema] method. Implement conversions as needed.
