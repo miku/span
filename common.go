@@ -11,11 +11,6 @@ import (
 // Version of span
 const Version = "0.1.7"
 
-// Tagger can set tags, e.g. institutions (list of ISILs)
-type Tagger interface {
-	SetTags([]string)
-}
-
 // SolrSchemaConverter should be implemented by
 // formats that can convert themselves to
 // finc solr schema and which can determine coverage

@@ -242,6 +242,7 @@ func (article *Article) Allfields() string {
 	return strings.TrimSpace(buf.String())
 }
 
+// Institutions, TODO(miku): implement lookup
 func (article *Article) Institutions(iih holdings.IsilIssnHolding) []string {
 	return []string{}
 }

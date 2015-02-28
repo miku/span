@@ -33,6 +33,7 @@ type Options struct {
 	FormatFactory FormatFactory
 }
 
+// XMLProcessor is a single worker implementation of XML based conversion.
 func XMLProcessor(filename string, options Options) error {
 	ff, err := os.Open(filename)
 	if err != nil {
@@ -50,6 +51,7 @@ func XMLProcessor(filename string, options Options) error {
 		}
 		switch se := t.(type) {
 		case xml.StartElement:
+			// TODO(miku): make 'article' configurable
 			if se.Name.Local == "article" {
 				doc := options.FormatFactory()
 				decoder.DecodeElement(&doc, &se)
@@ -131,7 +133,7 @@ func BatchedLDJWorker(batches chan []string, out chan []byte, options Options, w
 					continue
 				}
 			}
-			output.SetTags(doc.Institutions(options.Holdings))
+			output.Institutions = doc.Institutions(options.Holdings)
 			b, err := json.Marshal(output)
 			if err != nil {
 				log.Fatal(err)

@@ -26,10 +26,6 @@ type SolrSchema struct {
 	Fullrecord           string   `json:"fullrecord"`
 }
 
-func (s *SolrSchema) SetTags(tags []string) {
-	s.Institutions = tags
-}
-
 // Author representes an author, inspired by OpenURL.
 type Author struct {
 	ID           string `json:"id"`
