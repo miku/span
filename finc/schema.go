@@ -72,7 +72,7 @@ func (author *Author) String() string {
 }
 
 // Schema is an intermediate format inspired by a few existing formats, e.g. OpenURL.
-type Schema struct {
+type InternalSchema struct {
 	RecordID       string `json:"finc.record_id"`
 	SourceID       string `json:"finc.source_id"`
 	MegaCollection string `json:"finc.mega_collection"`

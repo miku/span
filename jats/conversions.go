@@ -7,8 +7,8 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// ToSchema converts a jats article into an intermediate schema.
-func (article *Article) ToSchema() (output finc.Schema, err error) {
+// ToInternalSchema converts a jats article into an internal schema.
+func (article *Article) ToInternalSchema() (output finc.InternalSchema, err error) {
 	doi, err := article.DOI()
 	if err != nil {
 		return output, err

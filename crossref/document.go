@@ -274,8 +274,8 @@ func (doc *Document) ParseMemberID() (int, error) {
 	return 0, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
-// ToSchema converts a crossref document into an intermediate schema.
-func (doc *Document) ToSchema() (output finc.Schema, err error) {
+// ToInternalSchema converts a crossref document into an internal finc schema.
+func (doc *Document) ToInternalSchema() (output finc.InternalSchema, err error) {
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
