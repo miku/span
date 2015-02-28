@@ -46,7 +46,7 @@ func BatchedLDJProcessor(filename string, options Options) error {
 	var wg sync.WaitGroup
 	for i := 0; i < options.NumWorkers; i++ {
 		wg.Add(1)
-		go Worker(batches, docs, options, &wg)
+		go BatchedLDJWorker(batches, docs, options, &wg)
 	}
 
 	i := 1
@@ -75,8 +75,8 @@ func BatchedLDJProcessor(filename string, options Options) error {
 	return nil
 }
 
-// Worker receives batches of strings, parses, transforms and serializes them.
-func Worker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
+// BatchedLDJWorker receives batches of strings, parses, transforms and serializes them.
+func BatchedLDJWorker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range batches {
 		for _, line := range batch {
