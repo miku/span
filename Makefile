@@ -1,4 +1,4 @@
-TARGETS = span
+TARGETS = span span-hspec
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -9,6 +9,9 @@ cover:
 
 span: imports
 	go build -o span cmd/span/main.go
+
+span-hspec: imports
+	go build -o span-hspec cmd/span-hspec/main.go
 
 imports:
 	goimports -w .
