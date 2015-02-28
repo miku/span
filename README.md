@@ -63,7 +63,7 @@ Two problems: wrapping formats and processing them. Wrapping formats could be fa
 
 Output is fixed at [finc.SolrSchema](https://github.com/miku/span/blob/fb0f1e13379fa53f63388ad07b8b2704f24bc311/finc/schema.go#L7) for now.
 
-The command line interface accepts an input format.
+The command line [interface](https://github.com/miku/span/blob/1b05cbe10cdba56b524cd59bee8de68c3538ec4b/common.go#L18) accepts an input format.
 
     $ span -i crossref crossref.ldj > output.ldj
     $ span -i jats in.xml > output.ldj
