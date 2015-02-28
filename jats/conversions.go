@@ -8,7 +8,8 @@ import (
 )
 
 // ToInternalSchema converts a jats article into an internal schema.
-func (article *Article) ToInternalSchema() (output finc.InternalSchema, err error) {
+func (article *Article) ToInternalSchema() (*finc.InternalSchema, error) {
+	output := new(finc.InternalSchema)
 	doi, err := article.DOI()
 	if err != nil {
 		return output, err
@@ -40,7 +41,8 @@ func (article *Article) ToInternalSchema() (output finc.InternalSchema, err erro
 }
 
 // ToSolrSchema converts a single jats article into a basic finc solr schema.
-func (article *Article) ToSolrSchema() (output finc.SolrSchema, err error) {
+func (article *Article) ToSolrSchema() (*finc.SolrSchema, error) {
+	output := new(finc.SolrSchema)
 	doi, err := article.DOI()
 	if err != nil {
 		return output, err

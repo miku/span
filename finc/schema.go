@@ -30,16 +30,6 @@ func (s *SolrSchema) SetTags(tags []string) {
 	s.Institutions = tags
 }
 
-// AddMegaCollection adds isil, if it is not already there.
-func (s *SolrSchema) AddMegaCollection(collection string) {
-	for _, c := range s.MegaCollection {
-		if c == collection {
-			return
-		}
-	}
-	s.MegaCollection = append(s.MegaCollection, collection)
-}
-
 // Author representes an author, inspired by OpenURL.
 type Author struct {
 	ID           string `json:"id"`
@@ -111,3 +101,5 @@ type InternalSchema struct {
 	Language string   `json:"language"`
 	Abstract string   `json:"abstract"`
 }
+
+func (s InternalSchema) SetTags(tags []string) {}

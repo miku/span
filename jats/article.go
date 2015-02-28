@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/miku/span/finc"
+	"github.com/miku/span/holdings"
 )
 
 // Article mirrors a JATS article element. Some elements, such as
@@ -239,4 +240,8 @@ func (article *Article) Allfields() string {
 		}
 	}
 	return strings.TrimSpace(buf.String())
+}
+
+func (article *Article) Institutions(iih holdings.IsilIssnHolding) []string {
+	return []string{}
 }

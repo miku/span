@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
 )
 
@@ -15,12 +16,12 @@ type Tagger interface {
 	SetTags([]string)
 }
 
-// ConverterCoverer should be implemented by
+// SolrSchemaConverter should be implemented by
 // formats that can convert themselves to
-// other format and which can determine coverage
+// finc solr schema and which can determine coverage
 // information, given holdings information.
-type ConverterCoverer interface {
-	ConvertFormat(string) Tagger
+type SolrSchemaConverter interface {
+	ToSolrSchema() (*finc.SolrSchema, error)
 	Institutions(holdings.IsilIssnHolding) []string
 }
 

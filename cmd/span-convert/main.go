@@ -6,8 +6,10 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/crossref"
 	"github.com/miku/span/holdings"
+	"github.com/miku/span/jats"
 
 	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
@@ -18,13 +20,51 @@ import (
 	"sync"
 )
 
+type Factory func() span.SolrSchemaConverter
+
 // Options for worker.
 type Options struct {
-	Holdings     holdings.IsilIssnHolding
-	IgnoreErrors bool
-	Verbose      bool
-	NumWorkers   int
-	BatchSize    int
+	Holdings      holdings.IsilIssnHolding
+	IgnoreErrors  bool
+	Verbose       bool
+	NumWorkers    int
+	BatchSize     int
+	FormatFactory Factory
+}
+
+func XMLProcessor(filename string, options Options) error {
+	ff, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ff.Close()
+	reader := bufio.NewReader(ff)
+
+	decoder := xml.NewDecoder(reader)
+
+	for {
+		t, _ := decoder.Token()
+		if t == nil {
+			break
+		}
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "article" {
+				doc := options.FormatFactory()
+				decoder.DecodeElement(&doc, &se)
+				output, err := doc.ToSolrSchema()
+				if err != nil {
+					return err
+				}
+				b, err := json.Marshal(output)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Println(string(b))
+			}
+		}
+	}
+	return nil
 }
 
 // BatchedLDJProcessor will send batches of line to the workers.
@@ -79,9 +119,9 @@ func BatchedLDJWorker(batches chan []string, out chan []byte, options Options, w
 	defer wg.Done()
 	for batch := range batches {
 		for _, line := range batch {
-			doc := new(crossref.Document)
+			doc := options.FormatFactory()
 			json.Unmarshal([]byte(line), &doc)
-			schema, err := doc.ToSolrSchema()
+			output, err := doc.ToSolrSchema()
 			if err != nil {
 				if options.Verbose {
 					log.Println(err)
@@ -90,8 +130,8 @@ func BatchedLDJWorker(batches chan []string, out chan []byte, options Options, w
 					continue
 				}
 			}
-			schema.SetTags(doc.Institutions(options.Holdings))
-			b, err := json.Marshal(schema)
+			output.SetTags(doc.Institutions(options.Holdings))
+			b, err := json.Marshal(output)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -123,6 +163,8 @@ func main() {
 	ignoreErrors := flag.Bool("ignore", false, "skip broken input record")
 	verbose := flag.Bool("verbose", false, "print debug messages")
 
+	inputFormat := flag.String("i", "crossref", "input format")
+
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] FILE\n", os.Args[0])
 		flag.PrintDefaults()
@@ -146,13 +188,23 @@ func main() {
 		os.Exit(0)
 	}
 
+	// add more input formats here ...
+	factories := map[string]Factory{
+		"crossref": func() span.SolrSchemaConverter { return new(crossref.Document) },
+		"jats":     func() span.SolrSchemaConverter { return new(jats.Article) },
+	}
+
+	if factories[*inputFormat] == nil {
+		log.Fatalf("unknown input format: %s", *inputFormat)
+	}
+
 	options := Options{
-		Holdings:               make(holdings.IsilIssnHolding),
-		IgnoreErrors:           *ignoreErrors,
-		Verbose:                *verbose,
-		AllowEmptyInstitutions: *allowEmptyInstitutions,
-		NumWorkers:             *numWorkers,
-		BatchSize:              *batchSize,
+		Holdings:      make(holdings.IsilIssnHolding),
+		IgnoreErrors:  *ignoreErrors,
+		Verbose:       *verbose,
+		NumWorkers:    *numWorkers,
+		BatchSize:     *batchSize,
+		FormatFactory: factories[*inputFormat],
 	}
 
 	if *hspec != "" {
@@ -182,8 +234,17 @@ func main() {
 		}
 	}
 
-	err := BatchedLDJProcessor(flag.Arg(0), options)
-	if err != nil {
-		log.Fatal(err)
+	// TODO(miku): a format should come with an appropriate converter, etc.
+	switch *inputFormat {
+	case "crossref":
+		err := BatchedLDJProcessor(flag.Arg(0), options)
+		if err != nil {
+			log.Fatal(err)
+		}
+	case "jats":
+		err := XMLProcessor(flag.Arg(0), options)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }

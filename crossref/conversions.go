@@ -9,7 +9,8 @@ import (
 )
 
 // ToInternalSchema converts a crossref document into an internal finc schema.
-func (doc *Document) ToInternalSchema() (output finc.InternalSchema, err error) {
+func (doc *Document) ToInternalSchema() (*finc.InternalSchema, error) {
+	output := new(finc.InternalSchema)
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
@@ -48,7 +49,8 @@ func (doc *Document) ToInternalSchema() (output finc.InternalSchema, err error) 
 }
 
 // ToSolrSchema converts a single crossref document into a basic finc solr schema.
-func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
+func (doc *Document) ToSolrSchema() (*finc.SolrSchema, error) {
+	output := new(finc.SolrSchema)
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
@@ -88,7 +90,7 @@ func (doc *Document) ToSolrSchema() (output finc.SolrSchema, err error) {
 
 	name, err := doc.MemberName()
 	if err == nil {
-		output.AddMegaCollection(fmt.Sprintf("%s (CrossRef)", name))
+		output.MegaCollection = []string{fmt.Sprintf("%s (CrossRef)", name)}
 	}
 
 	output.Fullrecord = "blob://id/" + output.ID
