@@ -6,8 +6,10 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/crossref"
 	"github.com/miku/span/holdings"
+	"github.com/miku/span/jats"
 
 	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
@@ -18,22 +20,109 @@ import (
 	"sync"
 )
 
+// FormatFactory builds various formats.
+type FormatFactory func() span.SolrSchemaConverter
+
 // Options for worker.
 type Options struct {
-	Holdings               holdings.IsilIssnHolding
-	IgnoreErrors           bool
-	Verbose                bool
-	AllowEmptyInstitutions bool
+	Holdings      holdings.IsilIssnHolding
+	IgnoreErrors  bool
+	Verbose       bool
+	NumWorkers    int
+	BatchSize     int
+	FormatFactory FormatFactory
 }
 
-// Worker receives batches of strings, parses, transforms and serializes them.
-func Worker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
+func XMLProcessor(filename string, options Options) error {
+	ff, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ff.Close()
+	reader := bufio.NewReader(ff)
+
+	decoder := xml.NewDecoder(reader)
+
+	for {
+		t, _ := decoder.Token()
+		if t == nil {
+			break
+		}
+		switch se := t.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "article" {
+				doc := options.FormatFactory()
+				decoder.DecodeElement(&doc, &se)
+				output, err := doc.ToSolrSchema()
+				if err != nil {
+					return err
+				}
+				b, err := json.Marshal(output)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Println(string(b))
+			}
+		}
+	}
+	return nil
+}
+
+// BatchedLDJProcessor will send batches of line to the workers.
+func BatchedLDJProcessor(filename string, options Options) error {
+	ff, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ff.Close()
+	reader := bufio.NewReader(ff)
+
+	batches := make(chan []string)
+	docs := make(chan []byte)
+	done := make(chan bool)
+
+	go ByteSliceCollector(docs, done)
+
+	var wg sync.WaitGroup
+	for i := 0; i < options.NumWorkers; i++ {
+		wg.Add(1)
+		go BatchedLDJWorker(batches, docs, options, &wg)
+	}
+
+	i := 1
+	batch := make([]string, options.BatchSize)
+	for {
+		line, err := reader.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		batch = append(batch, line)
+		if i == options.BatchSize {
+			batches <- batch
+			batch = batch[:0]
+			i = 1
+		}
+		i++
+	}
+	batches <- batch
+	close(batches)
+	wg.Wait()
+	close(docs)
+	<-done
+	return nil
+}
+
+// BatchedLDJWorker receives batches of strings, parses, transforms and serializes them.
+func BatchedLDJWorker(batches chan []string, out chan []byte, options Options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range batches {
 		for _, line := range batch {
-			doc := new(crossref.Document)
+			doc := options.FormatFactory()
 			json.Unmarshal([]byte(line), &doc)
-			schema, err := doc.ToSolrSchema()
+			output, err := doc.ToSolrSchema()
 			if err != nil {
 				if options.Verbose {
 					log.Println(err)
@@ -42,11 +131,8 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 					continue
 				}
 			}
-			schema.Institutions = doc.Institutions(options.Holdings)
-			if schema.Institutions == nil && !options.AllowEmptyInstitutions {
-				continue
-			}
-			b, err := json.Marshal(schema)
+			output.SetTags(doc.Institutions(options.Holdings))
+			b, err := json.Marshal(output)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -56,7 +142,7 @@ func Worker(batches chan []string, out chan []byte, options Options, wg *sync.Wa
 }
 
 // Collector collects docs and writes them out to stdout.
-func Collector(docs chan []byte, done chan bool) {
+func ByteSliceCollector(docs chan []byte, done chan bool) {
 	f := bufio.NewWriter(os.Stdout)
 	defer f.Flush()
 	for b := range docs {
@@ -77,10 +163,11 @@ func main() {
 
 	ignoreErrors := flag.Bool("ignore", false, "skip broken input record")
 	verbose := flag.Bool("verbose", false, "print debug messages")
-	allowEmptyInstitutions := flag.Bool("allow-empty-institutions", false, "keep records, even if no institutions is using it")
+
+	inputFormat := flag.String("i", "crossref", "input format")
 
 	PrintUsage := func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] CROSSREF.LDJ\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] FILE\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 
@@ -102,11 +189,23 @@ func main() {
 		os.Exit(0)
 	}
 
+	// add more input formats here ...
+	factories := map[string]FormatFactory{
+		"crossref": func() span.SolrSchemaConverter { return new(crossref.Document) },
+		"jats":     func() span.SolrSchemaConverter { return new(jats.Article) },
+	}
+
+	if factories[*inputFormat] == nil {
+		log.Fatalf("unknown input format: %s", *inputFormat)
+	}
+
 	options := Options{
-		Holdings:               make(holdings.IsilIssnHolding),
-		IgnoreErrors:           *ignoreErrors,
-		Verbose:                *verbose,
-		AllowEmptyInstitutions: *allowEmptyInstitutions,
+		Holdings:      make(holdings.IsilIssnHolding),
+		IgnoreErrors:  *ignoreErrors,
+		Verbose:       *verbose,
+		NumWorkers:    *numWorkers,
+		BatchSize:     *batchSize,
+		FormatFactory: factories[*inputFormat],
 	}
 
 	if *hspec != "" {
@@ -136,46 +235,17 @@ func main() {
 		}
 	}
 
-	ff, err := os.Open(flag.Arg(0))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ff.Close()
-	reader := bufio.NewReader(ff)
-
-	batches := make(chan []string)
-	docs := make(chan []byte)
-	done := make(chan bool)
-
-	go Collector(docs, done)
-
-	var wg sync.WaitGroup
-	for i := 0; i < *numWorkers; i++ {
-		wg.Add(1)
-		go Worker(batches, docs, options, &wg)
-	}
-
-	i := 1
-	batch := make([]string, *batchSize)
-	for {
-		line, err := reader.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
+	// TODO(miku): a format should come with an appropriate converter, etc.
+	switch *inputFormat {
+	case "crossref":
+		err := BatchedLDJProcessor(flag.Arg(0), options)
 		if err != nil {
 			log.Fatal(err)
 		}
-		batch = append(batch, line)
-		if i == *batchSize {
-			batches <- batch
-			batch = batch[:0]
-			i = 1
+	case "jats":
+		err := XMLProcessor(flag.Arg(0), options)
+		if err != nil {
+			log.Fatal(err)
 		}
-		i++
 	}
-	batches <- batch
-	close(batches)
-	wg.Wait()
-	close(docs)
-	<-done
 }
