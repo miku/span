@@ -53,7 +53,7 @@ use it as input. This way the API does not need to be called at all:
 
     $ span -hspec DE-15:file.xml,DE-10:other.xml -members members.ldj crossref.ldj
 
-The output is an LDJ in [finc.SolrSchema](https://github.com/miku/span/blob/aa59d6468bad530fbf680c529e341b76e033386c/finc/schema.go#L5),
+The output is an LDJ in [finc.SolrSchema](https://github.com/miku/span/blob/fb0f1e13379fa53f63388ad07b8b2704f24bc311/finc/schema.go#L7),
 which can be indexed into SOLR either via JSON update URL or with tools like [solrbulk](https://github.com/miku/solrbulk).
 
 Notes
@@ -61,7 +61,7 @@ Notes
 
 Two problems: wrapping formats and processing them. Wrapping formats could be factored out into an own package.
 
-Output is fixed at finc.SolrSchema for now.
+Output is fixed at [finc.SolrSchema](https://github.com/miku/span/blob/fb0f1e13379fa53f63388ad07b8b2704f24bc311/finc/schema.go#L7) for now.
 
 The command line interface accepts an input format.
 
