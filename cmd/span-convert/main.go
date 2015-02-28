@@ -20,12 +20,11 @@ import (
 
 // Options for worker.
 type Options struct {
-	Holdings               holdings.IsilIssnHolding
-	IgnoreErrors           bool
-	Verbose                bool
-	AllowEmptyInstitutions bool
-	NumWorkers             int
-	BatchSize              int
+	Holdings     holdings.IsilIssnHolding
+	IgnoreErrors bool
+	Verbose      bool
+	NumWorkers   int
+	BatchSize    int
 }
 
 // BatchedLDJProcessor will send batches of line to the workers.
@@ -91,10 +90,7 @@ func BatchedLDJWorker(batches chan []string, out chan []byte, options Options, w
 					continue
 				}
 			}
-			schema.Institutions = doc.Institutions(options.Holdings)
-			if schema.Institutions == nil && !options.AllowEmptyInstitutions {
-				continue
-			}
+			schema.SetTags(doc.Institutions(options.Holdings))
 			b, err := json.Marshal(schema)
 			if err != nil {
 				log.Fatal(err)
@@ -126,7 +122,6 @@ func main() {
 
 	ignoreErrors := flag.Bool("ignore", false, "skip broken input record")
 	verbose := flag.Bool("verbose", false, "print debug messages")
-	allowEmptyInstitutions := flag.Bool("allow-empty-institutions", false, "keep records, even if no institutions is using it")
 
 	PrintUsage := func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS] FILE\n", os.Args[0])

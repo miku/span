@@ -26,14 +26,8 @@ type SolrSchema struct {
 	Fullrecord           string   `json:"fullrecord"`
 }
 
-// AddInstitution adds an isil, if it is not already there.
-func (s *SolrSchema) AddInstitution(isil string) {
-	for _, institution := range s.Institutions {
-		if institution == isil {
-			return
-		}
-	}
-	s.Institutions = append(s.Institutions, isil)
+func (s *SolrSchema) SetTags(tags []string) {
+	s.Institutions = tags
 }
 
 // AddMegaCollection adds isil, if it is not already there.
