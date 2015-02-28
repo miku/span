@@ -1,4 +1,4 @@
-TARGETS = span span-hspec
+TARGETS = span span-hspec span-convert
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -12,6 +12,9 @@ span: imports
 
 span-hspec: imports
 	go build -o span-hspec cmd/span-hspec/main.go
+
+span-convert: imports
+	go build -o span-convert cmd/span-convert/main.go
 
 imports:
 	goimports -w .
