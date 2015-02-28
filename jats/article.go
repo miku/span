@@ -125,6 +125,8 @@ type Article struct {
 	}
 }
 
+// Authors returns the authors as slice.
+// TODO(miku): get rid of cross-format dependency.
 func (article *Article) Authors() []finc.Author {
 	var authors []finc.Author
 	group := article.Front.Article.ContribGroup
@@ -152,10 +154,7 @@ func (article *Article) CombinedTitle() string {
 	return ""
 }
 
-func (article *Article) ShortTitle() string {
-	return article.CombinedTitle()
-}
-
+// DOI is a convenience shortcut to get the DOI.
 func (article *Article) DOI() (string, error) {
 	for _, id := range article.Front.Article.ID {
 		if id.Type == "doi" {
@@ -165,6 +164,7 @@ func (article *Article) DOI() (string, error) {
 	return "", fmt.Errorf("article has no DOI")
 }
 
+// ISSN returns a list of ISSNs associated with this article.
 func (article *Article) ISSN() []string {
 	var issns []string
 	for _, issn := range article.Front.Journal.ISSN {
@@ -173,6 +173,7 @@ func (article *Article) ISSN() []string {
 	return issns
 }
 
+// PageCount return the number of pages as string.
 func (article *Article) PageCount() string {
 	first, err := strconv.Atoi(article.Front.Article.FirstPage.Value)
 	if err != nil {
@@ -188,6 +189,7 @@ func (article *Article) PageCount() string {
 	return ""
 }
 
+// defaultString returns a default if s is the empty string.
 func defaultString(s, defaultValue string) string {
 	if s == "" {
 		return defaultValue
@@ -195,6 +197,7 @@ func defaultString(s, defaultValue string) string {
 	return s
 }
 
+// Date returns this articles issuing date in a best effort manner.
 func (article *Article) Date() time.Time {
 	pubdate := article.Front.Article.PubDate
 	day := defaultString(pubdate.Day.Value, "01")
@@ -285,7 +288,6 @@ func (article *Article) ToSolrSchema() (output finc.SolrSchema, err error) {
 	output.SourceID = "50"
 	output.RecordType = "ai"
 	output.Title = article.CombinedTitle()
-
 	output.TitleFull = article.CombinedTitle()
 	output.TitleShort = article.Front.Article.TitleGroup.Title.Value
 	// output.Topics = doc.Subject // TODO(miku): article-categories
