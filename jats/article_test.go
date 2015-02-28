@@ -59,23 +59,23 @@ func TestSchema(t *testing.T) {
 	if err != nil {
 		t.Errorf("got %v, want %v", err, nil)
 	}
-	if len(article.Front.JournalMeta.ISSN) != 2 {
-		t.Errorf("got %d, want %d", len(article.Front.JournalMeta.ISSN), 2)
+	if len(article.Front.Journal.ISSN) != 2 {
+		t.Errorf("got %d, want %d", len(article.Front.Journal.ISSN), 2)
 	}
-	if article.Front.ArticleMeta.PubDate.Year.Value != "1969" {
-		t.Errorf("got %s, want %s", article.Front.ArticleMeta.PubDate.Year.Value, 1969)
+	if article.Front.Article.PubDate.Year.Value != "1969" {
+		t.Errorf("got %s, want %s", article.Front.Article.PubDate.Year.Value, 1969)
 	}
-	if article.Front.ArticleMeta.TitleGroup.Subtitle.Value != "Das Zeugnisdes Baeda" {
-		t.Errorf("got %s, want %s", article.Front.ArticleMeta.TitleGroup.Subtitle.Value, "Das Zeugnisdes Baeda")
+	if article.Front.Article.TitleGroup.Subtitle.Value != "Das Zeugnisdes Baeda" {
+		t.Errorf("got %s, want %s", article.Front.Article.TitleGroup.Subtitle.Value, "Das Zeugnisdes Baeda")
 	}
-	if article.Front.ArticleMeta.Issue.Value != "2" {
-		t.Errorf("got %s, want %s", article.Front.ArticleMeta.Issue.Value, 2)
+	if article.Front.Article.Issue.Value != "2" {
+		t.Errorf("got %s, want %s", article.Front.Article.Issue.Value, 2)
 	}
-	if article.Front.ArticleMeta.Volume.Value != "51" {
-		t.Errorf("got %s, want %s", article.Front.ArticleMeta.Volume.Value, 51)
+	if article.Front.Article.Volume.Value != "51" {
+		t.Errorf("got %s, want %s", article.Front.Article.Volume.Value, 51)
 	}
-	if article.Front.ArticleMeta.Permissions.CopyrightYear.Value != "2013" {
-		t.Errorf("got %s, want %s", article.Front.ArticleMeta.Permissions.CopyrightYear.Value, "2013")
+	if article.Front.Article.Permissions.CopyrightYear.Value != "2013" {
+		t.Errorf("got %s, want %s", article.Front.Article.Permissions.CopyrightYear.Value, "2013")
 	}
 }
 
@@ -89,7 +89,7 @@ func TestToSolrSchema(t *testing.T) {
 	if err != nil {
 		t.Errorf("got %v, want %v", err, nil)
 	}
-	if ss.Publisher != article.Front.JournalMeta.Publisher.Name.Value {
-		t.Errorf("got %v, want %v", ss.Publisher, article.Front.JournalMeta.Publisher.Name.Value)
+	if ss.Publisher != article.Front.Journal.Publisher.Name.Value {
+		t.Errorf("got %v, want %v", ss.Publisher, article.Front.Journal.Publisher.Name.Value)
 	}
 }

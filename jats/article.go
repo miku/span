@@ -18,92 +18,116 @@ import (
 type Article struct {
 	XMLName xml.Name `xml:"article"`
 	Front   struct {
-		JournalMeta struct {
-			JournalID struct {
-				Type string `xml:"journal-id-type,attr"`
-				ID   string `xml:",chardata"`
-			} `xml:"journal-id"`
+		XMLName xml.Name `xml:"front"`
+		Journal struct {
+			ID struct {
+				XMLName xml.Name `xml:"journal-id"`
+				Type    string   `xml:"journal-id-type,attr"`
+				Value   string   `xml:",chardata"`
+			}
 			ISSN []struct {
 				Type  string `xml:"pub-type,attr"`
 				Value string `xml:",chardata"`
 			} `xml:"issn"`
-			JournalTitleGroup struct {
-				AbbreviatedJournalTitle struct {
-					Value string `xml:",chardata"`
-					Type  string `xml:"abbrev-type,attr"`
-				} `xml:"abbrev-journal-title"`
-			} `xml:"journal-title-group"`
+			TitleGroup struct {
+				XMLName          xml.Name `xml:"journal-title-group"`
+				AbbreviatedTitle struct {
+					XMLName xml.Name `xml:"abbrev-journal-title"`
+					Title   string   `xml:",chardata"`
+					Type    string   `xml:"abbrev-type,attr"`
+				}
+			}
 			Publisher struct {
-				Name struct {
-					Value string `xml:",chardata"`
-				} `xml:"publisher-name"`
-			} `xml:"publisher"`
+				XMLName xml.Name `xml:"publisher"`
+				Name    struct {
+					XMLName xml.Name `xml:"publisher-name"`
+					Value   string   `xml:",chardata"`
+				}
+			}
 		} `xml:"journal-meta"`
-		ArticleMeta struct {
-			ArticleID []struct {
+		Article struct {
+			XMLName xml.Name `xml:"article-meta"`
+			ID      []struct {
 				Type  string `xml:"pub-id-type,attr"`
 				Value string `xml:",chardata"`
 			} `xml:"article-id"`
 			TitleGroup struct {
-				Title struct {
-					Value string `xml:",chardata"`
-				} `xml:"article-title"`
+				XMLName xml.Name `xml:"title-group"`
+				Title   struct {
+					XMLName xml.Name `xml:"article-title"`
+					Value   string   `xml:",chardata"`
+				}
 				Subtitle struct {
-					Value string `xml:",chardata"`
-				} `xml:"subtitle"`
-			} `xml:"title-group"`
+					XMLName xml.Name `xml:"subtitle"`
+					Value   string   `xml:",chardata"`
+				}
+			}
 			ContribGroup struct {
+				XMLName xml.Name `xml:"contrib-group"`
 				Contrib []struct {
 					Type string `xml:"contrib-type,attr"`
 					Name struct {
+						XMLName xml.Name `xml:"name"`
 						Surname struct {
-							Value string `xml:",chardata"`
-						} `xml:"surname"`
+							XMLName xml.Name `xml:"surname"`
+							Value   string   `xml:",chardata"`
+						}
 						GivenNames struct {
-							Value string `xml:",chardata"`
-						} `xml:"given-names"`
-					} `xml:"name"`
+							XMLName xml.Name `xml:"given-names"`
+							Value   string   `xml:",chardata"`
+						}
+					}
 				} `xml:"contrib"`
-			} `xml:"contrib-group"`
+			}
 			PubDate struct {
 				Type  string `xml:"pub-type,attr"`
 				Month struct {
-					Value string `xml:",chardata"`
-				} `xml:"month"`
+					XMLName xml.Name `xml:"month"`
+					Value   string   `xml:",chardata"`
+				}
 				Year struct {
-					Value string `xml:",chardata"`
-				} `xml:"year"`
+					XMLName xml.Name `xml:"year"`
+					Value   string   `xml:",chardata"`
+				}
 				Day struct {
-					Value string `xml:",chardata"`
-				} `xml:"day"`
+					XMLName xml.Name `xml:"day"`
+					Value   string   `xml:",chardata"`
+				}
 			} `xml:"pub-date"`
 			Volume struct {
-				Value string `xml:",chardata"`
-			} `xml:"volume"`
+				XMLName xml.Name `xml:"volume"`
+				Value   string   `xml:",chardata"`
+			}
 			Issue struct {
-				Value string `xml:",chardata"`
-			} `xml:"issue"`
+				XMLName xml.Name `xml:"issue"`
+				Value   string   `xml:",chardata"`
+			}
 			FirstPage struct {
-				Value string `xml:",chardata"`
-			} `xml:"fpage"`
+				XMLName xml.Name `xml:"fpage"`
+				Value   string   `xml:",chardata"`
+			}
 			LastPage struct {
-				Value string `xml:",chardata"`
-			} `xml:"lpage"`
+				XMLName xml.Name `xml:"lpage"`
+				Value   string   `xml:",chardata"`
+			}
 			Permissions struct {
+				XMLName       xml.Name `xml:"permissions"`
 				CopyrightYear struct {
-					Value string `xml:",chardata"`
-				} `xml:"copyright-year"`
+					XMLName xml.Name `xml:"copyright-year"`
+					Value   string   `xml:",chardata"`
+				}
 				CopyrightStatement struct {
-					Value string `xml:",chardata"`
-				} `xml:"copyright-statement"`
-			} `xml:"permissions"`
-		} `xml:"article-meta"`
-	} `xml:"front"`
+					XMLName xml.Name `xml:"copyright-statement"`
+					Value   string   `xml:",chardata"`
+				}
+			}
+		}
+	}
 }
 
 func (article *Article) Authors() []finc.Author {
 	var authors []finc.Author
-	group := article.Front.ArticleMeta.ContribGroup
+	group := article.Front.Article.ContribGroup
 	for _, contrib := range group.Contrib {
 		if contrib.Type != "author" {
 			continue
@@ -115,7 +139,7 @@ func (article *Article) Authors() []finc.Author {
 
 // CombinedTitle returns a longish title.
 func (article *Article) CombinedTitle() string {
-	group := article.Front.ArticleMeta.TitleGroup
+	group := article.Front.Article.TitleGroup
 	if group.Title.Value != "" {
 		if group.Subtitle.Value != "" {
 			return fmt.Sprintf("%s : %s", group.Title.Value, group.Subtitle.Value)
@@ -133,7 +157,7 @@ func (article *Article) ShortTitle() string {
 }
 
 func (article *Article) DOI() (string, error) {
-	for _, id := range article.Front.ArticleMeta.ArticleID {
+	for _, id := range article.Front.Article.ID {
 		if id.Type == "doi" {
 			return id.Value, nil
 		}
@@ -143,18 +167,18 @@ func (article *Article) DOI() (string, error) {
 
 func (article *Article) ISSN() []string {
 	var issns []string
-	for _, issn := range article.Front.JournalMeta.ISSN {
+	for _, issn := range article.Front.Journal.ISSN {
 		issns = append(issns, issn.Value)
 	}
 	return issns
 }
 
 func (article *Article) PageCount() string {
-	first, err := strconv.Atoi(article.Front.ArticleMeta.FirstPage.Value)
+	first, err := strconv.Atoi(article.Front.Article.FirstPage.Value)
 	if err != nil {
 		return ""
 	}
-	last, err := strconv.Atoi(article.Front.ArticleMeta.LastPage.Value)
+	last, err := strconv.Atoi(article.Front.Article.LastPage.Value)
 	if err != nil {
 		return ""
 	}
@@ -172,7 +196,7 @@ func defaultString(s, defaultValue string) string {
 }
 
 func (article *Article) Date() time.Time {
-	pubdate := article.Front.ArticleMeta.PubDate
+	pubdate := article.Front.Article.PubDate
 	day := defaultString(pubdate.Day.Value, "01")
 	month := defaultString(pubdate.Month.Value, "01")
 	year := defaultString(pubdate.Year.Value, "1970")
@@ -184,7 +208,7 @@ func (article *Article) Date() time.Time {
 }
 
 func (article *Article) Year() int {
-	year, err := strconv.Atoi(article.Front.ArticleMeta.PubDate.Year.Value)
+	year, err := strconv.Atoi(article.Front.Article.PubDate.Year.Value)
 	if err != nil {
 		return 0
 	}
@@ -198,8 +222,8 @@ func (article *Article) Allfields() string {
 		authors = append(authors, author.String())
 	}
 	fields := [][]string{article.ISSN(), authors, []string{article.CombinedTitle(),
-		doi, article.Front.JournalMeta.JournalTitleGroup.AbbreviatedJournalTitle.Value,
-		article.Front.ArticleMeta.Volume.Value, article.Front.ArticleMeta.Issue.Value}}
+		doi, article.Front.Journal.TitleGroup.AbbreviatedTitle.Title,
+		article.Front.Article.Volume.Value, article.Front.Article.Issue.Value}}
 
 	var buf bytes.Buffer
 	for _, f := range fields {
@@ -227,17 +251,17 @@ func (article *Article) ToSchema() (output finc.Schema, err error) {
 	output.URL = append(output.URL, articleURL)
 	output.DOI = doi
 	output.SourceID = "50"
-	output.Publisher = append(output.Publisher, article.Front.JournalMeta.Publisher.Name.Value)
+	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
 	output.ArticleTitle = article.CombinedTitle()
-	output.Issue = article.Front.ArticleMeta.Issue.Value
-	output.Volume = article.Front.ArticleMeta.Volume.Value
+	output.Issue = article.Front.Article.Issue.Value
+	output.Volume = article.Front.Article.Volume.Value
 	output.ISSN = article.ISSN()
-	output.JournalTitle = article.Front.JournalMeta.JournalTitleGroup.AbbreviatedJournalTitle.Value
+	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
 
 	output.Authors = article.Authors()
 
-	output.StartPage = article.Front.ArticleMeta.FirstPage.Value
-	output.EndPage = article.Front.ArticleMeta.LastPage.Value
+	output.StartPage = article.Front.Article.FirstPage.Value
+	output.EndPage = article.Front.Article.LastPage.Value
 	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
 	output.PageCount = article.PageCount()
 
@@ -257,17 +281,17 @@ func (article *Article) ToSolrSchema() (output finc.SolrSchema, err error) {
 
 	output.ID = fmt.Sprintf("ai050%s", base64.StdEncoding.EncodeToString([]byte(articleURL)))
 	output.ISSN = article.ISSN()
-	output.Publisher = article.Front.JournalMeta.Publisher.Name.Value
+	output.Publisher = article.Front.Journal.Publisher.Name.Value
 	output.SourceID = "50"
 	output.RecordType = "ai"
 	output.Title = article.CombinedTitle()
 
 	output.TitleFull = article.CombinedTitle()
-	output.TitleShort = article.Front.ArticleMeta.TitleGroup.Title.Value
+	output.TitleShort = article.Front.Article.TitleGroup.Title.Value
 	// output.Topics = doc.Subject // TODO(miku): article-categories
 	output.URL = articleURL
 
-	output.HierarchyParentTitle = article.Front.JournalMeta.JournalTitleGroup.AbbreviatedJournalTitle.Value
+	output.HierarchyParentTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
 	output.Format = "ElectronicArticle"
 
 	if len(article.Authors()) > 0 {
