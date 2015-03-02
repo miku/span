@@ -20,17 +20,28 @@ Usage
 -----
 
     $ span
-    Usage: span [OPTIONS] CROSSREF.LDJ
-      -allow-empty-institutions=false: keep records, even if no institutions is using it
+    Usage: span [OPTIONS] FILE
       -b=25000: batch size
       -cpuprofile="": write cpu profile to file
       -hspec="": ISIL PATH pairs
-      -hspec-export=false: export a single combined holdings map as JSON
+      -i="crossref": input format
       -ignore=false: skip broken input record
       -members="": path to LDJ file, one member per line
       -v=false: prints current program version
       -verbose=false: print debug messages
       -w=4: workers
+
+For combining various OVID holding files into a single json object, use span-hspec:
+
+    $ span-hspec -h
+    Usage of span-hspec:
+      -cpuprofile="": write cpu profile to file
+      -hspec="": ISIL PATH pairs
+      -v=false: prints current program version
+
+    $ span-hspec DE-15:ubl.xml,DE-105:tuf.xml > holdings.json
+
+This json object is basically the in-memory lookup data structure, when processing article data.
 
 Inputs and Outputs
 ------------------
