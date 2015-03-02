@@ -29,6 +29,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
 install -m 755 span $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-hspec $RPM_BUILD_ROOT/usr/local/sbin
 
 %post
 # the post section is where you can run commands after the rpm is installed.
@@ -43,6 +44,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 %files
 %defattr(-,root,root)
 /usr/local/sbin/span
+/usr/local/sbin/span-hspec
 
 
 %changelog
