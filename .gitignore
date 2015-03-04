@@ -27,7 +27,7 @@ _testmain.go
 /crparse
 /span
 /span-hspec
-/span-convert
+/span-gh-dump
 /fixtures
 
 span_*.deb
