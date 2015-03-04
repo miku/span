@@ -20,6 +20,11 @@ type SolrSchemaConverter interface {
 	Institutions(holdings.IsilIssnHolding) []string
 }
 
+// InternalSchemaConverter can output finc internal schema documents.
+type InternalSchemaConverter interface {
+	ToInternalSchema(*finc.InternalSchema, error)
+}
+
 // ParseHoldingSpec parses a holdings flag value into a map.
 func ParseHoldingSpec(s string) (map[string]string, error) {
 	fields := strings.Split(s, ",")
