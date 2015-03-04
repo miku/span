@@ -101,7 +101,7 @@ func (doc *Document) ToSolrSchema() (*finc.SolrSchema, error) {
 		output.MegaCollection = []string{fmt.Sprintf("%s (CrossRef)", name)}
 	}
 
-	output.Fullrecord = "blob://id/" + output.ID
+	output.Fullrecord = "blob://" + output.ID
 
 	return output, nil
 }
