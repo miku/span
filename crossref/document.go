@@ -2,6 +2,7 @@ package crossref
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"sort"
@@ -12,6 +13,8 @@ import (
 	"github.com/miku/span/holdings"
 	"github.com/miku/span/sets"
 )
+
+const SourceID = 49
 
 // Author is given by family and given name.
 type Author struct {
@@ -80,6 +83,10 @@ func (pi *PageInfo) PageCount() int {
 		}
 	}
 	return 0
+}
+
+func (doc *Document) RecordID() string {
+	return fmt.Sprintf("ai-%d-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.URL)))
 }
 
 // PageInfo parses a page specfication in a best effort manner into a PageInfo struct.

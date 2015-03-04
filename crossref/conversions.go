@@ -20,10 +20,10 @@ func (doc *Document) ToInternalSchema() (*finc.InternalSchema, error) {
 		return output, ErrMissingUrl
 	}
 
-	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	output.RecordID = doc.RecordID()
 	output.URL = append(output.URL, doc.URL)
 	output.DOI = doc.DOI
-	output.SourceID = "49"
+	output.SourceID = fmt.Sprintf("%d", SourceID)
 	output.Publisher = append(output.Publisher, doc.Publisher)
 	output.ArticleTitle = doc.CombinedTitle()
 	if output.ArticleTitle == "" {
