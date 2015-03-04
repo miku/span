@@ -34,16 +34,8 @@ type Options struct {
 }
 
 // XMLProcessor is a single worker implementation of XML based conversion.
-func XMLProcessor(filename string, options Options) error {
-	ff, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ff.Close()
-	reader := bufio.NewReader(ff)
-
-	decoder := xml.NewDecoder(reader)
-
+func XMLProcessor(reader io.Reader, options Options) error {
+	decoder := xml.NewDecoder(bufio.NewReader(reader))
 	for {
 		t, _ := decoder.Token()
 		if t == nil {
@@ -59,6 +51,7 @@ func XMLProcessor(filename string, options Options) error {
 				if err != nil {
 					return err
 				}
+				output.Institutions = doc.Institutions(options.Holdings)
 				b, err := json.Marshal(output)
 				if err != nil {
 					log.Fatal(err)
@@ -71,14 +64,8 @@ func XMLProcessor(filename string, options Options) error {
 }
 
 // BatchedLDJProcessor will send batches of line to the workers.
-func BatchedLDJProcessor(filename string, options Options) error {
-	ff, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ff.Close()
-	reader := bufio.NewReader(ff)
-
+func BatchedLDJProcessor(r io.Reader, options Options) error {
+	reader := bufio.NewReader(r)
 	batches := make(chan []string)
 	docs := make(chan []byte)
 	done := make(chan bool)
@@ -238,14 +225,20 @@ func main() {
 	}
 
 	// TODO(miku): a format should come with an appropriate converter, etc.
+	reader, err := os.Open(flag.Arg(0))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer reader.Close()
+
 	switch *inputFormat {
 	case "crossref":
-		err := BatchedLDJProcessor(flag.Arg(0), options)
+		err := BatchedLDJProcessor(reader, options)
 		if err != nil {
 			log.Fatal(err)
 		}
 	case "jats":
-		err := XMLProcessor(flag.Arg(0), options)
+		err := XMLProcessor(reader, options)
 		if err != nil {
 			log.Fatal(err)
 		}
