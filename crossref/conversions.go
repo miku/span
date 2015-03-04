@@ -8,11 +8,16 @@ import (
 	"github.com/miku/span/finc"
 )
 
+var (
+	ErrMissingUrl   = errors.New("document has no URL")
+	ErrMissingTitle = errors.New("document has no title")
+)
+
 // ToInternalSchema converts a crossref document into an internal finc schema.
 func (doc *Document) ToInternalSchema() (*finc.InternalSchema, error) {
 	output := new(finc.InternalSchema)
 	if doc.URL == "" {
-		return output, errors.New("input document has no URL")
+		return output, ErrMissingUrl
 	}
 
 	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
@@ -21,6 +26,9 @@ func (doc *Document) ToInternalSchema() (*finc.InternalSchema, error) {
 	output.SourceID = "49"
 	output.Publisher = append(output.Publisher, doc.Publisher)
 	output.ArticleTitle = doc.CombinedTitle()
+	if output.ArticleTitle == "" {
+		return output, ErrMissingTitle
+	}
 	output.Issue = doc.Issue
 	output.Volume = doc.Volume
 	output.ISSN = doc.ISSN
@@ -52,7 +60,7 @@ func (doc *Document) ToInternalSchema() (*finc.InternalSchema, error) {
 func (doc *Document) ToSolrSchema() (*finc.SolrSchema, error) {
 	output := new(finc.SolrSchema)
 	if doc.URL == "" {
-		return output, errors.New("input document has no URL")
+		return output, ErrMissingUrl
 	}
 
 	output.ID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
