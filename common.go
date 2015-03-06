@@ -9,7 +9,7 @@ import (
 )
 
 // Version of span
-const Version = "0.1.7"
+const Version = "0.1.8"
 
 // Batcher groups strings together for batched processing.
 // It is more effective to send one batch over a channel than 25k strings.

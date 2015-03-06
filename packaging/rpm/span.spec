@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.7
+Version:    0.1.8
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -28,8 +28,11 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 
 # put the files in to the relevant directories.
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
-install -m 755 span $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-gh-dump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-hspec $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
+
 
 %post
 # the post section is where you can run commands after the rpm is installed.
@@ -43,11 +46,16 @@ rm -rf %{_topdir}/BUILD/%{name}
 # list files owned by the package here
 %files
 %defattr(-,root,root)
-/usr/local/sbin/span
+/usr/local/sbin/span-export
+/usr/local/sbin/span-gh-dump
 /usr/local/sbin/span-hspec
+/usr/local/sbin/span-import
 
 
 %changelog
+* Thu Feb 19 2015 Martin Czygan
+- 0.1.8 release
+- import/export
 
 * Thu Feb 19 2015 Martin Czygan
 - 0.1.7 release
