@@ -295,6 +295,6 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 		output.Author = output.SecondaryAuthors[0]
 	}
 
-	output.Fullrecord = "blob://" + output.ID
+	output.Fullrecord = "blob:" + output.ID
 	return output, nil
 }

@@ -359,7 +359,7 @@ func (article *Article) ToSolrSchema() (*finc.SolrSchema, error) {
 
 	output.Allfields = article.Allfields()
 	output.MegaCollection = []string{"DeGruyter SSH"}
-	output.Fullrecord = "blob://id/" + output.ID
+	output.Fullrecord = "blob:" + output.ID
 
 	return output, nil
 }
