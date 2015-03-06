@@ -22,7 +22,7 @@ var (
 	ErrToVolume   = errors.New("to-volume mismatch")
 	ErrToIssue    = errors.New("to-issue mismatch")
 
-	ErrNotParseable = errors.New("not parseable")
+	ErrNotParsable = errors.New("not parsable")
 	ErrMovingWall   = errors.New("moving-wall violation")
 )
 
@@ -179,7 +179,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		if e.FromYear == is.ParsedDate.Year {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
-				return ErrNotParseable
+				return ErrNotParsable
 			}
 			if e.FromVolume != 0 && e.FromVolume > volume {
 				return ErrFromVolume
@@ -187,7 +187,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 			if e.FromVolume == volume {
 				issue, err := strconv.Atoi(is.Issue)
 				if err != nil {
-					return ErrNotParseable
+					return ErrNotParsable
 				}
 				if e.FromIssue != 0 && e.FromIssue > issue {
 					return ErrFromIssue
@@ -203,7 +203,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		if e.ToYear == is.ParsedDate.Year {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
-				return ErrNotParseable
+				return ErrNotParsable
 			}
 			if e.ToVolume != 0 && e.ToVolume < volume {
 				return ErrToVolume
@@ -211,7 +211,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 			if e.ToVolume == volume {
 				issue, err := strconv.Atoi(is.Issue)
 				if err != nil {
-					return ErrNotParseable
+					return ErrNotParsable
 				}
 				if e.ToIssue != 0 && e.ToIssue < issue {
 					return ErrToIssue
