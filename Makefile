@@ -7,6 +7,8 @@ test:
 cover:
 	go test -cover ./...
 
+all: $(TARGETS)
+
 span-import: imports
 	go build -o span-import cmd/span-import/main.go
 
