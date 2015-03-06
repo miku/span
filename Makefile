@@ -1,4 +1,4 @@
-TARGETS = span span-hspec span-is span-gh-dump span-finc
+TARGETS = span-import span-export span-gh-dump span-hspec
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -7,20 +7,17 @@ test:
 cover:
 	go test -cover ./...
 
-span: imports
-	go build -o span cmd/span/main.go
+span-import: imports
+	go build -o span-import cmd/span-import/main.go
+
+span-export: imports
+	go build -o span-export cmd/span-export/main.go
 
 span-hspec: imports
 	go build -o span-hspec cmd/span-hspec/main.go
 
-span-is: imports
-	go build -o span-is cmd/span-is/main.go
-
 span-gh-dump: imports
 	go build -o span-gh-dump cmd/span-gh-dump/main.go
-
-span-finc: imports
-	go build -o span-finc cmd/span-finc/main.go
 
 imports:
 	goimports -w .

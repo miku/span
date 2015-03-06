@@ -25,11 +25,7 @@ _testmain.go
 
 /ihparse
 /crparse
-/span
-/span-hspec
-/span-gh-dump
-/span-is
-/span-is-solr
+/span-*
 /fixtures
 
 span_*.deb
