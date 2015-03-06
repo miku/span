@@ -16,7 +16,10 @@ import (
 	"github.com/miku/span/holdings"
 )
 
-// Jats source
+// SourceID for internal bookkeeping.
+const SourceID = 50
+
+// Jats source.
 type Jats struct{}
 
 // Iterate emits Converter elements via XML decoding.
