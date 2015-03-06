@@ -317,7 +317,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
 	output.PageCount = article.PageCount()
 
-	output.Date = article.Date().Format("2006-01-02")
+	output.RawDate = article.Date().Format("2006-01-02")
 
 	output.MegaCollection = "DeGruyter SSH"
 	return output, nil

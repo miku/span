@@ -296,7 +296,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
-	output.Date = doc.Issued.Date().Format("2006-01-02")
+	output.RawDate = doc.Issued.Date().Format("2006-01-02")
 
 	name, err := doc.MemberName()
 	if err == nil {
