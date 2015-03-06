@@ -1,20 +1,70 @@
 package crossref
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"log"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/miku/span/holdings"
-	"github.com/miku/span/sets"
+	"github.com/miku/span"
+	"github.com/miku/span/finc"
 )
 
+// SourceID for internal bookkeeping.
 const SourceID = 49
+
+// DefaultBatchSize for batched reading.
+const DefaultBatchSize = 25000
+
+// Crossref source.
+type Crossref struct{}
+
+// Iterate returns a channel which carries batches. The processor function
+// is just plain JSON deserialization. It is ok to halt the world, if
+// there some error during reading.
+func (c Crossref) Iterate(r io.Reader) (chan interface{}, error) {
+	batch := span.Batcher{
+		Process: func(s string) (span.Converter, error) {
+			doc := new(Document)
+			err := json.Unmarshal([]byte(s), doc)
+			if err != nil {
+				return doc, err
+			}
+			return doc, nil
+		}}
+
+	ch := make(chan interface{})
+	reader := bufio.NewReader(r)
+	i := 1
+	go func() {
+		for {
+			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+			batch.Items = append(batch.Items, line)
+			if i == DefaultBatchSize {
+				ch <- batch
+				batch.Items = batch.Items[:0]
+				i = 0
+			}
+			i++
+		}
+		ch <- batch
+		close(ch)
+	}()
+	return ch, nil
+}
 
 // Author is given by family and given name.
 type Author struct {
@@ -202,69 +252,6 @@ func (doc *Document) MemberName() (name string, err error) {
 	return
 }
 
-// CoveredBy returns nil, if a given entitlement covers the current document.
-// If the given entitlement does not cover the document, the error returned
-// will contain the reason as message.
-// TODO(miku): better handling of 'unparseable' volume or issue strings
-func (doc *Document) CoveredBy(e holdings.Entitlement) error {
-	if e.FromYear != 0 && doc.Issued.Year() != 0 {
-		if e.FromYear > doc.Issued.Year() {
-			return fmt.Errorf("from-year %d > %d", e.FromYear, doc.Issued.Year())
-		}
-		if e.FromYear == doc.Issued.Year() {
-			volume, err := strconv.Atoi(doc.Volume)
-			if err != nil {
-				return err
-			}
-			if e.FromVolume != 0 && e.FromVolume > volume {
-				return fmt.Errorf("from-volume %d > %d", e.FromVolume, volume)
-			}
-			if e.FromVolume == volume {
-				issue, err := strconv.Atoi(doc.Issue)
-				if err != nil {
-					return err
-				}
-				if e.FromIssue != 0 && e.FromIssue > issue {
-					return fmt.Errorf("from-issue %d > %d", e.FromIssue, issue)
-				}
-			}
-		}
-	}
-
-	if e.ToYear != 0 && doc.Issued.Year() != 0 {
-		if e.ToYear < doc.Issued.Year() {
-			return fmt.Errorf("to-year %d < %d", e.ToYear, doc.Issued.Year())
-		}
-		if e.ToYear == doc.Issued.Year() {
-			volume, err := strconv.Atoi(doc.Volume)
-			if err != nil {
-				return err
-			}
-			if e.ToVolume != 0 && e.ToVolume < volume {
-				return fmt.Errorf("to-volume %d < %d", e.ToVolume, volume)
-			}
-			if e.ToVolume == volume {
-				issue, err := strconv.Atoi(doc.Issue)
-				if err != nil {
-					return err
-				}
-				if e.ToIssue != 0 && e.ToIssue < issue {
-					return fmt.Errorf("to-issue %d < %d", e.ToIssue, issue)
-				}
-			}
-		}
-	}
-
-	boundary, err := e.Boundary()
-	if err != nil {
-		return err
-	}
-	if doc.Issued.Date().After(boundary) {
-		return fmt.Errorf("moving-wall violation")
-	}
-	return nil
-}
-
 // ParseMemberID extracts the numeric member id.
 func (doc *Document) ParseMemberID() (int, error) {
 	fields := strings.Split(doc.Member, "/")
@@ -278,27 +265,42 @@ func (doc *Document) ParseMemberID() (int, error) {
 	return 0, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
-// Institutions returns a slice of ISILs for which this document finds
-// valid entitlements in a IsilIssnHolding map.
-func (doc *Document) Institutions(iih holdings.IsilIssnHolding) []string {
-	isils := sets.NewString()
-	for _, isil := range iih.Isils() {
-		for _, issn := range doc.ISSN {
-			h, exists := iih[isil][issn]
-			if !exists {
-				continue
-			}
-			for _, entitlement := range h.Entitlements {
-				err := doc.CoveredBy(entitlement)
-				if err != nil {
-					continue
-				}
-				isils.Add(isil)
-				break
-			}
-		}
+// ToIntermediateSchema converts a crossref document into IS.
+func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+	output := new(finc.IntermediateSchema)
+	if doc.URL == "" {
+		return output, errors.New("input document has no URL")
 	}
-	values := isils.Values()
-	sort.Strings(values)
-	return values
+
+	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	output.URL = append(output.URL, doc.URL)
+	output.DOI = doc.DOI
+	output.SourceID = "49"
+	output.Publisher = append(output.Publisher, doc.Publisher)
+	output.ArticleTitle = doc.CombinedTitle()
+	output.Issue = doc.Issue
+	output.Volume = doc.Volume
+	output.ISSN = doc.ISSN
+
+	if len(doc.ContainerTitle) > 0 {
+		output.JournalTitle = doc.ContainerTitle[0]
+	}
+
+	for _, author := range doc.Authors {
+		output.Authors = append(output.Authors, finc.Author{FirstName: author.Given, LastName: author.Family})
+	}
+
+	pi := doc.PageInfo()
+	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
+	output.EndPage = fmt.Sprintf("%d", pi.EndPage)
+	output.Pages = pi.RawMessage
+	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
+
+	output.Date = doc.Issued.Date().Format("2006-01-02")
+
+	name, err := doc.MemberName()
+	if err == nil {
+		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
+	}
+	return output, nil
 }

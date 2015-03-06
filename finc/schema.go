@@ -26,13 +26,18 @@ type SolrSchema struct {
 	Fullrecord           string   `json:"fullrecord"`
 }
 
+type AuthorID struct {
+	ID   string // ...
+	Type string // gnd, orcid, ...
+}
+
 // Author representes an author, inspired by OpenURL.
 type Author struct {
-	ID           string `json:"id"`
+	ID           string `json:"id"` // eventuell mehrfach, mit typ
 	Name         string `json:"rft.au"`
 	LastName     string `json:"rft.aulast"`
 	FirstName    string `json:"rft.aufirst"`
-	Initial      string `json:"rft.auinit"`
+	Initial      string `json:"rft.auinit"` // was ist unterschied zu auinit1?
 	FirstInitial string `json:"rft.auinit1"`
 	MiddleName   string `json:"rft.auinitm"`
 	Suffix       string `json:"rft.ausuffix"`
@@ -51,27 +56,39 @@ func (author *Author) String() string {
 	return author.ID
 }
 
-// Schema is an intermediate format inspired by a few existing formats, e.g. OpenURL.
-type InternalSchema struct {
+type Date struct {
+	Year      int `json:"year"`
+	Month     int `json:"month"`
+	Day       int `json:"year"`
+	Timestamp int `json:"timestamp"`
+}
+
+// IntermediateSchema abstract and collects the values of various input formats.
+// Goal is to simplify further processing by using a single format, from which
+// the next artifacts can be derived, e.g. records for solr indices.
+// This format can be viewed as a catch-all format. The dotted notation
+// hints at the origin of the field, e.g. OpenURL, RIS, finc.
+type IntermediateSchema struct {
 	RecordID       string `json:"finc.record_id"`
 	SourceID       string `json:"finc.source_id"`
 	MegaCollection string `json:"finc.mega_collection"`
+	Format         string `json:"finc.format"`
 
-	Genre  string `json:"rft.genre"`
-	Type   string `json:"ris.type"`
-	Format string `json:"finc.format"`
+	Genre string `json:"rft.genre"`
+	Type  string `json:"ris.type"` // RIS-Format? Wikipedia...
 
-	ArticleTitle string `json:"rft.atitle"`
-	BookTitle    string `json:"rft.btitle"`
-	JournalTitle string `json:"rft.jtitle"`
-	SeriesTitle  string `json:"rft.stitle"`
+	ArticleTitle    string `json:"rft.atitle"`
+	ArticleSubtitle string `json:"x.subtitle"`
+	BookTitle       string `json:"rft.btitle"`
+	JournalTitle    string `json:"rft.jtitle"`
+	SeriesTitle     string `json:"rft.stitle"`
 
 	Series string `json:"rft.series"`
 
 	Database     string `json:"ris.db"`
 	DataProvider string `json:"ris.dp"`
 
-	Date          string   `json:"rft.date"`
+	Date          string   `json:"rft.date"` // ISO8601 date
 	Place         []string `json:"rft.place"`
 	Publisher     []string `json:"rft.pub"`
 	Edition       string   `json:"rft.edition"`
@@ -88,14 +105,12 @@ type InternalSchema struct {
 	ArticleNumber string   `json:"rft.artnum"`
 	ISSN          []string `json:"rft.issn"`
 	EISSN         []string `json:"rft.eissn"`
-	ISBN          string   `json:"rft.isbn"`
+	ISBN          []string `json:"rft.isbn"`
 	EISBN         []string `json:"rft.isbn"`
 
-	DOI      string   `json:"doi"`
-	URL      []string `json:"url"`
-	Authors  []Author `json:"authors"`
-	Language string   `json:"language"`
-	Abstract string   `json:"abstract"`
+	DOI       string   `json:"doi"`
+	URL       []string `json:"url"`
+	Authors   []Author `json:"authors"`
+	Languages []string `json:"languages"`
+	Abstract  string   `json:"abstract"`
 }
-
-func (s InternalSchema) SetTags(tags []string) {}

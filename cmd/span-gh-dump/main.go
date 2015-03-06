@@ -1,4 +1,4 @@
-// span-gh-dump outputs ISSN, title from a google holdings file.
+// span-gh-dump outputs (ISSN, title) from a google holdings file.
 package main
 
 import (

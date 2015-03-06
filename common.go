@@ -2,27 +2,32 @@ package span
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/miku/span/finc"
-	"github.com/miku/span/holdings"
 )
 
 // Version of span
 const Version = "0.1.7"
 
-// SolrSchemaConverter should be implemented by
-// formats that can convert themselves to
-// finc solr schema and which can determine coverage
-// information, given holdings information.
-type SolrSchemaConverter interface {
-	ToSolrSchema() (*finc.SolrSchema, error)
-	Institutions(holdings.IsilIssnHolding) []string
+// Batcher groups strings together for batched processing.
+// It is more effective to send one batch over a channel than 25k strings.
+type Batcher struct {
+	Items   []string
+	Process func(string) (Converter, error)
 }
 
-// InternalSchemaConverter can output finc internal schema documents.
-type InternalSchemaConverter interface {
-	ToInternalSchema(*finc.InternalSchema, error)
+// Converter objects can be converted into an intermediate schema.
+type Converter interface {
+	ToIntermediateSchema() (*finc.IntermediateSchema, error)
+}
+
+// Source can emit records given a reader. What is actually returned is decided
+// by the source, e.g. it may return Converters or Batchers. Dealing with the
+// various types is responsibility of the call site.
+type Source interface {
+	Iterate(io.Reader) (chan interface{}, error)
 }
 
 // ParseHoldingSpec parses a holdings flag value into a map.

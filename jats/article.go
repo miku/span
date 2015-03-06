@@ -1,9 +1,12 @@
 package jats
 
 import (
+	"bufio"
 	"bytes"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"log"
 	"strconv"
 	"strings"
@@ -12,6 +15,36 @@ import (
 	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
 )
+
+// Jats source
+type Jats struct{}
+
+// Iterate emits Converter elements via XML decoding.
+func (s Jats) Iterate(r io.Reader) (chan interface{}, error) {
+	ch := make(chan interface{})
+	go func() {
+		decoder := xml.NewDecoder(bufio.NewReader(r))
+		for {
+			t, _ := decoder.Token()
+			if t == nil {
+				break
+			}
+			switch se := t.(type) {
+			case xml.StartElement:
+				if se.Name.Local == "article" {
+					doc := new(Article)
+					err := decoder.DecodeElement(&doc, &se)
+					if err != nil {
+						log.Fatal(err)
+					}
+					ch <- doc
+				}
+			}
+		}
+		close(ch)
+	}()
+	return ch, nil
+}
 
 // Article mirrors a JATS article element. Some elements, such as
 // article categories are not implmented yet.
@@ -121,6 +154,11 @@ type Article struct {
 					Value   string   `xml:",chardata"`
 				}
 			}
+			Abstract struct {
+				XMLName xml.Name `xml:"abstract"`
+				Value   string   `xml:",innerxml"`
+				Lang    string   `xml:"lang,attr"`
+			}
 		}
 	}
 }
@@ -197,15 +235,21 @@ func defaultString(s, defaultValue string) string {
 	return s
 }
 
+func (article *Article) Abstract() string {
+	return string(article.Front.Article.Abstract.Value)
+}
+
 // Date returns this articles issuing date in a best effort manner.
 func (article *Article) Date() time.Time {
 	pubdate := article.Front.Article.PubDate
 	day := defaultString(pubdate.Day.Value, "01")
 	month := defaultString(pubdate.Month.Value, "01")
 	year := defaultString(pubdate.Year.Value, "1970")
-	t, err := time.Parse("2006-01-02", fmt.Sprintf("%s-%s-%s", year, month, day))
+	t, err := time.Parse("2006-01-02", fmt.Sprintf("%s-%02s-%02s", year, month, day))
 	if err != nil {
-		log.Fatal(err)
+		// log.Printf("%+v", article)
+		log.Println(err)
+		t, _ = time.Parse("2006-01-02", "1970-01-01")
 	}
 	return t
 }
@@ -240,6 +284,81 @@ func (article *Article) Allfields() string {
 		}
 	}
 	return strings.TrimSpace(buf.String())
+}
+
+// ToInternalSchema converts a jats article into an internal schema.
+func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+	output := new(finc.IntermediateSchema)
+	doi, err := article.DOI()
+	if err != nil {
+		return output, err
+	}
+	articleURL := fmt.Sprintf("http://dx.doi.org/%s", doi)
+
+	output.RecordID = fmt.Sprintf("ai050%s", base64.StdEncoding.EncodeToString([]byte(articleURL)))
+	output.URL = append(output.URL, articleURL)
+	output.DOI = doi
+	output.SourceID = "50"
+	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
+	output.ArticleTitle = article.CombinedTitle()
+	output.Issue = article.Front.Article.Issue.Value
+	output.Volume = article.Front.Article.Volume.Value
+	output.ISSN = article.ISSN()
+	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+
+	output.Authors = article.Authors()
+	output.Abstract = article.Abstract()
+
+	output.StartPage = article.Front.Article.FirstPage.Value
+	output.EndPage = article.Front.Article.LastPage.Value
+	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+	output.PageCount = article.PageCount()
+
+	output.Date = article.Date().Format("2006-01-02")
+
+	output.MegaCollection = "DeGruyter SSH"
+	return output, nil
+}
+
+// ToSolrSchema converts a single jats article into a basic finc solr schema.
+func (article *Article) ToSolrSchema() (*finc.SolrSchema, error) {
+	output := new(finc.SolrSchema)
+	doi, err := article.DOI()
+	if err != nil {
+		return output, err
+	}
+	articleURL := fmt.Sprintf("http://dx.doi.org/%s", doi)
+
+	output.ID = fmt.Sprintf("ai050%s", base64.StdEncoding.EncodeToString([]byte(articleURL)))
+	output.ISSN = article.ISSN()
+	output.Publisher = article.Front.Journal.Publisher.Name.Value
+	output.SourceID = "50"
+	output.RecordType = "ai"
+	output.Title = article.CombinedTitle()
+	output.TitleFull = article.CombinedTitle()
+	output.TitleShort = article.Front.Article.TitleGroup.Title.Value
+	// output.Topics = doc.Subject // TODO(miku): article-categories
+	output.URL = articleURL
+
+	output.HierarchyParentTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+	output.Format = "ElectronicArticle"
+
+	if len(article.Authors()) > 0 {
+		output.Author = article.Authors()[0].String()
+		for _, author := range article.Authors() {
+			output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
+		}
+	}
+
+	if article.Year() > 0 {
+		output.PublishDateSort = article.Year()
+	}
+
+	output.Allfields = article.Allfields()
+	output.MegaCollection = []string{"DeGruyter SSH"}
+	output.Fullrecord = "blob://id/" + output.ID
+
+	return output, nil
 }
 
 // Institutions, TODO(miku): implement lookup

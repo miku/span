@@ -1,4 +1,4 @@
-TARGETS = span span-hspec
+TARGETS = span span-hspec span-is span-gh-dump
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -12,6 +12,12 @@ span: imports
 
 span-hspec: imports
 	go build -o span-hspec cmd/span-hspec/main.go
+
+span-is: imports
+	go build -o span-is cmd/span-is/main.go
+
+span-gh-dump: imports
+	go build -o span-gh-dump cmd/span-gh-dump/main.go
 
 imports:
 	goimports -w .

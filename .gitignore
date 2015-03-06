@@ -28,6 +28,7 @@ _testmain.go
 /span
 /span-hspec
 /span-gh-dump
+/span-is
 /fixtures
 
 span_*.deb
