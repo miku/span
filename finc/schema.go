@@ -23,7 +23,7 @@ var (
 	ErrToIssue    = errors.New("to-issue mismatch")
 
 	ErrNotParsable = errors.New("not parsable")
-	ErrMovingWall   = errors.New("moving-wall violation")
+	ErrMovingWall  = errors.New("moving-wall violation")
 )
 
 // SolrSchema represents a finc schema, evolving as needed.

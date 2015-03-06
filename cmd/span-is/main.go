@@ -1,3 +1,4 @@
+// Converts various input formats into an intermediate schema.
 package main
 
 import (
