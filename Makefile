@@ -1,4 +1,4 @@
-TARGETS = span span-hspec span-is span-gh-dump span-is-solr
+TARGETS = span span-hspec span-is span-gh-dump span-finc
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -19,8 +19,8 @@ span-is: imports
 span-gh-dump: imports
 	go build -o span-gh-dump cmd/span-gh-dump/main.go
 
-span-is-solr: imports
-	go build -o span-is-solr cmd/span-is-solr/main.go
+span-finc: imports
+	go build -o span-finc cmd/span-finc/main.go
 
 imports:
 	goimports -w .
