@@ -20,8 +20,10 @@ import (
 var (
 	ErrFormatRequired    = errors.New("input format required")
 	ErrFormatUnsupported = errors.New("input format not supported")
+	ErrCannotConvert     = errors.New("cannot convert type")
 )
 
+// available input formats and their source type
 var formats = map[string]span.Source{
 	"crossref": crossref.Crossref{},
 	"jats":     jats.Jats{},
@@ -31,8 +33,8 @@ var formats = map[string]span.Source{
 func worker(batches chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range batches {
-		for _, line := range batch.Items {
-			doc, err := batch.Process(line)
+		for _, item := range batch.Items {
+			doc, err := batch.Process(item)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -93,6 +95,10 @@ func main() {
 		}
 	}
 
+	if flag.Arg(0) == "" {
+		log.Fatal("input file required")
+	}
+
 	filename := flag.Arg(0)
 	file, err := os.Open(filename)
 	if err != nil {
@@ -119,9 +125,7 @@ func main() {
 	}
 
 	for item := range ch {
-		switch t := item.(type) {
-		case span.Batcher:
-			work <- item.(span.Batcher)
+		switch item.(type) {
 		case span.Converter:
 			doc := item.(span.Converter)
 			output, err := doc.ToIntermediateSchema()
@@ -133,8 +137,10 @@ func main() {
 				log.Fatal(err)
 			}
 			fmt.Println(string(b))
+		case span.Batcher:
+			work <- item.(span.Batcher)
 		default:
-			log.Fatal("cannot convert %x", t)
+			log.Fatal(ErrCannotConvert)
 		}
 	}
 
