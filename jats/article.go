@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -13,11 +14,12 @@ import (
 	"time"
 
 	"github.com/miku/span/finc"
-	"github.com/miku/span/holdings"
 )
 
 // SourceID for internal bookkeeping.
 const SourceID = 50
+
+var ErrNoDOI = errors.New("DOI is missing")
 
 // Jats source.
 type Jats struct{}
@@ -202,7 +204,7 @@ func (article *Article) DOI() (string, error) {
 			return id.Value, nil
 		}
 	}
-	return "", fmt.Errorf("article has no DOI")
+	return "", ErrNoDOI
 }
 
 // ISSN returns a list of ISSNs associated with this article.
@@ -289,19 +291,39 @@ func (article *Article) Allfields() string {
 	return strings.TrimSpace(buf.String())
 }
 
+type identifiers struct {
+	doi      string
+	url      string
+	recordID string
+}
+
+func (article *Article) identifiers() (identifiers, error) {
+	var ids identifiers
+	doi, err := article.DOI()
+	if err != nil {
+		return ids, err
+	}
+	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
+	ids = identifiers{doi: doi,
+		url:      locator,
+		recordID: fmt.Sprintf("ai-%d-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))}
+	return ids, nil
+}
+
 // ToInternalSchema converts a jats article into an internal schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := new(finc.IntermediateSchema)
-	doi, err := article.DOI()
+
+	ids, err := article.identifiers()
 	if err != nil {
 		return output, err
 	}
-	articleURL := fmt.Sprintf("http://dx.doi.org/%s", doi)
 
-	output.RecordID = fmt.Sprintf("ai050%s", base64.StdEncoding.EncodeToString([]byte(articleURL)))
-	output.URL = append(output.URL, articleURL)
-	output.DOI = doi
-	output.SourceID = "50"
+	output.RecordID = ids.recordID
+	output.URL = append(output.URL, ids.url)
+	output.DOI = ids.doi
+
+	output.SourceID = SourceID
 	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
 	output.ArticleTitle = article.CombinedTitle()
 	output.Issue = article.Front.Article.Issue.Value
@@ -324,47 +346,48 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
 // ToSolrSchema converts a single jats article into a basic finc solr schema.
-func (article *Article) ToSolrSchema() (*finc.SolrSchema, error) {
-	output := new(finc.SolrSchema)
-	doi, err := article.DOI()
-	if err != nil {
-		return output, err
-	}
-	articleURL := fmt.Sprintf("http://dx.doi.org/%s", doi)
+// func (article *Article) ToSolrSchema() (*finc.SolrSchema, error) {
+// 	output := new(finc.SolrSchema)
 
-	output.ID = fmt.Sprintf("ai050%s", base64.StdEncoding.EncodeToString([]byte(articleURL)))
-	output.ISSN = article.ISSN()
-	output.Publisher = article.Front.Journal.Publisher.Name.Value
-	output.SourceID = "50"
-	output.RecordType = "ai"
-	output.Title = article.CombinedTitle()
-	output.TitleFull = article.CombinedTitle()
-	output.TitleShort = article.Front.Article.TitleGroup.Title.Value
-	// output.Topics = doc.Subject // TODO(miku): article-categories
-	output.URL = articleURL
+// 	ids, err := article.identifiers()
+// 	if err != nil {
+// 		return output, err
+// 	}
 
-	output.HierarchyParentTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
-	output.Format = "ElectronicArticle"
+// 	output.ID = ids.recordID
+// 	output.URL = ids.url
 
-	if len(article.Authors()) > 0 {
-		output.Author = article.Authors()[0].String()
-		for _, author := range article.Authors() {
-			output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
-		}
-	}
+// 	output.ISSN = article.ISSN()
+// 	output.Publisher = article.Front.Journal.Publisher.Name.Value
+// 	output.SourceID = SourceID
+// 	output.RecordType = "ai"
+// 	output.Title = article.CombinedTitle()
+// 	output.TitleFull = article.CombinedTitle()
+// 	output.TitleShort = article.Front.Article.TitleGroup.Title.Value
+// 	// output.Topics = doc.Subject // TODO(miku): article-categories
 
-	if article.Year() > 0 {
-		output.PublishDateSort = article.Year()
-	}
+// 	output.HierarchyParentTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+// 	output.Format = "ElectronicArticle"
 
-	output.Allfields = article.Allfields()
-	output.MegaCollection = []string{"DeGruyter SSH"}
-	output.Fullrecord = "blob:" + output.ID
+// 	if len(article.Authors()) > 0 {
+// 		output.Author = article.Authors()[0].String()
+// 		for _, author := range article.Authors() {
+// 			output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
+// 		}
+// 	}
 
-	return output, nil
-}
+// 	if article.Year() > 0 {
+// 		output.PublishDateSort = article.Year()
+// 	}
 
-// Institutions, TODO(miku): implement lookup
-func (article *Article) Institutions(iih holdings.IsilIssnHolding) []string {
-	return []string{}
-}
+// 	output.Allfields = article.Allfields()
+// 	output.MegaCollection = []string{"DeGruyter SSH"}
+// 	output.Fullrecord = "blob:" + output.ID
+
+// 	return output, nil
+// }
+
+// // Institutions, TODO(miku): implement lookup
+// func (article *Article) Institutions(iih holdings.IsilIssnHolding) []string {
+// 	return []string{}
+// }

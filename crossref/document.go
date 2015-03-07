@@ -272,10 +272,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, errors.New("input document has no URL")
 	}
 
-	output.RecordID = fmt.Sprintf("ai049%s", base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	output.RecordID = doc.RecordID()
 	output.URL = append(output.URL, doc.URL)
 	output.DOI = doc.DOI
-	output.SourceID = "49"
+	output.SourceID = SourceID
 	output.Publisher = append(output.Publisher, doc.Publisher)
 	output.ArticleTitle = doc.CombinedTitle()
 	output.Issue = doc.Issue

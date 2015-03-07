@@ -2,9 +2,25 @@ package finc
 
 import (
 	"testing"
+	"time"
 
 	"github.com/miku/span/holdings"
 )
+
+func TestDate(t *testing.T) {
+	var tests = []struct {
+		is IntermediateSchema
+		r  time.Time
+	}{
+		{is: IntermediateSchema{ParsedDate: Date{Year: 2000}}, r: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)},
+	}
+	for _, tt := range tests {
+		r := tt.is.Date()
+		if r != tt.r {
+			t.Errorf("got: %v, want: %s", r, tt.r)
+		}
+	}
+}
 
 func TestCoveredBy(t *testing.T) {
 	var tests = []struct {

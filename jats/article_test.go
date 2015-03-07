@@ -79,17 +79,17 @@ func TestSchema(t *testing.T) {
 	}
 }
 
-func TestToSolrSchema(t *testing.T) {
-	var article Article
-	err := xml.Unmarshal([]byte(example), &article)
-	if err != nil {
-		t.Errorf("got %v, want %v", err, nil)
-	}
-	ss, err := article.ToSolrSchema()
-	if err != nil {
-		t.Errorf("got %v, want %v", err, nil)
-	}
-	if ss.Publisher != article.Front.Journal.Publisher.Name.Value {
-		t.Errorf("got %v, want %v", ss.Publisher, article.Front.Journal.Publisher.Name.Value)
-	}
-}
+// func TestToSolrSchema(t *testing.T) {
+// 	var article Article
+// 	err := xml.Unmarshal([]byte(example), &article)
+// 	if err != nil {
+// 		t.Errorf("got %v, want %v", err, nil)
+// 	}
+// 	ss, err := article.ToSolrSchema()
+// 	if err != nil {
+// 		t.Errorf("got %v, want %v", err, nil)
+// 	}
+// 	if ss.Publisher != article.Front.Journal.Publisher.Name.Value {
+// 		t.Errorf("got %v, want %v", ss.Publisher, article.Front.Journal.Publisher.Name.Value)
+// 	}
+// }

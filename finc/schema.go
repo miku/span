@@ -31,7 +31,7 @@ type SolrSchema struct {
 	RecordType           string   `json:"recordtype"`
 	ID                   string   `json:"id"`
 	ISSN                 []string `json:"issn"`
-	SourceID             string   `json:"source_id"`
+	SourceID             int      `json:"source_id"`
 	Title                string   `json:"title"`
 	TitleFull            string   `json:"title_full"`
 	TitleShort           string   `json:"title_short"`
@@ -98,7 +98,7 @@ type Classification struct {
 // hints at the origin of the field, e.g. OpenURL, RIS, finc.
 type IntermediateSchema struct {
 	RecordID       string `json:"finc.record_id"`
-	SourceID       string `json:"finc.source_id"`
+	SourceID       int    `json:"finc.source_id"`
 	MegaCollection string `json:"finc.mega_collection"`
 	Format         string `json:"finc.format"`
 
@@ -163,7 +163,17 @@ func (is *IntermediateSchema) ISSNList() []string {
 // present in the source document, while timestamp is only present if
 // dateparts consist of all three: year, month and day.
 func (is *IntermediateSchema) Date() time.Time {
-	t, _ := time.Parse("2006-01-02", fmt.Sprintf("%02d-%02d-%02d", is.ParsedDate.Year, is.ParsedDate.Month, is.ParsedDate.Day))
+	d := is.ParsedDate
+	year := d.Year
+	month := d.Month
+	day := d.Day
+	if month == 0 {
+		month = 1
+	}
+	if day == 0 {
+		day = 1
+	}
+	t, _ := time.Parse("2006-01-02", fmt.Sprintf("%02d-%02d-%02d", year, month, day))
 	return t
 }
 
