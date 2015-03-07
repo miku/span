@@ -2,7 +2,6 @@ package jats
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
 	"encoding/xml"
 	"errors"
@@ -10,7 +9,6 @@ import (
 	"io"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/miku/span/finc"
@@ -265,30 +263,6 @@ func (article *Article) Year() int {
 		return 0
 	}
 	return year
-}
-
-func (article *Article) Allfields() string {
-	doi, _ := article.DOI()
-	var authors []string
-	for _, author := range article.Authors() {
-		authors = append(authors, author.String())
-	}
-	fields := [][]string{article.ISSN(), authors, []string{article.CombinedTitle(),
-		doi, article.Front.Journal.TitleGroup.AbbreviatedTitle.Title,
-		article.Front.Article.Volume.Value, article.Front.Article.Issue.Value}}
-
-	var buf bytes.Buffer
-	for _, f := range fields {
-		for _, value := range f {
-			for _, token := range strings.Fields(value) {
-				_, err := buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}
-	}
-	return strings.TrimSpace(buf.String())
 }
 
 // identifiers is a helper struct.

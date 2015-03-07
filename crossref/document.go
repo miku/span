@@ -2,7 +2,6 @@ package crossref
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -215,31 +214,6 @@ func (doc *Document) ShortTitle() string {
 		return doc.Title[0]
 	}
 	return ""
-}
-
-// Allfields returns a combination of various fields.
-func (doc *Document) Allfields() string {
-	var authors []string
-	for _, author := range doc.Authors {
-		authors = append(authors, author.String())
-	}
-
-	fields := [][]string{authors,
-		doc.Subject, doc.ISSN, doc.Title, doc.Subtitle, doc.ContainerTitle,
-		[]string{doc.Publisher, doc.URL}}
-
-	var buf bytes.Buffer
-	for _, f := range fields {
-		for _, value := range f {
-			for _, token := range strings.Fields(value) {
-				_, err := buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}
-	}
-	return strings.TrimSpace(buf.String())
 }
 
 // MemberName resolves the primary name of the member.
