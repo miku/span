@@ -146,7 +146,7 @@ type IntermediateSchema struct {
 	Abstract  string   `json:"abstract"`
 }
 
-// ISSNs returns a deduplicated list of all ISSNs.
+// ISSNList returns a deduplicated list of all ISSNs.
 func (is *IntermediateSchema) ISSNList() []string {
 	set := make(map[string]struct{})
 	for _, issn := range append(is.ISSN, is.EISSN...) {
