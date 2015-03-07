@@ -136,22 +136,19 @@ func (is *IntermediateSchema) ISSNList() []string {
 	return issns
 }
 
+// max of ints.
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 // Date returns a time.Date in a best effort manner. Date parts seem to be always
 // present in the source document, while timestamp is only present if
 // dateparts consist of all three: year, month and day.
 func (is *IntermediateSchema) Date() time.Time {
-	d := is.ParsedDate
-	year := d.Year
-	month := d.Month
-	day := d.Day
-	if month == 0 {
-		month = 1
-	}
-	if day == 0 {
-		day = 1
-	}
-	t, _ := time.Parse("2006-01-02", fmt.Sprintf("%02d-%02d-%02d", year, month, day))
-	return t
+	return time.Date(max(1, is.ParsedDate.Year), time.Month(max(1, is.ParsedDate.Month)), max(1, is.ParsedDate.Day), 0, 0, 0, 0, time.UTC)
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
