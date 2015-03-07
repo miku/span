@@ -1,7 +1,6 @@
 package holdings
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 	"strings"
@@ -16,15 +15,15 @@ func TestParseDelay(t *testing.T) {
 		err error
 	}{
 		{"-0M", time.Duration(0), nil},
-		{"-1M", time.Duration(-2592000000000000), nil},
-		{"-2M", time.Duration(-5184000000000000), nil},
-		{"-1Y", time.Duration(-31536000000000000), nil},
-		{"-1D", time.Duration(0), fmt.Errorf("unknown format: -1D")},
-		{"-1", time.Duration(0), fmt.Errorf("unknown format: -1")},
-		{"129", time.Duration(0), fmt.Errorf("unknown format: 129")},
-		{"AB", time.Duration(0), fmt.Errorf("unknown format: AB")},
-		{"-111m", time.Duration(0), fmt.Errorf("unknown format: -111m")},
-		{"0.1M", time.Duration(0), fmt.Errorf("unknown format: 0.1M")},
+		{"-1M", time.Duration(-1) * Month, nil},
+		{"-2M", time.Duration(-2) * Month, nil},
+		{"-1Y", time.Duration(-1) * Year, nil},
+		{"-1D", time.Duration(0), ErrUnknownFormat},
+		{"-1", time.Duration(0), ErrUnknownFormat},
+		{"129", time.Duration(0), ErrUnknownFormat},
+		{"AB", time.Duration(0), ErrUnknownFormat},
+		{"-111m", time.Duration(0), ErrUnknownFormat},
+		{"0.1M", time.Duration(0), ErrUnknownFormat},
 	}
 
 	for _, tt := range tests {
@@ -81,7 +80,7 @@ func TestBoundary(t *testing.T) {
 		err error
 	}{
 		{Entitlement{FromDelay: "-0M"}, time.Now(), nil},
-		{Entitlement{FromDelay: "0M"}, time.Now(), fmt.Errorf("unknown format: 0M")},
+		{Entitlement{FromDelay: "0M"}, time.Now(), ErrUnknownFormat},
 	}
 	for _, tt := range tests {
 		d, err := tt.e.Boundary()

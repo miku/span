@@ -2,7 +2,7 @@ package holdings
 
 import (
 	"encoding/xml"
-	"fmt"
+	"errors"
 	"io"
 	"regexp"
 	"strconv"
@@ -10,8 +10,19 @@ import (
 	"time"
 )
 
+const (
+	Day   = 24 * time.Hour
+	Month = 30 * Day
+	Year  = 12 * Month
+)
+
 // DelayPattern is how moving walls are expressed in OVID format.
 var DelayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
+
+var (
+	ErrUnknownUnit   = errors.New("unknown unit")
+	ErrUnknownFormat = errors.New("unknown format")
+)
 
 // ISSNPattern is the canonical form of an ISSN.
 var ISSNPattern = regexp.MustCompile(`^\d\d\d\d-\d\d\d\d$`)
@@ -59,21 +70,20 @@ func (iih *IsilIssnHolding) Isils() []string {
 // ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
 func ParseDelay(s string) (d time.Duration, err error) {
 	ms := DelayPattern.FindStringSubmatch(s)
-	if len(ms) == 3 {
-		value, err := strconv.Atoi(ms[1])
-		if err != nil {
-			return d, err
-		}
-		switch {
-		case ms[2] == "Y":
-			d, err = time.ParseDuration(fmt.Sprintf("%dh", value*8760))
-		case ms[2] == "M":
-			d, err = time.ParseDuration(fmt.Sprintf("%dh", value*720))
-		default:
-			return d, fmt.Errorf("unknown unit: %s", ms[2])
-		}
-	} else {
-		return d, fmt.Errorf("unknown format: %s", s)
+	if len(ms) != 3 {
+		return d, ErrUnknownFormat
+	}
+	value, err := strconv.Atoi(ms[1])
+	if err != nil {
+		return d, err
+	}
+	switch {
+	case ms[2] == "Y":
+		d = time.Duration(time.Duration(value) * Year)
+	case ms[2] == "M":
+		d = time.Duration(time.Duration(value) * Month)
+	default:
+		return d, ErrUnknownUnit
 	}
 	return d, nil
 }
