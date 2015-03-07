@@ -291,12 +291,14 @@ func (article *Article) Allfields() string {
 	return strings.TrimSpace(buf.String())
 }
 
+// identifiers is a helper struct.
 type identifiers struct {
 	doi      string
 	url      string
 	recordID string
 }
 
+// identifiers returns doi and the dependent url and recordID in a struct.
 func (article *Article) identifiers() (identifiers, error) {
 	var ids identifiers
 	doi, err := article.DOI()
