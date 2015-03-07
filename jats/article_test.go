@@ -63,16 +63,16 @@ func TestSchema(t *testing.T) {
 		t.Errorf("got %d, want %d", len(article.Front.Journal.ISSN), 2)
 	}
 	if article.Front.Article.PubDate.Year.Value != "1969" {
-		t.Errorf("got %s, want %s", article.Front.Article.PubDate.Year.Value, 1969)
+		t.Errorf("got %s, want %d", article.Front.Article.PubDate.Year.Value, 1969)
 	}
 	if article.Front.Article.TitleGroup.Subtitle.Value != "Das Zeugnisdes Baeda" {
 		t.Errorf("got %s, want %s", article.Front.Article.TitleGroup.Subtitle.Value, "Das Zeugnisdes Baeda")
 	}
 	if article.Front.Article.Issue.Value != "2" {
-		t.Errorf("got %s, want %s", article.Front.Article.Issue.Value, 2)
+		t.Errorf("got %s, want %d", article.Front.Article.Issue.Value, 2)
 	}
 	if article.Front.Article.Volume.Value != "51" {
-		t.Errorf("got %s, want %s", article.Front.Article.Volume.Value, 51)
+		t.Errorf("got %s, want %d", article.Front.Article.Volume.Value, 51)
 	}
 	if article.Front.Article.Permissions.CopyrightYear.Value != "2013" {
 		t.Errorf("got %s, want %s", article.Front.Article.Permissions.CopyrightYear.Value, "2013")
