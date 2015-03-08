@@ -20,7 +20,7 @@ import (
 const SourceID = 49
 
 // DefaultBatchSize for batched reading.
-const DefaultBatchSize = 25000
+const BatchSize = 25000
 
 // Crossref source.
 type Crossref struct{}
@@ -52,7 +52,7 @@ func (c Crossref) Iterate(r io.Reader) (chan interface{}, error) {
 				log.Fatal(err)
 			}
 			batch.Items = append(batch.Items, line)
-			if i == DefaultBatchSize {
+			if i == BatchSize {
 				ch <- batch
 				batch.Items = batch.Items[:0]
 				i = 0
