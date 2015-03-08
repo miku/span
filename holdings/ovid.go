@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -11,13 +12,13 @@ import (
 )
 
 const (
-	Day   = 24 * time.Hour
-	Month = 30 * Day
-	Year  = 12 * Month
+	day   = 24 * time.Hour
+	month = 30 * day
+	year  = 12 * month
 )
 
-// DelayPattern is how moving walls are expressed in OVID format.
-var DelayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
+// delayPattern is how moving walls are expressed in OVID format.
+var delayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
 
 var (
 	errUnknownUnit   = errors.New("unknown unit")
@@ -59,8 +60,7 @@ type IssnHolding map[string]Holding
 type IsilIssnHolding map[string]IssnHolding
 
 // Isils returns available ISILs in this IsilIssnHolding map.
-func (iih *IsilIssnHolding) Isils() []string {
-	var keys []string
+func (iih *IsilIssnHolding) Isils() (keys []string) {
 	for k := range *iih {
 		keys = append(keys, k)
 	}
@@ -69,7 +69,7 @@ func (iih *IsilIssnHolding) Isils() []string {
 
 // ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
 func ParseDelay(s string) (d time.Duration, err error) {
-	ms := DelayPattern.FindStringSubmatch(s)
+	ms := delayPattern.FindStringSubmatch(s)
 	if len(ms) != 3 {
 		return d, errUnknownFormat
 	}
@@ -79,13 +79,13 @@ func ParseDelay(s string) (d time.Duration, err error) {
 	}
 	switch {
 	case ms[2] == "Y":
-		d = time.Duration(time.Duration(value) * Year)
+		d = time.Duration(time.Duration(value) * year)
 	case ms[2] == "M":
-		d = time.Duration(time.Duration(value) * Month)
+		d = time.Duration(time.Duration(value) * month)
 	default:
 		return d, errUnknownUnit
 	}
-	return d, nil
+	return
 }
 
 // Delay returns the specified delay as `time.Duration`
@@ -96,7 +96,7 @@ func (e *Entitlement) Delay() (d time.Duration, err error) {
 	if e.ToDelay != "" {
 		return ParseDelay(e.ToDelay)
 	}
-	return d, nil
+	return
 }
 
 // Boundary returns the last date before the moving wall restriction becomes effective.
@@ -109,12 +109,15 @@ func (e *Entitlement) Boundary() (d time.Time, err error) {
 }
 
 // HoldingsMap creates an ISSN[Holding] struct from a reader.
-func HoldingsMap(reader io.Reader) (h IssnHolding) {
-	h = make(map[string]Holding)
+func HoldingsMap(reader io.Reader) IssnHolding {
+	h := make(map[string]Holding)
 	decoder := xml.NewDecoder(reader)
 	var tag string
 	for {
-		t, _ := decoder.Token()
+		t, err := decoder.Token()
+		if err != nil {
+			log.Fatal(err)
+		}
 		if t == nil {
 			break
 		}
