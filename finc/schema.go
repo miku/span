@@ -15,15 +15,14 @@ import (
 const AIRecordType = "ai"
 
 var (
-	ErrFromYear   = errors.New("from-year mismatch")
-	ErrFromVolume = errors.New("from-volume mismatch")
-	ErrFromIssue  = errors.New("from-issue mismatch")
-	ErrToYear     = errors.New("to-year mismatch")
-	ErrToVolume   = errors.New("to-volume mismatch")
-	ErrToIssue    = errors.New("to-issue mismatch")
-
-	ErrNotParsable = errors.New("not parsable")
-	ErrMovingWall  = errors.New("moving-wall violation")
+	errFromYear    = errors.New("from-year mismatch")
+	errFromVolume  = errors.New("from-volume mismatch")
+	errFromIssue   = errors.New("from-issue mismatch")
+	errToYear      = errors.New("to-year mismatch")
+	errToVolume    = errors.New("to-volume mismatch")
+	errToIssue     = errors.New("to-issue mismatch")
+	errMovingWall  = errors.New("moving-wall violation")
+	errNotParsable = errors.New("not parsable")
 )
 
 type AuthorID struct {
@@ -158,23 +157,23 @@ func (is *IntermediateSchema) Date() time.Time {
 func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 	if e.FromYear != 0 && is.ParsedDate.Year != 0 {
 		if e.FromYear > is.ParsedDate.Year {
-			return ErrFromYear
+			return errFromYear
 		}
 		if e.FromYear == is.ParsedDate.Year {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
-				return ErrNotParsable
+				return errNotParsable
 			}
 			if e.FromVolume != 0 && e.FromVolume > volume {
-				return ErrFromVolume
+				return errFromVolume
 			}
 			if e.FromVolume == volume {
 				issue, err := strconv.Atoi(is.Issue)
 				if err != nil {
-					return ErrNotParsable
+					return errNotParsable
 				}
 				if e.FromIssue != 0 && e.FromIssue > issue {
-					return ErrFromIssue
+					return errFromIssue
 				}
 			}
 		}
@@ -182,23 +181,23 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 
 	if e.ToYear != 0 && is.ParsedDate.Year != 0 {
 		if e.ToYear < is.ParsedDate.Year {
-			return ErrToYear
+			return errToYear
 		}
 		if e.ToYear == is.ParsedDate.Year {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
-				return ErrNotParsable
+				return errNotParsable
 			}
 			if e.ToVolume != 0 && e.ToVolume < volume {
-				return ErrToVolume
+				return errToVolume
 			}
 			if e.ToVolume == volume {
 				issue, err := strconv.Atoi(is.Issue)
 				if err != nil {
-					return ErrNotParsable
+					return errNotParsable
 				}
 				if e.ToIssue != 0 && e.ToIssue < issue {
-					return ErrToIssue
+					return errToIssue
 				}
 			}
 		}
@@ -209,7 +208,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		return err
 	}
 	if is.Date().After(boundary) {
-		return ErrMovingWall
+		return errMovingWall
 	}
 	return nil
 }

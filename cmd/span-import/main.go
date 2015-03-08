@@ -18,9 +18,9 @@ import (
 )
 
 var (
-	ErrFormatRequired    = errors.New("input format required")
-	ErrFormatUnsupported = errors.New("input format not supported")
-	ErrCannotConvert     = errors.New("cannot convert type")
+	errFormatRequired    = errors.New("input format required")
+	errFormatUnsupported = errors.New("input format not supported")
+	errCannotConvert     = errors.New("cannot convert type")
 )
 
 // available input formats and their source type
@@ -81,11 +81,11 @@ func main() {
 	}
 
 	if *inputFormat == "" {
-		log.Fatal(ErrFormatRequired)
+		log.Fatal(errFormatRequired)
 	}
 
 	if _, ok := formats[*inputFormat]; !ok {
-		log.Fatal(ErrFormatUnsupported)
+		log.Fatal(errFormatUnsupported)
 	}
 
 	if *members != "" {
@@ -140,7 +140,7 @@ func main() {
 		case span.Batcher:
 			work <- item.(span.Batcher)
 		default:
-			log.Fatal(ErrCannotConvert)
+			log.Fatal(errCannotConvert)
 		}
 	}
 

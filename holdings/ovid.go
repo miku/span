@@ -20,8 +20,8 @@ const (
 var DelayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
 
 var (
-	ErrUnknownUnit   = errors.New("unknown unit")
-	ErrUnknownFormat = errors.New("unknown format")
+	errUnknownUnit   = errors.New("unknown unit")
+	errUnknownFormat = errors.New("unknown format")
 )
 
 // ISSNPattern is the canonical form of an ISSN.
@@ -71,7 +71,7 @@ func (iih *IsilIssnHolding) Isils() []string {
 func ParseDelay(s string) (d time.Duration, err error) {
 	ms := DelayPattern.FindStringSubmatch(s)
 	if len(ms) != 3 {
-		return d, ErrUnknownFormat
+		return d, errUnknownFormat
 	}
 	value, err := strconv.Atoi(ms[1])
 	if err != nil {
@@ -83,7 +83,7 @@ func ParseDelay(s string) (d time.Duration, err error) {
 	case ms[2] == "M":
 		d = time.Duration(time.Duration(value) * Month)
 	default:
-		return d, ErrUnknownUnit
+		return d, errUnknownUnit
 	}
 	return d, nil
 }
