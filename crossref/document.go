@@ -30,7 +30,7 @@ type Crossref struct{}
 // there some error during reading.
 func (c Crossref) Iterate(r io.Reader) (chan interface{}, error) {
 	batch := span.Batcher{
-		Apply: func(s string) (span.Converter, error) {
+		Apply: func(s string) (span.Importer, error) {
 			doc := new(Document)
 			err := json.Unmarshal([]byte(s), doc)
 			if err != nil {

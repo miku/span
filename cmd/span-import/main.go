@@ -126,8 +126,8 @@ func main() {
 
 	for item := range ch {
 		switch item.(type) {
-		case span.Converter:
-			doc := item.(span.Converter)
+		case span.Importer:
+			doc := item.(span.Importer)
 			output, err := doc.ToIntermediateSchema()
 			if err != nil {
 				log.Fatal(err)

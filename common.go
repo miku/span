@@ -15,11 +15,11 @@ const Version = "0.1.8"
 // It is more effective to send one batch over a channel than many strings.
 type Batcher struct {
 	Items []string
-	Apply func(string) (Converter, error)
+	Apply func(string) (Importer, error)
 }
 
 // Converter objects can be converted into an intermediate schema.
-type Converter interface {
+type Importer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
