@@ -12,10 +12,10 @@ import (
 const Version = "0.1.8"
 
 // Batcher groups strings together for batched processing.
-// It is more effective to send one batch over a channel than 25k strings.
+// It is more effective to send one batch over a channel than many strings.
 type Batcher struct {
-	Items   []string
-	Process func(string) (Converter, error)
+	Items []string
+	Apply func(string) (Converter, error)
 }
 
 // Converter objects can be converted into an intermediate schema.

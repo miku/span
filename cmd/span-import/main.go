@@ -34,7 +34,7 @@ func worker(batches chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range batches {
 		for _, item := range batch.Items {
-			doc, err := batch.Process(item)
+			doc, err := batch.Apply(item)
 			if err != nil {
 				log.Fatal(err)
 			}
