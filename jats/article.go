@@ -17,7 +17,7 @@ import (
 // SourceID for internal bookkeeping.
 const SourceID = 50
 
-var ErrNoDOI = errors.New("DOI is missing")
+var errNoDOI = errors.New("DOI is missing")
 
 // Jats source.
 type Jats struct{}
@@ -202,32 +202,31 @@ func (article *Article) DOI() (string, error) {
 			return id.Value, nil
 		}
 	}
-	return "", ErrNoDOI
+	return "", errNoDOI
 }
 
 // ISSN returns a list of ISSNs associated with this article.
-func (article *Article) ISSN() []string {
-	var issns []string
+func (article *Article) ISSN() (issns []string) {
 	for _, issn := range article.Front.Journal.ISSN {
 		issns = append(issns, issn.Value)
 	}
-	return issns
+	return
 }
 
 // PageCount return the number of pages as string.
-func (article *Article) PageCount() string {
+func (article *Article) PageCount() (s string) {
 	first, err := strconv.Atoi(article.Front.Article.FirstPage.Value)
 	if err != nil {
-		return ""
+		return
 	}
 	last, err := strconv.Atoi(article.Front.Article.LastPage.Value)
 	if err != nil {
-		return ""
+		return
 	}
 	if last-first > 0 {
 		return fmt.Sprintf("%d", last-first)
 	}
-	return ""
+	return
 }
 
 // defaultString returns a default if s is the empty string.
@@ -250,9 +249,8 @@ func (article *Article) Date() time.Time {
 	year := defaultString(pubdate.Year.Value, "1970")
 	t, err := time.Parse("2006-01-02", fmt.Sprintf("%s-%02s-%02s", year, month, day))
 	if err != nil {
-		// log.Printf("%+v", article)
-		log.Println(err)
-		t, _ = time.Parse("2006-01-02", "1970-01-01")
+		// TODO(miku): handle failure
+		log.Fatal(err)
 	}
 	return t
 }

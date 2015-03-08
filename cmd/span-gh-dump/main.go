@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"encoding/xml"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -12,15 +13,15 @@ import (
 	"github.com/miku/span/holdings"
 )
 
-func main() {
+var errInputFileRequired = errors.New("input file required")
 
+func main() {
 	flag.Parse()
 
 	if flag.NArg() < 1 {
-		log.Fatal("input file required")
+		log.Fatal(errInputFileRequired)
 	}
 
-	// the input XML
 	filename := flag.Arg(0)
 	handle, err := os.Open(filename)
 	if err != nil {
@@ -28,17 +29,14 @@ func main() {
 	}
 	defer handle.Close()
 
-	// XML decoder
 	decoder := xml.NewDecoder(bufio.NewReader(handle))
 	var inElement string
 
 	for {
-		// Read tokens from the XML document in a stream.
 		t, _ := decoder.Token()
 		if t == nil {
 			break
 		}
-		// Inspect the type of the token just read.
 		switch se := t.(type) {
 		case xml.StartElement:
 			inElement = se.Name.Local

@@ -18,7 +18,6 @@ import (
 func main() {
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 	version := flag.Bool("v", false, "prints current program version")
-
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
 
 	flag.Parse()

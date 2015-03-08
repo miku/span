@@ -63,7 +63,6 @@ func writer(out chan []byte, done chan bool) {
 }
 
 func main() {
-
 	inputFormat := flag.String("i", "", "input format")
 	listFormats := flag.Bool("l", false, "list formats")
 	members := flag.String("members", "", "path to LDJ file, one member per line")
@@ -74,7 +73,7 @@ func main() {
 	runtime.GOMAXPROCS(*numWorkers)
 
 	if *listFormats {
-		for k, _ := range formats {
+		for k := range formats {
 			fmt.Println(k)
 		}
 		os.Exit(0)

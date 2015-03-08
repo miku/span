@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -15,19 +16,20 @@ import (
 	"github.com/miku/span/holdings"
 )
 
+var errInputFileRequired = errors.New("input file required")
+
 // Options for worker.
 type Options struct {
 	Holdings holdings.IsilIssnHolding
 }
 
 func main() {
-
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
 
 	flag.Parse()
 
 	if flag.NArg() < 1 {
-		log.Fatal("input file required")
+		log.Fatal(errInputFileRequired)
 	}
 
 	options := Options{
