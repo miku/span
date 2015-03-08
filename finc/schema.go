@@ -147,7 +147,8 @@ func max(a, b int) int {
 // present in the source document, while timestamp is only present if
 // dateparts consist of all three: year, month and day.
 func (is *IntermediateSchema) Date() time.Time {
-	return time.Date(max(1, is.ParsedDate.Year), time.Month(max(1, is.ParsedDate.Month)), max(1, is.ParsedDate.Day), 0, 0, 0, 0, time.UTC)
+	return time.Date(max(1, is.ParsedDate.Year), time.Month(max(1, is.ParsedDate.Month)),
+		max(1, is.ParsedDate.Day), 0, 0, 0, 0, time.UTC)
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
