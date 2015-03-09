@@ -222,7 +222,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 // Institutions returns a slice of ISILs for which this document finds
 // valid entitlements in a IsilIssnHolding map.
 func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []string {
-	isils := sets.NewString()
+	isils := sets.NewStringSet()
 	for _, isil := range iih.Isils() {
 		for _, issn := range is.ISSNList() {
 			h, exists := iih[isil][issn]
