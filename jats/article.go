@@ -297,28 +297,26 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		return output, err
 	}
 
+	output.DOI = ids.doi
 	output.RecordID = ids.recordID
 	output.URL = append(output.URL, ids.url)
-	output.DOI = ids.doi
 
-	output.SourceID = SourceID
-	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
 	output.ArticleTitle = article.CombinedTitle()
-	output.Issue = article.Front.Article.Issue.Value
-	output.Volume = article.Front.Article.Volume.Value
-	output.ISSN = article.ISSN()
-	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
-
 	output.Authors = article.Authors()
 	output.Abstract = article.Abstract()
-
-	output.StartPage = article.Front.Article.FirstPage.Value
-	output.EndPage = article.Front.Article.LastPage.Value
-	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
-	output.PageCount = article.PageCount()
-
+	output.ISSN = article.ISSN()
+	output.Issue = article.Front.Article.Issue.Value
+	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
+	output.SourceID = SourceID
+	output.Volume = article.Front.Article.Volume.Value
 	output.RawDate = article.Date().Format("2006-01-02")
-
 	output.MegaCollection = SourceName
+
+	output.EndPage = article.Front.Article.LastPage.Value
+	output.PageCount = article.PageCount()
+	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+	output.StartPage = article.Front.Article.FirstPage.Value
+
 	return output, nil
 }
