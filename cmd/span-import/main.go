@@ -135,7 +135,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println(string(b))
+			out <- b
 		case span.Batcher:
 			queue <- item.(span.Batcher)
 		default:
