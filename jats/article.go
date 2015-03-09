@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/endeveit/guesslanguage"
 	"github.com/miku/span/finc"
 )
 
@@ -105,9 +106,11 @@ type Article struct {
 			ContribGroup struct {
 				XMLName xml.Name `xml:"contrib-group"`
 				Contrib []struct {
-					Type string `xml:"contrib-type,attr"`
-					Name struct {
+					Type      string `xml:"contrib-type,attr"`
+					XLinkType string `xml:"xlink.type,attr"`
+					Name      struct {
 						XMLName xml.Name `xml:"name"`
+						Style   string   `xml:"name-style"`
 						Surname struct {
 							XMLName xml.Name `xml:"surname"`
 							Value   string   `xml:",chardata"`
@@ -118,6 +121,17 @@ type Article struct {
 						}
 					}
 				} `xml:"contrib"`
+			}
+			Categories struct {
+				XMLName      xml.Name `xml:"article-categories"`
+				SubjectGroup struct {
+					XMLName xml.Name `xml:"subj-group"`
+					Type    string   `xml:"subj-group-type,attr"`
+					Subject []struct {
+						XMLName xml.Name `xml:"subject"`
+						Value   string   `xml:",chardata"`
+					}
+				}
 			}
 			PubDate struct {
 				Type  string `xml:"pub-type,attr"`
@@ -166,6 +180,33 @@ type Article struct {
 				Value   string   `xml:",innerxml"`
 				Lang    string   `xml:"lang,attr"`
 			}
+			TranslatedAbstract struct {
+				XMLName xml.Name `xml:"trans-abstract"`
+				Lang    string   `xml:"lang,attr"`
+				Title   struct {
+					XMLName xml.Name `xml:"title"`
+					Value   string   `xml:",innerxml"`
+				}
+			}
+			KeywordGroup struct {
+				XMLName xml.Name `xml:"kwd-group"`
+				Title   struct {
+					XMLName xml.Name `xml:"title"`
+					Value   string   `xml:",chardata"`
+				}
+				Keywords []struct {
+					XMLName xml.Name `xml:"kwd"`
+					Value   string   `xml:",chardata"`
+				}
+			}
+		}
+	}
+	Body struct {
+		XMLName xml.Name `xml:"body"`
+		Section struct {
+			XMLName xml.Name `xml:"sec"`
+			Type    string   `xml:"sec-type,attr"`
+			Value   string   `xml:",innerxml"`
 		}
 	}
 }
@@ -288,6 +329,31 @@ func (article *Article) identifiers() (identifiers, error) {
 	return ids, nil
 }
 
+// Languages returns the guessed languages found in abstract and fulltext.
+// TODO(miku): Weird OCR a r t i f a c t s are recognized as "el".
+func (article *Article) Languages() (langs []string, err error) {
+	lmap := make(map[string]struct{})
+	if article.Front.Article.Abstract.Lang != "" {
+		lmap[article.Front.Article.Abstract.Lang] = struct{}{}
+	}
+
+	for _, s := range []string{article.Front.Article.Abstract.Value, article.Body.Section.Value} {
+		lang, err := guesslanguage.Guess(s)
+		if err != nil {
+			continue
+		}
+		if lang == "" || lang == "UNKNOWN" {
+			continue
+		}
+		lmap[lang] = struct{}{}
+	}
+
+	for k := range lmap {
+		langs = append(langs, k)
+	}
+	return langs, err
+}
+
 // ToInternalSchema converts a jats article into an internal schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := new(finc.IntermediateSchema)
@@ -301,22 +367,29 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.RecordID = ids.recordID
 	output.URL = append(output.URL, ids.url)
 
+	output.Abstract = article.Abstract()
 	output.ArticleTitle = article.CombinedTitle()
 	output.Authors = article.Authors()
-	output.Abstract = article.Abstract()
 	output.ISSN = article.ISSN()
 	output.Issue = article.Front.Article.Issue.Value
 	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+	output.MegaCollection = SourceName
 	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
+	output.RawDate = article.Date().Format("2006-01-02")
 	output.SourceID = SourceID
 	output.Volume = article.Front.Article.Volume.Value
-	output.RawDate = article.Date().Format("2006-01-02")
-	output.MegaCollection = SourceName
 
 	output.EndPage = article.Front.Article.LastPage.Value
 	output.PageCount = article.PageCount()
 	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
 	output.StartPage = article.Front.Article.FirstPage.Value
+
+	langs, err := article.Languages()
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		output.Languages = langs
+	}
 
 	return output, nil
 }

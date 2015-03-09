@@ -2,6 +2,7 @@ package jats
 
 import (
 	"encoding/xml"
+	"strings"
 	"testing"
 )
 
@@ -77,4 +78,8 @@ func TestSchema(t *testing.T) {
 	if article.Front.Article.Permissions.CopyrightYear.Value != "2013" {
 		t.Errorf("got %s, want %s", article.Front.Article.Permissions.CopyrightYear.Value, "2013")
 	}
+	if !strings.HasPrefix(article.Body.Section.Value, "<p>Die frühe Friesen") {
+		t.Errorf("got %+v, want %s", article.Body.Section.Value, "<p>Die frühe Friesen...")
+	}
+
 }
