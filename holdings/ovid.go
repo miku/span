@@ -23,6 +23,7 @@ var delayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
 var (
 	errUnknownUnit   = errors.New("unknown unit")
 	errUnknownFormat = errors.New("unknown format")
+	errDelayMismatch = errors.New("delay mismatch")
 )
 
 // ISSNPattern is the canonical form of an ISSN.
@@ -90,6 +91,9 @@ func ParseDelay(s string) (d time.Duration, err error) {
 
 // Delay returns the specified delay as `time.Duration`
 func (e *Entitlement) Delay() (d time.Duration, err error) {
+	if e.FromDelay != "" && e.ToDelay != "" && e.FromDelay != e.ToDelay {
+		return d, errDelayMismatch
+	}
 	if e.FromDelay != "" {
 		return ParseDelay(e.FromDelay)
 	}
