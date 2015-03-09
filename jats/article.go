@@ -2,7 +2,6 @@ package jats
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
 	"encoding/xml"
 	"errors"
@@ -10,11 +9,11 @@ import (
 	"io"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/endeveit/guesslanguage"
+	"github.com/kapsteur/franco"
 	"github.com/miku/span/finc"
+	"github.com/miku/span/sets"
 )
 
 const (
@@ -25,6 +24,27 @@ const (
 )
 
 var errNoDOI = errors.New("DOI is missing")
+
+// datePatterns are candidate patterns for parsing publishing dates.
+var datePatterns = []string{
+	"2006",
+	"2006-",
+	"2006-1",
+	"2006-01",
+	"2006-1-2",
+	"2006-1-02",
+	"2006-01-2",
+	"2006-01-02",
+	"2006-Jan",
+	"2006-January",
+	"2006-Jan-2",
+	"2006-Jan-02",
+	"2006-January-2",
+	"2006-January-02",
+}
+
+// langpool is a restricted set of language for detection.
+var langpool = sets.NewStringSet("deu", "eng", "fra", "ita", "spa", "lat")
 
 // Jats source.
 type Jats struct{}
@@ -289,15 +309,32 @@ func (article *Article) Abstract() string {
 }
 
 // Date returns this articles issuing date in a best effort manner.
-func (article *Article) Date() time.Time {
+func (article *Article) Date() (t time.Time) {
+	var s string
 	pubdate := article.Front.Article.PubDate
-	day := defaultString(pubdate.Day.Value, "01")
-	month := defaultString(pubdate.Month.Value, "01")
-	year := defaultString(pubdate.Year.Value, "1970")
-	t, err := time.Parse("2006-01-02", fmt.Sprintf("%s-%02s-%02s", year, month, day))
-	if err != nil {
-		// TODO(miku): handle failure
-		log.Fatal(err)
+
+	if pubdate.Day.Value == "" {
+		if pubdate.Month.Value == "" {
+			s = fmt.Sprintf("%s", pubdate.Year.Value)
+		}
+		s = fmt.Sprintf("%s-%s", pubdate.Year.Value, pubdate.Month.Value)
+	} else {
+		s = fmt.Sprintf("%s-%s-%s", pubdate.Year.Value, pubdate.Month.Value, pubdate.Day.Value)
+	}
+
+	var err error
+	miss := true
+
+	for _, p := range datePatterns {
+		t, err = time.Parse(p, s)
+		if err == nil {
+			log.Println(s, ">", p, ">", t)
+			miss = false
+			break
+		}
+	}
+	if miss {
+		log.Printf("missing pattern in %s for %s: %s", article.Front.Journal.ID.Value, s, t)
 	}
 	return t
 }
@@ -331,18 +368,6 @@ func (article *Article) identifiers() (identifiers, error) {
 	return ids, nil
 }
 
-// MinLengthCorpus returns the given string minus all words shorter than min.
-func MinLengthCorpus(s string, min int) string {
-	var buf bytes.Buffer
-	for _, t := range strings.Fields(s) {
-		if len(t) < min {
-			continue
-		}
-		buf.WriteString(t)
-	}
-	return buf.String()
-}
-
 // Languages returns the guessed languages found in abstract and fulltext.
 // TODO(miku): Weird OCR a r t i f a c t s are recognized as "el".
 func (article *Article) Languages() (langs []string, err error) {
@@ -352,20 +377,18 @@ func (article *Article) Languages() (langs []string, err error) {
 	}
 
 	vals := []string{
-		MinLengthCorpus(article.Front.Article.Abstract.Value, 2),
-		MinLengthCorpus(article.Front.Article.TranslatedAbstract.Title.Value, 2),
-		MinLengthCorpus(article.Body.Section.Value, 2),
+		article.Front.Article.Abstract.Value,
+		article.Front.Article.TranslatedAbstract.Title.Value,
+		article.Body.Section.Value,
 	}
 
 	for _, s := range vals {
-		lang, err := guesslanguage.Guess(s)
-		if err != nil {
+		// lang, err := guesslanguage.Guess(s)
+		lang := franco.DetectOne(s)
+		if lang.Code == "und" {
 			continue
 		}
-		if lang == "" || lang == "UNKNOWN" {
-			continue
-		}
-		lmap[lang] = struct{}{}
+		lmap[lang.Code] = struct{}{}
 	}
 
 	for k := range lmap {
@@ -395,13 +418,16 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
 	output.MegaCollection = SourceName
 	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
-	output.RawDate = article.Date().Format("2006-01-02")
+
+	date := article.Date()
+	output.RawDate = date.Format("2006-01-02")
+	output.ParsedDate = []int{date.Year(), int(date.Month()), date.Day()}
 	output.SourceID = SourceID
 	output.Volume = article.Front.Article.Volume.Value
 
 	output.EndPage = article.Front.Article.LastPage.Value
 	output.PageCount = article.PageCount()
-	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+	output.Pages = fmt.Sprintf("%s-%s", output.EndPage, output.StartPage)
 	output.StartPage = article.Front.Article.FirstPage.Value
 
 	langs, err := article.Languages()
