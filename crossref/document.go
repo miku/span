@@ -2,6 +2,7 @@ package crossref
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -12,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/endeveit/guesslanguage"
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
 )
@@ -239,6 +241,23 @@ func (doc *Document) ParseMemberID() (int, error) {
 	return 0, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
+// Languages returns guessed languages of the document.
+// Always includes English as first guess and maybe another
+// which is inferred from the short title and subtitle strings
+// (high false positive rate).
+func (doc *Document) Languages() (langs []string, err error) {
+	var buf bytes.Buffer
+	for _, t := range append(doc.Title, doc.Subtitle...) {
+		buf.WriteString(t)
+	}
+	langs = append(langs, "en")
+	lang, err := guesslanguage.Guess(buf.String())
+	if lang != "" && lang != "UNKNOWN" && lang != "en" {
+		langs = append(langs, lang)
+	}
+	return langs, err
+}
+
 // ToIntermediateSchema converts a crossref document into IS.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := new(finc.IntermediateSchema)
@@ -276,5 +295,13 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err == nil {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
 	}
+
+	langs, err := doc.Languages()
+	if err == nil {
+		output.Languages = langs
+	} else {
+		output.Languages = []string{"en"}
+	}
+
 	return output, nil
 }
