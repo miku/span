@@ -30,9 +30,9 @@ var formats = map[string]span.Source{
 }
 
 // worker iterates over batches
-func worker(batches chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
+func worker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
 	defer wg.Done()
-	for batch := range batches {
+	for batch := range queue {
 		for _, item := range batch.Items {
 			doc, err := batch.Apply(item)
 			if err != nil {
@@ -111,7 +111,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	work := make(chan span.Batcher)
+	queue := make(chan span.Batcher)
 	out := make(chan []byte)
 	done := make(chan bool)
 	go writer(out, done)
@@ -120,7 +120,7 @@ func main() {
 
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go worker(work, out, &wg)
+		go worker(queue, out, &wg)
 	}
 
 	for item := range ch {
@@ -137,13 +137,13 @@ func main() {
 			}
 			fmt.Println(string(b))
 		case span.Batcher:
-			work <- item.(span.Batcher)
+			queue <- item.(span.Batcher)
 		default:
 			log.Fatal(errCannotConvert)
 		}
 	}
 
-	close(work)
+	close(queue)
 	wg.Wait()
 	close(out)
 	<-done
