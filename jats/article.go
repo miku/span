@@ -14,8 +14,12 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// SourceID for internal bookkeeping.
-const SourceID = 50
+const (
+	// SourceID for internal bookkeeping.
+	SourceID = 50
+	// Source name for finc.MegaCollection.
+	SourceName = "DeGruyter SSH"
+)
 
 var errNoDOI = errors.New("DOI is missing")
 
@@ -315,6 +319,6 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 
 	output.RawDate = article.Date().Format("2006-01-02")
 
-	output.MegaCollection = "DeGruyter SSH"
+	output.MegaCollection = SourceName
 	return output, nil
 }
