@@ -55,13 +55,6 @@ func (author *Author) String() string {
 	return author.ID
 }
 
-type Date struct {
-	Year      int `json:"year"`
-	Month     int `json:"month"`
-	Day       int `json:"year"`
-	Timestamp int `json:"timestamp"`
-}
-
 type Classification struct {
 	Type string   `json:"type"`
 	Tags []string `json:"tags"`
@@ -93,7 +86,7 @@ type IntermediateSchema struct {
 	DataProvider string `json:"ris.dp"`
 
 	RawDate    string `json:"rft.date"` // should be: ISO8601 date
-	ParsedDate Date   `json:"date"`
+	ParsedDate []int  `json:"date"`
 
 	Place           []string         `json:"rft.place"`
 	Publisher       []string         `json:"rft.pub"`
@@ -122,6 +115,27 @@ type IntermediateSchema struct {
 	Abstract  string   `json:"abstract"`
 }
 
+func (is *IntermediateSchema) Year() int {
+	if len(is.ParsedDate) > 0 {
+		return is.ParsedDate[0]
+	}
+	return 0
+}
+
+func (is *IntermediateSchema) Month() int {
+	if len(is.ParsedDate) > 1 {
+		return is.ParsedDate[1]
+	}
+	return 1
+}
+
+func (is *IntermediateSchema) Day() int {
+	if len(is.ParsedDate) > 2 {
+		return is.ParsedDate[2]
+	}
+	return 1
+}
+
 // ISSNList returns a deduplicated list of all ISSNs.
 func (is *IntermediateSchema) ISSNList() []string {
 	set := make(map[string]struct{})
@@ -135,20 +149,11 @@ func (is *IntermediateSchema) ISSNList() []string {
 	return issns
 }
 
-// max of ints.
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 // Date returns a time.Date in a best effort manner. Date parts seem to be always
 // present in the source document, while timestamp is only present if
 // dateparts consist of all three: year, month and day.
 func (is *IntermediateSchema) Date() time.Time {
-	return time.Date(max(1, is.ParsedDate.Year), time.Month(max(1, is.ParsedDate.Month)),
-		max(1, is.ParsedDate.Day), 0, 0, 0, 0, time.UTC)
+	return time.Date(is.Year(), time.Month(is.Month()), is.Day(), 0, 0, 0, 0, time.UTC)
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
@@ -156,11 +161,11 @@ func (is *IntermediateSchema) Date() time.Time {
 // will contain the reason as message.
 // TODO(miku): better handling of 'unparseable' volume or issue strings
 func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
-	if e.FromYear != 0 && is.ParsedDate.Year != 0 {
-		if e.FromYear > is.ParsedDate.Year {
+	if e.FromYear != 0 && is.Year() != 0 {
+		if e.FromYear > is.Year() {
 			return errFromYear
 		}
-		if e.FromYear == is.ParsedDate.Year {
+		if e.FromYear == is.Year() {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
 				return errNotParsable
@@ -180,11 +185,11 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		}
 	}
 
-	if e.ToYear != 0 && is.ParsedDate.Year != 0 {
-		if e.ToYear < is.ParsedDate.Year {
+	if e.ToYear != 0 && is.Year() != 0 {
+		if e.ToYear < is.Year() {
 			return errToYear
 		}
-		if e.ToYear == is.ParsedDate.Year {
+		if e.ToYear == is.Year() {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
 				return errNotParsable
@@ -255,7 +260,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output.TitleShort = is.ArticleTitle
 
 	output.HierarchyParentTitle = is.JournalTitle
-	output.PublishDateSort = is.ParsedDate.Year
+	output.PublishDateSort = is.Year()
 
 	if len(is.URL) > 0 {
 		output.URL = is.URL[0]
