@@ -337,7 +337,13 @@ func (article *Article) Languages() (langs []string, err error) {
 		lmap[article.Front.Article.Abstract.Lang] = struct{}{}
 	}
 
-	for _, s := range []string{article.Front.Article.Abstract.Value, article.Body.Section.Value} {
+	vals := []string{
+		article.Front.Article.Abstract.Value,
+		article.Front.Article.TranslatedAbstract.Title.Value,
+		article.Body.Section.Value,
+	}
+
+	for _, s := range vals {
 		lang, err := guesslanguage.Guess(s)
 		if err != nil {
 			continue
