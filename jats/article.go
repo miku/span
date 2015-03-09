@@ -2,6 +2,7 @@ package jats
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
 	"encoding/xml"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/endeveit/guesslanguage"
@@ -329,6 +331,18 @@ func (article *Article) identifiers() (identifiers, error) {
 	return ids, nil
 }
 
+// MinLengthCorpus returns the given string minus all words shorter than min.
+func MinLengthCorpus(s string, min int) string {
+	var buf bytes.Buffer
+	for _, t := range strings.Fields(s) {
+		if len(t) < min {
+			continue
+		}
+		buf.WriteString(t)
+	}
+	return buf.String()
+}
+
 // Languages returns the guessed languages found in abstract and fulltext.
 // TODO(miku): Weird OCR a r t i f a c t s are recognized as "el".
 func (article *Article) Languages() (langs []string, err error) {
@@ -338,9 +352,9 @@ func (article *Article) Languages() (langs []string, err error) {
 	}
 
 	vals := []string{
-		article.Front.Article.Abstract.Value,
-		article.Front.Article.TranslatedAbstract.Title.Value,
-		article.Body.Section.Value,
+		MinLengthCorpus(article.Front.Article.Abstract.Value, 2),
+		MinLengthCorpus(article.Front.Article.TranslatedAbstract.Title.Value, 2),
+		MinLengthCorpus(article.Body.Section.Value, 2),
 	}
 
 	for _, s := range vals {
