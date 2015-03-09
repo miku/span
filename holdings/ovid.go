@@ -4,7 +4,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -118,10 +117,7 @@ func HoldingsMap(reader io.Reader) IssnHolding {
 	decoder := xml.NewDecoder(reader)
 	var tag string
 	for {
-		t, err := decoder.Token()
-		if err != nil {
-			log.Fatal(err)
-		}
+		t, _ := decoder.Token()
 		if t == nil {
 			break
 		}

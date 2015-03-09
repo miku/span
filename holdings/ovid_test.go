@@ -15,15 +15,15 @@ func TestParseDelay(t *testing.T) {
 		err error
 	}{
 		{"-0M", time.Duration(0), nil},
-		{"-1M", time.Duration(-1) * Month, nil},
-		{"-2M", time.Duration(-2) * Month, nil},
-		{"-1Y", time.Duration(-1) * Year, nil},
-		{"-1D", time.Duration(0), ErrUnknownFormat},
-		{"-1", time.Duration(0), ErrUnknownFormat},
-		{"129", time.Duration(0), ErrUnknownFormat},
-		{"AB", time.Duration(0), ErrUnknownFormat},
-		{"-111m", time.Duration(0), ErrUnknownFormat},
-		{"0.1M", time.Duration(0), ErrUnknownFormat},
+		{"-1M", time.Duration(-1) * month, nil},
+		{"-2M", time.Duration(-2) * month, nil},
+		{"-1Y", time.Duration(-1) * year, nil},
+		{"-1D", time.Duration(0), errUnknownFormat},
+		{"-1", time.Duration(0), errUnknownFormat},
+		{"129", time.Duration(0), errUnknownFormat},
+		{"AB", time.Duration(0), errUnknownFormat},
+		{"-111m", time.Duration(0), errUnknownFormat},
+		{"0.1M", time.Duration(0), errUnknownFormat},
 	}
 
 	for _, tt := range tests {
@@ -52,8 +52,8 @@ func TestDelay(t *testing.T) {
 		{Entitlement{FromDelay: "-1M"}, time.Duration(-2592000000000000), nil},
 		{Entitlement{ToDelay: "-1M"}, time.Duration(-2592000000000000), nil},
 		{Entitlement{FromDelay: "-1M", ToDelay: "-1M"}, time.Duration(-2592000000000000), nil},
-		{Entitlement{FromDelay: "-1M", ToDelay: "-2M"}, time.Duration(-2592000000000000), nil},
-		{Entitlement{FromDelay: "-2M", ToDelay: "-1M"}, time.Duration(-5184000000000000), nil},
+		{Entitlement{FromDelay: "-1M", ToDelay: "-2M"}, time.Duration(0), errDelayMismatch},
+		{Entitlement{FromDelay: "-2M", ToDelay: "-1M"}, time.Duration(0), errDelayMismatch},
 	}
 	for _, tt := range tests {
 		d, err := tt.e.Delay()
@@ -80,7 +80,7 @@ func TestBoundary(t *testing.T) {
 		err error
 	}{
 		{Entitlement{FromDelay: "-0M"}, time.Now(), nil},
-		{Entitlement{FromDelay: "0M"}, time.Now(), ErrUnknownFormat},
+		{Entitlement{FromDelay: "0M"}, time.Now(), errUnknownFormat},
 	}
 	for _, tt := range tests {
 		d, err := tt.e.Boundary()
