@@ -2,7 +2,6 @@ package crossref
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -13,16 +12,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/endeveit/guesslanguage"
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
+	"github.com/miku/span/sets"
 )
 
-// SourceID for internal bookkeeping.
-const SourceID = 49
+const (
+	// SourceID for internal bookkeeping.
+	SourceID = 49
+	// BatchSize for batched reading.
+	BatchSize = 25000
+)
 
-// DefaultBatchSize for batched reading.
-const BatchSize = 25000
+// acceptedLanguages restricts the possible languages for detection.
+var acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
 
 // Crossref source.
 type Crossref struct{}
@@ -245,26 +248,41 @@ func (doc *Document) ParseMemberID() (int, error) {
 // Always includes English as first guess and maybe another
 // which is inferred from the short title and subtitle strings
 // (high false positive rate).
-func (doc *Document) Languages() (langs []string, err error) {
-	var buf bytes.Buffer
-	for _, t := range append(doc.Title, doc.Subtitle...) {
-		buf.WriteString(t)
-	}
+func (doc *Document) Languages() (langs []string) {
 	langs = append(langs, "en")
-	lang, err := guesslanguage.Guess(buf.String())
-	if lang != "" && lang != "UNKNOWN" && lang != "en" {
-		langs = append(langs, lang)
-	}
-	return langs, err
+
+	// TODO(miku): move lang detect to is-export, address 90% time spent here
+	// var buf bytes.Buffer
+	// for _, t := range append(doc.Title, doc.Subtitle...) {
+	// 	buf.WriteString(t)
+	// }
+
+	// lang := franco.DetectOne(buf.String())
+	// if lang.Code == "und" {
+	// 	return
+	// }
+	// base, err := language.ParseBase(lang.Code)
+	// if err != nil {
+	// 	return
+	// }
+	// if !acceptedLanguages.Contains(base.String()) {
+	// 	return
+	// }
+	// if base.String() != "en" {
+	// 	langs = append(langs, base.String())
+	// }
+	return langs
 }
 
 // ToIntermediateSchema converts a crossref document into IS.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := new(finc.IntermediateSchema)
+
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
 	}
 
+	output.Version = finc.IntermediateSchemaVersion
 	output.RecordID = doc.RecordID()
 	output.URL = append(output.URL, doc.URL)
 	output.DOI = doc.DOI
@@ -299,14 +317,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
 	}
 
-	langs, err := doc.Languages()
-	if err == nil {
-		output.Languages = langs
-	} else {
-		output.Languages = []string{"en"}
-	}
-
-	output.Version = finc.IntermediateSchemaVersion
+	output.Languages = doc.Languages()
 
 	return output, nil
 }
