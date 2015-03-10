@@ -34,13 +34,13 @@ type AuthorID struct {
 	Type string // gnd, orcid, ...
 }
 
-// Author representes an author, inspired by OpenURL.
+// Author representes an author, "inspired" by OpenURL.
 type Author struct {
-	ID           string `json:"id"` // eventuell mehrfach, mit typ
+	ID           string `json:"id"`
 	Name         string `json:"rft.au"`
 	LastName     string `json:"rft.aulast"`
 	FirstName    string `json:"rft.aufirst"`
-	Initial      string `json:"rft.auinit"` // was ist unterschied zu auinit1?
+	Initial      string `json:"rft.auinit"`
 	FirstInitial string `json:"rft.auinit1"`
 	MiddleName   string `json:"rft.auinitm"`
 	Suffix       string `json:"rft.ausuffix"`
