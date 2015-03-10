@@ -423,15 +423,7 @@ func (article *Article) identifiers() (identifiers, error) {
 	return ids, nil
 }
 
-func minint(a, b int) int {
-	if a > b {
-		return b
-	}
-	return a
-}
-
 // Languages returns the guessed languages found in abstract and fulltext.
-// TODO(miku): Weird OCR a r t i f a c t s are recognized as "el".
 func (article *Article) Languages() (langs []string, err error) {
 	m := make(map[string]struct{})
 	if article.Front.Article.Abstract.Lang != "" {
