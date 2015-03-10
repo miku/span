@@ -15,7 +15,7 @@ import (
 
 const (
 	AIRecordType              = "ai"
-	IntermediateSchemaVersion = "1.0.0"
+	IntermediateSchemaVersion = "0.1"
 )
 
 var (
