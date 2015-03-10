@@ -4,6 +4,7 @@ package finc
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sort"
 	"strconv"
 	"time"
@@ -12,7 +13,10 @@ import (
 	"github.com/miku/span/sets"
 )
 
-const AIRecordType = "ai"
+const (
+	AIRecordType              = "ai"
+	IntermediateSchemaVersion = "1.0.0"
+)
 
 var (
 	errFromYear    = errors.New("from-year mismatch")
@@ -55,11 +59,6 @@ func (author *Author) String() string {
 	return author.ID
 }
 
-type Classification struct {
-	Type string   `json:"type"`
-	Tags []string `json:"tags"`
-}
-
 // IntermediateSchema abstract and collects the values of various input formats.
 // Goal is to simplify further processing by using a single format, from which
 // the next artifacts can be derived, e.g. records for solr indices.
@@ -85,55 +84,57 @@ type IntermediateSchema struct {
 	Database     string `json:"ris.db"`
 	DataProvider string `json:"ris.dp"`
 
-	RawDate    string `json:"rft.date"` // should be: ISO8601 date
-	ParsedDate []int  `json:"date"`
+	// ISO8601 date or panic
+	RawDate string `json:"rft.date"`
 
-	Place           []string         `json:"rft.place"`
-	Publisher       []string         `json:"rft.pub"`
-	Edition         string           `json:"rft.edition"`
-	Chronology      string           `json:"rft.chron"`
-	Season          string           `json:"rft.ssn"`
-	Quarter         string           `json:"rft.quarter"`
-	Volume          string           `json:"rft.volume"`
-	Issue           string           `json:"rft.issue"`
-	Part            string           `json:"rft.part"`
-	StartPage       string           `json:"rft.spage"`
-	EndPage         string           `json:"rft.epage"`
-	Pages           string           `json:"rft.pages"`
-	PageCount       string           `json:"rft.tpages"`
-	ArticleNumber   string           `json:"rft.artnum"`
-	ISSN            []string         `json:"rft.issn"`
-	EISSN           []string         `json:"rft.eissn"`
-	ISBN            []string         `json:"rft.isbn"`
-	EISBN           []string         `json:"rft.isbn"`
-	Classifications []Classification `json:"x.classification"`
+	Place         []string `json:"rft.place"`
+	Publisher     []string `json:"rft.pub"`
+	Edition       string   `json:"rft.edition"`
+	Chronology    string   `json:"rft.chron"`
+	Season        string   `json:"rft.ssn"`
+	Quarter       string   `json:"rft.quarter"`
+	Volume        string   `json:"rft.volume"`
+	Issue         string   `json:"rft.issue"`
+	Part          string   `json:"rft.part"`
+	StartPage     string   `json:"rft.spage"`
+	EndPage       string   `json:"rft.epage"`
+	Pages         string   `json:"rft.pages"`
+	PageCount     string   `json:"rft.tpages"`
+	ArticleNumber string   `json:"rft.artnum"`
+	ISSN          []string `json:"rft.issn"`
+	EISSN         []string `json:"rft.eissn"`
+	ISBN          []string `json:"rft.isbn"`
+	EISBN         []string `json:"rft.isbn"`
 
 	DOI       string   `json:"doi"`
 	URL       []string `json:"url"`
 	Authors   []Author `json:"authors"`
 	Languages []string `json:"languages"`
 	Abstract  string   `json:"abstract"`
+
+	Subjects []string `json:"x.subjects"`
+	Headings []string `json:"x.headings"`
+	Version  string   `json:"version"`
+}
+
+func (is *IntermediateSchema) Date() time.Time {
+	t, err := time.Parse("2006-01-02", is.RawDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return t
 }
 
 func (is *IntermediateSchema) Year() int {
-	if len(is.ParsedDate) > 0 {
-		return is.ParsedDate[0]
-	}
-	return 0
+	return is.Date().Year()
 }
 
-func (is *IntermediateSchema) Month() int {
-	if len(is.ParsedDate) > 1 {
-		return is.ParsedDate[1]
-	}
-	return 1
+func (is *IntermediateSchema) Month() time.Month {
+	return is.Date().Month()
 }
 
 func (is *IntermediateSchema) Day() int {
-	if len(is.ParsedDate) > 2 {
-		return is.ParsedDate[2]
-	}
-	return 1
+	return is.Date().Day()
 }
 
 // ISSNList returns a deduplicated list of all ISSNs.
@@ -147,13 +148,6 @@ func (is *IntermediateSchema) ISSNList() []string {
 		issns = append(issns, k)
 	}
 	return issns
-}
-
-// Date returns a time.Date in a best effort manner. Date parts seem to be always
-// present in the source document, while timestamp is only present if
-// dateparts consist of all three: year, month and day.
-func (is *IntermediateSchema) Date() time.Time {
-	return time.Date(is.Year(), time.Month(is.Month()), is.Day(), 0, 0, 0, 0, time.UTC)
 }
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
@@ -271,10 +265,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	}
 
 	output.ISSN = is.ISSNList()
-
-	if len(is.Classifications) == 1 {
-		output.Topics = is.Classifications[0].Tags
-	}
+	output.Topics = is.Subjects
 
 	for _, author := range is.Authors {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())

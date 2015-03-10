@@ -18,7 +18,7 @@ type Batcher struct {
 	Apply func(string) (Importer, error)
 }
 
-// Converter objects can be converted into an intermediate schema.
+// Importer objects can be converted into an intermediate schema.
 type Importer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }

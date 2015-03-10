@@ -67,6 +67,7 @@ func main() {
 	listFormats := flag.Bool("l", false, "list formats")
 	members := flag.String("members", "", "path to LDJ file, one member per line")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+	logfile := flag.String("log", "", "if given log to file")
 
 	flag.Parse()
 
@@ -121,6 +122,14 @@ func main() {
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
 		go worker(queue, out, &wg)
+	}
+
+	if *logfile != "" {
+		ff, err := os.Create(*logfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.SetOutput(ff)
 	}
 
 	for item := range ch {

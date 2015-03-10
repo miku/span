@@ -110,7 +110,7 @@ type Document struct {
 	ReferenceCount int       `json:"reference-count"`
 	Score          float64   `json:"score"`
 	Source         string    `json:"source"`
-	Subject        []string  `json:"subject"`
+	Subjects       []string  `json:"subject"`
 	Subtitle       []string  `json:"subtitle"`
 	Title          []string  `json:"title"`
 	Type           string    `json:"type"`
@@ -271,6 +271,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = SourceID
 	output.Publisher = append(output.Publisher, doc.Publisher)
 	output.ArticleTitle = doc.CombinedTitle()
+	output.Format = "ElectronicArticle"
 	output.Issue = doc.Issue
 	output.Volume = doc.Volume
 	output.ISSN = doc.ISSN
@@ -291,6 +292,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.RawDate = doc.Issued.Date().Format("2006-01-02")
 
+	output.Subjects = doc.Subjects
+
 	name, err := doc.MemberName()
 	if err == nil {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
@@ -302,6 +305,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	} else {
 		output.Languages = []string{"en"}
 	}
+
+	output.Version = finc.IntermediateSchemaVersion
 
 	return output, nil
 }

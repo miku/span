@@ -14,37 +14,50 @@ import (
 	"github.com/kapsteur/franco"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/sets"
+	"golang.org/x/text/language"
 )
 
 const (
 	// SourceID for internal bookkeeping.
 	SourceID = 50
+
 	// Source name for finc.MegaCollection.
 	SourceName = "DeGruyter SSH"
 )
 
 var errNoDOI = errors.New("DOI is missing")
 
-// datePatterns are candidate patterns for parsing publishing dates.
-var datePatterns = []string{
-	"2006",
-	"2006-",
-	"2006-1",
-	"2006-01",
-	"2006-1-2",
-	"2006-1-02",
-	"2006-01-2",
-	"2006-01-02",
-	"2006-Jan",
-	"2006-January",
-	"2006-Jan-2",
-	"2006-Jan-02",
-	"2006-January-2",
-	"2006-January-02",
-}
+var (
+	// If multiple publication dates are available, choose this type.
+	preferredPubDateType = "epub"
 
-// langpool is a restricted set of language for detection.
-var langpool = sets.NewStringSet("deu", "eng", "fra", "ita", "spa", "lat")
+	// acceptedLanguages restricts the possible languages for detection.
+	acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
+
+	// datePatterns are candidate patterns for parsing publishing dates.
+	datePatterns = []string{
+		"2006",
+		"2006-",
+		"2006-1",
+		"2006-01",
+		"2006-1-2",
+		"2006-1-02",
+		"2006-01-2",
+		"2006-01-02",
+		"2006-Jan",
+		"2006-January",
+		"2006-Jan-2",
+		"2006-Jan-02",
+		"2006-January-2",
+		"2006-January-02",
+		"2006-x",
+		"2006-xx",
+		"2006-x-x",
+		"2006-x-xx",
+		"2006-xx-x",
+		"2006-xx-xx",
+	}
+)
 
 // Jats source.
 type Jats struct{}
@@ -76,6 +89,23 @@ func (s Jats) Iterate(r io.Reader) (chan interface{}, error) {
 	return ch, nil
 }
 
+// PubDate represents a publication date. Typical type values are ppub and epub.
+type PubDate struct {
+	Type  string `xml:"pub-type,attr"`
+	Month struct {
+		XMLName xml.Name `xml:"month"`
+		Value   string   `xml:",chardata"`
+	}
+	Year struct {
+		XMLName xml.Name `xml:"year"`
+		Value   string   `xml:",chardata"`
+	}
+	Day struct {
+		XMLName xml.Name `xml:"day"`
+		Value   string   `xml:",chardata"`
+	}
+}
+
 // Article mirrors a JATS article element. Some elements, such as
 // article categories are not implmented yet.
 type Article struct {
@@ -93,7 +123,11 @@ type Article struct {
 				Value string `xml:",chardata"`
 			} `xml:"issn"`
 			TitleGroup struct {
-				XMLName          xml.Name `xml:"journal-title-group"`
+				XMLName      xml.Name `xml:"journal-title-group"`
+				JournalTitle struct {
+					XMLName xml.Name `xml:"journal-title"`
+					Title   string   `xml:",chardata"`
+				}
 				AbbreviatedTitle struct {
 					XMLName xml.Name `xml:"abbrev-journal-title"`
 					Title   string   `xml:",chardata"`
@@ -145,32 +179,16 @@ type Article struct {
 				} `xml:"contrib"`
 			}
 			Categories struct {
-				XMLName      xml.Name `xml:"article-categories"`
-				SubjectGroup struct {
-					XMLName xml.Name `xml:"subj-group"`
-					Type    string   `xml:"subj-group-type,attr"`
-					Subject []struct {
-						XMLName xml.Name `xml:"subject"`
-						Value   string   `xml:",chardata"`
-					}
-				}
-			}
-			PubDate struct {
-				Type  string `xml:"pub-type,attr"`
-				Month struct {
-					XMLName xml.Name `xml:"month"`
-					Value   string   `xml:",chardata"`
-				}
-				Year struct {
-					XMLName xml.Name `xml:"year"`
-					Value   string   `xml:",chardata"`
-				}
-				Day struct {
-					XMLName xml.Name `xml:"day"`
-					Value   string   `xml:",chardata"`
-				}
-			} `xml:"pub-date"`
-			Volume struct {
+				XMLName       xml.Name `xml:"article-categories"`
+				SubjectGroups []struct {
+					Type     string `xml:"subj-group-type,attr"`
+					Subjects []struct {
+						Value string `xml:",chardata"`
+					} `xml:"subject"`
+				} `xml:"subj-group"`
+			} `xml:"article-categories"`
+			PubDates []PubDate `xml:"pub-date"`
+			Volume   struct {
 				XMLName xml.Name `xml:"volume"`
 				Value   string   `xml:",chardata"`
 			}
@@ -280,6 +298,30 @@ func (article *Article) ISSN() (issns []string) {
 	return
 }
 
+func (article *Article) Headings() (subjects []string) {
+	for _, g := range article.Front.Article.Categories.SubjectGroups {
+		if g.Type != "heading" {
+			continue
+		}
+		for _, s := range g.Subjects {
+			subjects = append(subjects, s.Value)
+		}
+	}
+	return
+}
+
+func (article *Article) Subjects() (subjects []string) {
+	for _, g := range article.Front.Article.Categories.SubjectGroups {
+		if g.Type == "heading" {
+			continue
+		}
+		for _, s := range g.Subjects {
+			subjects = append(subjects, s.Value)
+		}
+	}
+	return
+}
+
 // PageCount return the number of pages as string.
 func (article *Article) PageCount() (s string) {
 	first, err := strconv.Atoi(article.Front.Article.FirstPage.Value)
@@ -308,18 +350,16 @@ func (article *Article) Abstract() string {
 	return string(article.Front.Article.Abstract.Value)
 }
 
-// Date returns this articles issuing date in a best effort manner.
-func (article *Article) Date() (t time.Time) {
+// parsePubDate tries to get a date out of a pubdate.
+func (article *Article) parsePubDate(pd PubDate) (t time.Time) {
 	var s string
-	pubdate := article.Front.Article.PubDate
-
-	if pubdate.Day.Value == "" {
-		if pubdate.Month.Value == "" {
-			s = fmt.Sprintf("%s", pubdate.Year.Value)
+	if pd.Day.Value == "" {
+		if pd.Month.Value == "" {
+			s = fmt.Sprintf("%s", pd.Year.Value)
 		}
-		s = fmt.Sprintf("%s-%s", pubdate.Year.Value, pubdate.Month.Value)
+		s = fmt.Sprintf("%s-%s", pd.Year.Value, pd.Month.Value)
 	} else {
-		s = fmt.Sprintf("%s-%s-%s", pubdate.Year.Value, pubdate.Month.Value, pubdate.Day.Value)
+		s = fmt.Sprintf("%s-%s-%s", pd.Year.Value, pd.Month.Value, pd.Day.Value)
 	}
 
 	var err error
@@ -328,23 +368,38 @@ func (article *Article) Date() (t time.Time) {
 	for _, p := range datePatterns {
 		t, err = time.Parse(p, s)
 		if err == nil {
-			log.Println(s, ">", p, ">", t)
 			miss = false
 			break
 		}
 	}
 	if miss {
-		log.Printf("missing pattern in %s for %s: %s", article.Front.Journal.ID.Value, s, t)
+		doi, _ := article.DOI()
+		log.Printf("missed pattern: %s, %s, %s", doi, s, t)
 	}
 	return t
 }
 
-func (article *Article) Year() int {
-	year, err := strconv.Atoi(article.Front.Article.PubDate.Year.Value)
-	if err != nil {
-		return 0
+// Date returns this articles issuing date in a best effort manner.
+func (article *Article) Date() (t time.Time) {
+	switch len(article.Front.Article.PubDates) {
+	case 0:
+		return
+	case 1:
+		return article.parsePubDate(article.Front.Article.PubDates[0])
+	default:
+		var index int
+		for i, pd := range article.Front.Article.PubDates {
+			if pd.Type == "epub" {
+				index = i
+			}
+		}
+		return article.parsePubDate(article.Front.Article.PubDates[index])
 	}
-	return year
+	return
+}
+
+func (article *Article) Year() int {
+	return article.Date().Year()
 }
 
 // identifiers is a helper struct.
@@ -368,12 +423,19 @@ func (article *Article) identifiers() (identifiers, error) {
 	return ids, nil
 }
 
+func minint(a, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
+
 // Languages returns the guessed languages found in abstract and fulltext.
 // TODO(miku): Weird OCR a r t i f a c t s are recognized as "el".
 func (article *Article) Languages() (langs []string, err error) {
-	lmap := make(map[string]struct{})
+	m := make(map[string]struct{})
 	if article.Front.Article.Abstract.Lang != "" {
-		lmap[article.Front.Article.Abstract.Lang] = struct{}{}
+		m[article.Front.Article.Abstract.Lang] = struct{}{}
 	}
 
 	vals := []string{
@@ -383,15 +445,25 @@ func (article *Article) Languages() (langs []string, err error) {
 	}
 
 	for _, s := range vals {
-		// lang, err := guesslanguage.Guess(s)
+		if len(s) < 20 {
+			continue
+		}
 		lang := franco.DetectOne(s)
 		if lang.Code == "und" {
 			continue
 		}
-		lmap[lang.Code] = struct{}{}
+		base, err := language.ParseBase(lang.Code)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		if !acceptedLanguages.Contains(base.String()) {
+			continue
+		}
+		m[base.String()] = struct{}{}
 	}
 
-	for k := range lmap {
+	for k := range m {
 		langs = append(langs, k)
 	}
 	return langs, err
@@ -409,6 +481,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.DOI = ids.doi
 	output.RecordID = ids.recordID
 	output.URL = append(output.URL, ids.url)
+	output.Format = "ElectronicArticle"
 
 	output.Abstract = article.Abstract()
 	output.ArticleTitle = article.CombinedTitle()
@@ -421,7 +494,6 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 
 	date := article.Date()
 	output.RawDate = date.Format("2006-01-02")
-	output.ParsedDate = []int{date.Year(), int(date.Month()), date.Day()}
 	output.SourceID = SourceID
 	output.Volume = article.Front.Article.Volume.Value
 
@@ -430,12 +502,17 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Pages = fmt.Sprintf("%s-%s", output.EndPage, output.StartPage)
 	output.StartPage = article.Front.Article.FirstPage.Value
 
+	output.Version = finc.IntermediateSchemaVersion
+
 	langs, err := article.Languages()
 	if err != nil {
 		log.Fatal(err)
 	} else {
 		output.Languages = langs
 	}
+
+	output.Subjects = article.Subjects()
+	output.Headings = article.Headings()
 
 	return output, nil
 }
