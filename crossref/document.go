@@ -18,21 +18,29 @@ import (
 )
 
 const (
-	// SourceID for internal bookkeeping.
+	// Internal bookkeeping.
 	SourceID = 49
-	// BatchSize for batched reading.
+	// BatchSize for grouped channel transport.
 	BatchSize = 25000
 )
 
-// acceptedLanguages restricts the possible languages for detection.
-var acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
+var (
+	errNoDate = errors.New("date is missing")
+	errNoURL  = errors.New("URL is missing")
+)
+
+var (
+	Format = "ElectronicArticle"
+	// acceptedLanguages restricts the possible languages for detection.
+	acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
+)
 
 // Crossref source.
 type Crossref struct{}
 
 // Iterate returns a channel which carries batches. The processor function
-// is just plain JSON deserialization. It is ok to halt the world, if
-// there some error during reading.
+// is just plain JSON deserialization. It is ok to halt the world,
+// if there some error during reading.
 func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 	batch := span.Batcher{
 		Apply: func(s string) (span.Importer, error) {
@@ -164,34 +172,33 @@ func (doc *Document) PageInfo() PageInfo {
 	return pi
 }
 
-// Year returns the first year found inside a DateField.
-func (d *DateField) Year() int {
-	if len(d.DateParts) >= 1 && len(d.DateParts[0]) > 0 {
-		return d.DateParts[0][0]
-	}
-	return 0
-}
-
 // Date returns a time.Date in a best effort manner. Date parts seem to be always
 // present in the source document, while timestamp is only present if
 // dateparts consist of all three: year, month and day.
-func (d *DateField) Date() (t time.Time) {
+// It is an error, if no valid date can be extracted.
+func (d *DateField) Date() (t time.Time, err error) {
 	if len(d.DateParts) == 0 {
-		t, _ = time.Parse("2006-01-02", "0000-00-00")
-		return t
+		return t, errNoDate
 	}
-	p := d.DateParts[0]
-	switch len(p) {
+	parts := d.DateParts[0]
+	switch len(parts) {
 	case 1:
-		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%04d-01-01", p[0]))
+		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-01-01", parts[0]))
+		if err != nil {
+			return t, err
+		}
 	case 2:
-		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-01", p[0], p[1]))
+		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-01", parts[0], parts[1]))
+		if err != nil {
+			return t, err
+		}
 	case 3:
-		t, _ = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", p[0], p[1], p[2]))
-	default:
-		t, _ = time.Parse("2006-01-02", "1970-01-01")
+		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", parts[0], parts[1], parts[2]))
+		if err != nil {
+			return t, err
+		}
 	}
-	return t
+	return t, err
 }
 
 // CombinedTitle returns a longish title.
@@ -214,11 +221,11 @@ func (doc *Document) FullTitle() string {
 }
 
 // ShortTitle returns the first main title only.
-func (doc *Document) ShortTitle() string {
+func (doc *Document) ShortTitle() (s string) {
 	if len(doc.Title) > 0 {
-		return doc.Title[0]
+		s = doc.Title[0]
 	}
-	return ""
+	return
 }
 
 // MemberName resolves the primary name of the member.
@@ -232,74 +239,53 @@ func (doc *Document) MemberName() (name string, err error) {
 }
 
 // ParseMemberID extracts the numeric member id.
-func (doc *Document) ParseMemberID() (int, error) {
+func (doc *Document) ParseMemberID() (id int, err error) {
 	fields := strings.Split(doc.Member, "/")
 	if len(fields) > 0 {
-		id, err := strconv.Atoi(fields[len(fields)-1])
+		id, err = strconv.Atoi(fields[len(fields)-1])
 		if err != nil {
-			return 0, fmt.Errorf("invalid member: %s", doc.Member)
+			return id, fmt.Errorf("invalid member: %s", doc.Member)
 		}
 		return id, nil
 	}
-	return 0, fmt.Errorf("invalid member: %s", doc.Member)
-}
-
-// Languages returns guessed languages of the document.
-// Always includes English as first guess and maybe another
-// which is inferred from the short title and subtitle strings
-// (high false positive rate).
-func (doc *Document) Languages() (langs []string) {
-	langs = append(langs, "en")
-
-	// TODO(miku): move lang detect to is-export, address 90% time spent here
-	// var buf bytes.Buffer
-	// for _, t := range append(doc.Title, doc.Subtitle...) {
-	// 	buf.WriteString(t)
-	// }
-
-	// lang := franco.DetectOne(buf.String())
-	// if lang.Code == "und" {
-	// 	return
-	// }
-	// base, err := language.ParseBase(lang.Code)
-	// if err != nil {
-	// 	return
-	// }
-	// if !acceptedLanguages.Contains(base.String()) {
-	// 	return
-	// }
-	// if base.String() != "en" {
-	// 	langs = append(langs, base.String())
-	// }
-	return langs
+	return id, fmt.Errorf("invalid member: %s", doc.Member)
 }
 
 // ToIntermediateSchema converts a crossref document into IS.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	if doc.URL == "" {
-		return output, errors.New("input document has no URL")
+	date, err := doc.Issued.Date()
+	output.RawDate = date.Format("2006-01-02")
+	if err != nil {
+		return output, err
 	}
 
-	output.Version = finc.IntermediateSchemaVersion
-	output.RecordID = doc.RecordID()
-	output.URL = append(output.URL, doc.URL)
-	output.DOI = doc.DOI
-	output.SourceID = SourceID
-	output.Publisher = append(output.Publisher, doc.Publisher)
+	if doc.URL == "" {
+		return output, errNoURL
+	}
+
 	output.ArticleTitle = doc.CombinedTitle()
-	output.Format = "ElectronicArticle"
-	output.Issue = doc.Issue
-	output.Volume = doc.Volume
+	output.DOI = doc.DOI
+	output.Format = Format
 	output.ISSN = doc.ISSN
+	output.Issue = doc.Issue
+	output.Languages = []string{"en"}
+	output.Publisher = append(output.Publisher, doc.Publisher)
+	output.RecordID = doc.RecordID()
+	output.SourceID = SourceID
+	output.Subjects = doc.Subjects
+	output.URL = append(output.URL, doc.URL)
+	output.Version = finc.IntermediateSchemaVersion
+	output.Volume = doc.Volume
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = doc.ContainerTitle[0]
 	}
 
 	for _, author := range doc.Authors {
-		output.Authors = append(output.Authors, finc.Author{FirstName: author.Given, LastName: author.Family})
+		output.Authors = append(output.Authors, finc.Author{
+			FirstName: author.Given, LastName: author.Family})
 	}
 
 	pi := doc.PageInfo()
@@ -308,15 +294,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
-	output.RawDate = doc.Issued.Date().Format("2006-01-02")
-	output.Subjects = doc.Subjects
-
 	name, err := doc.MemberName()
 	if err == nil {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
 	}
-
-	output.Languages = doc.Languages()
 
 	return output, nil
 }

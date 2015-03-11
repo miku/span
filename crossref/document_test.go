@@ -24,25 +24,6 @@ func TestAuthorString(t *testing.T) {
 	}
 }
 
-func TestDateFieldYear(t *testing.T) {
-	var tests = []struct {
-		f DateField
-		y int
-	}{
-		{f: DateField{DateParts: []DatePart{DatePart{2000}}}, y: 2000},
-		{f: DateField{DateParts: []DatePart{DatePart{2000, 10}}}, y: 2000},
-		{f: DateField{DateParts: []DatePart{DatePart{2000, 10, 1}}}, y: 2000},
-		{f: DateField{DateParts: []DatePart{DatePart{}}}, y: 0},
-	}
-
-	for _, tt := range tests {
-		y := tt.f.Year()
-		if y != tt.y {
-			t.Errorf("DateField.Year(): got %d, want %d", y, tt.y)
-		}
-	}
-}
-
 func MustParse(layout, s string) time.Time {
 	t, err := time.Parse(layout, s)
 	if err != nil {
@@ -53,18 +34,22 @@ func MustParse(layout, s string) time.Time {
 
 func TestDateFieldDate(t *testing.T) {
 	var tests = []struct {
-		f DateField
-		d time.Time
+		f   DateField
+		d   time.Time
+		err error
 	}{
-		{f: DateField{DateParts: []DatePart{DatePart{2000}}}, d: MustParse("2006-01-02", "2000-01-01")},
-		{f: DateField{DateParts: []DatePart{DatePart{2000, 10}}}, d: MustParse("2006-01-02", "2000-10-01")},
-		{f: DateField{DateParts: []DatePart{DatePart{2000, 10, 1}}}, d: MustParse("2006-01-02", "2000-10-01")},
-		{f: DateField{DateParts: []DatePart{DatePart{}}}, d: MustParse("2006-01-02", "1970-01-01")},
+		{f: DateField{DateParts: []DatePart{DatePart{2000}}}, d: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{DatePart{2000, 10}}}, d: time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{DatePart{2000, 10, 1}}}, d: time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{DatePart{}}}, d: time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC), err: nil},
 	}
 
 	for _, tt := range tests {
-		d := tt.f.Date()
-		if d != tt.d {
+		d, err := tt.f.Date()
+		if err != tt.err {
+			t.Errorf("DateField.Date() err: got %v, want %v", err, tt.err)
+		}
+		if d.UnixNano() != tt.d.UnixNano() {
 			t.Errorf("DateField.Date(): got %v, want %v", d, tt.d)
 		}
 	}
