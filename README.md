@@ -103,20 +103,24 @@ Adding new sources
 
 For the moment, a new data source has to implement is the `span.Source` interface:
 
-    // Source can emit records given a reader. What is actually returned is decided
-    // by the source, e.g. it may return Importer or Batcher object.
-    // Dealing with the various types is responsibility of the call site.
-    // Channel will block on slow consumers and will not drop objects.
-    type Source interface {
-            Iterate(io.Reader) (<-chan interface{}, error)
-    }
+```go
+// Source can emit records given a reader. What is actually returned is decided
+// by the source, e.g. it may return Importer or Batcher object.
+// Dealing with the various types is responsibility of the call site.
+// Channel will block on slow consumers and will not drop objects.
+type Source interface {
+        Iterate(io.Reader) (<-chan interface{}, error)
+}
+```
 
 Channels in APIs might not be the optimum, though we deal with a kind of unbounded streams here.
 
 Additionally, the the emitted objects must implement `span.Importer` or `span.Batcher`,
 which is the transformation business logic:
 
-    // Importer objects can be converted into an intermediate schema.
-    type Importer interface {
-            ToIntermediateSchema() (*finc.IntermediateSchema, error)
-    }
+```go
+// Importer objects can be converted into an intermediate schema.
+type Importer interface {
+        ToIntermediateSchema() (*finc.IntermediateSchema, error)
+}
+```
