@@ -96,7 +96,7 @@ TODO
 
 Make the above a one-liner:
 
-    $ span-import -i jats degruyter.ldj | span-export ai.is.ldj | solrbulk
+    $ span-import -i jats degruyter.ldj | span-export | solrbulk
 
 Adding new sources
 ------------------
