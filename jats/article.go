@@ -395,7 +395,6 @@ func (article *Article) Date() (t time.Time) {
 		}
 		return article.parsePubDate(article.Front.Article.PubDates[index])
 	}
-	return
 }
 
 func (article *Article) Year() int {
