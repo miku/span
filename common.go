@@ -33,7 +33,7 @@ type Exporter interface {
 // by the source, e.g. it may return Converters or Batchers. Dealing with the
 // various types is responsibility of the call site.
 type Source interface {
-	Iterate(io.Reader) (chan interface{}, error)
+	Iterate(io.Reader) (<-chan interface{}, error)
 }
 
 // ParseHoldingSpec parses a holdings flag value into a map.

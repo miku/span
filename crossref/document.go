@@ -33,7 +33,7 @@ type Crossref struct{}
 // Iterate returns a channel which carries batches. The processor function
 // is just plain JSON deserialization. It is ok to halt the world, if
 // there some error during reading.
-func (c Crossref) Iterate(r io.Reader) (chan interface{}, error) {
+func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 	batch := span.Batcher{
 		Apply: func(s string) (span.Importer, error) {
 			doc := new(Document)

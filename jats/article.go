@@ -63,7 +63,7 @@ var (
 type Jats struct{}
 
 // Iterate emits Converter elements via XML decoding.
-func (s Jats) Iterate(r io.Reader) (chan interface{}, error) {
+func (s Jats) Iterate(r io.Reader) (<-chan interface{}, error) {
 	ch := make(chan interface{})
 	go func() {
 		decoder := xml.NewDecoder(bufio.NewReader(r))
