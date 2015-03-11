@@ -2,7 +2,7 @@ TARGETS = span-import span-export span-gh-dump span-hspec
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
-	go get -d && go test -v
+	go get -d && go test -v ./...
 
 cover:
 	go test -cover ./...
