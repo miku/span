@@ -24,9 +24,16 @@ type Options struct {
 }
 
 func main() {
+
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
+	showVersion := flag.Bool("v", false, "prints current program version")
 
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
 
 	if flag.NArg() < 1 {
 		log.Fatal(errInputFileRequired)

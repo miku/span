@@ -8,8 +8,8 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// Version of span
-const Version = "0.1.9"
+// AppVersion of span package. Commandline tools will show this on -v.
+const AppVersion = "0.1.9"
 
 // Batcher groups strings together for batched processing.
 // It is more effective to send one batch over a channel than many strings.

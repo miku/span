@@ -12,27 +12,16 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime/pprof"
 )
 
 func main() {
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	version := flag.Bool("v", false, "prints current program version")
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
+	showVersion := flag.Bool("v", false, "prints current program version")
 
 	flag.Parse()
 
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
-
-	if *version {
-		fmt.Println(span.Version)
+	if *showVersion {
+		fmt.Println(span.AppVersion)
 		os.Exit(0)
 	}
 

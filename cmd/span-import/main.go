@@ -68,8 +68,14 @@ func main() {
 	members := flag.String("members", "", "path to LDJ file, one member per line")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	logfile := flag.String("log", "", "if given log to file")
+	showVersion := flag.Bool("v", false, "prints current program version")
 
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
 
 	runtime.GOMAXPROCS(*numWorkers)
 

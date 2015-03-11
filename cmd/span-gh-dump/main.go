@@ -10,13 +10,22 @@ import (
 	"log"
 	"os"
 
+	"github.com/miku/span"
 	"github.com/miku/span/holdings"
 )
 
 var errInputFileRequired = errors.New("input file required")
 
 func main() {
+
+	showVersion := flag.Bool("v", false, "prints current program version")
+
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
 
 	if flag.NArg() < 1 {
 		log.Fatal(errInputFileRequired)
