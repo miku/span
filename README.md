@@ -91,6 +91,13 @@ It can be indexed quickly with [solrbulk](https://github.com/miku/solrbulk):
 
     $ solrbulk ai.ldj
 
+TODO
+----
+
+Make the above a one-liner:
+
+    $ span-import -i jats degruyter.ldj | span-export ai.is.ldj | solrbulk
+
 Adding new sources
 ------------------
 
