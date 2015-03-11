@@ -291,7 +291,9 @@ func (article *Article) Authors() []finc.Author {
 		if contrib.Type != "author" {
 			continue
 		}
-		authors = append(authors, finc.Author{LastName: contrib.Name.Surname.Value, FirstName: contrib.Name.GivenNames.Value})
+		authors = append(authors, finc.Author{
+			LastName:  contrib.Name.Surname.Value,
+			FirstName: contrib.Name.GivenNames.Value})
 	}
 	return authors
 }
