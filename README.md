@@ -16,72 +16,105 @@ Formats
 * FINC [SOLR Schema](https://github.com/miku/span/blob/4baf2a67fb057ac37edc2f12f05ece7b93190373/finc/schema.go#L5)
 * JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html)
 
+Span is a toolkit:
+
+* span-import, anything to intermediate schema
+* span-export, intermediate schema to finc.SolrSchema
+
+The `span-import` tool should require minimal external information (no holdings file, etc.)
+and be mainly concerned with the transformation of fancy source formats into the catch-all
+intermediate schema.
+
+The `span-export` tool may include external sources to create output, e.g. holdings
+files can be passed in via `-hspec`.
+
+And has a few helpers:
+
+* span-hspec, dump internal holdings data structure
+* span-gh-dump, tabularize google holdings file
+
 Usage
 -----
 
-    $ span
-    Usage: span [OPTIONS] FILE
-      -b=25000: batch size
-      -cpuprofile="": write cpu profile to file
-      -hspec="": ISIL PATH pairs
-      -i="crossref": input format
-      -ignore=false: skip broken input record
+    $ span-import -h
+    Usage of span-import:
+      -i="": input format
+      -l=false: list formats
+      -log="": if given log to file
       -members="": path to LDJ file, one member per line
       -v=false: prints current program version
-      -verbose=false: print debug messages
-      -w=4: workers
+      -w=4: number of workers
 
-For combining various OVID holding files into a single json object, use span-hspec:
+    $ span-export -h
+    Usage of span-export:
+      -hspec="": ISIL PATH pairs
+      -v=false: prints current program version
 
     $ span-hspec -h
     Usage of span-hspec:
-      -cpuprofile="": write cpu profile to file
       -hspec="": ISIL PATH pairs
       -v=false: prints current program version
 
-    $ span-hspec DE-15:ubl.xml,DE-105:tuf.xml > holdings.json
+    $ span-gh-dump -h
+    Usage of span-gh-dump:
+      -v=false: prints current program version
 
-This json object is basically the in-memory lookup data structure, when processing article data.
+Examples
+--------
 
-Inputs and Outputs
+List available formats:
+
+    $ span-import -l
+    crossref
+    jats
+
+Import crossref LDJ (with cached members API responses):
+
+    $ span-import -i crossref -members fixture/members.ldj fixtures/crossref.ldj > crossref.is.ldj
+
+Import degruyter XML:
+
+    $ span-import -i jats fixtures/degruyter.ldj > degruyter.is.ldj
+
+Various intermediate schema files may be concatenated for convenience:
+
+    $ cat crossref.is.ldj degruyter.is.ldj > ai.is.ldj
+
+----
+
+Export to a fixed (finc) SOLR schema:
+
+    $ span-export -hspec DE-14:DE-14.xml,DE-15:DE-15.xml ai.is.ldj >  ai.ldj
+
+The exported `ai.ldj` contains all AI record and incorporates all holdings information.
+It can be indexed quickly with [solrbulk](https://github.com/miku/solrbulk):
+
+    $ solrbulk ai.ldj
+
+----
+
+Export intermediate schema records to a memcache server with [memcldj](https://github.com/miku/memcldj):
+
+    $ memcldj ai.is.ldj
+
+Adding new sources
 ------------------
 
-The `span` tools recognizes the following inputs at the moment:
+For the moment, a new data source has to implement is the `span.Source` interface:
 
-* An input LDJ containing all crossref works metadata, one [crossref.Document](https://github.com/miku/span/blob/5585dc500d82fcab9c783937d7d567fdffb71fde/crossref/document.go#L46) per line. [Example API response](http://api.crossref.org/works/56). The [CrossrefItems](https://github.com/miku/siskin/blob/75bd2e51de9a38c9c6b5fd9dd611f1a23c866cc2/siskin/sources/crossref.py#L126) task creates such an output.
+    // Source can emit records given a reader. What is actually returned is decided
+    // by the source, e.g. it may return Converters or Batchers. Dealing with the
+    // various types is responsibility of the call site.
+    type Source interface {
+            Iterate(io.Reader) (<-chan interface{}, error)
+    }
 
-And, optionally:
+Channels in APIs might not be the optimum, though we deal with a kind of unbounded streams here.
 
-* A number of XML files, containing holdings information for various institutions in [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) format.
-* A file containing information about [members](https://github.com/miku/span/blob/aa59d6468bad530fbf680c529e341b76e033386c/crossref/api.go#L23), in LDJ format. [Example API response](http://api.crossref.org/members/56). The [CrossrefGenericItems](https://github.com/miku/siskin/blob/75bd2e51de9a38c9c6b5fd9dd611f1a23c866cc2/siskin/sources/crossref.py#L331) can create such an output.
+Additionally, the the emitted objects must implement `span.Importer` or `span.Batcher`,
+which is the transformation business logic:
 
-Example usage with two institutional holding files:
-
-    $ span -hspec DE-15:file.xml,DE-20:other.xml crossref.ldj
-
-Additionally, if one has a cached file of members API responses, one can
-use it as input. This way the API does not need to be called at all:
-
-    $ span -hspec DE-15:file.xml,DE-10:other.xml -members members.ldj crossref.ldj
-
-The output is an LDJ in [finc.SolrSchema](https://github.com/miku/span/blob/fb0f1e13379fa53f63388ad07b8b2704f24bc311/finc/schema.go#L7),
-which can be indexed into SOLR either via JSON update URL or with tools like [solrbulk](https://github.com/miku/solrbulk).
-
-Notes
------
-
-Two problems: wrapping formats and processing them. Wrapping formats could be factored out into an own package.
-
-Output is fixed at [finc.SolrSchema](https://github.com/miku/span/blob/fb0f1e13379fa53f63388ad07b8b2704f24bc311/finc/schema.go#L7) for now.
-
-The command line [interface](https://github.com/miku/span/blob/1b05cbe10cdba56b524cd59bee8de68c3538ec4b/common.go#L18) accepts an input format.
-
-    $ span -i crossref crossref.ldj > output.ldj
-    $ span -i jats in.xml > output.ldj
-
-Only one interface for now.
-
-    type SolrSchemaConverter interface {
-        ToSolrSchema() (*finc.SolrSchema, error)
-        Institutions(holdings.IsilIssnHolding) []string
+    // Importer objects can be converted into an intermediate schema.
+    type Importer interface {
+            ToIntermediateSchema() (*finc.IntermediateSchema, error)
     }
