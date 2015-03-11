@@ -16,7 +16,8 @@ Formats
 * FINC [SOLR Schema](https://github.com/miku/span/blob/4baf2a67fb057ac37edc2f12f05ece7b93190373/finc/schema.go#L5)
 * JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html)
 
-Span is a toolkit:
+A little toolkit
+----------------
 
 * span-import, anything to intermediate schema
 * span-export, intermediate schema to finc.SolrSchema
