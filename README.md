@@ -12,8 +12,8 @@ Formats
 
 * [CrossRef API](http://api.crossref.org/), works and members
 * [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
-* FINC [Intermediate Format](https://github.com/miku/span/blob/4baf2a67fb057ac37edc2f12f05ece7b93190373/finc/schema.go#L61)
-* FINC [SOLR Schema](https://github.com/miku/span/blob/4baf2a67fb057ac37edc2f12f05ece7b93190373/finc/schema.go#L5)
+* FINC [Intermediate Format](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/schema.go#L67)
+* FINC [SOLR Schema](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/solr.go#L4)
 * JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html)
 
 A little toolkit
@@ -101,7 +101,7 @@ Export intermediate schema records to a memcache server with [memcldj](https://g
 Adding new sources
 ------------------
 
-For the moment, a new data source has to implement is the `span.Source` interface:
+For the moment, a new data source has to implement is the [span.Source](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/common.go#L36) interface:
 
 ```go
 // Source can emit records given a reader. What is actually returned is decided
@@ -115,7 +115,8 @@ type Source interface {
 
 Channels in APIs might not be the optimum, though we deal with a kind of unbounded streams here.
 
-Additionally, the the emitted objects must implement `span.Importer` or `span.Batcher`,
+Additionally, the the emitted objects must implement [span.Importer](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/common.go#L22)
+or [span.Batcher](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/common.go#L16),
 which is the transformation business logic:
 
 ```go
