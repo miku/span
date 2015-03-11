@@ -23,18 +23,18 @@ const (
 
 	// Source name for finc.MegaCollection.
 	SourceName = "DeGruyter SSH"
+
+	// Fixed format of this source.
+	Format = "ElectronicArticle"
 )
 
 var errNoDOI = errors.New("DOI is missing")
 
 var (
-	// If multiple publication dates are available, choose this type.
-	preferredPubDateType = "epub"
-
-	// acceptedLanguages restricts the possible languages for detection.
+	// Restricts the possible languages for detection.
 	acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
 
-	// datePatterns are candidate patterns for parsing publishing dates.
+	// Candidate patterns for parsing publishing dates.
 	datePatterns = []string{
 		"2006",
 		"2006-",
@@ -106,8 +106,7 @@ type PubDate struct {
 	}
 }
 
-// Article mirrors a JATS article element. Some elements, such as
-// article categories are not implmented yet.
+// Article mirrors a JATS article element.
 type Article struct {
 	XMLName xml.Name `xml:"article"`
 	Front   struct {
@@ -251,6 +250,38 @@ type Article struct {
 	}
 }
 
+// DOI is a convenience shortcut to get the DOI.
+// It is an error, if there is no DOI.
+func (article *Article) DOI() (s string, err error) {
+	for _, id := range article.Front.Article.ID {
+		if id.Type == "doi" {
+			return id.Value, nil
+		}
+	}
+	return s, errNoDOI
+}
+
+// identifiers is a helper struct.
+type identifiers struct {
+	doi      string
+	url      string
+	recordID string
+}
+
+// identifiers returns the doi and the dependent url and recordID in a struct.
+// It is an error, if there is no DOI.
+func (article *Article) identifiers() (identifiers, error) {
+	var ids identifiers
+	doi, err := article.DOI()
+	if err != nil {
+		return ids, err
+	}
+	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
+	ids = identifiers{doi: doi, url: locator,
+		recordID: fmt.Sprintf("ai-%d-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))}
+	return ids, nil
+}
+
 // Authors returns the authors as slice.
 // TODO(miku): get rid of cross-format dependency.
 func (article *Article) Authors() []finc.Author {
@@ -280,16 +311,6 @@ func (article *Article) CombinedTitle() string {
 	return ""
 }
 
-// DOI is a convenience shortcut to get the DOI.
-func (article *Article) DOI() (string, error) {
-	for _, id := range article.Front.Article.ID {
-		if id.Type == "doi" {
-			return id.Value, nil
-		}
-	}
-	return "", errNoDOI
-}
-
 // ISSN returns a list of ISSNs associated with this article.
 func (article *Article) ISSN() (issns []string) {
 	for _, issn := range article.Front.Journal.ISSN {
@@ -298,31 +319,33 @@ func (article *Article) ISSN() (issns []string) {
 	return
 }
 
-func (article *Article) Headings() (subjects []string) {
+// Headings returns heading categories.
+func (article *Article) Headings() (hs []string) {
 	for _, g := range article.Front.Article.Categories.SubjectGroups {
 		if g.Type != "heading" {
 			continue
 		}
 		for _, s := range g.Subjects {
-			subjects = append(subjects, s.Value)
+			hs = append(hs, s.Value)
 		}
 	}
 	return
 }
 
-func (article *Article) Subjects() (subjects []string) {
+// Subjects returns subjects, that are not headings.
+func (article *Article) Subjects() (ss []string) {
 	for _, g := range article.Front.Article.Categories.SubjectGroups {
 		if g.Type == "heading" {
 			continue
 		}
 		for _, s := range g.Subjects {
-			subjects = append(subjects, s.Value)
+			ss = append(ss, s.Value)
 		}
 	}
 	return
 }
 
-// PageCount return the number of pages as string.
+// PageCount return the number of pages as string, or an empty string.
 func (article *Article) PageCount() (s string) {
 	first, err := strconv.Atoi(article.Front.Article.FirstPage.Value)
 	if err != nil {
@@ -338,18 +361,6 @@ func (article *Article) PageCount() (s string) {
 	return
 }
 
-// defaultString returns a default if s is the empty string.
-func defaultString(s, defaultValue string) string {
-	if s == "" {
-		return defaultValue
-	}
-	return s
-}
-
-func (article *Article) Abstract() string {
-	return string(article.Front.Article.Abstract.Value)
-}
-
 // parsePubDate tries to get a date out of a pubdate.
 func (article *Article) parsePubDate(pd PubDate) (t time.Time) {
 	var s string
@@ -363,23 +374,17 @@ func (article *Article) parsePubDate(pd PubDate) (t time.Time) {
 	}
 
 	var err error
-	miss := true
-
 	for _, p := range datePatterns {
 		t, err = time.Parse(p, s)
 		if err == nil {
-			miss = false
 			break
 		}
-	}
-	if miss {
-		doi, _ := article.DOI()
-		log.Printf("missed pattern: %s, %s, %s", doi, s, t)
 	}
 	return t
 }
 
-// Date returns this articles issuing date in a best effort manner.
+// Date returns this articles' issuing date in a best effort manner.
+// Use electronic publication (epub), if available.
 func (article *Article) Date() (t time.Time) {
 	switch len(article.Front.Article.PubDates) {
 	case 0:
@@ -397,34 +402,12 @@ func (article *Article) Date() (t time.Time) {
 	}
 }
 
-func (article *Article) Year() int {
-	return article.Date().Year()
-}
-
-// identifiers is a helper struct.
-type identifiers struct {
-	doi      string
-	url      string
-	recordID string
-}
-
-// identifiers returns doi and the dependent url and recordID in a struct.
-func (article *Article) identifiers() (identifiers, error) {
-	var ids identifiers
-	doi, err := article.DOI()
-	if err != nil {
-		return ids, err
-	}
-	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
-	ids = identifiers{doi: doi,
-		url:      locator,
-		recordID: fmt.Sprintf("ai-%d-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))}
-	return ids, nil
-}
-
-// Languages returns the guessed languages found in abstract and fulltext.
-func (article *Article) Languages() (langs []string, err error) {
+// Languages returns the given and guessed languages
+// found in abstract and fulltext. Note: This is slow.
+// Skip detection on too short strings.
+func (article *Article) Languages() (languages []string) {
 	m := make(map[string]struct{})
+
 	if article.Front.Article.Abstract.Lang != "" {
 		m[article.Front.Article.Abstract.Lang] = struct{}{}
 	}
@@ -455,55 +438,45 @@ func (article *Article) Languages() (langs []string, err error) {
 	}
 
 	for k := range m {
-		langs = append(langs, k)
+		languages = append(languages, k)
 	}
-	return langs, err
+	return
 }
 
 // ToInternalSchema converts a jats article into an internal schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
-	output := new(finc.IntermediateSchema)
+	output := finc.NewIntermediateSchema()
 
 	ids, err := article.identifiers()
 	if err != nil {
 		return output, err
 	}
-
 	output.DOI = ids.doi
 	output.RecordID = ids.recordID
 	output.URL = append(output.URL, ids.url)
-	output.Format = "ElectronicArticle"
-
-	output.Abstract = article.Abstract()
-	output.ArticleTitle = article.CombinedTitle()
-	output.Authors = article.Authors()
-	output.ISSN = article.ISSN()
-	output.Issue = article.Front.Article.Issue.Value
-	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
-	output.MegaCollection = SourceName
-	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
 
 	date := article.Date()
 	output.RawDate = date.Format("2006-01-02")
+
+	output.Abstract = string(article.Front.Article.Abstract.Value)
+	output.ArticleTitle = article.CombinedTitle()
+	output.Authors = article.Authors()
+	output.Format = Format
+	output.Headings = article.Headings()
+	output.ISSN = article.ISSN()
+	output.Issue = article.Front.Article.Issue.Value
+	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+	output.Languages = article.Languages()
+	output.MegaCollection = SourceName
+	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
 	output.SourceID = SourceID
+	output.Subjects = article.Subjects()
 	output.Volume = article.Front.Article.Volume.Value
 
 	output.EndPage = article.Front.Article.LastPage.Value
 	output.PageCount = article.PageCount()
 	output.Pages = fmt.Sprintf("%s-%s", output.EndPage, output.StartPage)
 	output.StartPage = article.Front.Article.FirstPage.Value
-
-	output.Version = finc.IntermediateSchemaVersion
-
-	langs, err := article.Languages()
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		output.Languages = langs
-	}
-
-	output.Subjects = article.Subjects()
-	output.Headings = article.Headings()
 
 	return output, nil
 }

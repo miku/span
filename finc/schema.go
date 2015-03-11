@@ -116,6 +116,10 @@ type IntermediateSchema struct {
 	Version  string   `json:"version"`
 }
 
+func NewIntermediateSchema() *IntermediateSchema {
+	return &IntermediateSchema{Version: IntermediateSchemaVersion}
+}
+
 func (is *IntermediateSchema) Date() time.Time {
 	t, err := time.Parse("2006-01-02", is.RawDate)
 	if err != nil {

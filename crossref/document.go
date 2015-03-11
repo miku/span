@@ -276,7 +276,7 @@ func (doc *Document) Languages() (langs []string) {
 
 // ToIntermediateSchema converts a crossref document into IS.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
-	output := new(finc.IntermediateSchema)
+	output := finc.NewIntermediateSchema()
 
 	if doc.URL == "" {
 		return output, errors.New("input document has no URL")
@@ -309,7 +309,6 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
 	output.RawDate = doc.Issued.Date().Format("2006-01-02")
-
 	output.Subjects = doc.Subjects
 
 	name, err := doc.MemberName()
