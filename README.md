@@ -69,19 +69,18 @@ List available formats:
     crossref
     jats
 
-Import crossref LDJ (with cached members API responses):
+Import crossref LDJ (with cached members API responses) or DeGruyter XML (preprocessed into a single file):
 
     $ span-import -i crossref -members members.ldj crossref.ldj > crossref.is.ldj
-
-Import DeGruyter XML (preprocessed into a single file):
-
     $ span-import -i jats degruyter.ldj > degruyter.is.ldj
 
-Various intermediate schema files may be concatenated for convenience:
+Concat for convenience:
 
     $ cat crossref.is.ldj degruyter.is.ldj > ai.is.ldj
 
-----
+Export intermediate schema records to a memcache server with [memcldj](https://github.com/miku/memcldj):
+
+    $ memcldj ai.is.ldj
 
 Export to a fixed (finc) SOLR schema:
 
@@ -91,12 +90,6 @@ The exported `ai.ldj` contains all AI record and incorporates all holdings infor
 It can be indexed quickly with [solrbulk](https://github.com/miku/solrbulk):
 
     $ solrbulk ai.ldj
-
-----
-
-Export intermediate schema records to a memcache server with [memcldj](https://github.com/miku/memcldj):
-
-    $ memcldj ai.is.ldj
 
 Adding new sources
 ------------------
