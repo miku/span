@@ -63,8 +63,8 @@ func TestSchema(t *testing.T) {
 	if len(article.Front.Journal.ISSN) != 2 {
 		t.Errorf("got %d, want %d", len(article.Front.Journal.ISSN), 2)
 	}
-	if article.Front.Article.PubDate.Year.Value != "1969" {
-		t.Errorf("got %s, want %d", article.Front.Article.PubDate.Year.Value, 1969)
+	if article.Front.Article.PubDates[0].Year.Value != "1969" {
+		t.Errorf("got %s, want %d", article.Front.Article.PubDates[0].Year.Value, 1969)
 	}
 	if article.Front.Article.TitleGroup.Subtitle.Value != "Das Zeugnisdes Baeda" {
 		t.Errorf("got %s, want %s", article.Front.Article.TitleGroup.Subtitle.Value, "Das Zeugnisdes Baeda")

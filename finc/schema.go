@@ -4,7 +4,6 @@ package finc
 import (
 	"errors"
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 	"time"
@@ -19,14 +18,14 @@ const (
 )
 
 var (
-	errFromYear    = errors.New("from-year mismatch")
-	errFromVolume  = errors.New("from-volume mismatch")
-	errFromIssue   = errors.New("from-issue mismatch")
-	errToYear      = errors.New("to-year mismatch")
-	errToVolume    = errors.New("to-volume mismatch")
-	errToIssue     = errors.New("to-issue mismatch")
-	errMovingWall  = errors.New("moving-wall violation")
-	errNotParsable = errors.New("not parsable")
+	errFromYear        = errors.New("from-year mismatch")
+	errFromVolume      = errors.New("from-volume mismatch")
+	errFromIssue       = errors.New("from-issue mismatch")
+	errToYear          = errors.New("to-year mismatch")
+	errToVolume        = errors.New("to-volume mismatch")
+	errToIssue         = errors.New("to-issue mismatch")
+	errMovingWall      = errors.New("moving-wall violation")
+	errUnparsableValue = errors.New("value not parsable")
 )
 
 type AuthorID struct {
@@ -120,7 +119,7 @@ type IntermediateSchema struct {
 func (is *IntermediateSchema) Date() time.Time {
 	t, err := time.Parse("2006-01-02", is.RawDate)
 	if err != nil {
-		log.Fatal(err)
+		panic(fmt.Sprintf("unparsable date: %s", is.RawDate))
 	}
 	return t
 }
@@ -153,7 +152,7 @@ func (is *IntermediateSchema) ISSNList() []string {
 // CoveredBy returns nil, if a given entitlement covers the current document.
 // If the given entitlement does not cover the document, the error returned
 // will contain the reason as message.
-// TODO(miku): better handling of 'unparseable' volume or issue strings
+// TODO(miku): better handling of 'unparsable' volume or issue strings
 func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 	if e.FromYear != 0 && is.Year() != 0 {
 		if e.FromYear > is.Year() {
@@ -162,7 +161,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		if e.FromYear == is.Year() {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
-				return errNotParsable
+				return errUnparsableValue
 			}
 			if e.FromVolume != 0 && e.FromVolume > volume {
 				return errFromVolume
@@ -170,7 +169,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 			if e.FromVolume == volume {
 				issue, err := strconv.Atoi(is.Issue)
 				if err != nil {
-					return errNotParsable
+					return errUnparsableValue
 				}
 				if e.FromIssue != 0 && e.FromIssue > issue {
 					return errFromIssue
@@ -186,7 +185,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		if e.ToYear == is.Year() {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
-				return errNotParsable
+				return errUnparsableValue
 			}
 			if e.ToVolume != 0 && e.ToVolume < volume {
 				return errToVolume
@@ -194,7 +193,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 			if e.ToVolume == volume {
 				issue, err := strconv.Atoi(is.Issue)
 				if err != nil {
-					return errNotParsable
+					return errUnparsableValue
 				}
 				if e.ToIssue != 0 && e.ToIssue < issue {
 					return errToIssue
