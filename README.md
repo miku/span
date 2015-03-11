@@ -94,8 +94,9 @@ It can be indexed quickly with [solrbulk](https://github.com/miku/solrbulk):
 TODO
 ----
 
-Make the above a one-liner:
+Make the above one-liners:
 
+    $ span-import -i jats degruyter.ldj | memcldj
     $ span-import -i jats degruyter.ldj | span-export | solrbulk
 
 Adding new sources
