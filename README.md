@@ -19,8 +19,8 @@ Formats
 A little toolkit
 ----------------
 
-* span-import, anything to intermediate schema
-* span-export, intermediate schema to finc.SolrSchema
+* `span-import`, anything to intermediate schema
+* `span-export`, intermediate schema to finc.SolrSchema
 
 The `span-import` tool should require minimal external information (no holdings file, etc.)
 and be mainly concerned with the transformation of fancy source formats into the catch-all
@@ -29,10 +29,10 @@ intermediate schema.
 The `span-export` tool may include external sources to create output, e.g. holdings
 files can be passed in via `-hspec`.
 
-And has a few helpers:
+There are a few helpers:
 
-* span-hspec, dump internal holdings data structure
-* span-gh-dump, tabularize google holdings file
+* `span-hspec`, dump internal holdings data structure
+* `span-gh-dump`, tabularize google holdings file
 
 Usage
 -----
@@ -71,11 +71,11 @@ List available formats:
 
 Import crossref LDJ (with cached members API responses):
 
-    $ span-import -i crossref -members fixture/members.ldj fixtures/crossref.ldj > crossref.is.ldj
+    $ span-import -i crossref -members members.ldj crossref.ldj > crossref.is.ldj
 
-Import degruyter XML:
+Import DeGruyter XML (preprocessed into a single file):
 
-    $ span-import -i jats fixtures/degruyter.ldj > degruyter.is.ldj
+    $ span-import -i jats degruyter.ldj > degruyter.is.ldj
 
 Various intermediate schema files may be concatenated for convenience:
 
@@ -104,8 +104,9 @@ Adding new sources
 For the moment, a new data source has to implement is the `span.Source` interface:
 
     // Source can emit records given a reader. What is actually returned is decided
-    // by the source, e.g. it may return Converters or Batchers. Dealing with the
-    // various types is responsibility of the call site.
+    // by the source, e.g. it may return Importer or Batcher object.
+    // Dealing with the various types is responsibility of the call site.
+    // Channel will block on slow consumers and will not drop objects.
     type Source interface {
             Iterate(io.Reader) (<-chan interface{}, error)
     }

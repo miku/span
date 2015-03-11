@@ -23,15 +23,16 @@ type Importer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
-// Exporter, hypothetical interface, collecting all exportable formats.
-// IntermediateSchema must implement this.
+// Exporter interface might collect all exportable formats.
+// IntermediateSchema is the first and must implement this.
 type Exporter interface {
 	ToSolrSchema(*finc.SolrSchema, error)
 }
 
 // Source can emit records given a reader. What is actually returned is decided
-// by the source, e.g. it may return Converters or Batchers. Dealing with the
-// various types is responsibility of the call site.
+// by the source, e.g. it may return Importer or Batcher object.
+// Dealing with the various types is responsibility of the call site.
+// Channel will block on slow consumers and will not drop objects.
 type Source interface {
 	Iterate(io.Reader) (<-chan interface{}, error)
 }
