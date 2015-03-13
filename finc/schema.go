@@ -103,6 +103,7 @@ type IntermediateSchema struct {
 	Volume        string   `json:"rft.volume,omitempty"`
 
 	Abstract  string   `json:"abstract,omitempty"`
+	Fulltext  string   `json:"x.fulltext,omitempty"`
 	Authors   []Author `json:"authors,omitempty"`
 	DOI       string   `json:"doi,omitempty"`
 	Languages []string `json:"languages,omitempty"`
@@ -246,27 +247,22 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
 
-	output.RecordType = AIRecordType
 	output.Formats = append(output.Formats, is.Format)
-
-	output.MegaCollection = append(output.MegaCollection, is.MegaCollection)
-	output.SourceID = is.SourceID
+	output.Fullrecord = "blob:" + output.ID
+	output.Fulltext = is.Fulltext
+	output.HierarchyParentTitle = is.JournalTitle
 	output.ID = is.RecordID
-
+	output.ISSN = is.ISSNList()
+	output.MegaCollection = append(output.MegaCollection, is.MegaCollection)
+	output.PublishDateSort = is.Year()
+	output.Publishers = is.Publishers
+	output.RecordType = AIRecordType
+	output.SourceID = is.SourceID
 	output.Title = is.ArticleTitle
 	output.TitleFull = is.ArticleTitle
 	output.TitleShort = is.ArticleTitle
-
-	output.HierarchyParentTitle = is.JournalTitle
-	output.PublishDateSort = is.Year()
-
-	if len(is.URL) > 0 {
-		output.URL = is.URL[0]
-	}
-
-	output.Publishers = is.Publishers
-	output.ISSN = is.ISSNList()
 	output.Topics = is.Subjects
+	output.URL = is.URL
 
 	for _, author := range is.Authors {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
@@ -275,8 +271,6 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	if len(output.SecondaryAuthors) > 0 {
 		output.Author = output.SecondaryAuthors[0]
 	}
-
-	output.Fullrecord = "blob:" + output.ID
 
 	// source and finc specific alterations
 	// TODO(miku): reuse some mapping files if necessary

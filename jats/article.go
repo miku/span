@@ -464,6 +464,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.ArticleTitle = article.CombinedTitle()
 	output.Authors = article.Authors()
 	output.Format = Format
+	output.Fulltext = article.Body.Section.Value
 	output.Headings = article.Headings()
 	output.ISSN = article.ISSN()
 	output.Issue = article.Front.Article.Issue.Value
