@@ -63,6 +63,7 @@ func (author *Author) String() string {
 // the next artifacts can be derived, e.g. records for solr indices.
 // This format can be viewed as a catch-all format. The dotted notation
 // hints at the origin of the field, e.g. OpenURL, RIS, finc.
+// OpenURL: http://ocoins.info/cobg.html
 type IntermediateSchema struct {
 	RecordID       string `json:"finc.record_id"`
 	SourceID       int    `json:"finc.source_id"`
