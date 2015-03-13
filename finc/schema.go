@@ -35,15 +35,15 @@ type AuthorID struct {
 
 // Author representes an author, "inspired" by OpenURL.
 type Author struct {
-	ID           string `json:"id"`
-	Name         string `json:"rft.au"`
-	LastName     string `json:"rft.aulast"`
-	FirstName    string `json:"rft.aufirst"`
-	Initial      string `json:"rft.auinit"`
-	FirstInitial string `json:"rft.auinit1"`
-	MiddleName   string `json:"rft.auinitm"`
-	Suffix       string `json:"rft.ausuffix"`
-	Corporation  string `json:"rft.aucorp"`
+	ID           string `json:"x.id,omitempty"`
+	Name         string `json:"rft.au,omitempty"`
+	LastName     string `json:"rft.aulast,omitempty"`
+	FirstName    string `json:"rft.aufirst,omitempty"`
+	Initial      string `json:"rft.auinit,omitempty"`
+	FirstInitial string `json:"rft.auinit1,omitempty"`
+	MiddleName   string `json:"rft.auinitm,omitempty"`
+	Suffix       string `json:"rft.ausuffix,omitempty"`
+	Corporation  string `json:"rft.aucorp,omitempty"`
 }
 
 // String returns a formatted author string.
