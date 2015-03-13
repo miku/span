@@ -81,9 +81,6 @@ type IntermediateSchema struct {
 	Database     string `json:"ris.db"`
 	DataProvider string `json:"ris.dp"`
 
-	// ISO8601 date or panic
-	RawDate string `json:"rft.date"`
-
 	ArticleNumber string   `json:"rft.artnum"`
 	Chronology    string   `json:"rft.chron"`
 	Edition       string   `json:"rft.edition"`
@@ -100,6 +97,7 @@ type IntermediateSchema struct {
 	Place         []string `json:"rft.place"`
 	Publishers    []string `json:"rft.pub"`
 	Quarter       string   `json:"rft.quarter"`
+	RawDate       string   `json:"rft.date"`
 	Season        string   `json:"rft.ssn"`
 	StartPage     string   `json:"rft.spage"`
 	Volume        string   `json:"rft.volume"`
