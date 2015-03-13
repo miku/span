@@ -8,6 +8,7 @@ type SolrSchema struct {
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
+	Fulltext             string   `json:"fulltext,omitempty"`
 	HierarchyParentTitle string   `json:"hierarchy_parent_title,omitempty"`
 	ID                   string   `json:"id,omitempty"`
 	Institutions         []string `json:"institution,omitempty"`
