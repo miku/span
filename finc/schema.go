@@ -69,51 +69,50 @@ type IntermediateSchema struct {
 	MegaCollection string `json:"finc.mega_collection"`
 	Format         string `json:"finc.format"`
 
-	Genre string `json:"rft.genre"`
-	Type  string `json:"ris.type"` // RIS-Format? Wikipedia...
-
 	ArticleTitle    string `json:"rft.atitle"`
 	ArticleSubtitle string `json:"x.subtitle"`
 	BookTitle       string `json:"rft.btitle"`
 	JournalTitle    string `json:"rft.jtitle"`
 	SeriesTitle     string `json:"rft.stitle"`
+	Series          string `json:"rft.series"`
 
-	Series string `json:"rft.series"`
-
+	RefType      string `json:"ris.ty"`
 	Database     string `json:"ris.db"`
 	DataProvider string `json:"ris.dp"`
 
 	// ISO8601 date or panic
 	RawDate string `json:"rft.date"`
 
-	Place         []string `json:"rft.place"`
-	Publisher     []string `json:"rft.pub"`
-	Edition       string   `json:"rft.edition"`
-	Chronology    string   `json:"rft.chron"`
-	Season        string   `json:"rft.ssn"`
-	Quarter       string   `json:"rft.quarter"`
-	Volume        string   `json:"rft.volume"`
-	Issue         string   `json:"rft.issue"`
-	Part          string   `json:"rft.part"`
-	StartPage     string   `json:"rft.spage"`
-	EndPage       string   `json:"rft.epage"`
-	Pages         string   `json:"rft.pages"`
-	PageCount     string   `json:"rft.tpages"`
 	ArticleNumber string   `json:"rft.artnum"`
-	ISSN          []string `json:"rft.issn"`
-	EISSN         []string `json:"rft.eissn"`
-	ISBN          []string `json:"rft.isbn"`
+	Chronology    string   `json:"rft.chron"`
+	Edition       string   `json:"rft.edition"`
 	EISBN         []string `json:"rft.isbn"`
+	EISSN         []string `json:"rft.eissn"`
+	EndPage       string   `json:"rft.epage"`
+	Genre         string   `json:"rft.genre"`
+	ISBN          []string `json:"rft.isbn"`
+	ISSN          []string `json:"rft.issn"`
+	Issue         string   `json:"rft.issue"`
+	PageCount     string   `json:"rft.tpages"`
+	Pages         string   `json:"rft.pages"`
+	Part          string   `json:"rft.part"`
+	Place         []string `json:"rft.place"`
+	Publishers    []string `json:"rft.pub"`
+	Quarter       string   `json:"rft.quarter"`
+	Season        string   `json:"rft.ssn"`
+	StartPage     string   `json:"rft.spage"`
+	Volume        string   `json:"rft.volume"`
 
-	DOI       string   `json:"doi"`
-	URL       []string `json:"url"`
-	Authors   []Author `json:"authors"`
-	Languages []string `json:"languages"`
 	Abstract  string   `json:"abstract"`
+	Authors   []Author `json:"authors"`
+	DOI       string   `json:"doi"`
+	Languages []string `json:"languages"`
+	URL       []string `json:"url"`
+	Version   string   `json:"version"`
 
-	Subjects []string `json:"x.subjects"`
+	Type     string   `json:"x.type"`
 	Headings []string `json:"x.headings"`
-	Version  string   `json:"version"`
+	Subjects []string `json:"x.subjects"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {
@@ -241,12 +240,15 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 	return values
 }
 
-// ToSolrSchema converts an intermediate Schema to Solr
+// ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
+// Note that this method can and will include all kinds of source
+// specific alterations, which are not expressed in the intermediate
+// format.
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
 
 	output.RecordType = AIRecordType
-	output.Format = is.Format
+	output.Formats = append(output.Formats, is.Format)
 
 	output.MegaCollection = append(output.MegaCollection, is.MegaCollection)
 	output.SourceID = is.SourceID
@@ -263,10 +265,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 		output.URL = is.URL[0]
 	}
 
-	if len(is.Publisher) > 0 {
-		output.Publisher = is.Publisher[0]
-	}
-
+	output.Publishers = is.Publishers
 	output.ISSN = is.ISSNList()
 	output.Topics = is.Subjects
 
@@ -279,5 +278,18 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	}
 
 	output.Fullrecord = "blob:" + output.ID
+
+	// source and finc specific alterations
+	// TODO(miku): reuse some mapping files if necessary
+	switch is.SourceID {
+	case 49:
+		output.AccessFacet = "Electronic Resource"
+		switch is.Type {
+		case "":
+			// map ISIL-ish to value
+		case "journal-article":
+			// map ISIL-ish to value
+		}
+	}
 	return output, nil
 }

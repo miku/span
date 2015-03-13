@@ -470,7 +470,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
 	output.Languages = article.Languages()
 	output.MegaCollection = SourceName
-	output.Publisher = append(output.Publisher, article.Front.Journal.Publisher.Name.Value)
+	output.Publishers = append(output.Publishers, article.Front.Journal.Publisher.Name.Value)
 	output.SourceID = SourceID
 	output.Subjects = article.Subjects()
 	output.Volume = article.Front.Article.Volume.Value

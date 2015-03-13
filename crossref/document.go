@@ -271,13 +271,14 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ISSN = doc.ISSN
 	output.Issue = doc.Issue
 	output.Languages = []string{"en"}
-	output.Publisher = append(output.Publisher, doc.Publisher)
+	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
 	output.Subjects = doc.Subjects
 	output.URL = append(output.URL, doc.URL)
 	output.Version = finc.IntermediateSchemaVersion
 	output.Volume = doc.Volume
+	output.Type = doc.Type
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = doc.ContainerTitle[0]
