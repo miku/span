@@ -2,7 +2,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -49,17 +48,6 @@ func worker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
 			out <- b
 		}
 	}
-}
-
-// writer fan-in
-func writer(out chan []byte, done chan bool) {
-	f := bufio.NewWriter(os.Stdout)
-	defer f.Flush()
-	for b := range out {
-		f.Write(b)
-		f.Write([]byte("\n"))
-	}
-	done <- true
 }
 
 func main() {
@@ -121,7 +109,7 @@ func main() {
 	queue := make(chan span.Batcher)
 	out := make(chan []byte)
 	done := make(chan bool)
-	go writer(out, done)
+	go span.ByteSink(os.Stdout, out, done)
 
 	var wg sync.WaitGroup
 

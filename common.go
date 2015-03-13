@@ -1,6 +1,7 @@
 package span
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"strings"
@@ -35,6 +36,18 @@ type Exporter interface {
 // Channel will block on slow consumers and will not drop objects.
 type Source interface {
 	Iterate(io.Reader) (<-chan interface{}, error)
+}
+
+// ByteSink is a fan in writer for a byte channel.
+// A newline is appended after each object.
+func ByteSink(w io.Writer, out chan []byte, done chan bool) {
+	f := bufio.NewWriter(w)
+	defer f.Flush()
+	for b := range out {
+		f.Write(b)
+		f.Write([]byte("\n"))
+	}
+	done <- true
 }
 
 // ParseHoldingSpec parses a holdings flag value into a map.

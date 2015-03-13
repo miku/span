@@ -10,6 +10,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"runtime"
+	"sync"
 
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
@@ -19,16 +21,44 @@ import (
 var errInputFileRequired = errors.New("input file required")
 
 // Options for worker.
-type Options struct {
+type options struct {
 	Holdings holdings.IsilIssnHolding
+}
+
+// worker iterates over string batches
+func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for batch := range queue {
+		for _, s := range batch {
+			is := new(finc.IntermediateSchema)
+			err := json.Unmarshal([]byte(s), is)
+			if err != nil {
+				log.Fatal(err)
+			}
+			ss, err := is.ToSolrSchema()
+			ss.Institutions = is.Institutions(opts.Holdings)
+			if err != nil {
+				log.Fatal(err)
+			}
+			b, err := json.Marshal(ss)
+			if err != nil {
+				log.Fatal(err)
+			}
+			out <- b
+		}
+	}
 }
 
 func main() {
 
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
 	showVersion := flag.Bool("v", false, "prints current program version")
+	size := flag.Int("b", 20000, "batch size")
+	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
 	flag.Parse()
+
+	runtime.GOMAXPROCS(*numWorkers)
 
 	if *showVersion {
 		fmt.Println(span.AppVersion)
@@ -39,7 +69,7 @@ func main() {
 		log.Fatal(errInputFileRequired)
 	}
 
-	options := Options{
+	opts := options{
 		Holdings: make(holdings.IsilIssnHolding),
 	}
 
@@ -54,9 +84,24 @@ func main() {
 				log.Fatal(err)
 			}
 			defer file.Close()
-			options.Holdings[isil] = holdings.HoldingsMap(bufio.NewReader(file))
+			opts.Holdings[isil] = holdings.HoldingsMap(bufio.NewReader(file))
 		}
 	}
+
+	queue := make(chan []string)
+	out := make(chan []byte)
+	done := make(chan bool)
+	go span.ByteSink(os.Stdout, out, done)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < *numWorkers; i++ {
+		wg.Add(1)
+		go worker(queue, out, opts, &wg)
+	}
+
+	var batch []string
+	var i int
 
 	for _, filename := range flag.Args() {
 		file, err := os.Open(filename)
@@ -72,21 +117,19 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			is := new(finc.IntermediateSchema)
-			err = json.Unmarshal([]byte(line), is)
-			if err != nil {
-				log.Fatal(err)
+			batch = append(batch, line)
+			if i%*size == 0 {
+				queue <- batch
+				batch = batch[:0]
 			}
-			ss, err := is.ToSolrSchema()
-			ss.Institutions = is.Institutions(options.Holdings)
-			if err != nil {
-				log.Fatal(err)
-			}
-			b, err := json.Marshal(ss)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(string(b))
+			i++
 		}
 	}
+
+	queue <- batch
+	close(queue)
+	wg.Wait()
+	close(out)
+	<-done
+
 }
