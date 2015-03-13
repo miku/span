@@ -65,53 +65,53 @@ func (author *Author) String() string {
 // hints at the origin of the field, e.g. OpenURL, RIS, finc.
 // OpenURL: http://ocoins.info/cobg.html
 type IntermediateSchema struct {
-	RecordID       string `json:"finc.record_id"`
-	SourceID       string `json:"finc.source_id"`
-	MegaCollection string `json:"finc.mega_collection"`
-	Format         string `json:"finc.format"`
+	RecordID       string `json:"finc.record_id,omitempty"`
+	SourceID       string `json:"finc.source_id,omitempty"`
+	MegaCollection string `json:"finc.mega_collection,omitempty"`
+	Format         string `json:"finc.format,omitempty"`
 
-	ArticleTitle    string `json:"rft.atitle"`
-	ArticleSubtitle string `json:"x.subtitle"`
-	BookTitle       string `json:"rft.btitle"`
-	JournalTitle    string `json:"rft.jtitle"`
-	ShortTitle      string `json:"rft.stitle"`
-	Series          string `json:"rft.series"`
+	ArticleTitle    string `json:"rft.atitle,omitempty"`
+	ArticleSubtitle string `json:"x.subtitle,omitempty"`
+	BookTitle       string `json:"rft.btitle,omitempty"`
+	JournalTitle    string `json:"rft.jtitle,omitempty"`
+	ShortTitle      string `json:"rft.stitle,omitempty"`
+	Series          string `json:"rft.series,omitempty"`
 
-	RefType      string `json:"ris.ty"`
-	Database     string `json:"ris.db"`
-	DataProvider string `json:"ris.dp"`
+	RefType      string `json:"ris.ty,omitempty"`
+	Database     string `json:"ris.db,omitempty"`
+	DataProvider string `json:"ris.dp,omitempty"`
 
-	ArticleNumber string   `json:"rft.artnum"`
-	Chronology    string   `json:"rft.chron"`
-	Edition       string   `json:"rft.edition"`
-	EISBN         []string `json:"rft.isbn"`
-	EISSN         []string `json:"rft.eissn"`
-	EndPage       string   `json:"rft.epage"`
-	Genre         string   `json:"rft.genre"`
-	ISBN          []string `json:"rft.isbn"`
-	ISSN          []string `json:"rft.issn"`
-	Issue         string   `json:"rft.issue"`
-	PageCount     string   `json:"rft.tpages"`
-	Pages         string   `json:"rft.pages"`
-	Part          string   `json:"rft.part"`
-	Place         []string `json:"rft.place"`
-	Publishers    []string `json:"rft.pub"`
-	Quarter       string   `json:"rft.quarter"`
-	RawDate       string   `json:"rft.date"`
-	Season        string   `json:"rft.ssn"`
-	StartPage     string   `json:"rft.spage"`
-	Volume        string   `json:"rft.volume"`
+	ArticleNumber string   `json:"rft.artnum,omitempty"`
+	Chronology    string   `json:"rft.chron,omitempty"`
+	Edition       string   `json:"rft.edition,omitempty"`
+	EISBN         []string `json:"rft.isbn,omitempty"`
+	EISSN         []string `json:"rft.eissn,omitempty"`
+	EndPage       string   `json:"rft.epage,omitempty"`
+	Genre         string   `json:"rft.genre,omitempty"`
+	ISBN          []string `json:"rft.isbn,omitempty"`
+	ISSN          []string `json:"rft.issn,omitempty"`
+	Issue         string   `json:"rft.issue,omitempty"`
+	PageCount     string   `json:"rft.tpages,omitempty"`
+	Pages         string   `json:"rft.pages,omitempty"`
+	Part          string   `json:"rft.part,omitempty"`
+	Place         []string `json:"rft.place,omitempty"`
+	Publishers    []string `json:"rft.pub,omitempty"`
+	Quarter       string   `json:"rft.quarter,omitempty"`
+	RawDate       string   `json:"rft.date,omitempty"`
+	Season        string   `json:"rft.ssn,omitempty"`
+	StartPage     string   `json:"rft.spage,omitempty"`
+	Volume        string   `json:"rft.volume,omitempty"`
 
-	Abstract  string   `json:"abstract"`
-	Authors   []Author `json:"authors"`
-	DOI       string   `json:"doi"`
-	Languages []string `json:"languages"`
-	URL       []string `json:"url"`
-	Version   string   `json:"version"`
+	Abstract  string   `json:"abstract,omitempty"`
+	Authors   []Author `json:"authors,omitempty"`
+	DOI       string   `json:"doi,omitempty"`
+	Languages []string `json:"languages,omitempty"`
+	URL       []string `json:"url,omitempty"`
+	Version   string   `json:"version,omitempty"`
 
-	Type     string   `json:"x.type"`
-	Headings []string `json:"x.headings"`
-	Subjects []string `json:"x.subjects"`
+	Type     string   `json:"x.type,omitempty"`
+	Headings []string `json:"x.headings,omitempty"`
+	Subjects []string `json:"x.subjects,omitempty"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {
