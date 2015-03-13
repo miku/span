@@ -74,7 +74,7 @@ type IntermediateSchema struct {
 	ArticleSubtitle string `json:"x.subtitle"`
 	BookTitle       string `json:"rft.btitle"`
 	JournalTitle    string `json:"rft.jtitle"`
-	SeriesTitle     string `json:"rft.stitle"`
+	ShortTitle      string `json:"rft.stitle"`
 	Series          string `json:"rft.series"`
 
 	RefType      string `json:"ris.ty"`
