@@ -148,7 +148,7 @@ func (pi *PageInfo) PageCount() int {
 }
 
 func (doc *Document) RecordID() string {
-	return fmt.Sprintf("ai-%d-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	return fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.URL)))
 }
 
 // PageInfo parses a page specfication in a best effort manner into a PageInfo struct.

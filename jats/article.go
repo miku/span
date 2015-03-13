@@ -278,7 +278,7 @@ func (article *Article) identifiers() (identifiers, error) {
 	}
 	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
 	ids = identifiers{doi: doi, url: locator,
-		recordID: fmt.Sprintf("ai-%d-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))}
+		recordID: fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))}
 	return ids, nil
 }
 
