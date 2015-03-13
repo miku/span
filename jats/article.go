@@ -19,7 +19,7 @@ import (
 
 const (
 	// SourceID for internal bookkeeping.
-	SourceID = 50
+	SourceID = "50"
 
 	// Source name for finc.MegaCollection.
 	SourceName = "DeGruyter SSH"

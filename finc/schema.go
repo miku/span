@@ -66,7 +66,7 @@ func (author *Author) String() string {
 // OpenURL: http://ocoins.info/cobg.html
 type IntermediateSchema struct {
 	RecordID       string `json:"finc.record_id"`
-	SourceID       int    `json:"finc.source_id"`
+	SourceID       string `json:"finc.source_id"`
 	MegaCollection string `json:"finc.mega_collection"`
 	Format         string `json:"finc.format"`
 
@@ -281,7 +281,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	// source and finc specific alterations
 	// TODO(miku): reuse some mapping files if necessary
 	switch is.SourceID {
-	case 49:
+	case "49":
 		output.AccessFacet = "Electronic Resource"
 		switch is.Type {
 		case "":

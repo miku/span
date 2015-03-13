@@ -19,7 +19,7 @@ import (
 
 const (
 	// Internal bookkeeping.
-	SourceID = 49
+	SourceID = "49"
 	// BatchSize for grouped channel transport.
 	BatchSize = 25000
 )

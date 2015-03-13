@@ -18,7 +18,7 @@ type SolrSchema struct {
 	Publishers           []string `json:"publisher"`
 	RecordType           string   `json:"recordtype"`
 	SecondaryAuthors     []string `json:"author2"`
-	SourceID             int      `json:"source_id"`
+	SourceID             string   `json:"source_id"`
 	Title                string   `json:"title"`
 	TitleFull            string   `json:"title_full"`
 	TitleShort           string   `json:"title_short"`
