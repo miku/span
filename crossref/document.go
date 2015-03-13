@@ -280,6 +280,11 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = doc.Volume
 	output.Type = doc.Type
 
+	if doc.Type == "journal-article" {
+		output.Genre = "article"
+		output.RefType = "EJOUR"
+	}
+
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = doc.ContainerTitle[0]
 	}

@@ -285,9 +285,9 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 		output.AccessFacet = "Electronic Resource"
 		switch is.Type {
 		case "":
-			// map ISIL-ish to value
+			output.FormatDe15 = "not assigned"
 		case "journal-article":
-			// map ISIL-ish to value
+			output.FormatDe15 = "Article, E-Article"
 		}
 	}
 	return output, nil
