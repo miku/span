@@ -28,11 +28,6 @@ var (
 	errUnparsableValue = errors.New("value not parsable")
 )
 
-type AuthorID struct {
-	ID   string // ...
-	Type string // gnd, orcid, ...
-}
-
 // Author representes an author, "inspired" by OpenURL.
 type Author struct {
 	ID           string `json:"x.id,omitempty"`
@@ -66,9 +61,10 @@ func (author *Author) String() string {
 //
 // Notes on the format:
 // - The x namespace is experimental.
-// - RawDate must be in ISO8601 format
-// - Version is mandatory
-// - Headings and Subjects are not bound to any format yet
+// - RawDate must be in ISO8601 format.
+// - Version is mandatory.
+// - Headings and Subjects are not bound to any format yet.
+// - Use plural for slices, if possible.
 type IntermediateSchema struct {
 	Format         string `json:"finc.format,omitempty"`
 	MegaCollection string `json:"finc.mega_collection,omitempty"`
@@ -95,7 +91,7 @@ type IntermediateSchema struct {
 	PageCount     string   `json:"rft.tpages,omitempty"`
 	Pages         string   `json:"rft.pages,omitempty"`
 	Part          string   `json:"rft.part,omitempty"`
-	Place         []string `json:"rft.place,omitempty"`
+	Places        []string `json:"rft.place,omitempty"`
 	Publishers    []string `json:"rft.pub,omitempty"`
 	Quarter       string   `json:"rft.quarter,omitempty"`
 	RawDate       string   `json:"rft.date,omitempty"`
@@ -133,7 +129,7 @@ func (is *IntermediateSchema) Date() (time.Time, error) {
 	return t, nil
 }
 
-// ISSNList returns a deduplicated list of all ISSNs.
+// ISSNList returns a deduplicated list of all ISSN and EISSN.
 func (is *IntermediateSchema) ISSNList() []string {
 	set := make(map[string]struct{})
 	for _, issn := range append(is.ISSN, is.EISSN...) {
@@ -148,8 +144,7 @@ func (is *IntermediateSchema) ISSNList() []string {
 
 // CoveredBy returns nil, if a given entitlement covers the current document.
 // If the given entitlement does not cover the document, the error returned
-// will contain the reason as message.
-// TODO(miku): better handling of 'unparsable' volume or issue strings
+// will contain a reason.
 func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 	date, err := is.Date()
 	if err != nil {
@@ -240,8 +235,7 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 
 // ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
 // Note that this method can and will include all kinds of source
-// specific alterations, which are not expressed in the intermediate
-// format.
+// specific alterations, which are not expressed in the intermediate format.
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
 	date, err := is.Date()
@@ -255,7 +249,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output.HierarchyParentTitle = is.JournalTitle
 	output.ID = is.RecordID
 	output.ISSN = is.ISSNList()
-	output.MegaCollection = append(output.MegaCollection, is.MegaCollection)
+	output.MegaCollections = append(output.MegaCollections, is.MegaCollection)
 	output.PublishDateSort = date.Year()
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType

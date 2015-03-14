@@ -5,7 +5,7 @@ type SolrSchema struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
 	Author               string   `json:"author,omitempty"`
-	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
+	FincClassFacets      []string `json:"finc_class_facet,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
 	Fulltext             string   `json:"fulltext,omitempty"`
@@ -14,7 +14,7 @@ type SolrSchema struct {
 	Institutions         []string `json:"institution,omitempty"`
 	ISSN                 []string `json:"issn,omitempty"`
 	Languages            []string `json:"language,omitempty"`
-	MegaCollection       []string `json:"mega_collection,omitempty"`
+	MegaCollections      []string `json:"mega_collection,omitempty"`
 	PublishDateSort      int      `json:"publishDateSort,omitempty"`
 	Publishers           []string `json:"publisher,omitempty"`
 	RecordType           string   `json:"recordtype,omitempty"`
