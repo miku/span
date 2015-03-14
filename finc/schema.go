@@ -119,24 +119,14 @@ func NewIntermediateSchema() *IntermediateSchema {
 	return &IntermediateSchema{Version: IntermediateSchemaVersion}
 }
 
-func (is *IntermediateSchema) Date() time.Time {
+// Date returns the publication or issuing date of this record.
+// Fails on non ISO-8601 compliant dates.
+func (is *IntermediateSchema) Date() (time.Time, error) {
 	t, err := time.Parse("2006-01-02", is.RawDate)
 	if err != nil {
-		panic(fmt.Sprintf("unparsable date: %s", is.RawDate))
+		return t, fmt.Errorf("invalid date: %s", is.RawDate)
 	}
-	return t
-}
-
-func (is *IntermediateSchema) Year() int {
-	return is.Date().Year()
-}
-
-func (is *IntermediateSchema) Month() time.Month {
-	return is.Date().Month()
-}
-
-func (is *IntermediateSchema) Day() int {
-	return is.Date().Day()
+	return t, nil
 }
 
 // ISSNList returns a deduplicated list of all ISSNs.
@@ -157,11 +147,15 @@ func (is *IntermediateSchema) ISSNList() []string {
 // will contain the reason as message.
 // TODO(miku): better handling of 'unparsable' volume or issue strings
 func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
-	if e.FromYear != 0 && is.Year() != 0 {
-		if e.FromYear > is.Year() {
+	date, err := is.Date()
+	if err != nil {
+		return err
+	}
+	if e.FromYear != 0 && date.Year() != 0 {
+		if e.FromYear > date.Year() {
 			return errFromYear
 		}
-		if e.FromYear == is.Year() {
+		if e.FromYear == date.Year() {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
 				return errUnparsableValue
@@ -181,11 +175,11 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 		}
 	}
 
-	if e.ToYear != 0 && is.Year() != 0 {
-		if e.ToYear < is.Year() {
+	if e.ToYear != 0 && date.Year() != 0 {
+		if e.ToYear < date.Year() {
 			return errToYear
 		}
-		if e.ToYear == is.Year() {
+		if e.ToYear == date.Year() {
 			volume, err := strconv.Atoi(is.Volume)
 			if err != nil {
 				return errUnparsableValue
@@ -209,7 +203,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 	if err != nil {
 		return err
 	}
-	if is.Date().After(boundary) {
+	if date.After(boundary) {
 		return errMovingWall
 	}
 	return nil
@@ -246,6 +240,10 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 // format.
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
+	date, err := is.Date()
+	if err != nil {
+		return output, err
+	}
 
 	output.Formats = append(output.Formats, is.Format)
 	output.Fullrecord = "blob:" + output.ID
@@ -254,7 +252,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output.ID = is.RecordID
 	output.ISSN = is.ISSNList()
 	output.MegaCollection = append(output.MegaCollection, is.MegaCollection)
-	output.PublishDateSort = is.Year()
+	output.PublishDateSort = date.Year()
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
 	output.SourceID = is.SourceID

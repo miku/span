@@ -15,7 +15,7 @@ func TestDate(t *testing.T) {
 		{is: IntermediateSchema{RawDate: "2000-01-01"}, r: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)},
 	}
 	for _, tt := range tests {
-		r := tt.is.Date()
+		r, _ := tt.is.Date()
 		if r != tt.r {
 			t.Errorf("got: %v, want: %s", r, tt.r)
 		}
@@ -95,5 +95,14 @@ func TestCoveredBy(t *testing.T) {
 				t.Errorf("got: %v, want: %s", err, tt.err)
 			}
 		}
+	}
+}
+
+func TestCoveredByError(t *testing.T) {
+	is := NewIntermediateSchema()
+	e := holdings.Entitlement{}
+	err := is.CoveredBy(e)
+	if err == nil {
+		t.Errorf("no error but expected")
 	}
 }
