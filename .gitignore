@@ -31,3 +31,5 @@ _testmain.go
 span_*.deb
 span-*.rpm
 /packaging/deb/span/usr
+
+NOTES.md
