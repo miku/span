@@ -230,7 +230,7 @@ func (doc *Document) ShortTitle() (s string) {
 
 // MemberName resolves the primary name of the member.
 func (doc *Document) MemberName() (name string, err error) {
-	id, err := doc.ParseMemberID()
+	id, err := doc.parseMemberID()
 	if err != nil {
 		return
 	}
@@ -239,7 +239,7 @@ func (doc *Document) MemberName() (name string, err error) {
 }
 
 // ParseMemberID extracts the numeric member id.
-func (doc *Document) ParseMemberID() (id int, err error) {
+func (doc *Document) parseMemberID() (id int, err error) {
 	fields := strings.Split(doc.Member, "/")
 	if len(fields) > 0 {
 		id, err = strconv.Atoi(fields[len(fields)-1])
