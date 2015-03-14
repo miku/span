@@ -63,25 +63,25 @@ func (author *Author) String() string {
 // the next artifacts can be derived, e.g. records for solr indices.
 // This format can be viewed as a catch-all format. The dotted notation
 // hints at the origin of the field, e.g. OpenURL, RIS, finc.
-// OpenURL: http://ocoins.info/cobg.html
+//
+// Notes on the format:
+// - The x namespace is experimental.
+// - RawDate must be in ISO8601 format
+// - Version is mandatory
+// - Headings and Subjects are not bound to any format yet
 type IntermediateSchema struct {
+	Format         string `json:"finc.format,omitempty"`
+	MegaCollection string `json:"finc.mega_collection,omitempty"`
 	RecordID       string `json:"finc.record_id,omitempty"`
 	SourceID       string `json:"finc.source_id,omitempty"`
-	MegaCollection string `json:"finc.mega_collection,omitempty"`
-	Format         string `json:"finc.format,omitempty"`
 
-	ArticleTitle    string `json:"rft.atitle,omitempty"`
-	ArticleSubtitle string `json:"x.subtitle,omitempty"`
-	BookTitle       string `json:"rft.btitle,omitempty"`
-	JournalTitle    string `json:"rft.jtitle,omitempty"`
-	ShortTitle      string `json:"rft.stitle,omitempty"`
-	Series          string `json:"rft.series,omitempty"`
-
-	RefType      string `json:"ris.ty,omitempty"`
 	Database     string `json:"ris.db,omitempty"`
 	DataProvider string `json:"ris.dp,omitempty"`
+	RefType      string `json:"ris.ty,omitempty"`
 
 	ArticleNumber string   `json:"rft.artnum,omitempty"`
+	ArticleTitle  string   `json:"rft.atitle,omitempty"`
+	BookTitle     string   `json:"rft.btitle,omitempty"`
 	Chronology    string   `json:"rft.chron,omitempty"`
 	Edition       string   `json:"rft.edition,omitempty"`
 	EISBN         []string `json:"rft.isbn,omitempty"`
@@ -91,6 +91,7 @@ type IntermediateSchema struct {
 	ISBN          []string `json:"rft.isbn,omitempty"`
 	ISSN          []string `json:"rft.issn,omitempty"`
 	Issue         string   `json:"rft.issue,omitempty"`
+	JournalTitle  string   `json:"rft.jtitle,omitempty"`
 	PageCount     string   `json:"rft.tpages,omitempty"`
 	Pages         string   `json:"rft.pages,omitempty"`
 	Part          string   `json:"rft.part,omitempty"`
@@ -99,20 +100,23 @@ type IntermediateSchema struct {
 	Quarter       string   `json:"rft.quarter,omitempty"`
 	RawDate       string   `json:"rft.date,omitempty"`
 	Season        string   `json:"rft.ssn,omitempty"`
+	Series        string   `json:"rft.series,omitempty"`
+	ShortTitle    string   `json:"rft.stitle,omitempty"`
 	StartPage     string   `json:"rft.spage,omitempty"`
 	Volume        string   `json:"rft.volume,omitempty"`
 
 	Abstract  string   `json:"abstract,omitempty"`
-	Fulltext  string   `json:"x.fulltext,omitempty"`
 	Authors   []Author `json:"authors,omitempty"`
 	DOI       string   `json:"doi,omitempty"`
 	Languages []string `json:"languages,omitempty"`
 	URL       []string `json:"url,omitempty"`
 	Version   string   `json:"version,omitempty"`
 
-	Type     string   `json:"x.type,omitempty"`
-	Headings []string `json:"x.headings,omitempty"`
-	Subjects []string `json:"x.subjects,omitempty"`
+	ArticleSubtitle string   `json:"x.subtitle,omitempty"`
+	Fulltext        string   `json:"x.fulltext,omitempty"`
+	Headings        []string `json:"x.headings,omitempty"`
+	Subjects        []string `json:"x.subjects,omitempty"`
+	Type            string   `json:"x.type,omitempty"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {
