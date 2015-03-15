@@ -91,7 +91,7 @@ Export intermediate schema records to a memcache server with [memcldj](https://g
 
 Export to a fixed (finc) SOLR schema:
 
-    $ span-export -hspec DE-14:DE-14.xml,DE-15:DE-15.xml ai.is.ldj >  ai.ldj
+    $ span-export -hspec DE-14:DE-14.xml,DE-15:DE-15.xml ai.is.ldj > ai.ldj
 
 The exported `ai.ldj` contains all AI record and incorporates all holdings information.
 It can be indexed quickly with [solrbulk](https://github.com/miku/solrbulk):
