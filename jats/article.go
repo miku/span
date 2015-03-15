@@ -32,7 +32,7 @@ var errNoDOI = errors.New("DOI is missing")
 
 var (
 	// Restricts the possible languages for detection.
-	acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
+	acceptedLanguages = sets.NewStringSet("deu", "eng", "fra", "ita", "spa")
 
 	// Candidate patterns for parsing publishing dates.
 	datePatterns = []string{
@@ -407,11 +407,14 @@ func (article *Article) Date() (t time.Time) {
 // Languages returns the given and guessed languages
 // found in abstract and fulltext. Note: This is slow.
 // Skip detection on too short strings.
-func (article *Article) Languages() (languages []string) {
-	m := make(map[string]struct{})
+func (article *Article) Languages() []string {
+	set := sets.NewStringSet()
 
 	if article.Front.Article.Abstract.Lang != "" {
-		m[article.Front.Article.Abstract.Lang] = struct{}{}
+		base, err := language.ParseBase(article.Front.Article.Abstract.Lang)
+		if err == nil {
+			set.Add(base.ISO3())
+		}
 	}
 
 	vals := []string{
@@ -425,24 +428,16 @@ func (article *Article) Languages() (languages []string) {
 			continue
 		}
 		lang := franco.DetectOne(s)
+		if !acceptedLanguages.Contains(lang.Code) {
+			continue
+		}
 		if lang.Code == "und" {
 			continue
 		}
-		base, err := language.ParseBase(lang.Code)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		if !acceptedLanguages.Contains(base.String()) {
-			continue
-		}
-		m[base.String()] = struct{}{}
+		set.Add(lang.Code)
 	}
 
-	for k := range m {
-		languages = append(languages, k)
-	}
-	return
+	return set.Values()
 }
 
 // ToInternalSchema converts a jats article into an internal schema.
@@ -465,6 +460,8 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Authors = article.Authors()
 	output.Format = Format
 	output.Fulltext = article.Body.Section.Value
+	output.Genre = "article"
+	output.RefType = "JOUR"
 	output.Headings = article.Headings()
 	output.ISSN = article.ISSN()
 	output.Issue = article.Front.Article.Issue.Value
@@ -478,7 +475,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 
 	output.EndPage = article.Front.Article.LastPage.Value
 	output.PageCount = article.PageCount()
-	output.Pages = fmt.Sprintf("%s-%s", output.EndPage, output.StartPage)
+	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
 	output.StartPage = article.Front.Article.FirstPage.Value
 
 	return output, nil
