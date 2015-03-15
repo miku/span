@@ -11,10 +11,11 @@ Formats
 -------
 
 * [CrossRef API](http://api.crossref.org/), works and members
-* [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
-* FINC [Intermediate Format](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/schema.go#L67)
-* FINC [SOLR Schema](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/solr.go#L4)
 * JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html)
+* [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
+* [Google holdings](http://scholar.google.com/intl/en/scholar/libraries.html)
+* FINC [Intermediate Format](https://github.com/miku/span/blob/master/schema/README.md)
+* FINC [SOLR Schema](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/solr.go#L4)
 
 A little toolkit
 ----------------
