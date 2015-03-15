@@ -19,6 +19,5 @@ Minor updates shall not break clients. Major updates may break clients.
 Notes
 -----
 
-* Languages can refer to language of the article or the abstract.
-  Articles and abstracts both might use more than one language.
-  Currently used: ISO639-3.
+* Languages can refer to the language of the article or the abstract.
+  Articles and abstracts both might use more than one language. The [ISO639-3](http://www.sil.org/iso639-3/) language codes are used.
