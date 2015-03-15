@@ -14,7 +14,6 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
-	"github.com/miku/span/sets"
 )
 
 const (
@@ -29,11 +28,7 @@ var (
 	errNoURL  = errors.New("URL is missing")
 )
 
-var (
-	Format = "ElectronicArticle"
-	// acceptedLanguages restricts the possible languages for detection.
-	acceptedLanguages = sets.NewStringSet("de", "en", "fr", "it", "es")
-)
+var Format = "ElectronicArticle"
 
 // Crossref source.
 type Crossref struct{}
@@ -270,7 +265,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Format = Format
 	output.ISSN = doc.ISSN
 	output.Issue = doc.Issue
-	output.Languages = []string{"en"}
+	output.Languages = []string{"eng"}
 	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
