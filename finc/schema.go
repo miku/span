@@ -244,7 +244,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	}
 
 	output.Formats = append(output.Formats, is.Format)
-	output.Fullrecord = "blob:" + output.ID
+	output.Fullrecord = "blob:" + is.RecordID
 	output.Fulltext = is.Fulltext
 	output.HierarchyParentTitle = is.JournalTitle
 	output.ID = is.RecordID
