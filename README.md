@@ -7,6 +7,12 @@ Span formats.
 
 The `span` tools aims at high performance, versatile document conversions between a series of metadata formats.
 
+Install with
+
+    $ go get github.com/miku/span/cmd/...
+
+or via [packages](https://github.com/miku/span/releases).
+
 Formats
 -------
 
@@ -17,8 +23,8 @@ Formats
 * FINC [Intermediate Format](https://github.com/miku/span/blob/master/schema/README.md)
 * FINC [SOLR Schema](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/solr.go#L4)
 
-A little toolkit
-----------------
+A toolkit approach
+------------------
 
 * `span-import`, anything to intermediate schema
 * `span-export`, intermediate schema to finc.SolrSchema
