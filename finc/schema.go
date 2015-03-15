@@ -73,7 +73,7 @@ type IntermediateSchema struct {
 
 	Database     string `json:"ris.db,omitempty"`
 	DataProvider string `json:"ris.dp,omitempty"`
-	RefType      string `json:"ris.ty,omitempty"`
+	RefType      string `json:"ris.type,omitempty"`
 
 	ArticleNumber string   `json:"rft.artnum,omitempty"`
 	ArticleTitle  string   `json:"rft.atitle,omitempty"`
