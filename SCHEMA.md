@@ -19,3 +19,10 @@ The default serialization is JSON. Documents can be validated against
 a JSON schema (draft 4). The schema is versioned.
 
 Minor updates shall not break clients. Major updates may break clients.
+
+Notes
+-----
+
+* Languages can refer to language of the article or the abstract.
+  Articles and abstracts both might use more than one language.
+  Currently used: ISO639-3.
