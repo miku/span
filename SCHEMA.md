@@ -1,0 +1,21 @@
+Intermediate Schema Specification
+=================================
+
+The intermediate schema serves, among others, these purposes:
+
+1. It should assists clients in generating OpenURLs.
+
+2. It should assists clients in generating citation formats.
+
+3. It should provide an intermediate step between data
+   sources and export formats. Instead of implementing
+   m x n transformations for m data sources and n export
+   formats, it reduces the effort to m + n.
+
+4. It can serve as a "catch-all" format, leveling out
+   peculiarities of input data formats.
+
+The default serialization is JSON. Documents can be validated against
+a JSON schema (draft 4). The schema is versioned.
+
+Minor updates shall not break clients. Major updates may break clients.
