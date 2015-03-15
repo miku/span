@@ -1,1 +1,45 @@
-{"finc.format":"ElectronicArticle","finc.mega_collection":"DeGruyter SSH","finc.record_id":"ai-50-aHR0cDovL2R4LmRvaS5vcmcvMTAuMjIwMi8xOTQzLTM4NjcuMTA4OQ==","finc.source_id":"50","ris.type":"JOUR","rft.atitle":"Introduction","rft.epage":"2","rft.genre":"article","rft.issn":["1943-3867"],"rft.issue":"2","rft.tpages":"1","rft.pages":"-2","rft.pub":["De Gruyter"],"rft.date":"2011-02-24","rft.spage":"1","rft.volume":"4","abstract":"\r\n\t\t\t\t\u003cp /\u003e\r\n\t\t\t","authors":[{"rft.aulast":"Lee","rft.aufirst":"Yong-Shik"}],"doi":"10.2202/1943-3867.1089","languages":["eng"],"url":["http://dx.doi.org/10.2202/1943-3867.1089"],"version":"0.1","x.fulltext":"\u003cp\u003eThe Law and Development Review Volume 4, Number 2 2011 Article 1  SPECIAL ISSUE (2011): XXXX-XXXX-XXXX","x.headings":["Article"],"x.subjects":["Law and Development","International Trade Law"]}
+{
+  "finc.format": "ElectronicArticle",
+  "finc.mega_collection": "DeGruyter SSH",
+  "finc.record_id": "ai-50-aHR0cDovL2R4LmRvaS5vcmcvMTAuMjIwMi8xOTQzLTM4NjcuMTA4OQ==",
+  "finc.source_id": "50",
+  "ris.type": "JOUR",
+  "rft.atitle": "Introduction",
+  "rft.epage": "2",
+  "rft.genre": "article",
+  "rft.issn": [
+    "1943-3867"
+  ],
+  "rft.issue": "2",
+  "rft.tpages": "1",
+  "rft.pages": "-2",
+  "rft.pub": [
+    "De Gruyter"
+  ],
+  "rft.date": "2011-02-24",
+  "rft.spage": "1",
+  "rft.volume": "4",
+  "abstract": "\r\n\t\t\t\t\u003cp /\u003e\r\n\t\t\t",
+  "authors": [
+    {
+      "rft.aulast": "Lee",
+      "rft.aufirst": "Yong-Shik"
+    }
+  ],
+  "doi": "10.2202/1943-3867.1089",
+  "languages": [
+    "eng"
+  ],
+  "url": [
+    "http://dx.doi.org/10.2202/1943-3867.1089"
+  ],
+  "version": "0.1",
+  "x.fulltext": "\u003cp\u003eThe Law and Development Review Volume 4, Number 2 2011 Article 1  SPECIAL ISSUE (2011): XXXX-XXXX-XXXX",
+  "x.headings": [
+    "Article"
+  ],
+  "x.subjects": [
+    "Law and Development",
+    "International Trade Law"
+  ]
+}

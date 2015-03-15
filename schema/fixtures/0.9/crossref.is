@@ -1,1 +1,41 @@
-{"finc.format":"ElectronicArticle","finc.mega_collection":"Nature Publishing Group (CrossRef)","finc.record_id":"ai-49-aHR0cDovL2R4LmRvaS5vcmcvMTAuMTAzOC8xOTg1MDZiMA==","finc.source_id":"49","ris.type":"EJOUR","rft.atitle":"Characterization of Pools of Protein in Cells of Shigella flexneri F6S infected with Phage H-Sh","rft.epage":"507","rft.genre":"article","rft.issn":["0028-0836"],"rft.issue":"4879","rft.jtitle":"Nature","rft.tpages":"1","rft.pages":"506-507","rft.pub":["Nature Publishing Group"],"rft.date":"1963-05-04","rft.spage":"506","rft.volume":"198","authors":[{"rft.aulast":"BEUMER-JOCHMANS","rft.aufirst":"M. P."}],"doi":"10.1038/198506b0","languages":["eng"],"url":["http://dx.doi.org/10.1038/198506b0"],"version":"0.1","x.subjects":["General"],"x.type":"journal-article"}
+{
+  "finc.format": "ElectronicArticle",
+  "finc.mega_collection": "Nature Publishing Group (CrossRef)",
+  "finc.record_id": "ai-49-aHR0cDovL2R4LmRvaS5vcmcvMTAuMTAzOC8xOTg1MDZiMA==",
+  "finc.source_id": "49",
+  "ris.type": "EJOUR",
+  "rft.atitle": "Characterization of Pools of Protein in Cells of Shigella flexneri F6S infected with Phage H-Sh",
+  "rft.epage": "507",
+  "rft.genre": "article",
+  "rft.issn": [
+    "0028-0836"
+  ],
+  "rft.issue": "4879",
+  "rft.jtitle": "Nature",
+  "rft.tpages": "1",
+  "rft.pages": "506-507",
+  "rft.pub": [
+    "Nature Publishing Group"
+  ],
+  "rft.date": "1963-05-04",
+  "rft.spage": "506",
+  "rft.volume": "198",
+  "authors": [
+    {
+      "rft.aulast": "BEUMER-JOCHMANS",
+      "rft.aufirst": "M. P."
+    }
+  ],
+  "doi": "10.1038/198506b0",
+  "languages": [
+    "eng"
+  ],
+  "url": [
+    "http://dx.doi.org/10.1038/198506b0"
+  ],
+  "version": "0.1",
+  "x.subjects": [
+    "General"
+  ],
+  "x.type": "journal-article"
+}
