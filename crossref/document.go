@@ -33,10 +33,8 @@ var Format = "ElectronicArticle"
 // Crossref source.
 type Crossref struct{}
 
-// Iterate returns a channel which carries batches. The processor function
-// is just plain JSON deserialization. It is ok to halt the world,
-// if there some error during reading.
-func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
+// NewBatch wraps up a new batch for channel com.
+func NewBatch(lines []string) span.Batcher {
 	batch := span.Batcher{
 		Apply: func(s string) (span.Importer, error) {
 			doc := new(Document)
@@ -45,11 +43,19 @@ func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 				return doc, err
 			}
 			return doc, nil
-		}}
+		}, Items: make([]string, len(lines))}
+	copy(batch.Items, lines)
+	return batch
+}
 
+// Iterate returns a channel which carries batches. The processor function
+// is just plain JSON deserialization. It is ok to halt the world,
+// if there some error during reading.
+func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 	ch := make(chan interface{})
 	reader := bufio.NewReader(r)
-	i := 1
+	i := 0
+	var lines []string
 	go func() {
 		for {
 			line, err := reader.ReadString('\n')
@@ -59,14 +65,16 @@ func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			batch.Items = append(batch.Items, line)
+			i++
+			lines = append(lines, line)
 			if i == BatchSize {
+				batch := NewBatch(lines)
 				ch <- batch
-				batch.Items = batch.Items[:0]
+				lines = lines[:0]
 				i = 0
 			}
-			i++
 		}
+		batch := NewBatch(lines)
 		ch <- batch
 		close(ch)
 	}()
