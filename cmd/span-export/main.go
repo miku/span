@@ -35,8 +35,7 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 			if err != nil {
 				log.Fatal(err)
 			}
-			ss, err := is.ToSolrSchema()
-			ss.Institutions = is.Institutions(opts.Holdings)
+			ss, err := is.ToSolrSchema(opts.Holdings)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -119,14 +118,19 @@ func main() {
 			}
 			batch = append(batch, line)
 			if i%*size == 0 {
-				queue <- batch
+				b := make([]string, len(batch))
+				copy(b, batch)
+				queue <- b
 				batch = batch[:0]
 			}
 			i++
 		}
 	}
 
-	queue <- batch
+	b := make([]string, len(batch))
+	copy(b, batch)
+	queue <- b
+
 	close(queue)
 	wg.Wait()
 	close(out)

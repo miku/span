@@ -261,7 +261,7 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 // ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
 // Note that this method can and will include all kinds of source
 // specific alterations, which are not expressed in the intermediate format.
-func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
+func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrSchema, error) {
 	output := new(SolrSchema)
 
 	date, err := is.Date()
@@ -315,6 +315,10 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 		case "journal-article":
 			output.FormatDe15 = "Article, E-Article"
 		}
+		output.Institutions = is.Institutions(iih)
+	case "50":
+		output.Institutions = []string{"DE-15"}
+		output.FormatDe15 = "Article, E-Article"
 	}
 	return output, nil
 }
