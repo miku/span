@@ -68,14 +68,12 @@ func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 			i++
 			lines = append(lines, line)
 			if i == BatchSize {
-				batch := NewBatch(lines)
-				ch <- batch
+				ch <- NewBatch(lines)
 				lines = lines[:0]
 				i = 0
 			}
 		}
-		batch := NewBatch(lines)
-		ch <- batch
+		ch <- NewBatch(lines)
 		close(ch)
 	}()
 	return ch, nil
