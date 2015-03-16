@@ -304,6 +304,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	name, err := doc.MemberName()
 	if err == nil {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
+	} else {
+		output.MegaCollection = fmt.Sprintf("X-U (CrossRef)", name)
 	}
 
 	return output, nil
