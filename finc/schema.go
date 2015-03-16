@@ -292,6 +292,10 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output.Topics = is.Subjects
 	output.URL = is.URL
 
+	for _, lang := range is.Languages {
+		output.Languages = append(output.Languages, ReferenceName(lang))
+	}
+
 	for _, author := range is.Authors {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
 	}
