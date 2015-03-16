@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.15
+Version:    0.1.16
 Release:    0
 License:    MIT
 BuildArch:  x86_64
