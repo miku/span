@@ -2,10 +2,12 @@
 package finc
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/miku/span/holdings"
@@ -142,6 +144,29 @@ func (is *IntermediateSchema) ISSNList() []string {
 	return issns
 }
 
+// Allfields returns a combination of various fields.
+func (is *IntermediateSchema) Allfields() (string, error) {
+	var authors []string
+	for _, author := range is.Authors {
+		authors = append(authors, author.String())
+	}
+	fields := [][]string{authors,
+		is.Subjects, is.ISSN, is.EISSN, is.Publishers, is.Places, is.URL,
+		[]string{is.ArticleTitle, is.ArticleSubtitle, is.JournalTitle, is.Fulltext}}
+	var buf bytes.Buffer
+	for _, f := range fields {
+		for _, value := range f {
+			for _, token := range strings.Fields(value) {
+				_, err := buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
+				if err != nil {
+					return "", err
+				}
+			}
+		}
+	}
+	return strings.TrimSpace(buf.String()), nil
+}
+
 // CoveredBy returns nil, if a given entitlement covers the current document.
 // If the given entitlement does not cover the document, the error returned
 // will contain a reason.
@@ -238,11 +263,18 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 // specific alterations, which are not expressed in the intermediate format.
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
+
 	date, err := is.Date()
 	if err != nil {
 		return output, err
 	}
 
+	all, err := is.Allfields()
+	if err != nil {
+		return output, err
+	}
+
+	output.Allfields = all
 	output.Formats = append(output.Formats, is.Format)
 	output.Fullrecord = "blob:" + is.RecordID
 	output.Fulltext = is.Fulltext
