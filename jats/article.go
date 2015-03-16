@@ -473,10 +473,10 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Subjects = article.Subjects()
 	output.Volume = article.Front.Article.Volume.Value
 
+	output.StartPage = article.Front.Article.FirstPage.Value
 	output.EndPage = article.Front.Article.LastPage.Value
 	output.PageCount = article.PageCount()
 	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
-	output.StartPage = article.Front.Article.FirstPage.Value
 
 	return output, nil
 }
