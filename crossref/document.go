@@ -281,9 +281,79 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = doc.Volume
 	output.Type = doc.Type
 
-	if doc.Type == "journal-article" {
+	switch doc.Type {
+	case "journal-article":
 		output.Genre = "article"
 		output.RefType = "EJOUR"
+	case "book-chapter":
+		output.Genre = "bookitem"
+		output.RefType = "ECHAP"
+	case "proceedings-article ":
+		output.Genre = "proceeding"
+		output.RefType = "CONF"
+	case "component":
+		output.Genre = "document"
+		output.RefType = "GEN"
+	case "dataset":
+		output.Genre = "document"
+		output.RefType = "DATA"
+	case "reference-entry":
+		output.Genre = "document"
+		output.RefType = "GEN"
+	case "journal-issue":
+		output.Genre = "issue"
+		output.RefType = "EJOUR"
+	case "book":
+		output.Genre = "book"
+		output.RefType = "EBOOK"
+	case "report":
+		output.Genre = "report"
+		output.RefType = "RPRT"
+	case "monograph":
+		output.Genre = "book"
+		output.RefType = "EBOOK"
+	case "other":
+		output.Genre = "unknown"
+		output.RefType = "GEN"
+	case "standard":
+		output.Genre = "unknown"
+		output.RefType = "GEN"
+	case "dissertation":
+		output.Genre = "book"
+		output.RefType = "THES"
+	case "journal":
+		output.Genre = "unknown"
+		output.RefType = "EJOUR"
+	case "proceedings":
+		output.Genre = "proceedings"
+		output.RefType = "CONF"
+	case "report-series":
+		output.Genre = "report"
+		output.RefType = "SER"
+	case "book-section":
+		output.Genre = "bookitem"
+		output.RefType = "ECHAP"
+	case "book-series":
+		output.Genre = "bookitem"
+		output.RefType = "SER"
+	case "reference-book":
+		output.Genre = "book"
+		output.RefType = "EBOOK"
+	case "book-part":
+		output.Genre = "bookitem"
+		output.RefType = "ECHAP"
+	case "journal-volume":
+		output.Genre = "unknown"
+		output.RefType = "GEN"
+	case "book-set":
+		output.Genre = "unknown"
+		output.RefType = "GEN"
+	case "ook-track":
+		output.Genre = "unknown"
+		output.RefType = "GEN"
+	default:
+		output.Genre = "unknown"
+		output.RefType = "GEN"
 	}
 
 	if len(doc.ContainerTitle) > 0 {
