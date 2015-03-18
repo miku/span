@@ -281,6 +281,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = doc.Volume
 	output.Type = doc.Type
 
+	// TODO(miku): factor this out
 	switch doc.Type {
 	case "journal-article":
 		output.Genre = "article"
