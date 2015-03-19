@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/holdings"
 	"github.com/miku/span/sets"
 )
@@ -286,11 +287,13 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
 	output.SourceID = is.SourceID
-	output.Title = is.ArticleTitle
-	output.TitleFull = is.ArticleTitle
-	output.TitleShort = is.ArticleTitle
 	output.Topics = is.Subjects
 	output.URL = is.URL
+
+	sanitized := sanitize.HTML(is.ArticleTitle)
+	output.Title = sanitized
+	output.TitleFull = sanitized
+	output.TitleShort = sanitized
 
 	for _, lang := range is.Languages {
 		output.Languages = append(output.Languages, ReferenceName(lang))
