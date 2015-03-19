@@ -12,6 +12,7 @@ type SolrSchema struct {
 	HierarchyParentTitle string   `json:"hierarchy_parent_title,omitempty"`
 	ID                   string   `json:"id,omitempty"`
 	Institutions         []string `json:"institution,omitempty"`
+	Imprint              string   `json:"imprint,omitempty"`
 	ISSN                 []string `json:"issn,omitempty"`
 	Languages            []string `json:"language,omitempty"`
 	MegaCollections      []string `json:"mega_collection,omitempty"`

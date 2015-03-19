@@ -169,6 +169,44 @@ func (is *IntermediateSchema) Allfields() (string, error) {
 	return strings.TrimSpace(buf.String()), nil
 }
 
+func btoi(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+// Imprint MARC 260 a, b, c (trad.)
+func (is *IntermediateSchema) Imprint() (s string) {
+	var places, publisher string
+	date, _ := is.Date()
+	year := date.Year()
+	places = strings.Join(is.Places, " ; ")
+	if len(is.Publishers) > 0 {
+		publisher = is.Publishers[0]
+	}
+
+	mask := btoi(places != "") + 2*btoi(publisher != "") + 4*btoi(year != 0)
+
+	switch mask {
+	case 1:
+		s = places
+	case 2:
+		s = publisher
+	case 3:
+		s = fmt.Sprintf("%s : %s", places, publisher)
+	case 4:
+		s = fmt.Sprintf("%d", year)
+	case 5:
+		s = fmt.Sprintf("%s : %d", places, year)
+	case 6:
+		s = fmt.Sprintf("%s, %d", publisher, year)
+	case 7:
+		s = fmt.Sprintf("%s : %s, %d", places, publisher, year)
+	}
+	return
+}
+
 // CoveredBy returns nil, if a given entitlement covers the current document.
 // If the given entitlement does not cover the document, the error returned
 // will contain a reason.
@@ -283,6 +321,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.HierarchyParentTitle = is.JournalTitle
 	output.ID = is.RecordID
 	output.ISSN = is.ISSNList()
+	output.Imprint = is.Imprint()
 	output.MegaCollections = append(output.MegaCollections, is.MegaCollection)
 	output.PublishDateSort = date.Year()
 	output.Publishers = is.Publishers
