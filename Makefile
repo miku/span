@@ -1,28 +1,31 @@
 TARGETS = span-import span-export span-gh-dump span-hspec
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
-test:
-	go get ./... && go test -v ./...
+test: deps
+	go test -v ./...
+
+deps:
+	go get ./...
+
+imports:
+	goimports -w .
 
 cover:
 	go test -cover ./...
 
 all: $(TARGETS)
 
-span-import: imports
+span-import: imports deps
 	go build -o span-import cmd/span-import/main.go
 
-span-export: imports
+span-export: imports deps
 	go build -o span-export cmd/span-export/main.go
 
-span-hspec: imports
+span-hspec: imports deps
 	go build -o span-hspec cmd/span-hspec/main.go
 
-span-gh-dump: imports
+span-gh-dump: imports deps
 	go build -o span-gh-dump cmd/span-gh-dump/main.go
-
-imports:
-	goimports -w .
 
 clean:
 	rm -f $(TARGETS)
