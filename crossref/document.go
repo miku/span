@@ -80,7 +80,7 @@ var (
 		"dataset":             "DATA",
 		"dissertation":        "THES",
 		"journal":             "EJOUR",
-		"journal-article":     "article",
+		"journal-article":     "EJOUR",
 		"journal-issue":       "EJOUR",
 		"monograph":           "EBOOK",
 		"proceedings":         "CONF",
