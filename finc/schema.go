@@ -348,9 +348,6 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 		output.Author = output.SecondaryAuthors[0]
 	}
 
-	// source and finc specific alterations
-	// TODO(miku): reuse some mapping files if necessary
-
 	output.AccessFacet = AIAccessFacet
 	switch is.SourceID {
 	case "49":
