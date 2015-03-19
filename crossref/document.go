@@ -29,7 +29,27 @@ var (
 )
 
 var (
-	Format = "ElectronicArticle"
+	DefaultFormat = "ElectronicArticle"
+	Formats       = span.StringMap{
+		"book":                "eBook",
+		"book-chapter":        "ElectronicBookPart",
+		"book-part":           "ElectronicBookPart",
+		"book-section":        "ElectronicBookPart",
+		"book-series":         "ElectronicSerial",
+		"component":           "ElectronicArticle",
+		"dataset":             "ElectronicArticle",
+		"dissertation":        "ElectronicThesis",
+		"journal":             "ElectronicJournal",
+		"journal-article":     "ElectronicJournal",
+		"journal-issue":       "ElectronicJournal",
+		"monograph":           "eBook",
+		"proceedings":         "ElectronicProceeding",
+		"proceedings-article": "ElectronicProceeding",
+		"reference-book":      "eBook",
+		"reference-entry":     "ElectronicArticle",
+		"report":              "ElectronicArticle",
+		"report-series":       "Serial",
+	}
 	Genres = span.StringMap{
 		"book":                "book",
 		"book-chapter":        "bookitem",
@@ -310,7 +330,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.ArticleTitle = doc.CombinedTitle()
 	output.DOI = doc.DOI
-	output.Format = Format
+	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
 	output.Genre = Genres.Lookup(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
 	output.Issue = doc.Issue
