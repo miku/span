@@ -308,7 +308,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	// TODO(miku): reuse some mapping files if necessary
 	switch is.SourceID {
 	case "49":
-		output.AccessFacet = "Electronic Resource"
+		output.AccessFacet = "Electronic Resources"
 		switch is.Type {
 		case "":
 			output.FormatDe15 = "not assigned"
