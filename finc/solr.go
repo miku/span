@@ -6,7 +6,7 @@ type SolrSchema struct {
 	AuthorFacet          []string `json:"author_facet"`
 	Allfields            string   `json:"allfields,omitempty"`
 	Author               string   `json:"author,omitempty"`
-	FincClassFacets      []string `json:"finc_class_facet,omitempty"`
+	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
 	Fulltext             string   `json:"fulltext,omitempty"`
