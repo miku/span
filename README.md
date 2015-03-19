@@ -5,7 +5,7 @@ Span formats.
 
 [![Build Status](https://travis-ci.org/miku/span.svg?branch=master)](https://travis-ci.org/miku/span) [![GoDoc](https://godoc.org/github.com/miku/span?status.svg)](https://godoc.org/github.com/miku/span)
 
-The `span` tools aims at high performance, versatile document conversions between a series of metadata formats.
+The `span` tools aim at high performance, versatile document conversions between a series of metadata formats.
 
 Install with
 
@@ -27,7 +27,7 @@ A toolkit approach
 ------------------
 
 * `span-import`, anything to intermediate schema
-* `span-export`, intermediate schema to finc.SolrSchema
+* `span-export`, intermediate schema to anything (finc.SolrSchema only, at the moment)
 
 The `span-import` tool should require minimal external information (no holdings file, etc.)
 and be mainly concerned with the transformation of fancy source formats into the catch-all
