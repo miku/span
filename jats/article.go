@@ -465,7 +465,13 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Headings = article.Headings()
 	output.ISSN = article.ISSN()
 	output.Issue = article.Front.Article.Issue.Value
-	output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+
+	if article.Front.Journal.TitleGroup.JournalTitle.Title != "" {
+		output.JournalTitle = article.Front.Journal.TitleGroup.JournalTitle.Title
+	} else {
+		output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+	}
+
 	output.Languages = article.Languages()
 	output.MegaCollection = SourceName
 	output.Publishers = append(output.Publishers, article.Front.Journal.Publisher.Name.Value)
