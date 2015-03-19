@@ -309,16 +309,9 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	switch is.SourceID {
 	case "49":
 		output.AccessFacet = "Electronic Resources"
-		switch is.Type {
-		case "":
-			output.FormatDe15 = "not assigned"
-		case "journal-article":
-			output.FormatDe15 = "Article, E-Article"
-		}
 		output.Institutions = is.Institutions(iih)
 	case "50":
 		output.Institutions = []string{"DE-15"}
-		output.FormatDe15 = "Article, E-Article"
 	}
 	return output, nil
 }
