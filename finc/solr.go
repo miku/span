@@ -3,6 +3,7 @@ package finc
 // SolrSchema represents a finc schema, evolving as needed.
 type SolrSchema struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
+	AuthorFacet          []string `json:"author_facet"`
 	Allfields            string   `json:"allfields,omitempty"`
 	Author               string   `json:"author,omitempty"`
 	FincClassFacets      []string `json:"finc_class_facet,omitempty"`

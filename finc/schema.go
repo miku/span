@@ -341,6 +341,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 
 	for _, author := range is.Authors {
 		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
+		output.AuthorFacet = append(output.AuthorFacet, author.String())
 	}
 
 	if len(output.SecondaryAuthors) > 0 {
