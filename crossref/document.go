@@ -28,7 +28,49 @@ var (
 	errNoURL  = errors.New("URL is missing")
 )
 
-var Format = "ElectronicArticle"
+var (
+	Format = "ElectronicArticle"
+	Genres = span.StringMap{
+		"book":                "book",
+		"book-chapter":        "bookitem",
+		"book-part":           "bookitem",
+		"book-section":        "bookitem",
+		"book-series":         "bookitem",
+		"component":           "document",
+		"dataset":             "document",
+		"dissertation":        "book",
+		"journal":             "unknown",
+		"journal-article":     "article",
+		"journal-issue":       "issue",
+		"monograph":           "book",
+		"proceedings":         "proceeding",
+		"proceedings-article": "proceeding",
+		"reference-book":      "book",
+		"reference-entry":     "document",
+		"report":              "report",
+		"report-series":       "report",
+	}
+	RefTypes = span.StringMap{
+		"book":                "EBOOK",
+		"book-chapter":        "ECHAP",
+		"book-part":           "ECHAP",
+		"book-section":        "ECHAP",
+		"book-series":         "SER",
+		"component":           "GEN",
+		"dataset":             "DATA",
+		"dissertation":        "THES",
+		"journal":             "EJOUR",
+		"journal-article":     "article",
+		"journal-issue":       "EJOUR",
+		"monograph":           "EBOOK",
+		"proceedings":         "CONF",
+		"proceedings-article": "CONF",
+		"reference-book":      "EBOOK",
+		"reference-entry":     "GEN",
+		"report":              "RPRT",
+		"report-series":       "SER",
+	}
+)
 
 // Crossref source.
 type Crossref struct{}
@@ -269,93 +311,18 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ArticleTitle = doc.CombinedTitle()
 	output.DOI = doc.DOI
 	output.Format = Format
+	output.Genre = Genres.Lookup(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
 	output.Issue = doc.Issue
 	output.Languages = []string{"eng"}
 	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RecordID = doc.RecordID()
+	output.RefType = RefTypes.Lookup(doc.Type, "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subjects
-	output.URL = append(output.URL, doc.URL)
-	output.Version = finc.IntermediateSchemaVersion
-	output.Volume = doc.Volume
 	output.Type = doc.Type
-
-	// TODO(miku): factor this out
-	switch doc.Type {
-	case "journal-article":
-		output.Genre = "article"
-		output.RefType = "EJOUR"
-	case "book-chapter":
-		output.Genre = "bookitem"
-		output.RefType = "ECHAP"
-	case "proceedings-article ":
-		output.Genre = "proceeding"
-		output.RefType = "CONF"
-	case "component":
-		output.Genre = "document"
-		output.RefType = "GEN"
-	case "dataset":
-		output.Genre = "document"
-		output.RefType = "DATA"
-	case "reference-entry":
-		output.Genre = "document"
-		output.RefType = "GEN"
-	case "journal-issue":
-		output.Genre = "issue"
-		output.RefType = "EJOUR"
-	case "book":
-		output.Genre = "book"
-		output.RefType = "EBOOK"
-	case "report":
-		output.Genre = "report"
-		output.RefType = "RPRT"
-	case "monograph":
-		output.Genre = "book"
-		output.RefType = "EBOOK"
-	case "other":
-		output.Genre = "unknown"
-		output.RefType = "GEN"
-	case "standard":
-		output.Genre = "unknown"
-		output.RefType = "GEN"
-	case "dissertation":
-		output.Genre = "book"
-		output.RefType = "THES"
-	case "journal":
-		output.Genre = "unknown"
-		output.RefType = "EJOUR"
-	case "proceedings":
-		output.Genre = "proceedings"
-		output.RefType = "CONF"
-	case "report-series":
-		output.Genre = "report"
-		output.RefType = "SER"
-	case "book-section":
-		output.Genre = "bookitem"
-		output.RefType = "ECHAP"
-	case "book-series":
-		output.Genre = "bookitem"
-		output.RefType = "SER"
-	case "reference-book":
-		output.Genre = "book"
-		output.RefType = "EBOOK"
-	case "book-part":
-		output.Genre = "bookitem"
-		output.RefType = "ECHAP"
-	case "journal-volume":
-		output.Genre = "unknown"
-		output.RefType = "GEN"
-	case "book-set":
-		output.Genre = "unknown"
-		output.RefType = "GEN"
-	case "ook-track":
-		output.Genre = "unknown"
-		output.RefType = "GEN"
-	default:
-		output.Genre = "unknown"
-		output.RefType = "GEN"
-	}
+	output.URL = append(output.URL, doc.URL)
+	output.Volume = doc.Volume
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = doc.ContainerTitle[0]
