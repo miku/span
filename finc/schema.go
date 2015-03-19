@@ -154,7 +154,7 @@ func (is *IntermediateSchema) Allfields() (string, error) {
 	}
 	fields := [][]string{authors,
 		is.Subjects, is.ISSN, is.EISSN, is.Publishers, is.Places, is.URL,
-		[]string{is.ArticleTitle, is.ArticleSubtitle, is.JournalTitle, is.Fulltext}}
+		{is.ArticleTitle, is.ArticleSubtitle, is.JournalTitle, is.Fulltext}}
 	var buf bytes.Buffer
 	for _, f := range fields {
 		for _, value := range f {

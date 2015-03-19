@@ -133,14 +133,14 @@ func TestHoldingsMap(t *testing.T) {
     </entitlement>
   </entitlements>
 </holding>`), map[string]Holding{
-			"1610-2940": Holding{
+			"1610-2940": {
 				EZBID:      1,
 				Title:      "Journal of Molecular Modeling",
 				Publishers: "Springer",
 				PISSN:      []string{"1610-2940"},
 				EISSN:      []string{"0948-5023"},
 				Entitlements: []Entitlement{
-					Entitlement{
+					{
 						Status:     "subscribed",
 						URL:        "http://link.springer.com/journal/894",
 						Anchor:     "natli_springer",
@@ -149,7 +149,7 @@ func TestHoldingsMap(t *testing.T) {
 						ToYear:     2002,
 						ToVolume:   8,
 					},
-					Entitlement{
+					{
 						Status: "subscribed",
 						URL:    "http://link.springer.com/journal/894",
 						Anchor: "springer",

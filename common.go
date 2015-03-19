@@ -45,7 +45,7 @@ func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	f := bufio.NewWriter(w)
 	defer f.Flush()
 	for b := range out {
-		f.Write(b[:len(b)])
+		f.Write(b[:])
 		f.Write([]byte("\n"))
 	}
 	done <- true

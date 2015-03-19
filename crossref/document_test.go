@@ -38,10 +38,10 @@ func TestDateFieldDate(t *testing.T) {
 		d   time.Time
 		err error
 	}{
-		{f: DateField{DateParts: []DatePart{DatePart{2000}}}, d: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC), err: nil},
-		{f: DateField{DateParts: []DatePart{DatePart{2000, 10}}}, d: time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC), err: nil},
-		{f: DateField{DateParts: []DatePart{DatePart{2000, 10, 1}}}, d: time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC), err: nil},
-		{f: DateField{DateParts: []DatePart{DatePart{}}}, d: time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{{2000}}}, d: time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{{2000, 10}}}, d: time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{{2000, 10, 1}}}, d: time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC), err: nil},
+		{f: DateField{DateParts: []DatePart{{}}}, d: time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC), err: nil},
 	}
 
 	for _, tt := range tests {
