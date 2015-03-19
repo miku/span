@@ -17,6 +17,7 @@ import (
 
 const (
 	AIRecordType              = "ai"
+	AIAccessFacet             = "Electronic Resources"
 	IntermediateSchemaVersion = "0.9"
 )
 
@@ -309,9 +310,10 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 
 	// source and finc specific alterations
 	// TODO(miku): reuse some mapping files if necessary
+
+	output.AccessFacet = AIAccessFacet
 	switch is.SourceID {
 	case "49":
-		output.AccessFacet = "Electronic Resources"
 		output.Institutions = is.Institutions(iih)
 	case "50":
 		output.Institutions = []string{"DE-15"}
