@@ -93,19 +93,6 @@ func main() {
 		log.Fatal("input file required")
 	}
 
-	filename := flag.Arg(0)
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	source, _ := formats[*inputFormat]
-
-	ch, err := source.Iterate(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	queue := make(chan span.Batcher)
 	out := make(chan []byte)
 	done := make(chan bool)
@@ -124,6 +111,19 @@ func main() {
 			log.Fatal(err)
 		}
 		log.SetOutput(ff)
+	}
+
+	filename := flag.Arg(0)
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	source, _ := formats[*inputFormat]
+
+	ch, err := source.Iterate(file)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	for item := range ch {
