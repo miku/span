@@ -211,8 +211,13 @@ func (pi *PageInfo) PageCount() int {
 	return 0
 }
 
+// RecordID is of the form <kind>-<source-id>-<id-base64-unpadded>
+// We simple map any primary key of the source (preferably a URL)
+// to a safer alphabet. Since the base64 part is not meant to be decoded
+// we drop the padding. It is simple enough to recover the original value.
 func (doc *Document) RecordID() string {
-	return fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	return strings.TrimRight(enc, "=")
 }
 
 // PageInfo parses a page specfication in a best effort manner into a PageInfo struct.

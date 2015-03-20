@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/kapsteur/franco"
@@ -277,8 +278,9 @@ func (article *Article) identifiers() (identifiers, error) {
 		return ids, err
 	}
 	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
-	ids = identifiers{doi: doi, url: locator,
-		recordID: fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))}
+	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(locator)))
+	recordID := strings.TrimRight(enc, "=")
+	ids = identifiers{doi: doi, url: locator, recordID: recordID}
 	return ids, nil
 }
 
