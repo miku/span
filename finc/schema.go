@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
+	"github.com/miku/span"
 	"github.com/miku/span/holdings"
 	"github.com/miku/span/sets"
 )
@@ -31,6 +32,18 @@ var (
 	errMovingWall      = errors.New("moving-wall violation")
 	errUnparsableValue = errors.New("value not parsable")
 )
+
+var FormatSite = span.StringMap{
+	"eBook":                          "Book, E-Book",
+	"ElectronicArticle":              "Article, E-Article",
+	"ElectronicBookPart":             "Book, E-Book",
+	"ElectronicJournal":              "Journal, E-Journal",
+	"ElectronicProceeding":           "Proceeding",
+	"ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
+	"ElectronicSerial":               "Journal, E-Journal",
+	"ElectronicThesis":               "Thesis",
+	"Unknown":                        "Unknown Format",
+}
 
 // Author representes an author, "inspired" by OpenURL.
 type Author struct {
