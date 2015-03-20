@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/kapsteur/franco"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
-	"github.com/miku/span/sets"
 	"golang.org/x/text/language"
 )
 
@@ -32,7 +32,7 @@ var errNoDOI = errors.New("DOI is missing")
 
 var (
 	// Restricts the possible languages for detection.
-	acceptedLanguages = sets.NewStringSet("deu", "eng", "fra", "ita", "spa")
+	acceptedLanguages = container.NewStringSet("deu", "eng", "fra", "ita", "spa")
 
 	// Candidate patterns for parsing publishing dates.
 	datePatterns = []string{
@@ -408,7 +408,7 @@ func (article *Article) Date() (t time.Time) {
 // found in abstract and fulltext. Note: This is slow.
 // Skip detection on too short strings.
 func (article *Article) Languages() []string {
-	set := sets.NewStringSet()
+	set := container.NewStringSet()
 
 	if article.Front.Article.Abstract.Lang != "" {
 		base, err := language.ParseBase(article.Front.Article.Abstract.Lang)

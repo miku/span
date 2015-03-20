@@ -11,9 +11,8 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
-	"github.com/miku/span"
+	"github.com/miku/span/container"
 	"github.com/miku/span/holdings"
-	"github.com/miku/span/sets"
 )
 
 const (
@@ -33,7 +32,7 @@ var (
 	errUnparsableValue = errors.New("value not parsable")
 )
 
-var FormatSite = span.StringMap{
+var FormatSite = container.StringMap{
 	"eBook":                          "Book, E-Book",
 	"ElectronicArticle":              "Article, E-Article",
 	"ElectronicBookPart":             "Book, E-Book",
@@ -289,7 +288,7 @@ func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
 // Institutions returns a slice of ISILs for which this document finds
 // valid entitlements in a IsilIssnHolding map.
 func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []string {
-	isils := sets.NewStringSet()
+	isils := container.NewStringSet()
 	for _, isil := range iih.Isils() {
 		for _, issn := range is.ISSNList() {
 			h, exists := iih[isil][issn]

@@ -51,18 +51,6 @@ func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	done <- true
 }
 
-// StringMap provides defaults for string map lookups.
-type StringMap map[string]string
-
-// Lookup with default value.
-func (m StringMap) Lookup(key, def string) string {
-	val, ok := m[key]
-	if !ok {
-		return def
-	}
-	return val
-}
-
 // ParseHoldingSpec parses a holdings flag value into a map.
 func ParseHoldingSpec(s string) (map[string]string, error) {
 	fields := strings.Split(s, ",")

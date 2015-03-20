@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/miku/span"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
 
@@ -30,7 +31,7 @@ var (
 
 var (
 	DefaultFormat = "ElectronicArticle"
-	Formats       = span.StringMap{
+	Formats       = container.StringMap{
 		"book":                "eBook",
 		"book-chapter":        "ElectronicBookPart",
 		"book-part":           "ElectronicBookPart",
@@ -50,7 +51,7 @@ var (
 		"report":              "ElectronicArticle",
 		"report-series":       "ElectronicSerial",
 	}
-	Genres = span.StringMap{
+	Genres = container.StringMap{
 		"book":                "book",
 		"book-chapter":        "bookitem",
 		"book-part":           "bookitem",
@@ -70,7 +71,7 @@ var (
 		"report":              "report",
 		"report-series":       "report",
 	}
-	RefTypes = span.StringMap{
+	RefTypes = container.StringMap{
 		"book":                "EBOOK",
 		"book-chapter":        "ECHAP",
 		"book-part":           "ECHAP",

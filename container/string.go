@@ -1,7 +1,19 @@
 // Package sets implements basic set types.
-package sets
+package container
 
-// String is map disguised as set.
+// StringMap provides defaults for string map lookups.
+type StringMap map[string]string
+
+// Lookup with default value.
+func (m StringMap) Lookup(key, def string) string {
+	val, ok := m[key]
+	if !ok {
+		return def
+	}
+	return val
+}
+
+// StringSet is map disguised as set.
 type StringSet struct {
 	set map[string]struct{}
 }
