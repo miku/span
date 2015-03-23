@@ -25,6 +25,7 @@ type SolrSchema struct {
 	Title                string   `json:"title,omitempty"`
 	TitleFull            string   `json:"title_full"`
 	TitleShort           string   `json:"title_short,omitempty"`
+	TitleSort            string   `json:"title_sort,omitempty"`
 	Topics               []string `json:"topic,omitempty"`
 	URL                  []string `json:"url,omitempty"`
 

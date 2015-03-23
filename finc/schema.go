@@ -310,6 +310,14 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 	return values
 }
 
+func (is *IntermediateSchema) SortableTitle() string {
+	return ""
+}
+
+func (is *IntermediateSchema) SortableAuthor() string {
+	return ""
+}
+
 // ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
 // Note that this method can and will include all kinds of source
 // specific alterations, which are not expressed in the intermediate format.
