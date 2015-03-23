@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -31,6 +32,8 @@ var (
 	errMovingWall      = errors.New("moving-wall violation")
 	errUnparsableValue = errors.New("value not parsable")
 )
+
+var NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
 
 var FormatSite = container.StringMap{
 	"eBook":                          "Book, E-Book",
@@ -310,12 +313,19 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 	return values
 }
 
+// SortableAuthor is loosely based on solrmarcs builtin getSortableTitle
 func (is *IntermediateSchema) SortableTitle() string {
-	return ""
+	return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.ArticleTitle, ""))
 }
 
+// SortableAuthor is loosely based on solrmarcs builtin getSortableAuthor
 func (is *IntermediateSchema) SortableAuthor() string {
-	return ""
+	var buf bytes.Buffer
+	for _, author := range is.Authors {
+		buf.WriteString(strings.ToLower(NonAlphaNumeric.ReplaceAllString(author.String(), "")))
+	}
+	buf.WriteString(is.SortableTitle())
+	return buf.String()
 }
 
 // ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
