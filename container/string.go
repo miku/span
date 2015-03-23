@@ -13,6 +13,18 @@ func (m StringMap) Lookup(key, def string) string {
 	return val
 }
 
+// StringMap provides defaults for string map lookups.
+type StringSliceMap map[string][]string
+
+// Lookup with default value.
+func (m StringSliceMap) Lookup(key string, def []string) []string {
+	val, ok := m[key]
+	if !ok {
+		return def
+	}
+	return val
+}
+
 // StringSet is map disguised as set.
 type StringSet struct {
 	set map[string]struct{}
