@@ -350,15 +350,26 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.Fulltext = is.Fulltext
 	output.HierarchyParentTitle = is.JournalTitle
 	output.ID = is.RecordID
-	output.ISSN = is.ISSNList()
 	output.Imprint = is.Imprint()
+	output.ISSN = is.ISSNList()
 	output.MegaCollections = append(output.MegaCollections, is.MegaCollection)
 	output.PublishDateSort = date.Year()
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
+	output.SortableAuthor = is.SortableAuthor()
+	output.SortableTitle = is.SortableTitle()
 	output.SourceID = is.SourceID
+	output.Subtitle = is.ArticleSubtitle
 	output.Topics = is.Subjects
 	output.URL = is.URL
+
+	classes := container.NewStringSet()
+	for _, s := range is.Subjects {
+		for _, class := range SubjectMapping.Lookup(s, []string{"no subject assigned"}) {
+			classes.Add(class)
+		}
+	}
+	output.FincClassFacet = classes.Values()
 
 	sanitized := sanitize.HTML(is.ArticleTitle)
 	output.Title = sanitized
@@ -379,6 +390,8 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	}
 
 	output.AccessFacet = AIAccessFacet
+	output.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
+
 	switch is.SourceID {
 	case "49":
 		output.Institutions = is.Institutions(iih)

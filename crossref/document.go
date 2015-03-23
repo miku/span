@@ -354,6 +354,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.JournalTitle = doc.ContainerTitle[0]
 	}
 
+	if len(doc.Subtitle) > 0 {
+		output.ArticleSubtitle = doc.Subtitle[0]
+	}
+
 	for _, author := range doc.Authors {
 		output.Authors = append(output.Authors, finc.Author{
 			FirstName: author.Given, LastName: author.Family})
