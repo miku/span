@@ -216,7 +216,7 @@ func (pi *PageInfo) PageCount() int {
 // to a safer alphabet. Since the base64 part is not meant to be decoded
 // we drop the padding. It is simple enough to recover the original value.
 func (doc *Document) RecordID() string {
-	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.URL)))
+	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.URLEncoding.EncodeToString([]byte(doc.URL)))
 	return strings.TrimRight(enc, "=")
 }
 
