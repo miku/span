@@ -16,8 +16,8 @@ const AppVersion = "0.1.21"
 // Batcher groups strings together for batched processing.
 // It is more effective to send one batch over a channel than many strings.
 type Batcher struct {
-	Items []string
-	Apply func(string) (Importer, error)
+	Items []interface{}
+	Apply func(interface{}) (Importer, error)
 }
 
 // Importer objects can be converted into an intermediate schema.

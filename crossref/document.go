@@ -99,15 +99,17 @@ type Crossref struct{}
 // NewBatch wraps up a new batch for channel com.
 func NewBatch(lines []string) span.Batcher {
 	batch := span.Batcher{
-		Apply: func(s string) (span.Importer, error) {
+		Apply: func(s interface{}) (span.Importer, error) {
 			doc := new(Document)
-			err := json.Unmarshal([]byte(s), doc)
+			err := json.Unmarshal([]byte(s.(string)), doc)
 			if err != nil {
 				return doc, err
 			}
 			return doc, nil
-		}, Items: make([]string, len(lines))}
-	copy(batch.Items, lines)
+		}, Items: make([]interface{}, len(lines))}
+	for i, line := range lines {
+		batch.Items[i] = line
+	}
 	return batch
 }
 

@@ -28,8 +28,8 @@ var formats = map[string]span.Source{
 	"jats":     jats.Jats{},
 }
 
-// worker iterates over batches
-func worker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
+// batcherWorker iterates over Batcher objects
+func batcherWorker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range queue {
 		for _, item := range batch.Items {
@@ -102,7 +102,7 @@ func main() {
 
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go worker(queue, out, &wg)
+		go batcherWorker(queue, out, &wg)
 	}
 
 	if *logfile != "" {

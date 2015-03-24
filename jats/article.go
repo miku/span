@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/kapsteur/franco"
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 	"golang.org/x/text/language"
@@ -27,6 +28,8 @@ const (
 
 	// Fixed format of this source.
 	Format = "ElectronicArticle"
+
+	BatchSize = 2000
 )
 
 var errNoDOI = errors.New("DOI is missing")
@@ -63,9 +66,23 @@ var (
 // Jats source.
 type Jats struct{}
 
+// NewBatch wraps up a new batch for channel com.
+func NewBatch(docs []Article) span.Batcher {
+	batch := span.Batcher{
+		Apply: func(s interface{}) (span.Importer, error) {
+			return s.(span.Importer), nil
+		}, Items: make([]interface{}, len(docs))}
+	for i, doc := range docs {
+		batch.Items[i] = doc
+	}
+	return batch
+}
+
 // Iterate emits Converter elements via XML decoding.
 func (s Jats) Iterate(r io.Reader) (<-chan interface{}, error) {
 	ch := make(chan interface{})
+	i := 0
+	var docs []Article
 	go func() {
 		decoder := xml.NewDecoder(bufio.NewReader(r))
 		for {
@@ -81,10 +98,17 @@ func (s Jats) Iterate(r io.Reader) (<-chan interface{}, error) {
 					if err != nil {
 						log.Fatal(err)
 					}
-					ch <- doc
+					i++
+					docs = append(docs, *doc)
+					if i == BatchSize {
+						ch <- NewBatch(docs)
+						docs = docs[:0]
+						i = 0
+					}
 				}
 			}
 		}
+		ch <- NewBatch(docs)
 		close(ch)
 	}()
 	return ch, nil
