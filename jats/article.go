@@ -67,7 +67,7 @@ var (
 type Jats struct{}
 
 // NewBatch wraps up a new batch for channel com.
-func NewBatch(docs []Article) span.Batcher {
+func NewBatch(docs []*Article) span.Batcher {
 	batch := span.Batcher{
 		Apply: func(s interface{}) (span.Importer, error) {
 			return s.(span.Importer), nil
@@ -82,7 +82,7 @@ func NewBatch(docs []Article) span.Batcher {
 func (s Jats) Iterate(r io.Reader) (<-chan interface{}, error) {
 	ch := make(chan interface{})
 	i := 0
-	var docs []Article
+	var docs []*Article
 	go func() {
 		decoder := xml.NewDecoder(bufio.NewReader(r))
 		for {
@@ -99,7 +99,7 @@ func (s Jats) Iterate(r io.Reader) (<-chan interface{}, error) {
 						log.Fatal(err)
 					}
 					i++
-					docs = append(docs, *doc)
+					docs = append(docs, doc)
 					if i == BatchSize {
 						ch <- NewBatch(docs)
 						docs = docs[:0]
