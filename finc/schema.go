@@ -356,7 +356,6 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.PublishDateSort = date.Year()
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
-	output.SortableAuthor = is.SortableAuthor()
 	output.SortableTitle = is.SortableTitle()
 	output.SourceID = is.SourceID
 	output.Subtitle = is.ArticleSubtitle
