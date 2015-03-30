@@ -91,6 +91,8 @@ var (
 		"report":              "RPRT",
 		"report-series":       "SER",
 	}
+	// AuthorReplacer is a special cleaner for author names.
+	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
 )
 
 // Crossref source.
@@ -148,6 +150,16 @@ func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
 type Author struct {
 	Family string `json:"family"`
 	Given  string `json:"given"`
+}
+
+// FamilyCleaned returns a mostly clean family name.
+func (author *Author) FamilyCleaned() string {
+	return AuthorReplacer.Replace(span.UnescapeTrim(author.Family))
+}
+
+// GivenCleaned returns a mostly clean family name.
+func (author *Author) GivenCleaned() string {
+	return AuthorReplacer.Replace(span.UnescapeTrim(author.Given))
 }
 
 // String pretty prints the author.
@@ -353,17 +365,17 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = doc.Volume
 
 	if len(doc.ContainerTitle) > 0 {
-		output.JournalTitle = doc.ContainerTitle[0]
+		output.JournalTitle = span.UnescapeTrim(doc.ContainerTitle[0])
 	}
 
 	if len(doc.Subtitle) > 0 {
-		output.ArticleSubtitle = doc.Subtitle[0]
+		output.ArticleSubtitle = span.UnescapeTrim(doc.Subtitle[0])
 	}
 
 	for _, author := range doc.Authors {
 		output.Authors = append(output.Authors, finc.Author{
-			FirstName: span.UnescapeTrim(author.Given),
-			LastName:  span.UnescapeTrim(author.Family)})
+			FirstName: author.GivenCleaned(),
+			LastName:  author.FamilyCleaned()})
 	}
 
 	pi := doc.PageInfo()

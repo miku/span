@@ -40,6 +40,7 @@ type Source interface {
 	Iterate(io.Reader) (<-chan interface{}, error)
 }
 
+// UnescapeTrim unescapes HTML character references and trims the space of a given string.
 func UnescapeTrim(s string) string {
 	return strings.TrimSpace(html.UnescapeString(s))
 }
