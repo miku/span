@@ -14,6 +14,7 @@ func TestAuthorString(t *testing.T) {
 		{a: Author{Given: "John", Family: "Doe"}, s: "Doe, John"},
 		{a: Author{Family: "Doe"}, s: "Doe"},
 		{a: Author{Given: "John"}, s: "John"},
+		{a: Author{Given: "&#122 &#x000FC;kr&#x000FC; Mercan"}, s: "z ükrü Mercan"},
 	}
 
 	for _, tt := range tests {

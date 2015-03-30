@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"log"
 	"strconv"
@@ -154,11 +155,11 @@ type Author struct {
 func (author *Author) String() string {
 	if author.Given != "" {
 		if author.Family != "" {
-			return fmt.Sprintf("%s, %s", author.Family, author.Given)
+			return html.UnescapeString(fmt.Sprintf("%s, %s", author.Family, author.Given))
 		}
-		return author.Given
+		return html.UnescapeString(author.Given)
 	}
-	return author.Family
+	return html.UnescapeString(author.Family)
 }
 
 // DatePart consists of up to three int, representing year, month, day.
@@ -276,25 +277,25 @@ func (d *DateField) Date() (t time.Time, err error) {
 func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
 		if len(doc.Subtitle) > 0 {
-			return fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0])
+			return html.UnescapeString(fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0]))
 		}
-		return doc.Title[0]
+		return html.UnescapeString(doc.Title[0])
 	}
 	if len(doc.Subtitle) > 0 {
-		return doc.Subtitle[0]
+		return html.UnescapeString(doc.Subtitle[0])
 	}
 	return ""
 }
 
 // FullTitle returns everything title.
 func (doc *Document) FullTitle() string {
-	return strings.Join(append(doc.Title, doc.Subtitle...), " ")
+	return html.UnescapeString(strings.Join(append(doc.Title, doc.Subtitle...), " "))
 }
 
 // ShortTitle returns the first main title only.
 func (doc *Document) ShortTitle() (s string) {
 	if len(doc.Title) > 0 {
-		s = doc.Title[0]
+		s = html.UnescapeString(doc.Title[0])
 	}
 	return
 }
