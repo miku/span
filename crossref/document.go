@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html"
 	"io"
 	"log"
 	"strconv"
@@ -155,11 +154,11 @@ type Author struct {
 func (author *Author) String() string {
 	if author.Given != "" {
 		if author.Family != "" {
-			return html.UnescapeString(fmt.Sprintf("%s, %s", author.Family, author.Given))
+			return span.UnescapeTrim(fmt.Sprintf("%s, %s", author.Family, author.Given))
 		}
-		return strings.TrimSpace(html.UnescapeString(author.Given))
+		return span.UnescapeTrim(author.Given)
 	}
-	return strings.TrimSpace(html.UnescapeString(author.Family))
+	return span.UnescapeTrim(author.Family)
 }
 
 // DatePart consists of up to three int, representing year, month, day.
@@ -277,25 +276,25 @@ func (d *DateField) Date() (t time.Time, err error) {
 func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
 		if len(doc.Subtitle) > 0 {
-			return strings.TrimSpace(html.UnescapeString(fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0])))
+			return span.UnescapeTrim(fmt.Sprintf("%s : %s", doc.Title[0], doc.Subtitle[0]))
 		}
-		return html.UnescapeString(doc.Title[0])
+		return span.UnescapeTrim(doc.Title[0])
 	}
 	if len(doc.Subtitle) > 0 {
-		return strings.TrimSpace(html.UnescapeString(doc.Subtitle[0]))
+		return span.UnescapeTrim(doc.Subtitle[0])
 	}
 	return ""
 }
 
 // FullTitle returns everything title.
 func (doc *Document) FullTitle() string {
-	return strings.TrimSpace(html.UnescapeString(strings.Join(append(doc.Title, doc.Subtitle...), " ")))
+	return span.UnescapeTrim(strings.Join(append(doc.Title, doc.Subtitle...), " "))
 }
 
 // ShortTitle returns the first main title only.
 func (doc *Document) ShortTitle() (s string) {
 	if len(doc.Title) > 0 {
-		s = strings.TrimSpace(html.UnescapeString(doc.Title[0]))
+		s = span.UnescapeTrim(doc.Title[0])
 	}
 	return
 }
@@ -363,8 +362,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	for _, author := range doc.Authors {
 		output.Authors = append(output.Authors, finc.Author{
-			FirstName: strings.TrimSpace(html.UnescapeString(author.Given)),
-			LastName:  strings.TrimSpace(html.UnescapeString(author.Family))})
+			FirstName: span.UnescapeTrim(author.Given),
+			LastName:  span.UnescapeTrim(author.Family)})
 	}
 
 	pi := doc.PageInfo()

@@ -3,6 +3,7 @@ package span
 import (
 	"bufio"
 	"fmt"
+	"html"
 	"io"
 	"strings"
 
@@ -37,6 +38,10 @@ type Exporter interface {
 // Channel will block on slow consumers and will not drop objects.
 type Source interface {
 	Iterate(io.Reader) (<-chan interface{}, error)
+}
+
+func UnescapeTrim(s string) string {
+	return strings.TrimSpace(html.UnescapeString(s))
 }
 
 // ByteSink is a fan in writer for a byte channel.
