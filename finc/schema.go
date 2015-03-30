@@ -364,7 +364,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 
 	classes := container.NewStringSet()
 	for _, s := range is.Subjects {
-		for _, class := range SubjectMapping.Lookup(s, []string{"no subject assigned"}) {
+		for _, class := range SubjectMapping.Lookup(s, []string{}) {
 			classes.Add(class)
 		}
 	}
