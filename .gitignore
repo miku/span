@@ -27,6 +27,7 @@ _testmain.go
 /crparse
 /span-*
 /fixtures
+/tmp
 
 span_*.deb
 span-*.rpm
