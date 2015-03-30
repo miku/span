@@ -363,7 +363,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	for _, author := range doc.Authors {
 		output.Authors = append(output.Authors, finc.Author{
-			FirstName: author.Given, LastName: author.Family})
+			FirstName: html.UnescapeString(author.Given),
+			LastName:  html.UnescapeString(author.Family)})
 	}
 
 	pi := doc.PageInfo()
