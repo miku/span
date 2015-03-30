@@ -43,11 +43,11 @@ type Source interface {
 // A newline is appended after each object.
 func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	f := bufio.NewWriter(w)
-	defer f.Flush()
 	for b := range out {
 		f.Write(b[:])
 		f.Write([]byte("\n"))
 	}
+	f.Flush()
 	done <- true
 }
 
