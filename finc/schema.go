@@ -348,7 +348,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.Formats = append(output.Formats, is.Format)
 	output.Fullrecord = "blob:" + is.RecordID
 	output.Fulltext = is.Fulltext
-	output.HierarchyParentTitle = is.JournalTitle
+	output.HierarchyParentTitle = append(output.HierarchyParentTitle, is.JournalTitle)
 	output.ID = is.RecordID
 	output.Imprint = is.Imprint()
 	output.ISSN = is.ISSNList()
