@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/kapsteur/franco"
@@ -257,12 +258,12 @@ func (article *Article) CombinedTitle() string {
 	group := article.Front.Article.TitleGroup
 	if group.Title.Value != "" {
 		if group.Subtitle.Value != "" {
-			return fmt.Sprintf("%s : %s", group.Title.Value, group.Subtitle.Value)
+			return strings.TrimSpace(fmt.Sprintf("%s : %s", group.Title.Value, group.Subtitle.Value))
 		}
-		return group.Title.Value
+		return strings.TrimSpace(group.Title.Value)
 	}
 	if group.Subtitle.Value != "" {
-		return group.Subtitle.Value
+		return strings.TrimSpace(group.Subtitle.Value)
 	}
 	return ""
 }
