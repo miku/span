@@ -110,5 +110,13 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.MegaCollection = SourceName
 	output.SourceID = SourceID
 
+	var normalized []string
+	for _, issn := range output.ISSN {
+		if len(issn) == 8 && !strings.Contains(issn, "-") {
+			normalized = append(normalized, fmt.Sprintf("%s-%s", issn[:4], issn[4:]))
+		}
+	}
+	output.ISSN = normalized
+
 	return output, nil
 }
