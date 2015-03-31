@@ -1,38 +1,22 @@
 package jats
 
 import (
-	"bufio"
-	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io"
-	"log"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/kapsteur/franco"
-	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 	"golang.org/x/text/language"
 )
 
-const (
-	// SourceID for internal bookkeeping.
-	SourceID = "50"
-
-	// Source name for finc.MegaCollection.
-	SourceName = "DeGruyter SSH"
-
-	// Fixed format of this source.
-	Format = "ElectronicArticle"
-
-	BatchSize = 2000
+var (
+	errNoDOI          = errors.New("DOI is missing")
+	errNotImplemented = errors.New("not implemented")
 )
-
-var errNoDOI = errors.New("DOI is missing")
 
 var (
 	// Restricts the possible languages for detection.
@@ -62,57 +46,6 @@ var (
 		"2006-xx-xx",
 	}
 )
-
-// Jats source.
-type Jats struct{}
-
-// NewBatch wraps up a new batch for channel com.
-func NewBatch(docs []*Article) span.Batcher {
-	batch := span.Batcher{
-		Apply: func(s interface{}) (span.Importer, error) {
-			return s.(span.Importer), nil
-		}, Items: make([]interface{}, len(docs))}
-	for i, doc := range docs {
-		batch.Items[i] = doc
-	}
-	return batch
-}
-
-// Iterate emits Converter elements via XML decoding.
-func (s Jats) Iterate(r io.Reader) (<-chan interface{}, error) {
-	ch := make(chan interface{})
-	i := 0
-	var docs []*Article
-	go func() {
-		decoder := xml.NewDecoder(bufio.NewReader(r))
-		for {
-			t, _ := decoder.Token()
-			if t == nil {
-				break
-			}
-			switch se := t.(type) {
-			case xml.StartElement:
-				if se.Name.Local == "article" {
-					doc := new(Article)
-					err := decoder.DecodeElement(&doc, &se)
-					if err != nil {
-						log.Fatal(err)
-					}
-					i++
-					docs = append(docs, doc)
-					if i == BatchSize {
-						ch <- NewBatch(docs)
-						docs = docs[:0]
-						i = 0
-					}
-				}
-			}
-		}
-		ch <- NewBatch(docs)
-		close(ch)
-	}()
-	return ch, nil
-}
 
 // PubDate represents a publication date. Typical type values are ppub and epub.
 type PubDate struct {
@@ -263,6 +196,10 @@ type Article struct {
 					Value   string   `xml:",chardata"`
 				}
 			}
+			SelfURI struct {
+				XMLName xml.Name `xml:"self-uri"`
+				Value   string   `xml:"href,attr"`
+			}
 		}
 	}
 	Body struct {
@@ -287,25 +224,16 @@ func (article *Article) DOI() (s string, err error) {
 }
 
 // identifiers is a helper struct.
-type identifiers struct {
-	doi      string
-	url      string
-	recordID string
+type Identifiers struct {
+	DOI      string
+	URL      string
+	RecordID string
 }
 
 // identifiers returns the doi and the dependent url and recordID in a struct.
 // It is an error, if there is no DOI.
-func (article *Article) identifiers() (identifiers, error) {
-	var ids identifiers
-	doi, err := article.DOI()
-	if err != nil {
-		return ids, err
-	}
-	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
-	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.URLEncoding.EncodeToString([]byte(locator)))
-	recordID := strings.TrimRight(enc, "=")
-	ids = identifiers{doi: doi, url: locator, recordID: recordID}
-	return ids, nil
+func (article *Article) Identifiers() (Identifiers, error) {
+	return Identifiers{}, errNotImplemented
 }
 
 // Authors returns the authors as slice.
@@ -470,21 +398,12 @@ func (article *Article) Languages() []string {
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	ids, err := article.identifiers()
-	if err != nil {
-		return output, err
-	}
-	output.DOI = ids.doi
-	output.RecordID = ids.recordID
-	output.URL = append(output.URL, ids.url)
-
 	date := article.Date()
 	output.RawDate = date.Format("2006-01-02")
 
 	output.Abstract = string(article.Front.Article.Abstract.Value)
 	output.ArticleTitle = article.CombinedTitle()
 	output.Authors = article.Authors()
-	output.Format = Format
 	output.Fulltext = article.Body.Section.Value
 	output.Genre = "article"
 	output.RefType = "JOUR"
@@ -499,9 +418,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	}
 
 	output.Languages = article.Languages()
-	output.MegaCollection = SourceName
 	output.Publishers = append(output.Publishers, article.Front.Journal.Publisher.Name.Value)
-	output.SourceID = SourceID
 	output.Subjects = article.Subjects()
 	output.Volume = article.Front.Article.Volume.Value
 
