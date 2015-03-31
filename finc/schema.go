@@ -357,6 +357,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
 	output.SortableTitle = is.SortableTitle()
+	output.Series = append(output.Series, is.JournalTitle)
 	output.SourceID = is.SourceID
 	output.Subtitle = is.ArticleSubtitle
 	output.Topics = is.Subjects

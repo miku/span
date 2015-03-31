@@ -20,6 +20,7 @@ type SolrSchema struct {
 	PublishDateSort      int      `json:"publishDateSort,omitempty"`
 	Publishers           []string `json:"publisher,omitempty"`
 	RecordType           string   `json:"recordtype,omitempty"`
+	Series               []string `json:"series,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	SourceID             string   `json:"source_id,omitempty"`
 	SortableTitle        string   `json:"title_sort,omitempty"`
