@@ -4,7 +4,6 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -17,8 +16,6 @@ import (
 	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
 )
-
-var errInputFileRequired = errors.New("input file required")
 
 // Options for worker.
 type options struct {
@@ -64,10 +61,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	if flag.NArg() < 1 {
-		log.Fatal(errInputFileRequired)
-	}
-
 	opts := options{
 		Holdings: make(holdings.IsilIssnHolding),
 	}
@@ -102,14 +95,25 @@ func main() {
 	var batch []string
 	var i int
 
-	for _, filename := range flag.Args() {
-		file, err := os.Open(filename)
-		if err != nil {
-			log.Fatal(err)
+	var readers []io.Reader
+
+	if flag.NArg() == 0 {
+		readers = append(readers, os.Stdin)
+	} else {
+		for _, filename := range flag.Args() {
+			file, err := os.Open(filename)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+			readers = append(readers, file)
 		}
-		reader := bufio.NewReader(file)
+	}
+
+	for _, r := range readers {
+		br := bufio.NewReader(r)
 		for {
-			line, err := reader.ReadString('\n')
+			line, err := br.ReadString('\n')
 			if err == io.EOF {
 				break
 			}
