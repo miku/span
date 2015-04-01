@@ -134,6 +134,17 @@ type Article struct {
 							Value   string   `xml:",chardata"`
 						}
 					}
+					StringName struct {
+						XMLName xml.Name `xml:"string-name"`
+						Surname struct {
+							XMLName xml.Name `xml:"surname"`
+							Value   string   `xml:",chardata"`
+						}
+						GivenNames struct {
+							XMLName xml.Name `xml:"given-names"`
+							Value   string   `xml:",chardata"`
+						}
+					}
 				} `xml:"contrib"`
 			}
 			Categories struct {

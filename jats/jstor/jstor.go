@@ -91,6 +91,18 @@ func (article *Article) Identifiers() (jats.Identifiers, error) {
 	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
 }
 
+// Authors returns the authors as slice.
+func (article *Article) Authors() []finc.Author {
+	var authors []finc.Author
+	group := article.Front.Article.ContribGroup
+	for _, contrib := range group.Contrib {
+		authors = append(authors, finc.Author{
+			LastName:  contrib.StringName.Surname.Value,
+			FirstName: contrib.StringName.GivenNames.Value})
+	}
+	return authors
+}
+
 // ToInternalSchema converts an article into an internal schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
@@ -106,6 +118,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.RecordID = ids.RecordID
 	output.URL = append(output.URL, ids.URL)
 
+	output.Authors = article.Authors()
 	output.Format = Format
 	output.MegaCollection = SourceName
 	output.SourceID = SourceID
