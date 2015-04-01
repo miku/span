@@ -10,8 +10,10 @@ import (
 	"strings"
 
 	"github.com/miku/span"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/jats"
+	"golang.org/x/text/language"
 )
 
 const (
@@ -106,6 +108,19 @@ func (article *Article) Authors() []finc.Author {
 	return authors
 }
 
+func (article *Article) Languages() []string {
+	set := container.NewStringSet()
+	for _, cm := range article.Front.Article.CustomMetaGroup.CustomMeta {
+		if cm.Name.Value == "lang" {
+			base, err := language.ParseBase(cm.Value.Value)
+			if err == nil {
+				set.Add(base.ISO3())
+			}
+		}
+	}
+	return set.Values()
+}
+
 // ToInternalSchema converts an article into an internal schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
@@ -123,6 +138,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 
 	output.Authors = article.Authors()
 	output.Format = Format
+	output.Languages = article.Languages()
 	output.MegaCollection = SourceName
 	output.SourceID = SourceID
 
