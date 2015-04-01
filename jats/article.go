@@ -223,11 +223,11 @@ type Article struct {
 				XMLName    xml.Name `xml:"custom-meta-group"`
 				CustomMeta []struct {
 					Name struct {
-						XMLName xml.Name `xml:"name"`
+						XMLName xml.Name `xml:"meta-name"`
 						Value   string   `xml:",chardata"`
 					}
 					Value struct {
-						XMLName xml.Name `xml:"value"`
+						XMLName xml.Name `xml:"meta-value"`
 						Value   string   `xml:",chardata"`
 					}
 				} `xml:"custom-meta"`
