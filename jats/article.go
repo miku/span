@@ -219,6 +219,19 @@ type Article struct {
 				XMLName xml.Name `xml:"self-uri"`
 				Value   string   `xml:"href,attr"`
 			}
+			CustomMetaGroup struct {
+				XMLName    xml.Name `xml:"custom-meta-group"`
+				CustomMeta []struct {
+					Name struct {
+						XMLName xml.Name `xml:"name"`
+						Value   string   `xml:",chardata"`
+					}
+					Value struct {
+						XMLName xml.Name `xml:"value"`
+						Value   string   `xml:",chardata"`
+					}
+				} `xml:"custom-meta"`
+			}
 		}
 	}
 	Body struct {
