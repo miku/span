@@ -144,6 +144,14 @@ type Article struct {
 							XMLName xml.Name `xml:"given-names"`
 							Value   string   `xml:",chardata"`
 						}
+						X struct {
+							XMLName xml.Name `xml:"x"`
+							Value   string   `xml:",chardata"`
+						}
+						Suffix struct {
+							XMLName xml.Name `xml:"suffix"`
+							Value   string   `xml:",chardata"`
+						}
 					}
 				} `xml:"contrib"`
 			}
