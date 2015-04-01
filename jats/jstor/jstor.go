@@ -96,6 +96,9 @@ func (article *Article) Authors() []finc.Author {
 	var authors []finc.Author
 	group := article.Front.Article.ContribGroup
 	for _, contrib := range group.Contrib {
+		if contrib.Type != "author" {
+			continue
+		}
 		authors = append(authors, finc.Author{
 			LastName:  contrib.StringName.Surname.Value,
 			FirstName: contrib.StringName.GivenNames.Value})
