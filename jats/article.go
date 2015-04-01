@@ -212,9 +212,8 @@ type Article struct {
 					Value   string   `xml:",chardata"`
 				}
 				Keywords []struct {
-					XMLName xml.Name `xml:"kwd"`
-					Value   string   `xml:",chardata"`
-				}
+					Value string `xml:",chardata"`
+				} `xml:"kwd"`
 			}
 			SelfURI struct {
 				XMLName xml.Name `xml:"self-uri"`
