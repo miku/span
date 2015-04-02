@@ -18,6 +18,7 @@ Formats
 
 * [CrossRef API](http://api.crossref.org/), works and members
 * JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html)
+* [DOAJ](http://doaj.org/) exports
 * [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
 * [Google holdings](http://scholar.google.com/intl/en/scholar/libraries.html)
 * FINC [Intermediate Format](https://github.com/miku/span/blob/master/schema/README.md)
