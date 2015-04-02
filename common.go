@@ -12,7 +12,7 @@ import (
 )
 
 // AppVersion of span package. Commandline tools will show this on -v.
-const AppVersion = "0.1.28"
+const AppVersion = "0.1.29"
 
 // Batcher groups strings together for batched processing.
 // It is more effective to send one batch over a channel than many strings.
