@@ -13,6 +13,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/crossref"
+	"github.com/miku/span/doaj"
 	"github.com/miku/span/jats/degruyter"
 	"github.com/miku/span/jats/jstor"
 )
@@ -28,6 +29,7 @@ var formats = map[string]span.Source{
 	"crossref":  crossref.Crossref{},
 	"degruyter": degruyter.DeGruyter{},
 	"jstor":     jstor.Jstor{},
+	"doaj":      doaj.DOAJ{},
 }
 
 // batcherWorker iterates over Batcher objects

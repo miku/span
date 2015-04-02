@@ -101,12 +101,12 @@ type DOAJ struct{}
 func NewBatch(lines []string) span.Batcher {
 	batch := span.Batcher{
 		Apply: func(s interface{}) (span.Importer, error) {
-			doc := new(Document)
-			err := json.Unmarshal([]byte(s.(string)), doc)
+			resp := new(Response)
+			err := json.Unmarshal([]byte(s.(string)), resp)
 			if err != nil {
-				return doc, err
+				return resp.Source, err
 			}
-			return doc, nil
+			return resp.Source, nil
 		}, Items: make([]interface{}, len(lines))}
 	for i, line := range lines {
 		batch.Items[i] = line
