@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/miku/span"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
 
@@ -142,13 +143,17 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan interface{}, error) {
 	return ch, nil
 }
 
-func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	output.ISSN = doc.Index.ISSN
-	// TODO(miku): language code lookups
-	output.Languages = doc.Index.Language
 	output.ArticleTitle = doc.BibJson.Title
+
+	languages := container.NewStringSet()
+	for _, l := range doc.Index.Language {
+		languages.Add(LanguageMap.Lookup(l, "und"))
+	}
+	output.Languages = languages.Values()
 
 	return output, nil
 }
