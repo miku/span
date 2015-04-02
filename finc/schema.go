@@ -393,10 +393,10 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
 
 	switch is.SourceID {
-	case "49":
-		output.Institutions = is.Institutions(iih)
 	case "50":
 		output.Institutions = []string{"DE-15"}
+	default:
+		output.Institutions = is.Institutions(iih)
 	}
 	return output, nil
 }
