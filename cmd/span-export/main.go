@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/miku/span"
@@ -48,6 +49,7 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 func main() {
 
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
+	fspec := flag.String("fspec", "", "ISIL ISSN-file pairs")
 	showVersion := flag.Bool("v", false, "prints current program version")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
@@ -77,6 +79,40 @@ func main() {
 			}
 			defer file.Close()
 			opts.Holdings[isil] = holdings.HoldingsMap(bufio.NewReader(file))
+		}
+	}
+
+	if *fspec != "" {
+		pathmap, err := span.ParseHoldingSpec(*fspec)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for isil, path := range pathmap {
+			file, err := os.Open(path)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+			br := bufio.NewReader(file)
+			for {
+				line, err := br.ReadString('\n')
+				if err == io.EOF {
+					break
+				}
+				if err != nil {
+					log.Fatal(err)
+				}
+				issn := strings.TrimSpace(line)
+				if _, ok := opts.Holdings[isil]; !ok {
+					opts.Holdings[isil] = make(holdings.IssnHolding)
+				}
+				if _, ok := opts.Holdings[isil][issn]; !ok {
+					opts.Holdings[isil][issn] = holdings.Holding{EISSN: []string{issn}, PISSN: []string{issn}}
+				}
+				h := opts.Holdings[isil][issn]
+				h.Entitlements = append(h.Entitlements, holdings.Entitlement{})
+				opts.Holdings[isil][issn] = h
+			}
 		}
 	}
 
