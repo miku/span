@@ -18,7 +18,7 @@ import (
 
 const (
 	// SourceID for internal bookkeeping.
-	SourceID = "52"
+	SourceID = "55"
 	// SourceName for finc.mega_collection.
 	SourceName = "JSTOR"
 	// Format for intermediate schema.
