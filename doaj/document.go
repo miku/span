@@ -4,8 +4,10 @@ package doaj
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
+	"strconv"
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
@@ -143,17 +145,53 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan interface{}, error) {
 	return ch, nil
 }
 
+func (doc Document) Date() (s string) {
+	if doc.BibJson.Year != "" {
+		if doc.BibJson.Month != "" {
+			return fmt.Sprintf("%s-%s-01", doc.BibJson.Year, doc.BibJson.Month)
+		}
+		return fmt.Sprintf("%s-01-01", doc.BibJson.Year)
+	}
+	return ""
+}
+
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	output.ISSN = doc.Index.ISSN
 	output.ArticleTitle = doc.BibJson.Title
+	output.JournalTitle = doc.BibJson.Journal.Title
+	output.Volume = doc.BibJson.Journal.Volume
+	output.Publishers = append(output.Publishers, doc.BibJson.Journal.Publisher)
+	output.RawDate = doc.Date()
+
+	for _, link := range doc.BibJson.Link {
+		output.URL = append(output.URL, link.URL)
+	}
+
+	output.StartPage = doc.BibJson.StartPage
+	output.EndPage = doc.BibJson.EndPage
+
+	if sp, err := strconv.Atoi(doc.BibJson.StartPage); err == nil {
+		if ep, err := strconv.Atoi(doc.BibJson.EndPage); err == nil {
+			output.PageCount = fmt.Sprintf("%d", ep-sp)
+			output.Pages = fmt.Sprintf("%d-%d", sp, ep)
+		}
+	}
+
+	for _, s := range doc.BibJson.Subject {
+		output.Subjects = append(output.Subjects, s.Term)
+	}
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Index.Language {
 		languages.Add(LanguageMap.Lookup(l, "und"))
 	}
 	output.Languages = languages.Values()
+
+	for _, author := range doc.BibJson.Author {
+		output.Authors = append(output.Authors, finc.Author{Name: author.Name})
+	}
 
 	return output, nil
 }
