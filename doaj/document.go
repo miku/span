@@ -160,7 +160,7 @@ func (doc Document) Date() (s string) {
 	}
 	if doc.BibJson.Year != "" {
 		if doc.BibJson.Month != "" {
-			return fmt.Sprintf("%s-%s-01", doc.BibJson.Year, doc.BibJson.Month)
+			return fmt.Sprintf("%04s-%02s-01", doc.BibJson.Year, doc.BibJson.Month)
 		}
 		return fmt.Sprintf("%s-01-01", doc.BibJson.Year)
 	}
