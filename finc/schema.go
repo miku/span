@@ -63,6 +63,9 @@ type Author struct {
 // String returns a formatted author string.
 // TODO(miku): make this complete.
 func (author *Author) String() string {
+	if author.Name != "" {
+		return author.Name
+	}
 	if author.LastName != "" {
 		if author.FirstName != "" {
 			return fmt.Sprintf("%s, %s", author.LastName, author.FirstName)
