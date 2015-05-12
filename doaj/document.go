@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
@@ -150,6 +151,13 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan interface{}, error) {
 }
 
 func (doc Document) Date() (s string) {
+	if doc.Index.Date != "" {
+		layout := "2006-01-02T15:04:05Z"
+		t, err := time.Parse(layout, doc.Index.Date)
+		if err != nil {
+			return t.Format("2006-01-02")
+		}
+	}
 	if doc.BibJson.Year != "" {
 		if doc.BibJson.Month != "" {
 			return fmt.Sprintf("%s-%s-01", doc.BibJson.Year, doc.BibJson.Month)
