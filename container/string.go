@@ -1,6 +1,8 @@
 // Package sets implements basic set types.
 package container
 
+import "sort"
+
 // StringMap provides defaults for string map lookups.
 type StringMap map[string]string
 
@@ -70,5 +72,14 @@ func (set *StringSet) Values() (values []string) {
 	for k := range set.set {
 		values = append(values, k)
 	}
+	return values
+}
+
+// Values returns the set values as a string slice.
+func (set *StringSet) SortedValues() (values []string) {
+	for k := range set.set {
+		values = append(values, k)
+	}
+	sort.Strings(values)
 	return values
 }
