@@ -158,6 +158,11 @@ func (doc Document) Date() (s string) {
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
+	output.SourceID = SourceID
+	output.RecordID = doc.ID
+	output.MegaCollection = "DOAJ"
+	output.Format = "ElectronicArticle"
+
 	output.ISSN = doc.Index.ISSN
 	output.ArticleTitle = doc.BibJson.Title
 	output.JournalTitle = doc.BibJson.Journal.Title
@@ -179,9 +184,11 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
+	subjects := container.NewStringSet()
 	for _, s := range doc.BibJson.Subject {
-		output.Subjects = append(output.Subjects, s.Term)
+		subjects.Add(s.Term)
 	}
+	output.Subjects = subjects.SortedValues()
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Index.Language {
