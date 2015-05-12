@@ -19,6 +19,10 @@ const (
 	SourceID = "28"
 	// BatchSize for grouped channel transport.
 	BatchSize = 25000
+	// Collection name
+	Collection = "DOAJ Directory of Open Access Journals"
+	// Format for all records
+	Format = "ElectronicArticle"
 )
 
 type Response struct {
@@ -160,8 +164,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.SourceID = SourceID
 	output.RecordID = doc.ID
-	output.MegaCollection = "DOAJ"
-	output.Format = "ElectronicArticle"
+	output.MegaCollection = Collection
+	output.Format = Format
 
 	output.ISSN = doc.Index.ISSN
 	output.ArticleTitle = doc.BibJson.Title
