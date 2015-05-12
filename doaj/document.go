@@ -196,11 +196,11 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
-	subjects := container.NewStringSet()
-	for _, s := range doc.BibJson.Subject {
-		subjects.Add(s.Term)
+	codes := container.NewStringSet()
+	for _, s := range doc.Index.SchemaCode {
+		codes.Add(s)
 	}
-	output.Subjects = subjects.SortedValues()
+	output.Subjects = codes.SortedValues()
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Index.Language {
