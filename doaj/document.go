@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/miku/span"
@@ -158,13 +159,16 @@ func (doc Document) Date() (s string) {
 			return t.Format("2006-01-02")
 		}
 	}
-	if doc.BibJson.Year != "" {
-		if doc.BibJson.Month != "" {
+	if IsYear(doc.BibJson.Year) {
+		if IsMonth(doc.BibJson.Month) {
 			return fmt.Sprintf("%04s-%02s-01", doc.BibJson.Year, doc.BibJson.Month)
 		}
 		return fmt.Sprintf("%s-01-01", doc.BibJson.Year)
 	}
-	return ""
+	// TODO(miku): resolve missing date records
+	// records w/o date seem to represent journal homepages and the like
+	// should be skipable in general
+	return "1970-01-01"
 }
 
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
@@ -196,11 +200,18 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
-	codes := container.NewStringSet()
+	subjects := container.NewStringSet()
 	for _, s := range doc.Index.SchemaCode {
-		codes.Add(s)
+		class := finc.LCCToFincClass(strings.Replace(s, "LCC:", "", -1))
+		if class != finc.NOT_ASSIGNED {
+			subjects.Add(class)
+		}
 	}
-	output.Subjects = codes.SortedValues()
+	if subjects.Size() == 0 {
+		output.Subjects = []string{finc.NOT_ASSIGNED}
+	} else {
+		output.Subjects = subjects.SortedValues()
+	}
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Index.Language {
