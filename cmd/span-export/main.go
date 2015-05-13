@@ -46,10 +46,14 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 	}
 }
 
+// TODO(miku): support various ISIL attachments;
+// via holdings files, ISIL-ISSN lists, or attach all via '*'
+// Maybe: span-export -hspec DE-1:path/to/holdings -fspec DE-2:path/to/issnlist -all 'DE-3, DE-4'
 func main() {
 
 	hspec := flag.String("hspec", "", "ISIL PATH pairs")
 	fspec := flag.String("fspec", "", "ISIL ISSN-file pairs")
+	// all := flag.String("all", "", "ISIL or list of ISILs added to each record")
 	showVersion := flag.Bool("v", false, "prints current program version")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
