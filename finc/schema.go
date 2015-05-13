@@ -83,7 +83,7 @@ func (author *Author) String() string {
 //
 // Notes on the format:
 // - The x namespace is experimental.
-// - RawDate must be in ISO8601 format.
+// - RawDate must be in ISO8601 (YYYY-MM-DD) format.
 // - Version is mandatory.
 // - Headings and Subjects are not bound to any format yet.
 // - Use plural for slices, if possible.
