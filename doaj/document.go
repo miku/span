@@ -163,7 +163,7 @@ func (doc Document) Date() (s string) {
 		if IsMonth(doc.BibJson.Month) {
 			return fmt.Sprintf("%04s-%02s-01", doc.BibJson.Year, doc.BibJson.Month)
 		}
-		return fmt.Sprintf("%s-01-01", doc.BibJson.Year)
+		return fmt.Sprintf("%04s-01-01", doc.BibJson.Year)
 	}
 	// TODO(miku): resolve missing date records
 	// records w/o date seem to represent journal homepages and the like
