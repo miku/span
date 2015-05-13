@@ -226,10 +226,10 @@ func (is *IntermediateSchema) Imprint() (s string) {
 	return
 }
 
-// CoveredBy returns nil, if a given entitlement covers the current document.
+// CoveredByEntitlement returns nil, if a given entitlement covers the current document.
 // If the given entitlement does not cover the document, the error returned
 // will contain a reason.
-func (is *IntermediateSchema) CoveredBy(e holdings.Entitlement) error {
+func (is *IntermediateSchema) CoveredByEntitlement(e holdings.Entitlement) error {
 	date, err := is.Date()
 	if err != nil {
 		return err
@@ -303,7 +303,7 @@ func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []strin
 				continue
 			}
 			for _, entitlement := range h.Entitlements {
-				err := is.CoveredBy(entitlement)
+				err := is.CoveredByEntitlement(entitlement)
 				if err != nil {
 					continue
 				}
