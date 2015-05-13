@@ -78,21 +78,13 @@ var DDCFincMap = map[string]string{
 	"^04[0-9].*":                      NOT_ASSIGNED,
 }
 
-func LCCToFincClass(s string) string {
-	for pattern, class := range LCCFincMap {
-		rx := regexp.MustCompile(pattern)
+// RegexpResolve takes a string and a map with regular expressions
+// and returns the value of the map, where the key regexp matches.
+func RegexpResolve(s string, m map[string]string) string {
+	for p, c := range m {
+		rx := regexp.MustCompile(p)
 		if rx.MatchString(s) {
-			return class
-		}
-	}
-	return NOT_ASSIGNED
-}
-
-func DDCToFincClass(s string) string {
-	for pattern, class := range DDCFincMap {
-		rx := regexp.MustCompile(pattern)
-		if rx.MatchString(s) {
-			return class
+			return c
 		}
 	}
 	return NOT_ASSIGNED

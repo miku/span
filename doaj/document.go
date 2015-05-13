@@ -202,7 +202,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	subjects := container.NewStringSet()
 	for _, s := range doc.Index.SchemaCode {
-		class := finc.LCCToFincClass(strings.Replace(s, "LCC:", "", -1))
+		class := finc.RegexpResolve(strings.Replace(s, "LCC:", "", -1), finc.LCCFincMap)
 		if class != finc.NOT_ASSIGNED {
 			subjects.Add(class)
 		}
