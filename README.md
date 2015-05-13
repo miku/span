@@ -75,7 +75,9 @@ List available formats:
 
     $ span-import -l
     crossref
-    jats
+    degruyter
+    jstor
+    doaj
 
 Import crossref LDJ (with cached members API responses) or DeGruyter XML (preprocessed into a single file):
 
@@ -102,10 +104,8 @@ It can be indexed quickly with [solrbulk](https://github.com/miku/solrbulk):
 TODO
 ----
 
-Make the above one-liners:
-
-    $ span-import -i jats degruyter.ldj | memcldj
-    $ span-import -i jats degruyter.ldj | span-export | solrbulk
+* clearer holdings file handling
+* support for files or URLs as lookup tables (e.g. classification, languages, ...)
 
 Adding new sources
 ------------------
