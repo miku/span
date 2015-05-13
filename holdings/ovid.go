@@ -54,9 +54,11 @@ type Entitlement struct {
 }
 
 // IssnHolding maps an ISSN to a holdings.Holding struct.
+// ISSN -> Holding -> []Entitlements
 type IssnHolding map[string]Holding
 
 // IsilIssnHolding maps an ISIL to an IssnHolding map.
+// ISIL -> ISSN -> Holding -> []Entitlements
 type IsilIssnHolding map[string]IssnHolding
 
 // Isils returns available ISILs in this IsilIssnHolding map.
