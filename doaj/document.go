@@ -159,11 +159,15 @@ func (doc Document) Date() (s string) {
 			return t.Format("2006-01-02")
 		}
 	}
-	if IsYear(doc.BibJson.Year) {
-		if IsMonth(doc.BibJson.Month) {
-			return fmt.Sprintf("%04s-%02s-01", doc.BibJson.Year, doc.BibJson.Month)
+	if year, err := strconv.Atoi(doc.BibJson.Year); err == nil {
+		if month, err := strconv.Atoi(doc.BibJson.Month); err == nil {
+			if month > 0 && month < 13 {
+				return fmt.Sprintf("%04d-%02d-01", year, month)
+			} else {
+				return fmt.Sprintf("%04d-01-01", year)
+			}
 		}
-		return fmt.Sprintf("%04s-01-01", doc.BibJson.Year)
+		return fmt.Sprintf("%04d-01-01", year)
 	}
 	// TODO(miku): resolve missing date records
 	// records w/o date seem to represent journal homepages and the like
