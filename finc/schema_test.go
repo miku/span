@@ -22,7 +22,7 @@ func TestDate(t *testing.T) {
 	}
 }
 
-func TestCoveredBy(t *testing.T) {
+func TestCoveredByEntitlement(t *testing.T) {
 	var tests = []struct {
 		doc IntermediateSchema
 		e   holdings.Entitlement
@@ -85,7 +85,7 @@ func TestCoveredBy(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		err := tt.doc.CoveredBy(tt.e)
+		err := tt.doc.CoveredByEntitlement(tt.e)
 		if err != tt.err {
 			if err != nil && tt.err != nil {
 				if err.Error() != tt.err.Error() {
@@ -101,7 +101,7 @@ func TestCoveredBy(t *testing.T) {
 func TestCoveredByError(t *testing.T) {
 	is := NewIntermediateSchema()
 	e := holdings.Entitlement{}
-	err := is.CoveredBy(e)
+	err := is.CoveredByEntitlement(e)
 	if err == nil {
 		t.Errorf("no error but expected")
 	}
