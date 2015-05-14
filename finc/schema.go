@@ -396,6 +396,7 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.AccessFacet = AIAccessFacet
 	output.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
 
+	// TODO(miku): externalize this
 	switch is.SourceID {
 	case "50":
 		output.Institutions = []string{"DE-15"}
