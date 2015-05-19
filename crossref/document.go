@@ -164,13 +164,14 @@ func (author *Author) GivenCleaned() string {
 
 // String pretty prints the author.
 func (author *Author) String() string {
-	if author.Given != "" {
-		if author.Family != "" {
-			return AuthorReplacer.Replace(span.UnescapeTrim(fmt.Sprintf("%s, %s", author.Family, author.Given)))
+	var given, family = author.GivenCleaned(), author.FamilyCleaned()
+	if given != "" {
+		if family != "" {
+			return fmt.Sprintf("%s, %s", family, given)
 		}
-		return AuthorReplacer.Replace(span.UnescapeTrim(author.Given))
+		return given
 	}
-	return AuthorReplacer.Replace(span.UnescapeTrim(author.Family))
+	return family
 }
 
 // DatePart consists of up to three int, representing year, month, day.
