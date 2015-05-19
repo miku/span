@@ -3,6 +3,7 @@ package holdings
 import (
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
@@ -52,6 +53,40 @@ type Entitlement struct {
 	ToIssue    string `xml:"end>issue" json:"to-issue"`
 	ToDelay    string `xml:"end>delay" json:"to-delay"`
 }
+
+// slimmer processing ----
+
+const (
+	// LowDatum represents a lowest datum for unspecified start dates
+	LowDatum = "0000000000000000"
+	// HighDatum represents a lowest datum for unspecified end dates
+	HighDatum = "ZZZZZZZZZZZZZZZZ"
+)
+
+// CombineDatum combines year, volume and issue into a single value,
+// that preserves the order, if length of year, volume and issue do not
+// exceed 4, 6 and 6, respectively.
+func CombineDatum(year, volume, issue string, empty string) string {
+	if year == "" && volume == "" && issue == "" && empty != "" {
+		return empty
+	}
+	return fmt.Sprintf("%04s%06s%06s", year, volume, issue)
+}
+
+// Licenses holds the license ranges for an ISSN.
+type Licenses map[string][]string
+
+// Add adds a license range string to a given ISSN. Dups are ignored.
+func (t Licenses) Add(issn, license string) {
+	for _, v := range t[issn] {
+		if v == license {
+			return
+		}
+	}
+	t[issn] = append(t[issn], license)
+}
+
+// slimmer processing ----
 
 // IssnHolding maps an ISSN to a holdings.Holding struct.
 // ISSN -> Holding -> []Entitlements
