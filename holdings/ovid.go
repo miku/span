@@ -43,13 +43,13 @@ type Entitlement struct {
 	Status     string `xml:"status,attr" json:"status"`
 	URL        string `xml:"url" json:"url"`
 	Anchor     string `xml:"anchor" json:"anchor"`
-	FromYear   int    `xml:"begin>year" json:"from-year"`
-	FromVolume int    `xml:"begin>volume" json:"from-volume"`
-	FromIssue  int    `xml:"begin>issue" json:"from-issue"`
+	FromYear   string `xml:"begin>year" json:"from-year"`
+	FromVolume string `xml:"begin>volume" json:"from-volume"`
+	FromIssue  string `xml:"begin>issue" json:"from-issue"`
 	FromDelay  string `xml:"begin>delay" json:"from-delay"`
-	ToYear     int    `xml:"end>year" json:"to-year"`
-	ToVolume   int    `xml:"end>volume" json:"to-volume"`
-	ToIssue    int    `xml:"end>issue" json:"to-issue"`
+	ToYear     string `xml:"end>year" json:"to-year"`
+	ToVolume   string `xml:"end>volume" json:"to-volume"`
+	ToIssue    string `xml:"end>issue" json:"to-issue"`
 	ToDelay    string `xml:"end>delay" json:"to-delay"`
 }
 

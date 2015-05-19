@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -230,65 +229,65 @@ func (is *IntermediateSchema) Imprint() (s string) {
 // If the given entitlement does not cover the document, the error returned
 // will contain a reason.
 func (is *IntermediateSchema) CoveredByEntitlement(e holdings.Entitlement) error {
-	date, err := is.Date()
-	if err != nil {
-		return err
-	}
-	if e.FromYear != 0 && date.Year() != 0 {
-		if e.FromYear > date.Year() {
-			return errFromYear
-		}
-		if e.FromYear == date.Year() {
-			volume, err := strconv.Atoi(is.Volume)
-			if err != nil {
-				return errUnparsableValue
-			}
-			if e.FromVolume != 0 && e.FromVolume > volume {
-				return errFromVolume
-			}
-			if e.FromVolume == volume {
-				issue, err := strconv.Atoi(is.Issue)
-				if err != nil {
-					return errUnparsableValue
-				}
-				if e.FromIssue != 0 && e.FromIssue > issue {
-					return errFromIssue
-				}
-			}
-		}
-	}
+	// date, err := is.Date()
+	// if err != nil {
+	// 	return err
+	// }
+	// if e.FromYear != 0 && date.Year() != 0 {
+	// 	if e.FromYear > date.Year() {
+	// 		return errFromYear
+	// 	}
+	// 	if e.FromYear == date.Year() {
+	// 		volume, err := strconv.Atoi(is.Volume)
+	// 		if err != nil {
+	// 			return errUnparsableValue
+	// 		}
+	// 		if e.FromVolume != 0 && e.FromVolume > volume {
+	// 			return errFromVolume
+	// 		}
+	// 		if e.FromVolume == volume {
+	// 			issue, err := strconv.Atoi(is.Issue)
+	// 			if err != nil {
+	// 				return errUnparsableValue
+	// 			}
+	// 			if e.FromIssue != 0 && e.FromIssue > issue {
+	// 				return errFromIssue
+	// 			}
+	// 		}
+	// 	}
+	// }
 
-	if e.ToYear != 0 && date.Year() != 0 {
-		if e.ToYear < date.Year() {
-			return errToYear
-		}
-		if e.ToYear == date.Year() {
-			volume, err := strconv.Atoi(is.Volume)
-			if err != nil {
-				return errUnparsableValue
-			}
-			if e.ToVolume != 0 && e.ToVolume < volume {
-				return errToVolume
-			}
-			if e.ToVolume == volume {
-				issue, err := strconv.Atoi(is.Issue)
-				if err != nil {
-					return errUnparsableValue
-				}
-				if e.ToIssue != 0 && e.ToIssue < issue {
-					return errToIssue
-				}
-			}
-		}
-	}
+	// if e.ToYear != 0 && date.Year() != 0 {
+	// 	if e.ToYear < date.Year() {
+	// 		return errToYear
+	// 	}
+	// 	if e.ToYear == date.Year() {
+	// 		volume, err := strconv.Atoi(is.Volume)
+	// 		if err != nil {
+	// 			return errUnparsableValue
+	// 		}
+	// 		if e.ToVolume != 0 && e.ToVolume < volume {
+	// 			return errToVolume
+	// 		}
+	// 		if e.ToVolume == volume {
+	// 			issue, err := strconv.Atoi(is.Issue)
+	// 			if err != nil {
+	// 				return errUnparsableValue
+	// 			}
+	// 			if e.ToIssue != 0 && e.ToIssue < issue {
+	// 				return errToIssue
+	// 			}
+	// 		}
+	// 	}
+	// }
 
-	boundary, err := e.Boundary()
-	if err != nil {
-		return err
-	}
-	if date.After(boundary) {
-		return errMovingWall
-	}
+	// boundary, err := e.Boundary()
+	// if err != nil {
+	// 	return err
+	// }
+	// if date.After(boundary) {
+	// 	return errMovingWall
+	// }
 	return nil
 }
 
