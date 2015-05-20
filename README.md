@@ -107,6 +107,30 @@ TODO
 * clearer holdings file handling
 * support for files or URLs as lookup tables (e.g. classification, languages, ...)
 
+Notes
+-----
+
+About holding file handling:
+
+Holding file information can be viewed as a separate data layer around the core
+metadata of an index. Therefore, we separate their handling out into single tool,
+that helps to keep things simple.
+
+Given an file with intermediate schema records
+(we really only need the ISSN, volume, issue and date),
+the `span-holdings` tool will inject local information into the JSON records.
+
+    $ cat is.ldj | span-holdings -key institution -hspec DE-15:de-15.xml > output.ldj
+
+The additional step takes longer (JSON has to be parsed and serialized again).
+The overprocess will look like this:
+
+    span-import -i FORMAT source.data | span-export | span-holdings >> ai.ldj
+    span-import -i FORMAT source.data | span-export | span-holdings >> ai.ldj
+    ...
+
+70M crossref items take about 63min to run (stages one and two).
+
 Adding new sources
 ------------------
 

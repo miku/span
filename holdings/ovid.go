@@ -1,6 +1,7 @@
 package holdings
 
 import (
+	"bufio"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -75,6 +76,13 @@ func (l License) To() string {
 	return parts[1]
 }
 
+func (l License) Covers(signature string) bool {
+	if signature < l.From || l.To < signature {
+		return false
+	}
+	return true
+}
+
 func (l License) Delay() time.Duration {
 	parts := strings.Split(string(l), ":")
 	v, _ := strconv.Atoi(parts[2])
@@ -89,8 +97,8 @@ func (l License) Boundary() time.Time {
 // NewLicenseFromEntitlement creates a simple License string from the more complex
 // Entitlement structure. If error is nil, the License passed sanity checks.
 func NewLicenseFromEntitlement(e Entitlement) (License, error) {
-	from := combineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
-	to := combineDatum(e.ToYear, e.ToVolume, e.ToIssue, HighDatum16)
+	from := CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
+	to := CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, HighDatum16)
 	if to < from {
 		return License(""), errors.New("invalid range in holdings file")
 	}
@@ -121,7 +129,7 @@ func (t Licenses) Add(issn string, license License) {
 // CombineDatum combines year, volume and issue into a single value,
 // that preserves the order, if length of year, volume and issue do not
 // exceed 4, 6 and 6, respectively.
-func combineDatum(year, volume, issue string, empty string) string {
+func CombineDatum(year, volume, issue string, empty string) string {
 	if year == "" && volume == "" && issue == "" && empty != "" {
 		return empty
 	}
@@ -163,6 +171,46 @@ func firstNonemptyString(v ...string) string {
 		}
 	}
 	return ""
+}
+
+func ParseHoldings(r io.Reader) (Licenses, []error) {
+	var errors []error
+	lmap := make(Licenses)
+	decoder := xml.NewDecoder(bufio.NewReader(r))
+	var tag string
+	for {
+		t, err := decoder.Token()
+		if err != nil && err != io.EOF {
+			errors = append(errors, err)
+			return lmap, errors
+		}
+		if t == nil {
+			break
+		}
+		switch se := t.(type) {
+		case xml.StartElement:
+			tag = se.Name.Local
+			if tag == "holding" {
+				var item Holding
+				decoder.DecodeElement(&item, &se)
+				var hls []License
+				for _, e := range item.Entitlements {
+					l, err := NewLicenseFromEntitlement(e)
+					if err != nil {
+						errors = append(errors, fmt.Errorf("in EZBID(%d): %s", item.EZBID, err))
+					}
+					hls = append(hls, l)
+				}
+
+				for _, issn := range append(item.EISSN, item.PISSN...) {
+					for _, l := range hls {
+						lmap.Add(issn, l)
+					}
+				}
+			}
+		}
+	}
+	return lmap, errors
 }
 
 // slimmer processing ----
