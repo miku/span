@@ -23,7 +23,7 @@ const (
 )
 
 // delayPattern is how moving walls are expressed in OVID format.
-var delayPattern = regexp.MustCompile(`^(-\d+)(M|Y)$`)
+var delayPattern = regexp.MustCompile(`^([-+]\d+)(M|Y)$`)
 
 var (
 	errUnknownUnit   = errors.New("unknown unit")
@@ -75,28 +75,34 @@ func (l License) To() string {
 	return parts[1]
 }
 
-// To returns the end of the license range.
-func (l License) Delay() string {
+func (l License) Delay() time.Duration {
 	parts := strings.Split(string(l), ":")
-	return parts[2]
+	v, _ := strconv.Atoi(parts[2])
+	return time.Duration(v)
+
 }
 
-func (l License) Boundary() (time.Time, error) {
-	delay, err := parseDelay(l.Delay())
-	if err != nil {
-		return time.Time{}, err
-	}
-	return time.Now().Add(delay), nil
-
+func (l License) Boundary() time.Time {
+	return time.Now().Add(l.Delay())
 }
 
 // NewLicenseFromEntitlement creates a simple License string from the more complex
-// Entitlement structure.
-func NewLicenseFromEntitlement(e Entitlement) License {
+// Entitlement structure. If error is nil, the License passed sanity checks.
+func NewLicenseFromEntitlement(e Entitlement) (License, error) {
 	from := combineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
-	to := combineDatum(e.ToYear, e.ToVolume, e.FromIssue, HighDatum16)
+	to := combineDatum(e.ToYear, e.ToVolume, e.ToIssue, HighDatum16)
+	if to < from {
+		return License(""), errors.New("invalid range in holdings file")
+	}
 	delay := firstNonemptyString(e.FromDelay, e.ToDelay)
-	return License(fmt.Sprintf("%s:%s:%s", from, to, delay))
+	if delay == "" {
+		delay = "-0M"
+	}
+	dur, err := parseDelay(delay)
+	if err != nil {
+		return License(""), err
+	}
+	return License(fmt.Sprintf("%s:%s:%d", from, to, dur.Nanoseconds())), nil
 }
 
 // Licenses holds the license ranges for an ISSN.
@@ -124,6 +130,9 @@ func combineDatum(year, volume, issue string, empty string) string {
 
 // parseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
 func parseDelay(s string) (d time.Duration, err error) {
+	if s == "" {
+		return time.Duration(0), nil
+	}
 	ms := delayPattern.FindStringSubmatch(s)
 	if len(ms) != 3 {
 		return d, errUnknownFormat
@@ -131,6 +140,9 @@ func parseDelay(s string) (d time.Duration, err error) {
 	value, err := strconv.Atoi(ms[1])
 	if err != nil {
 		return d, err
+	}
+	if value > 0 {
+		value = -value
 	}
 	switch {
 	case ms[2] == "Y":

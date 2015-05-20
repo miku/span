@@ -13,7 +13,10 @@ import (
 )
 
 func main() {
+	skip := flag.Bool("skip", false, "skip errorneous entries")
+
 	flag.Parse()
+
 	if flag.NArg() < 1 {
 		log.Fatal("input file required")
 	}
@@ -41,19 +44,29 @@ func main() {
 				var item holdings.Holding
 				decoder.DecodeElement(&item, &se)
 
-				var licenses []holdings.License
+				var hls []holdings.License
 				for _, e := range item.Entitlements {
-					licenses = append(licenses, holdings.NewLicenseFromEntitlement(e))
+					l, err := holdings.NewLicenseFromEntitlement(e)
+					if err != nil {
+						if *skip {
+							log.Println(err)
+							continue
+						} else {
+							log.Fatal(err)
+						}
+					}
+					hls = append(hls, l)
 				}
 
 				for _, issn := range append(item.EISSN, item.PISSN...) {
-					for _, l := range licenses {
+					for _, l := range hls {
 						lmap.Add(issn, l)
 					}
 				}
 			}
 		}
 	}
+
 	b, err := json.Marshal(lmap)
 	if err != nil {
 		log.Fatal(err)
