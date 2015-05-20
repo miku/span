@@ -229,6 +229,18 @@ func (is *IntermediateSchema) Imprint() (s string) {
 // If the given entitlement does not cover the document, the error returned
 // will contain a reason.
 func (is *IntermediateSchema) CoveredByEntitlement(e holdings.Entitlement) error {
+	date, err := is.Date()
+	if err != nil {
+		return err
+	}
+	signature := holdings.CombineDatum(fmt.Sprintf("%s", date.Year()), is.Volume, is.Issue, "")
+	from := holdings.CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, "")
+	to := holdings.CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, "")
+
+	if signature < from || to < signature {
+		return errors.New("outside license range")
+	}
+
 	// date, err := is.Date()
 	// if err != nil {
 	// 	return err
