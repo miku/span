@@ -24,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	licenses := make(holdings.Licenses)
+	lmap := make(holdings.Licenses)
 
 	decoder := xml.NewDecoder(bufio.NewReader(file))
 	var tag string
@@ -40,21 +40,21 @@ func main() {
 			if tag == "holding" {
 				var item holdings.Holding
 				decoder.DecodeElement(&item, &se)
-				var l []string
+
+				var licenses []holdings.License
 				for _, e := range item.Entitlements {
-					from := holdings.CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, holdings.LowDatum)
-					to := holdings.CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, holdings.HighDatum)
-					l = append(l, fmt.Sprintf("%s:%s", from, to))
+					licenses = append(licenses, holdings.NewLicenseFromEntitlement(e))
 				}
+
 				for _, issn := range append(item.EISSN, item.PISSN...) {
-					for _, license := range l {
-						licenses.Add(issn, license)
+					for _, l := range licenses {
+						lmap.Add(issn, l)
 					}
 				}
 			}
 		}
 	}
-	b, err := json.Marshal(licenses)
+	b, err := json.Marshal(lmap)
 	if err != nil {
 		log.Fatal(err)
 	}

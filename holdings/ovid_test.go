@@ -27,17 +27,17 @@ func TestParseDelay(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		d, err := ParseDelay(tt.s)
+		d, err := parseDelay(tt.s)
 		if d != tt.d {
-			t.Errorf("ParseDelay(%s) => %v, %v, want %v, %v", tt.s, d, err, tt.d, tt.err)
+			t.Errorf("parseDelay(%s) => %v, %v, want %v, %v", tt.s, d, err, tt.d, tt.err)
 		}
 		if err != nil {
 			if tt.err != nil {
 				if err.Error() != tt.err.Error() {
-					t.Errorf("ParseDelay(%s) => %v, %v, want %v, %v", tt.s, d, err, tt.d, tt.err)
+					t.Errorf("parseDelay(%s) => %v, %v, want %v, %v", tt.s, d, err, tt.d, tt.err)
 				}
 			} else {
-				t.Errorf("ParseDelay(%s) => %v, %v, want %v, %v", tt.s, d, err, tt.d, tt.err)
+				t.Errorf("parseDelay(%s) => %v, %v, want %v, %v", tt.s, d, err, tt.d, tt.err)
 			}
 		}
 	}
@@ -144,10 +144,10 @@ func TestHoldingsMap(t *testing.T) {
 						Status:     "subscribed",
 						URL:        "http://link.springer.com/journal/894",
 						Anchor:     "natli_springer",
-						FromYear:   1995,
-						FromVolume: 1,
-						ToYear:     2002,
-						ToVolume:   8,
+						FromYear:   "1995",
+						FromVolume: "1",
+						ToYear:     "2002",
+						ToVolume:   "8",
 					},
 					{
 						Status: "subscribed",

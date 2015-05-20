@@ -15,6 +15,11 @@ const (
 	day   = 24 * time.Hour
 	month = 30 * day
 	year  = 12 * month
+
+	// LowDatum16 represents a lowest datum for unspecified start dates.
+	LowDatum16 = "0000000000000000"
+	// HighDatum16 represents a lowest datum for unspecified end dates.
+	HighDatum16 = "ZZZZZZZZZZZZZZZZ"
 )
 
 // delayPattern is how moving walls are expressed in OVID format.
@@ -29,7 +34,7 @@ var (
 // ISSNPattern is the canonical form of an ISSN.
 var ISSNPattern = regexp.MustCompile(`^\d\d\d\d-\d\d\d\d$`)
 
-// Holding contains a single holding
+// Holding contains a single holding.
 type Holding struct {
 	EZBID        int           `xml:"ezb_id,attr" json:"ezbid"`
 	Title        string        `xml:"title" json:"title"`
@@ -54,36 +59,98 @@ type Entitlement struct {
 	ToDelay    string `xml:"end>delay" json:"to-delay"`
 }
 
-// slimmer processing ----
+// License represents a span of time, which a license covers,
+// expressed as a string of the form from:to:delay.
+type License string
 
-const (
-	// LowDatum represents a lowest datum for unspecified start dates
-	LowDatum = "0000000000000000"
-	// HighDatum represents a lowest datum for unspecified end dates
-	HighDatum = "ZZZZZZZZZZZZZZZZ"
-)
+// From returns the start of the license range.
+func (l License) From() string {
+	parts := strings.Split(string(l), ":")
+	return parts[0]
+}
 
-// CombineDatum combines year, volume and issue into a single value,
-// that preserves the order, if length of year, volume and issue do not
-// exceed 4, 6 and 6, respectively.
-func CombineDatum(year, volume, issue string, empty string) string {
-	if year == "" && volume == "" && issue == "" && empty != "" {
-		return empty
+// To returns the end of the license range.
+func (l License) To() string {
+	parts := strings.Split(string(l), ":")
+	return parts[1]
+}
+
+// To returns the end of the license range.
+func (l License) Delay() string {
+	parts := strings.Split(string(l), ":")
+	return parts[2]
+}
+
+func (l License) Boundary() (time.Time, error) {
+	delay, err := parseDelay(l.Delay())
+	if err != nil {
+		return time.Time{}, err
 	}
-	return fmt.Sprintf("%04s%06s%06s", year, volume, issue)
+	return time.Now().Add(delay), nil
+
+}
+
+// NewLicenseFromEntitlement creates a simple License string from the more complex
+// Entitlement structure.
+func NewLicenseFromEntitlement(e Entitlement) License {
+	from := combineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
+	to := combineDatum(e.ToYear, e.ToVolume, e.FromIssue, HighDatum16)
+	delay := firstNonemptyString(e.FromDelay, e.ToDelay)
+	return License(fmt.Sprintf("%s:%s:%s", from, to, delay))
 }
 
 // Licenses holds the license ranges for an ISSN.
-type Licenses map[string][]string
+type Licenses map[string][]License
 
 // Add adds a license range string to a given ISSN. Dups are ignored.
-func (t Licenses) Add(issn, license string) {
+func (t Licenses) Add(issn string, license License) {
 	for _, v := range t[issn] {
 		if v == license {
 			return
 		}
 	}
 	t[issn] = append(t[issn], license)
+}
+
+// CombineDatum combines year, volume and issue into a single value,
+// that preserves the order, if length of year, volume and issue do not
+// exceed 4, 6 and 6, respectively.
+func combineDatum(year, volume, issue string, empty string) string {
+	if year == "" && volume == "" && issue == "" && empty != "" {
+		return empty
+	}
+	return fmt.Sprintf("%04s%06s%06s", year, volume, issue)
+}
+
+// parseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
+func parseDelay(s string) (d time.Duration, err error) {
+	ms := delayPattern.FindStringSubmatch(s)
+	if len(ms) != 3 {
+		return d, errUnknownFormat
+	}
+	value, err := strconv.Atoi(ms[1])
+	if err != nil {
+		return d, err
+	}
+	switch {
+	case ms[2] == "Y":
+		d = time.Duration(time.Duration(value) * year)
+	case ms[2] == "M":
+		d = time.Duration(time.Duration(value) * month)
+	default:
+		return d, errUnknownUnit
+	}
+	return
+}
+
+// firstNonemptyString returns the first value that is not the empty string.
+func firstNonemptyString(v ...string) string {
+	for _, s := range v {
+		if s != "" {
+			return s
+		}
+	}
+	return ""
 }
 
 // slimmer processing ----
@@ -104,26 +171,26 @@ func (iih *IsilIssnHolding) Isils() (keys []string) {
 	return keys
 }
 
-// ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
-func ParseDelay(s string) (d time.Duration, err error) {
-	ms := delayPattern.FindStringSubmatch(s)
-	if len(ms) != 3 {
-		return d, errUnknownFormat
-	}
-	value, err := strconv.Atoi(ms[1])
-	if err != nil {
-		return d, err
-	}
-	switch {
-	case ms[2] == "Y":
-		d = time.Duration(time.Duration(value) * year)
-	case ms[2] == "M":
-		d = time.Duration(time.Duration(value) * month)
-	default:
-		return d, errUnknownUnit
-	}
-	return
-}
+// // ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
+// func ParseDelay(s string) (d time.Duration, err error) {
+// 	ms := delayPattern.FindStringSubmatch(s)
+// 	if len(ms) != 3 {
+// 		return d, errUnknownFormat
+// 	}
+// 	value, err := strconv.Atoi(ms[1])
+// 	if err != nil {
+// 		return d, err
+// 	}
+// 	switch {
+// 	case ms[2] == "Y":
+// 		d = time.Duration(time.Duration(value) * year)
+// 	case ms[2] == "M":
+// 		d = time.Duration(time.Duration(value) * month)
+// 	default:
+// 		return d, errUnknownUnit
+// 	}
+// 	return
+// }
 
 // Delay returns the specified delay as `time.Duration`
 func (e *Entitlement) Delay() (d time.Duration, err error) {
@@ -131,10 +198,10 @@ func (e *Entitlement) Delay() (d time.Duration, err error) {
 		return d, errDelayMismatch
 	}
 	if e.FromDelay != "" {
-		return ParseDelay(e.FromDelay)
+		return parseDelay(e.FromDelay)
 	}
 	if e.ToDelay != "" {
-		return ParseDelay(e.ToDelay)
+		return parseDelay(e.ToDelay)
 	}
 	return
 }

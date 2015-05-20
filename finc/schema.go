@@ -225,72 +225,27 @@ func (is *IntermediateSchema) Imprint() (s string) {
 	return
 }
 
+// CoveredByLicenses takes a list of strings representing license ranges,
+// e.g. 1910000001000000:1995000072000000 and returns error if none of the
+// given license ranges cover this intermediate schema record.
+func (is *IntermediateSchema) CoveredByLicenses(licenses []string) error {
+	return nil
+}
+
 // CoveredByEntitlement returns nil, if a given entitlement covers the current document.
 // If the given entitlement does not cover the document, the error returned
 // will contain a reason.
 func (is *IntermediateSchema) CoveredByEntitlement(e holdings.Entitlement) error {
-	date, err := is.Date()
-	if err != nil {
-		return err
-	}
-	signature := holdings.CombineDatum(fmt.Sprintf("%s", date.Year()), is.Volume, is.Issue, "")
-	from := holdings.CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, "")
-	to := holdings.CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, "")
-
-	if signature < from || to < signature {
-		return errors.New("outside license range")
-	}
-
 	// date, err := is.Date()
 	// if err != nil {
 	// 	return err
 	// }
-	// if e.FromYear != 0 && date.Year() != 0 {
-	// 	if e.FromYear > date.Year() {
-	// 		return errFromYear
-	// 	}
-	// 	if e.FromYear == date.Year() {
-	// 		volume, err := strconv.Atoi(is.Volume)
-	// 		if err != nil {
-	// 			return errUnparsableValue
-	// 		}
-	// 		if e.FromVolume != 0 && e.FromVolume > volume {
-	// 			return errFromVolume
-	// 		}
-	// 		if e.FromVolume == volume {
-	// 			issue, err := strconv.Atoi(is.Issue)
-	// 			if err != nil {
-	// 				return errUnparsableValue
-	// 			}
-	// 			if e.FromIssue != 0 && e.FromIssue > issue {
-	// 				return errFromIssue
-	// 			}
-	// 		}
-	// 	}
-	// }
+	// signature := holdings.CombineDatum(fmt.Sprintf("%s", date.Year()), is.Volume, is.Issue, "")
+	// from := holdings.CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, "")
+	// to := holdings.CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, "")
 
-	// if e.ToYear != 0 && date.Year() != 0 {
-	// 	if e.ToYear < date.Year() {
-	// 		return errToYear
-	// 	}
-	// 	if e.ToYear == date.Year() {
-	// 		volume, err := strconv.Atoi(is.Volume)
-	// 		if err != nil {
-	// 			return errUnparsableValue
-	// 		}
-	// 		if e.ToVolume != 0 && e.ToVolume < volume {
-	// 			return errToVolume
-	// 		}
-	// 		if e.ToVolume == volume {
-	// 			issue, err := strconv.Atoi(is.Issue)
-	// 			if err != nil {
-	// 				return errUnparsableValue
-	// 			}
-	// 			if e.ToIssue != 0 && e.ToIssue < issue {
-	// 				return errToIssue
-	// 			}
-	// 		}
-	// 	}
+	// if signature < from || to < signature {
+	// 	return errors.New("outside license range")
 	// }
 
 	// boundary, err := e.Boundary()
