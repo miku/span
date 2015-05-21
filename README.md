@@ -112,24 +112,24 @@ Notes
 
 About holding file handling:
 
-Holding file information can be viewed as a separate data layer around the core
-metadata of an index. Therefore, we separate their handling out into single tool,
-that helps to keep things simple.
+A new filter for making decisions about ISIL attachments.
 
-Given an file with intermediate schema records
-(we really only need the ISSN, volume, issue and date),
-the `span-holdings` tool will inject local information into the JSON records.
+    tagger := map[ISIL][]Filter{
+        "DE-15": []Filter{NewHoldingsFilter(rdr)},
+        "DE-XY": []Filter{NewListFilter(rdr)},
+        "DE-ZZ": []Filter{NewListFilter(rdr), NewListFilter(rdr), HoldingsFilter(rdr)},
+    }
 
-    $ cat is.ldj | span-holdings -key institution -hspec DE-15:de-15.xml > output.ldj
+    for _, is := range records {
+        // determine for each registered ISIL whether it should be attached
+        isils := tagger.Tag(is)
 
-The additional step takes longer (JSON has to be parsed and serialized again).
-The overprocess will look like this:
+        // generate the export schema
+        ss := is.ToSolrSchema()
 
-    span-import -i FORMAT source.data | span-export | span-holdings >> ai.ldj
-    span-import -i FORMAT source.data | span-export | span-holdings >> ai.ldj
-    ...
-
-70M crossref items take about 63min to run (stages one and two).
+        // update record
+        ss.Institutions = isils
+    }
 
 Adding new sources
 ------------------
