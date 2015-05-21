@@ -77,7 +77,7 @@ func (l License) To() string {
 }
 
 func (l License) Covers(signature string) bool {
-	if signature < l.From || l.To < signature {
+	if signature < l.From() || l.To() < signature {
 		return false
 	}
 	return true
