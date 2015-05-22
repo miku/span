@@ -94,6 +94,7 @@ func (f None) Apply(is finc.IntermediateSchema) bool { return false }
 type HoldingFilter struct{ Table holdings.Licenses }
 
 // NewHoldingFilter loads the holdings information for a single institution.
+// TODO(miku): pass errors
 func NewHoldingFilter(r io.Reader) HoldingFilter {
 	licenses, errors := holdings.ParseHoldings(r)
 	if len(errors) > 0 {
@@ -102,25 +103,33 @@ func NewHoldingFilter(r io.Reader) HoldingFilter {
 	return HoldingFilter{Table: licenses}
 }
 
+// CoveredAndValid checks coverage and moving wall.
+func (f HoldingFilter) CoveredAndValid(signature, issn string) bool {
+	licenses, ok := f.Table[issn]
+	if !ok {
+		return false
+	}
+	now := time.Now()
+	for _, license := range licenses {
+		if !license.Covers(signature) {
+			continue
+		}
+		if now.After(license.Wall()) {
+			return true
+		}
+	}
+	return false
+}
+
 // HoldingFilter compares the (year, volume, issue) of the
 // record with license information, including possible moving walls.
 func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 	// TODO(miku): make is.Date() fail earlier.
 	date, _ := is.Date()
 	signature := holdings.CombineDatum(fmt.Sprintf("%d", date.Year()), is.Volume, is.Issue, "")
-	now := time.Now()
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		licenses, ok := f.Table[issn]
-		if !ok {
-			continue
-		}
-		for _, l := range licenses {
-			if !l.Covers(signature) {
-				continue
-			}
-			if now.After(l.Boundary()) {
-				return true
-			}
+		if f.CoveredAndValid(signature, issn) {
+			return true
 		}
 	}
 	return false

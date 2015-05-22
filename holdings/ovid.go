@@ -90,8 +90,11 @@ func (l License) Delay() time.Duration {
 
 }
 
-func (l License) Boundary() time.Time {
-	return time.Now().Add(l.Delay())
+// Wall returns the licence wall truncated to day.
+func (l License) Wall() time.Time {
+	now := time.Now()
+	d := time.Duration(-now.Hour()) * time.Hour
+	return now.Truncate(time.Hour).Add(d + l.Delay())
 }
 
 // NewLicenseFromEntitlement creates a simple License string from the more complex
