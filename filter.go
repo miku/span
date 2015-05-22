@@ -42,7 +42,7 @@ func (f SourceFilter) MarshalJSON() ([]byte, error) {
 
 // HoldingFilter decides ISIL-attachment by looking at licensing information from OVID files.
 type HoldingFilter struct {
-	Table holdings.Licenses `json: "table"`
+	Table holdings.Licenses
 }
 
 // NewHoldingFilter loads the holdings information for a single institution.
