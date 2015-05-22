@@ -61,15 +61,20 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 				log.Fatal(err)
 			}
 
+			// source specific filter, e.g. attach DE-15 to all source id 50 items:
+			//
+			//     $ ./span-export -source DE-15:50
+			//
 			// source specific fields
 			// TODO(miku): move this into ISILTagger as well, e.g.
 			// with a "SourceSpecific" Tagger
-			switch is.SourceID {
-			case "50":
-				ss.Institutions = []string{"DE-15"}
-			default:
-				ss.Institutions = opts.tagger.Tags(*is)
-			}
+			// switch is.SourceID {
+			// case "50":
+			// 	ss.Institutions = []string{"DE-15"}
+			// default:
+			// 	ss.Institutions = opts.tagger.Tags(*is)
+			// }
+			ss.Institutions = opts.tagger.Tags(*is)
 
 			b, err := json.Marshal(ss)
 			if err != nil {
