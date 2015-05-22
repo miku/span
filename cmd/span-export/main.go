@@ -80,6 +80,7 @@ func main() {
 
 	skip := flag.Bool("skip", false, "skip errors")
 	showVersion := flag.Bool("v", false, "prints current program version")
+	dumpFilters := flag.Bool("d", false, "dump filters and exit")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
@@ -101,7 +102,7 @@ func main() {
 			log.Fatal(err)
 		}
 		f, err := span.NewHoldingFilter(file)
-		opts.tagger[isil] = append(opts.tagger[isil], f)
+		tagger[isil] = append(tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
@@ -114,7 +115,7 @@ func main() {
 			log.Fatal(err)
 		}
 		f, err := span.NewListFilter(file)
-		opts.tagger[isil] = append(opts.tagger[isil], f)
+		tagger[isil] = append(tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
@@ -125,12 +126,21 @@ func main() {
 		if len(ss) != 2 {
 			log.Fatal("use ISIL:SID")
 		}
-		opts.tagger[ss[0]] = append(opts.tagger[ss[0]], span.SourceFilter{SourceID: ss[1]})
+		tagger[ss[0]] = append(tagger[ss[0]], span.SourceFilter{SourceID: ss[1]})
 	}
 
 	for _, isil := range any {
 		// Any filter would override any other, so just keep this.
-		opts.tagger[isil] = []span.Filter{span.Any{}}
+		tagger[isil] = []span.Filter{span.Any{}}
+	}
+
+	if *dumpFilters {
+		b, err := json.Marshal(tagger)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(b))
+		os.Exit(0)
 	}
 
 	opts := options{tagger: tagger}
