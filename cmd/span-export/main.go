@@ -80,7 +80,7 @@ func main() {
 
 	skip := flag.Bool("skip", false, "skip errors")
 	showVersion := flag.Bool("v", false, "prints current program version")
-	dumpFilters := flag.Bool("d", false, "dump filters and exit")
+	dumpFilters := flag.Bool("dump", false, "dump filters and exit")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
