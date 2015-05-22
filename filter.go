@@ -15,27 +15,26 @@ import (
 
 // Filter wraps the decision, whether a given record should be attached or not.
 type Filter interface {
-	Apply(is finc.IntermediateSchema) bool
+	Apply(finc.IntermediateSchema) bool
 }
 
-// Any attaches all records.
+// Any always returns true.
 type Any struct{}
 
+// Apply filter.
 func (f Any) Apply(is finc.IntermediateSchema) bool { return true }
 
-// None declines any record.
-type None struct{}
-
-func (f None) Apply(is finc.IntermediateSchema) bool { return false }
-
+// SourceFilter allows to attach ISIL on records of a given source.
 type SourceFilter struct {
 	SourceID string
 }
 
+// Apply filter.
 func (f SourceFilter) Apply(is finc.IntermediateSchema) bool {
 	return is.SourceID == f.SourceID
 }
 
+// MarshalJSON provides custom serialization.
 func (f SourceFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(f.SourceID)
 }
@@ -58,6 +57,7 @@ func NewHoldingFilter(r io.Reader) (HoldingFilter, error) {
 	return HoldingFilter{Table: licenses}, nil
 }
 
+// MarshalJSON provides custom serialization.
 func (f HoldingFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(f.Table)
 }
@@ -116,10 +116,12 @@ func NewListFilter(r io.Reader) (ListFilter, error) {
 	return f, nil
 }
 
+// MarshalJSON provides custom serialization.
 func (f ListFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(f.Set.Values())
 }
 
+// Apply filter.
 func (f ListFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		if f.Set.Contains(issn) {
@@ -129,12 +131,11 @@ func (f ListFilter) Apply(is finc.IntermediateSchema) bool {
 	return false
 }
 
-// ISILAttacher maps an ISIL to one or more Filter.
-// If any of these filters return true, the ISIL should be attached.
-// The filters are applied in order.
+// ISILAttacher maps an ISIL to one or more Filters. If any of these filters
+// return true, the ISIL should be attached (Therefore order does not matter).
 type ISILTagger map[string][]Filter
 
-// Tags will return all ISILs that can be attached to this record.
+// Tags returns all ISILs that can be attached to a given intermediate schema record.
 func (t ISILTagger) Tags(is finc.IntermediateSchema) []string {
 	isils := container.NewStringSet()
 	for isil, filters := range t {

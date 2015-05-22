@@ -239,8 +239,6 @@ func (is *IntermediateSchema) SortableAuthor() string {
 }
 
 // ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
-// Note that this method can and will include all kinds of source
-// specific alterations, which are not expressed in the intermediate format.
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
 
