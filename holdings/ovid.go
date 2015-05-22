@@ -140,7 +140,8 @@ func CombineDatum(year, volume, issue string, empty string) string {
 }
 
 // parseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
-func parseDelay(s string) (d time.Duration, err error) {
+func parseDelay(s string) (time.Duration, error) {
+	var d time.Duration
 	if s == "" {
 		return time.Duration(0), nil
 	}
@@ -163,7 +164,7 @@ func parseDelay(s string) (d time.Duration, err error) {
 	default:
 		return d, errUnknownUnit
 	}
-	return
+	return d, nil
 }
 
 // firstNonemptyString returns the first value that is not the empty string.
