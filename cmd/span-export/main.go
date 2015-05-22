@@ -1,168 +1,197 @@
 // Converts intermediate schema docs into solr docs.
 package main
 
-import "github.com/miku/span/holdings"
+import (
+	"bufio"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"runtime"
+	"strings"
+	"sync"
+
+	"github.com/miku/span"
+	"github.com/miku/span/finc"
+)
 
 // Options for worker.
 type options struct {
-	Holdings holdings.IsilIssnHolding
+	tagger span.ISILTagger
 }
 
-// // worker iterates over string batches
-// func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
-// 	defer wg.Done()
-// 	for batch := range queue {
-// 		for _, s := range batch {
-// 			is := new(finc.IntermediateSchema)
-// 			err := json.Unmarshal([]byte(s), is)
-// 			if err != nil {
-// 				log.Fatal(err)
-// 			}
-// 			ss, err := is.ToSolrSchema(opts.Holdings)
-// 			if err != nil {
-// 				log.Fatal(err)
-// 			}
-// 			b, err := json.Marshal(ss)
-// 			if err != nil {
-// 				log.Fatal(err)
-// 			}
-// 			out <- b
-// 		}
-// 	}
-// }
+// parseTagPathString turns TAG:/path/to into single strings and returns them.
+func parseTagPathString(s string) (string, string, error) {
+	p := strings.Split(s, ":")
+	if len(p) != 2 {
+		return "", "", errors.New("invalid tagpath, use ISIL:/path/to/file")
+	}
+	return p[0], p[1], nil
+}
 
-// TODO(miku): support various ISIL attachments;
-// via holdings files, ISIL-ISSN lists, or attach all via '*'
-// Maybe: span-export -hspec DE-1:path/to/holdings -fspec DE-2:path/to/issnlist -all 'DE-3, DE-4'
+// parseTagPath returns the tag, an open file and possible errors.
+func parseTagPath(s string) (string, *os.File, error) {
+	var file *os.File
+	isil, path, err := parseTagPathString(s)
+	if err != nil {
+		return isil, file, err
+	}
+	file, err = os.Open(path)
+	if err != nil {
+		return isil, file, err
+	}
+	return isil, file, nil
+}
+
+// worker iterates over string batches
+func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for batch := range queue {
+		for _, s := range batch {
+			is := new(finc.IntermediateSchema)
+			err := json.Unmarshal([]byte(s), is)
+			if err != nil {
+				log.Fatal(err)
+			}
+			ss, err := is.ToSolrSchema()
+			if err != nil {
+				log.Fatal(err)
+			}
+			ss.Institutions = opts.tagger.Tags(*is)
+			b, err := json.Marshal(ss)
+			if err != nil {
+				log.Fatal(err)
+			}
+			out <- b
+		}
+	}
+}
+
 func main() {
 
-	// hspec := flag.String("hspec", "", "ISIL PATH pairs")
-	// fspec := flag.String("fspec", "", "ISIL ISSN-file pairs")
-	// // all := flag.String("all", "", "ISIL or list of ISILs added to each record")
-	// showVersion := flag.Bool("v", false, "prints current program version")
-	// size := flag.Int("b", 20000, "batch size")
-	// numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+	var hfiles, lfiles, any, source span.StringSlice
+	flag.Var(&hfiles, "f", "ISIL:/path/to/ovid.xml")
+	flag.Var(&lfiles, "l", "ISIL:/path/to/list.txt")
+	flag.Var(&any, "any", "ISIL")
+	flag.Var(&source, "source", "ISIL:SID")
 
-	// flag.Parse()
+	skip := flag.Bool("skip", false, "skip errors")
+	showVersion := flag.Bool("v", false, "prints current program version")
+	size := flag.Int("b", 20000, "batch size")
+	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
-	// runtime.GOMAXPROCS(*numWorkers)
+	flag.Parse()
 
-	// if *showVersion {
-	// 	fmt.Println(span.AppVersion)
-	// 	os.Exit(0)
-	// }
+	runtime.GOMAXPROCS(*numWorkers)
 
-	// opts := options{
-	// 	Holdings: make(holdings.IsilIssnHolding),
-	// }
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
 
-	// if *hspec != "" {
-	// 	pathmap, err := span.ParseHoldingSpec(*hspec)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	for isil, path := range pathmap {
-	// 		file, err := os.Open(path)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 		defer file.Close()
-	// 		opts.Holdings[isil] = holdings.HoldingsMap(bufio.NewReader(file))
-	// 	}
-	// }
+	tagger := make(span.ISILTagger)
 
-	// if *fspec != "" {
-	// 	pathmap, err := span.ParseHoldingSpec(*fspec)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	for isil, path := range pathmap {
-	// 		file, err := os.Open(path)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 		defer file.Close()
-	// 		br := bufio.NewReader(file)
-	// 		for {
-	// 			line, err := br.ReadString('\n')
-	// 			if err == io.EOF {
-	// 				break
-	// 			}
-	// 			if err != nil {
-	// 				log.Fatal(err)
-	// 			}
-	// 			issn := strings.TrimSpace(line)
-	// 			if _, ok := opts.Holdings[isil]; !ok {
-	// 				opts.Holdings[isil] = make(holdings.IssnHolding)
-	// 			}
-	// 			if _, ok := opts.Holdings[isil][issn]; !ok {
-	// 				opts.Holdings[isil][issn] = holdings.Holding{EISSN: []string{issn}, PISSN: []string{issn}}
-	// 			}
-	// 			h := opts.Holdings[isil][issn]
-	// 			h.Entitlements = append(h.Entitlements, holdings.Entitlement{})
-	// 			opts.Holdings[isil][issn] = h
-	// 		}
-	// 	}
-	// }
+	for _, s := range hfiles {
+		isil, file, err := parseTagPath(s)
+		defer file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		f, err := span.NewHoldingFilter(file)
+		opts.tagger[isil] = append(opts.tagger[isil], f)
+		if err != nil && !*skip {
+			log.Fatal(err)
+		}
+	}
 
-	// queue := make(chan []string)
-	// out := make(chan []byte)
-	// done := make(chan bool)
-	// go span.ByteSink(os.Stdout, out, done)
+	for _, s := range lfiles {
+		isil, file, err := parseTagPath(s)
+		defer file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		f, err := span.NewListFilter(file)
+		opts.tagger[isil] = append(opts.tagger[isil], f)
+		if err != nil && !*skip {
+			log.Fatal(err)
+		}
+	}
 
-	// var wg sync.WaitGroup
+	for _, s := range source {
+		ss := strings.Split(s, ":")
+		if len(ss) != 2 {
+			log.Fatal("use ISIL:SID")
+		}
+		opts.tagger[ss[0]] = append(opts.tagger[ss[0]], span.SourceFilter{SourceID: ss[1]})
+	}
 
-	// for i := 0; i < *numWorkers; i++ {
-	// 	wg.Add(1)
-	// 	go worker(queue, out, opts, &wg)
-	// }
+	for _, isil := range any {
+		// Any filter would override any other, so just keep this.
+		opts.tagger[isil] = []span.Filter{span.Any{}}
+	}
 
-	// var batch []string
-	// var i int
+	opts := options{tagger: tagger}
 
-	// var readers []io.Reader
+	queue := make(chan []string)
+	out := make(chan []byte)
+	done := make(chan bool)
+	go span.ByteSink(os.Stdout, out, done)
 
-	// if flag.NArg() == 0 {
-	// 	readers = append(readers, os.Stdin)
-	// } else {
-	// 	for _, filename := range flag.Args() {
-	// 		file, err := os.Open(filename)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 		defer file.Close()
-	// 		readers = append(readers, file)
-	// 	}
-	// }
+	var wg sync.WaitGroup
 
-	// for _, r := range readers {
-	// 	br := bufio.NewReader(r)
-	// 	for {
-	// 		line, err := br.ReadString('\n')
-	// 		if err == io.EOF {
-	// 			break
-	// 		}
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 		batch = append(batch, line)
-	// 		if i%*size == 0 {
-	// 			b := make([]string, len(batch))
-	// 			copy(b, batch)
-	// 			queue <- b
-	// 			batch = batch[:0]
-	// 		}
-	// 		i++
-	// 	}
-	// }
+	for i := 0; i < *numWorkers; i++ {
+		wg.Add(1)
+		go worker(queue, out, opts, &wg)
+	}
 
-	// b := make([]string, len(batch))
-	// copy(b, batch)
-	// queue <- b
+	var batch []string
+	var i int
 
-	// close(queue)
-	// wg.Wait()
-	// close(out)
-	// <-done
+	var readers []io.Reader
 
+	if flag.NArg() == 0 {
+		readers = append(readers, os.Stdin)
+	} else {
+		for _, filename := range flag.Args() {
+			file, err := os.Open(filename)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+			readers = append(readers, file)
+		}
+	}
+
+	for _, r := range readers {
+		br := bufio.NewReader(r)
+		for {
+			line, err := br.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+			batch = append(batch, line)
+			if i%*size == 0 {
+				b := make([]string, len(batch))
+				copy(b, batch)
+				queue <- b
+				batch = batch[:0]
+			}
+			i++
+		}
+	}
+
+	b := make([]string, len(batch))
+	copy(b, batch)
+	queue <- b
+
+	close(queue)
+	wg.Wait()
+	close(out)
+	<-done
 }
