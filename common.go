@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/miku/span/finc"
-	"github.com/miku/span/holdings"
 )
 
 // AppVersion of span package. Commandline tools will show this on -v.
@@ -29,7 +28,7 @@ type Importer interface {
 // Exporter interface might collect all exportable formats.
 // IntermediateSchema is the first and must implement this.
 type Exporter interface {
-	ToSolrSchema(holdings.IsilIssnHolding) (*finc.SolrSchema, error)
+	ToSolrSchema() (*finc.SolrSchema, error)
 }
 
 // Source can emit records given a reader. What is actually returned is decided

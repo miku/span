@@ -6,13 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
-	"github.com/miku/span/holdings"
 )
 
 const (
@@ -225,64 +223,6 @@ func (is *IntermediateSchema) Imprint() (s string) {
 	return
 }
 
-// CoveredByLicenses takes a list of strings representing license ranges,
-// e.g. 1910000001000000:1995000072000000 and returns error if none of the
-// given license ranges cover this intermediate schema record.
-func (is *IntermediateSchema) CoveredByLicenses(licenses []string) error {
-	return nil
-}
-
-// CoveredByEntitlement returns nil, if a given entitlement covers the current document.
-// If the given entitlement does not cover the document, the error returned
-// will contain a reason.
-func (is *IntermediateSchema) CoveredByEntitlement(e holdings.Entitlement) error {
-	// date, err := is.Date()
-	// if err != nil {
-	// 	return err
-	// }
-	// signature := holdings.CombineDatum(fmt.Sprintf("%s", date.Year()), is.Volume, is.Issue, "")
-	// from := holdings.CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, "")
-	// to := holdings.CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, "")
-
-	// if signature < from || to < signature {
-	// 	return errors.New("outside license range")
-	// }
-
-	// boundary, err := e.Boundary()
-	// if err != nil {
-	// 	return err
-	// }
-	// if date.After(boundary) {
-	// 	return errMovingWall
-	// }
-	return nil
-}
-
-// Institutions returns a slice of ISILs for which this document finds
-// valid entitlements in a IsilIssnHolding map.
-func (is *IntermediateSchema) Institutions(iih holdings.IsilIssnHolding) []string {
-	isils := container.NewStringSet()
-	for _, isil := range iih.Isils() {
-		for _, issn := range is.ISSNList() {
-			h, exists := iih[isil][issn]
-			if !exists {
-				continue
-			}
-			for _, entitlement := range h.Entitlements {
-				err := is.CoveredByEntitlement(entitlement)
-				if err != nil {
-					continue
-				}
-				isils.Add(isil)
-				break
-			}
-		}
-	}
-	values := isils.Values()
-	sort.Strings(values)
-	return values
-}
-
 // SortableAuthor is loosely based on solrmarcs builtin getSortableTitle
 func (is *IntermediateSchema) SortableTitle() string {
 	return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.ArticleTitle, ""))
@@ -301,7 +241,7 @@ func (is *IntermediateSchema) SortableAuthor() string {
 // ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
 // Note that this method can and will include all kinds of source
 // specific alterations, which are not expressed in the intermediate format.
-func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrSchema, error) {
+func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
 
 	date, err := is.Date()
@@ -362,12 +302,5 @@ func (is *IntermediateSchema) ToSolrSchema(iih holdings.IsilIssnHolding) (*SolrS
 	output.AccessFacet = AIAccessFacet
 	output.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
 
-	// TODO(miku): externalize this
-	switch is.SourceID {
-	case "50":
-		output.Institutions = []string{"DE-15"}
-	default:
-		output.Institutions = is.Institutions(iih)
-	}
 	return output, nil
 }
