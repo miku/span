@@ -82,10 +82,11 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 
 func main() {
 
-	var hfiles, lfiles, any span.StringSlice
+	var hfiles, lfiles, any, source span.StringSlice
 	flag.Var(&hfiles, "f", "ISIL:/path/to/ovid.xml")
 	flag.Var(&lfiles, "l", "ISIL:/path/to/list.txt")
 	flag.Var(&any, "any", "ISIL")
+	flag.Var(&source, "source", "ISIL:SID")
 
 	skip := flag.Bool("skip", false, "skip errors")
 	showVersion := flag.Bool("v", false, "prints current program version")
@@ -102,6 +103,7 @@ func main() {
 	}
 
 	// setup ISIL tagger
+
 	opts := options{
 		tagger: make(span.ISILTagger),
 	}
@@ -112,11 +114,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		opts.tagger[isil], err = span.NewHoldingFilter(file)
+		f, err := span.NewHoldingFilter(file)
+		opts.tagger[isil] = append(opts.tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
-
 	}
 
 	for _, s := range lfiles {
@@ -125,17 +127,28 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		opts.tagger[isil], err = span.NewListFilter(file)
+		f, err := span.NewListFilter(file)
+		opts.tagger[isil] = append(opts.tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
 	}
 
+	for _, s := range source {
+		ss := strings.Split(s, ":")
+		if len(ss) != 2 {
+			log.Fatal("use ISIL:SID")
+		}
+		opts.tagger[ss[0]] = append(opts.tagger[ss[0]], span.SourceFilter{SourceID: ss[1]})
+	}
+
 	for _, isil := range any {
-		opts.tagger[isil] = span.Any{}
+		// Any filter would override any other, so just keep this.
+		opts.tagger[isil] = []span.Filter{span.Any{}}
 	}
 
 	// parallel machinery
+
 	queue := make(chan []string)
 	out := make(chan []byte)
 	done := make(chan bool)

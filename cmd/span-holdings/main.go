@@ -55,7 +55,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		tagger[isil], err = span.NewHoldingFilter(file)
+		f, err := span.NewHoldingFilter(file)
+		tagger[isil] = append(tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
@@ -68,14 +69,15 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		tagger[isil], err = span.NewListFilter(file)
+		f, err := span.NewListFilter(file)
+		tagger[isil] = append(tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
 	}
 
 	for _, isil := range any {
-		tagger[isil] = span.Any{}
+		tagger[isil] = []span.Filter{span.Any{}}
 	}
 
 	if *dump {

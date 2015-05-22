@@ -28,6 +28,18 @@ type None struct{}
 
 func (f None) Apply(is finc.IntermediateSchema) bool { return false }
 
+type SourceFilter struct {
+	SourceID string
+}
+
+func (f SourceFilter) Apply(is finc.IntermediateSchema) bool {
+	return is.SourceID == f.SourceID
+}
+
+func (f SourceFilter) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.SourceID)
+}
+
 // HoldingFilter decides ISIL-attachment by looking at licensing information from OVID files.
 type HoldingFilter struct {
 	Table holdings.Licenses `json: "table"`
@@ -117,17 +129,19 @@ func (f ListFilter) Apply(is finc.IntermediateSchema) bool {
 	return false
 }
 
-// ISILAttacher maps an ISIL to a Filter (one should be enough).
+// ISILAttacher maps an ISIL to one or more Filter.
 // If any of these filters return true, the ISIL should be attached.
 // The filters are applied in order.
-type ISILTagger map[string]Filter
+type ISILTagger map[string][]Filter
 
 // Tags will return all ISILs that can be attached to this record.
 func (t ISILTagger) Tags(is finc.IntermediateSchema) []string {
 	isils := container.NewStringSet()
-	for isil, f := range t {
-		if f.Apply(is) {
-			isils.Add(isil)
+	for isil, filters := range t {
+		for _, f := range filters {
+			if f.Apply(is) {
+				isils.Add(isil)
+			}
 		}
 	}
 	return isils.Values()
