@@ -1,7 +1,4 @@
 // span-holdings: test ground for next span-export.
-// usage maybe:
-//
-// $ span-holdings -f DE-15:file.xml -f DE-14:another.xml -l DE-FID:list.txt -a DE-13
 package main
 
 import (
@@ -16,11 +13,6 @@ import (
 	"github.com/miku/span"
 )
 
-type TagPath struct {
-	Tag  string
-	Path string
-}
-
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
 func parseTagPathString(s string) (string, string, error) {
 	p := strings.Split(s, ":")
@@ -30,6 +22,7 @@ func parseTagPathString(s string) (string, string, error) {
 	return p[0], p[1], nil
 }
 
+// parseTagPath returns the tag, an open file and possible errors.
 func parseTagPath(s string) (string, *os.File, error) {
 	var file *os.File
 	isil, path, err := parseTagPathString(s)
@@ -53,10 +46,6 @@ func main() {
 	dump := flag.Bool("dump", false, "dump json and exit")
 
 	flag.Parse()
-
-	if flag.NArg() < 1 {
-		log.Fatal("input file required")
-	}
 
 	tagger := make(span.ISILTagger)
 
