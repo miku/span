@@ -143,7 +143,7 @@ func CombineDatum(year, volume, issue string, empty string) string {
 func parseDelay(s string) (time.Duration, error) {
 	var d time.Duration
 	if s == "" {
-		return time.Duration(0), nil
+		return d, nil
 	}
 	ms := delayPattern.FindStringSubmatch(s)
 	if len(ms) != 3 {
@@ -153,14 +153,11 @@ func parseDelay(s string) (time.Duration, error) {
 	if err != nil {
 		return d, err
 	}
-	if value > 0 {
-		value = -value
-	}
 	switch {
 	case ms[2] == "Y":
-		d = time.Duration(time.Duration(value) * year)
+		return time.Duration(time.Duration(value) * year), nil
 	case ms[2] == "M":
-		d = time.Duration(time.Duration(value) * month)
+		return time.Duration(time.Duration(value) * month), nil
 	default:
 		return d, errUnknownUnit
 	}
