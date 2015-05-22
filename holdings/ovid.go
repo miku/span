@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -85,7 +86,10 @@ func (l License) Covers(signature string) bool {
 
 func (l License) Delay() time.Duration {
 	parts := strings.Split(string(l), ":")
-	v, _ := strconv.Atoi(parts[2])
+	v, err := strconv.Atoi(parts[2])
+	if err != nil {
+		log.Fatal(err)
+	}
 	return time.Duration(v)
 
 }
@@ -198,9 +202,10 @@ func ParseHoldings(r io.Reader) (Licenses, []error) {
 				for _, e := range item.Entitlements {
 					l, err := NewLicenseFromEntitlement(e)
 					if err != nil {
-						errors = append(errors, fmt.Errorf("in EZBID(%d): %s", item.EZBID, err))
+						errors = append(errors, fmt.Errorf("%d => %s", item.EZBID, err))
+					} else {
+						hls = append(hls, l)
 					}
-					hls = append(hls, l)
 				}
 
 				for _, issn := range append(item.EISSN, item.PISSN...) {
@@ -212,100 +217,4 @@ func ParseHoldings(r io.Reader) (Licenses, []error) {
 		}
 	}
 	return lmap, errors
-}
-
-// slimmer processing ----
-
-// IssnHolding maps an ISSN to a holdings.Holding struct.
-// ISSN -> Holding -> []Entitlements
-type IssnHolding map[string]Holding
-
-// IsilIssnHolding maps an ISIL to an IssnHolding map.
-// ISIL -> ISSN -> Holding -> []Entitlements
-type IsilIssnHolding map[string]IssnHolding
-
-// Isils returns available ISILs in this IsilIssnHolding map.
-func (iih *IsilIssnHolding) Isils() (keys []string) {
-	for k := range *iih {
-		keys = append(keys, k)
-	}
-	return keys
-}
-
-// // ParseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
-// func ParseDelay(s string) (d time.Duration, err error) {
-// 	ms := delayPattern.FindStringSubmatch(s)
-// 	if len(ms) != 3 {
-// 		return d, errUnknownFormat
-// 	}
-// 	value, err := strconv.Atoi(ms[1])
-// 	if err != nil {
-// 		return d, err
-// 	}
-// 	switch {
-// 	case ms[2] == "Y":
-// 		d = time.Duration(time.Duration(value) * year)
-// 	case ms[2] == "M":
-// 		d = time.Duration(time.Duration(value) * month)
-// 	default:
-// 		return d, errUnknownUnit
-// 	}
-// 	return
-// }
-
-// Delay returns the specified delay as `time.Duration`
-func (e *Entitlement) Delay() (d time.Duration, err error) {
-	if e.FromDelay != "" && e.ToDelay != "" && e.FromDelay != e.ToDelay {
-		return d, errDelayMismatch
-	}
-	if e.FromDelay != "" {
-		return parseDelay(e.FromDelay)
-	}
-	if e.ToDelay != "" {
-		return parseDelay(e.ToDelay)
-	}
-	return
-}
-
-// Boundary returns the last date before the moving wall restriction becomes effective.
-func (e *Entitlement) Boundary() (d time.Time, err error) {
-	delay, err := e.Delay()
-	if err != nil {
-		return d, err
-	}
-	return time.Now().Add(delay), nil
-}
-
-// HoldingsMap creates an ISSN[Holding] struct from a reader.
-func HoldingsMap(reader io.Reader) IssnHolding {
-	h := make(map[string]Holding)
-	decoder := xml.NewDecoder(reader)
-	var tag string
-	for {
-		t, _ := decoder.Token()
-		if t == nil {
-			break
-		}
-		switch se := t.(type) {
-		case xml.StartElement:
-			tag = se.Name.Local
-			if tag == "holding" {
-				var item Holding
-				decoder.DecodeElement(&item, &se)
-				for _, id := range item.EISSN {
-					tid := strings.TrimSpace(id)
-					if ISSNPattern.MatchString(tid) {
-						h[tid] = item
-					}
-				}
-				for _, id := range item.PISSN {
-					tid := strings.TrimSpace(id)
-					if ISSNPattern.MatchString(tid) {
-						h[tid] = item
-					}
-				}
-			}
-		}
-	}
-	return h
 }

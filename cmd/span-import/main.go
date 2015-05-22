@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"runtime/pprof"
 	"sync"
 
 	"github.com/miku/span"
@@ -24,7 +25,7 @@ var (
 	errCannotConvert     = errors.New("cannot convert type")
 )
 
-// available input formats and their source type
+// Available input formats and their source type.
 var formats = map[string]span.Source{
 	"crossref":  crossref.Crossref{},
 	"degruyter": degruyter.DeGruyter{},
@@ -61,12 +62,22 @@ func main() {
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	logfile := flag.String("log", "", "if given log to file")
 	showVersion := flag.Bool("v", false, "prints current program version")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 
 	flag.Parse()
 
 	if *showVersion {
 		fmt.Println(span.AppVersion)
 		os.Exit(0)
+	}
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	runtime.GOMAXPROCS(*numWorkers)

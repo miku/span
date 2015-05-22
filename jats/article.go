@@ -431,8 +431,7 @@ func (article *Article) Languages() []string {
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	date := article.Date()
-	output.RawDate = date.Format("2006-01-02")
+	output.Date = article.Date()
 
 	output.Abstract = string(article.Front.Article.Abstract.Value)
 	output.ArticleTitle = article.CombinedTitle()

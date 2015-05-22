@@ -4,6 +4,7 @@ package doaj
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -26,6 +27,8 @@ const (
 	// Format for all records
 	Format = "ElectronicArticle"
 )
+
+var errDateMissing = errors.New("date is missing")
 
 type Response struct {
 	ID     string   `json:"_id"`
@@ -151,32 +154,30 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan interface{}, error) {
 	return ch, nil
 }
 
-func (doc Document) Date() (s string) {
+func (doc Document) Date() (time.Time, error) {
 	if doc.Index.Date != "" {
-		layout := "2006-01-02T15:04:05Z"
-		t, err := time.Parse(layout, doc.Index.Date)
-		if err != nil {
-			return t.Format("2006-01-02")
-		}
+		return time.Parse("2006-01-02T15:04:05Z", doc.Index.Date)
 	}
-	if year, err := strconv.Atoi(doc.BibJson.Year); err == nil {
-		if month, err := strconv.Atoi(doc.BibJson.Month); err == nil {
-			if month > 0 && month < 13 {
-				return fmt.Sprintf("%04d-%02d-01", year, month)
-			} else {
-				return fmt.Sprintf("%04d-01-01", year)
+	var s string
+	if y, err := strconv.Atoi(doc.BibJson.Year); err == nil {
+		s = fmt.Sprintf("%04d-01-01", y)
+		if m, err := strconv.Atoi(doc.BibJson.Month); err == nil {
+			if m > 0 && m < 13 {
+				s = fmt.Sprintf("%04d-%02d-01", y, m)
 			}
 		}
-		return fmt.Sprintf("%04d-01-01", year)
 	}
-	// TODO(miku): resolve missing date records
-	// records w/o date seem to represent journal homepages and the like
-	// should be skipable in general
-	return "1970-01-01"
+	return time.Parse("2006-01-02", s)
 }
 
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+	var err error
+
 	output := finc.NewIntermediateSchema()
+	output.Date, err = doc.Date()
+	if err != nil {
+		return output, err
+	}
 
 	output.SourceID = SourceID
 	output.RecordID = doc.ID
@@ -188,7 +189,6 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.JournalTitle = doc.BibJson.Journal.Title
 	output.Volume = doc.BibJson.Journal.Volume
 	output.Publishers = append(output.Publishers, doc.BibJson.Journal.Publisher)
-	output.RawDate = doc.Date()
 
 	for _, link := range doc.BibJson.Link {
 		output.URL = append(output.URL, link.URL)

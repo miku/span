@@ -83,9 +83,7 @@ func (f HoldingFilter) CoveredAndValid(signature, issn string) bool {
 // HoldingFilter compares the (year, volume, issue) of the
 // record with license information, including possible moving walls.
 func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
-	// TODO(miku): make is.Date() fail earlier.
-	date, _ := is.Date()
-	signature := holdings.CombineDatum(fmt.Sprintf("%d", date.Year()), is.Volume, is.Issue, "")
+	signature := holdings.CombineDatum(fmt.Sprintf("%d", is.Date.Year()), is.Volume, is.Issue, "")
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		if f.CoveredAndValid(signature, issn) {
 			return true

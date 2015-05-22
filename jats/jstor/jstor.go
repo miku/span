@@ -108,6 +108,7 @@ func (article *Article) Authors() []finc.Author {
 	return authors
 }
 
+// Languages returns a list of language in 3-letter format.
 func (article *Article) Languages() []string {
 	set := container.NewStringSet()
 	for _, cm := range article.Front.Article.CustomMetaGroup.CustomMeta {

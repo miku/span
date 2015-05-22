@@ -337,10 +337,10 @@ func (doc *Document) parseMemberID() (id int, err error) {
 
 // ToIntermediateSchema converts a crossref document into IS.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+	var err error
 	output := finc.NewIntermediateSchema()
 
-	date, err := doc.Issued.Date()
-	output.RawDate = date.Format("2006-01-02")
+	output.Date, err = doc.Issued.Date()
 	if err != nil {
 		return output, err
 	}

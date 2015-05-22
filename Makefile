@@ -1,4 +1,4 @@
-TARGETS = span-import span-export span-gh-dump span-hspec
+TARGETS = span-import span-export span-gh-dump
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test: deps
@@ -20,9 +20,6 @@ span-import: imports deps
 
 span-export: imports deps
 	go build -o span-export cmd/span-export/main.go
-
-span-hspec: imports deps
-	go build -o span-hspec cmd/span-hspec/main.go
 
 span-gh-dump: imports deps
 	go build -o span-gh-dump cmd/span-gh-dump/main.go

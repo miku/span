@@ -30,7 +30,6 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 # the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-gh-dump $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-hspec $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
 
 
@@ -48,7 +47,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 %defattr(-,root,root)
 /usr/local/sbin/span-export
 /usr/local/sbin/span-gh-dump
-/usr/local/sbin/span-hspec
 /usr/local/sbin/span-import
 
 

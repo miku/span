@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"runtime/pprof"
 	"strings"
 	"sync"
 
@@ -83,6 +84,7 @@ func main() {
 	dumpFilters := flag.Bool("dump", false, "dump filters and exit")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 
 	flag.Parse()
 
@@ -91,6 +93,15 @@ func main() {
 	if *showVersion {
 		fmt.Println(span.AppVersion)
 		os.Exit(0)
+	}
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	tagger := make(span.ISILTagger)

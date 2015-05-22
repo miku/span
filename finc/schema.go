@@ -3,7 +3,6 @@ package finc
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -17,17 +16,6 @@ const (
 	AIRecordType              = "ai"
 	AIAccessFacet             = "Electronic Resources"
 	IntermediateSchemaVersion = "0.9"
-)
-
-var (
-	errFromYear        = errors.New("from-year mismatch")
-	errFromVolume      = errors.New("from-volume mismatch")
-	errFromIssue       = errors.New("from-issue mismatch")
-	errToYear          = errors.New("to-year mismatch")
-	errToVolume        = errors.New("to-volume mismatch")
-	errToIssue         = errors.New("to-issue mismatch")
-	errMovingWall      = errors.New("moving-wall violation")
-	errUnparsableValue = errors.New("value not parsable")
 )
 
 var NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
@@ -114,12 +102,13 @@ type IntermediateSchema struct {
 	Places       []string `json:"rft.place,omitempty"`
 	Publishers   []string `json:"rft.pub,omitempty"`
 	Quarter      string   `json:"rft.quarter,omitempty"`
-	RawDate      string   `json:"rft.date,omitempty"`
-	Season       string   `json:"rft.ssn,omitempty"`
-	Series       string   `json:"rft.series,omitempty"`
-	ShortTitle   string   `json:"rft.stitle,omitempty"`
-	StartPage    string   `json:"rft.spage,omitempty"`
-	Volume       string   `json:"rft.volume,omitempty"`
+	// RawDate      string    `json:"rft.date,omitempty"`
+	Date       time.Time `json:"x.date,omitempty"`
+	Season     string    `json:"rft.ssn,omitempty"`
+	Series     string    `json:"rft.series,omitempty"`
+	ShortTitle string    `json:"rft.stitle,omitempty"`
+	StartPage  string    `json:"rft.spage,omitempty"`
+	Volume     string    `json:"rft.volume,omitempty"`
 
 	Abstract  string   `json:"abstract,omitempty"`
 	Authors   []Author `json:"authors,omitempty"`
@@ -139,16 +128,6 @@ func NewIntermediateSchema() *IntermediateSchema {
 	return &IntermediateSchema{Version: IntermediateSchemaVersion}
 }
 
-// Date returns the publication or issuing date of this record.
-// Fails on non ISO-8601 compliant dates.
-func (is *IntermediateSchema) Date() (time.Time, error) {
-	t, err := time.Parse("2006-01-02", is.RawDate)
-	if err != nil {
-		return t, fmt.Errorf("invalid date: %s", is.RawDate)
-	}
-	return t, nil
-}
-
 // ISSNList returns a deduplicated list of all ISSN and EISSN.
 func (is *IntermediateSchema) ISSNList() []string {
 	set := make(map[string]struct{})
@@ -163,7 +142,7 @@ func (is *IntermediateSchema) ISSNList() []string {
 }
 
 // Allfields returns a combination of various fields.
-func (is *IntermediateSchema) Allfields() (string, error) {
+func (is *IntermediateSchema) Allfields() string {
 	var authors []string
 	for _, author := range is.Authors {
 		authors = append(authors, author.String())
@@ -175,14 +154,11 @@ func (is *IntermediateSchema) Allfields() (string, error) {
 	for _, f := range fields {
 		for _, value := range f {
 			for _, token := range strings.Fields(value) {
-				_, err := buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
-				if err != nil {
-					return "", err
-				}
+				buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
 			}
 		}
 	}
-	return strings.TrimSpace(buf.String()), nil
+	return strings.TrimSpace(buf.String())
 }
 
 func btoi(b bool) int {
@@ -195,8 +171,7 @@ func btoi(b bool) int {
 // Imprint MARC 260 a, b, c (trad.)
 func (is *IntermediateSchema) Imprint() (s string) {
 	var places, publisher string
-	date, _ := is.Date()
-	year := date.Year()
+	year := is.Date.Year()
 	places = strings.Join(is.Places, " ; ")
 	if len(is.Publishers) > 0 {
 		publisher = is.Publishers[0]
@@ -242,17 +217,7 @@ func (is *IntermediateSchema) SortableAuthor() string {
 func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output := new(SolrSchema)
 
-	date, err := is.Date()
-	if err != nil {
-		return output, err
-	}
-
-	all, err := is.Allfields()
-	if err != nil {
-		return output, err
-	}
-
-	output.Allfields = all
+	output.Allfields = is.Allfields()
 	output.Formats = append(output.Formats, is.Format)
 	output.Fullrecord = "blob:" + is.RecordID
 	output.Fulltext = is.Fulltext
@@ -261,7 +226,7 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output.Imprint = is.Imprint()
 	output.ISSN = is.ISSNList()
 	output.MegaCollections = append(output.MegaCollections, is.MegaCollection)
-	output.PublishDateSort = date.Year()
+	output.PublishDateSort = is.Date.Year()
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
 	output.SortableTitle = is.SortableTitle()
