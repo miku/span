@@ -60,22 +60,7 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 			if err != nil {
 				log.Fatal(err)
 			}
-
-			// source specific filter, e.g. attach DE-15 to all source id 50 items:
-			//
-			//     $ ./span-export -source DE-15:50
-			//
-			// source specific fields
-			// TODO(miku): move this into ISILTagger as well, e.g.
-			// with a "SourceSpecific" Tagger
-			// switch is.SourceID {
-			// case "50":
-			// 	ss.Institutions = []string{"DE-15"}
-			// default:
-			// 	ss.Institutions = opts.tagger.Tags(*is)
-			// }
 			ss.Institutions = opts.tagger.Tags(*is)
-
 			b, err := json.Marshal(ss)
 			if err != nil {
 				log.Fatal(err)
@@ -107,11 +92,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	// setup ISIL tagger
-
-	opts := options{
-		tagger: make(span.ISILTagger),
-	}
+	tagger := make(span.ISILTagger)
 
 	for _, s := range hfiles {
 		isil, file, err := parseTagPath(s)
@@ -152,7 +133,7 @@ func main() {
 		opts.tagger[isil] = []span.Filter{span.Any{}}
 	}
 
-	// parallel machinery
+	opts := options{tagger: tagger}
 
 	queue := make(chan []string)
 	out := make(chan []byte)
@@ -213,5 +194,4 @@ func main() {
 	wg.Wait()
 	close(out)
 	<-done
-
 }
