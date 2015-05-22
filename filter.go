@@ -96,7 +96,7 @@ func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 
 // ListFilter will include records, whose ISSN is contained in a given set.
 type ListFilter struct {
-	Set *container.StringSet `json: "set"`
+	Set *container.StringSet
 }
 
 // NewAttachByList reads one record per line from reader.
