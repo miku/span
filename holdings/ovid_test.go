@@ -224,7 +224,7 @@ func TestWall(t *testing.T) {
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2011-02-02"), false},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2014-02-02"), true},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2013-02-02"), false},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2013-09-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2018-09-02"), true},
 	}
 	for _, c := range cases {
 		r := c.t.After(c.license.Wall())
