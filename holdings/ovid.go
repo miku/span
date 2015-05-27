@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	// Inaccurate but sufficient helpers for unwrapping delay values.
 	day   = 24 * time.Hour
 	month = 30 * day
 	year  = 12 * month
@@ -21,24 +22,32 @@ const (
 	// LowDatum16 represents a lowest datum for unspecified start dates.
 	// The format is YYYYvvvvvviiiiii (year-volume-issue, zero-padded).
 	LowDatum16 = "0000000000000000"
+
 	// HighDatum16 represents a lowest datum for unspecified end dates.
 	// The format is YYYYvvvvvviiiiii (year-volume-issue, zero-padded).
 	HighDatum16 = "ZZZZZZZZZZZZZZZZ"
+
 	// MaxVolume is the largest volume number we can sensibly handle.
 	MaxVolume = "999999"
+
 	// MaxVolume is the largest issue number we can sensibly handle.
 	MaxIssue = "999999"
+
 	// emptyLicense
 	emptyLicense = License("")
 )
 
-// delayPattern is how moving walls are expressed in OVID format.
+// delayPattern is how moving walls are expressed in OVID.
 var delayPattern = regexp.MustCompile(`^([-+]\d+)(M|Y)$`)
 
 var (
 	errUnknownUnit   = errors.New("unknown unit")
 	errUnknownFormat = errors.New("unknown format")
 	errDelayMismatch = errors.New("delay mismatch")
+	errInvalidYear   = errors.New("invalid year")
+	errVolumeTooBig  = errors.New("volume number too big")
+	errIssueTooBig   = errors.New("issue number too big")
+	errInvalidRange  = errors.New("invalid range in holdings file")
 )
 
 // ISSNPattern is the canonical form of an ISSN.
@@ -122,27 +131,29 @@ func (l License) Wall() time.Time {
 // sanity checks.
 func NewLicenseFromEntitlement(e Entitlement) (License, error) {
 	if len(e.FromYear) > 4 || len(e.ToYear) > 4 {
-		return emptyLicense, errors.New("invalid year")
+		return emptyLicense, errInvalidYear
 	}
 	if len(e.FromVolume) > len(MaxVolume) || len(e.ToVolume) > len(MaxVolume) {
-		return emptyLicense, errors.New("volume number too big")
+		return emptyLicense, errVolumeTooBig
 	}
 	if len(e.FromIssue) > len(MaxIssue) || len(e.ToIssue) > len(MaxIssue) {
-		return emptyLicense, errors.New("issue number too big")
+		return emptyLicense, errIssueTooBig
 	}
+
 	from := CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
 	to := CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, HighDatum16)
+
 	if to < from {
-		return emptyLicense, errors.New("invalid range in holdings file")
+		return emptyLicense, errInvalidRange
 	}
-	delay := firstNonemptyString(e.FromDelay, e.ToDelay)
-	if delay == "" {
-		delay = "-0M"
-	}
+
+	delay := firstNonemptyString(e.FromDelay, e.ToDelay, "-0M")
+
 	dur, err := parseDelay(delay)
 	if err != nil {
 		return emptyLicense, err
 	}
+
 	return License(fmt.Sprintf("%s:%s:%d", from, to, dur.Nanoseconds())), nil
 }
 
