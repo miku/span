@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+func mustParse(s string) time.Time {
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
 func TestParseDelay(t *testing.T) {
 	var tests = []struct {
 		s   string
@@ -192,15 +200,36 @@ func TestCovers(t *testing.T) {
 		result    bool
 	}{
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2013000035000000", true},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2011000035000000", false},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2012000035000000", true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2018000034000000", true},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2012000034000000", false},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2018000034000000", false}, // this test will fail in ~2020 :)
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2011000035000000", false},
 	}
 	for _, c := range cases {
 		r := c.license.Covers(c.signature)
 		if r != c.result {
 			t.Errorf("Covers(%s) => got %v, want %v", c.signature, r, c.result)
+		}
+	}
+}
+
+// Test whether some date would fail because of a moving wall.
+func TestWall(t *testing.T) {
+	var cases = []struct {
+		license License
+		t       time.Time
+		result  bool
+	}{
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2012-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2011-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2014-02-02"), true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2013-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2013-09-02"), false},
+	}
+	for _, c := range cases {
+		r := c.t.After(c.license.Wall())
+		if r != c.result {
+			t.Errorf("%s, Wall() => got %v, want %v", c.t, r, c.result)
 		}
 	}
 }
