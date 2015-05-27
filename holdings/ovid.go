@@ -127,6 +127,19 @@ func (l License) Wall(ref time.Time) time.Time {
 	return ref.Truncate(time.Hour).Add(d + l.Delay())
 }
 
+// Licenses holds the license ranges for an ISSN.
+type Licenses map[string][]License
+
+// Add adds a license range string to a given ISSN. Dups are ignored.
+func (t Licenses) Add(issn string, license License) {
+	for _, v := range t[issn] {
+		if v == license {
+			return
+		}
+	}
+	t[issn] = append(t[issn], license)
+}
+
 // NewLicenseFromEntitlement creates a simple License string from the more
 // complex Entitlement structure. If error is nil, the License passed the
 // sanity checks.
@@ -156,19 +169,6 @@ func NewLicenseFromEntitlement(e Entitlement) (License, error) {
 	}
 
 	return License(fmt.Sprintf("%s:%s:%d", from, to, dur.Nanoseconds())), nil
-}
-
-// Licenses holds the license ranges for an ISSN.
-type Licenses map[string][]License
-
-// Add adds a license range string to a given ISSN. Dups are ignored.
-func (t Licenses) Add(issn string, license License) {
-	for _, v := range t[issn] {
-		if v == license {
-			return
-		}
-	}
-	t[issn] = append(t[issn], license)
 }
 
 // CombineDatum combines year, volume and issue into a single value,
