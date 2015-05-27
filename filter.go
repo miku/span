@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 	"time"
 
@@ -48,11 +49,10 @@ type HoldingFilter struct {
 func NewHoldingFilter(r io.Reader) (HoldingFilter, error) {
 	licenses, errs := holdings.ParseHoldings(r)
 	if len(errs) > 0 {
-		var msgs []string
-		for i, e := range errs {
-			msgs = append(msgs, fmt.Sprintf("[%d] %s", i, e.Error()))
+		for _, e := range errs {
+			log.Println(e)
 		}
-		return HoldingFilter{Table: licenses}, fmt.Errorf("one or more errors\n%s", strings.Join(msgs, "\n"))
+		return HoldingFilter{Table: licenses}, fmt.Errorf("%d errors in holdings file, use -skip to ignore faulty entries", len(errs))
 	}
 	return HoldingFilter{Table: licenses}, nil
 }
