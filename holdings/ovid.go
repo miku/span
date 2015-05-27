@@ -115,15 +115,13 @@ func (l License) Delay() time.Duration {
 		log.Fatal(err)
 	}
 	return time.Duration(v)
-
 }
 
 // Wall returns the licence wall truncated to day. The moving wall calculation
 // is based on the system current time.
-func (l License) Wall() time.Time {
-	now := time.Now()
-	d := time.Duration(-now.Hour()) * time.Hour
-	return now.Truncate(time.Hour).Add(d + l.Delay())
+func (l License) Wall(ref time.Time) time.Time {
+	d := time.Duration(-ref.Hour()) * time.Hour
+	return ref.Truncate(time.Hour).Add(d + l.Delay())
 }
 
 // NewLicenseFromEntitlement creates a simple License string from the more
