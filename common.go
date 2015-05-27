@@ -56,21 +56,6 @@ func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	done <- true
 }
 
-// ParseHoldingSpec parses a holdings flag value into a map.
-func ParseHoldingSpec(s string) (map[string]string, error) {
-	fields := strings.Split(s, ",")
-	pathmap := make(map[string]string)
-	for _, f := range fields {
-		parts := strings.Split(f, ":")
-		if len(parts) != 2 {
-			return nil, fmt.Errorf("invalid spec: %s", f)
-		}
-		pathmap[parts[0]] = parts[1]
-
-	}
-	return pathmap, nil
-}
-
 // Define a type named "StringSlice" as a slice of strings
 type StringSlice []string
 
