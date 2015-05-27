@@ -184,3 +184,23 @@ func TestParseHoldings(t *testing.T) {
 		}
 	}
 }
+
+func TestCovers(t *testing.T) {
+	var cases = []struct {
+		license   License
+		signature string
+		result    bool
+	}{
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2013000035000000", true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2011000035000000", false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2012000035000000", true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2012000034000000", false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2018000034000000", false}, // this test will fail in ~2020 :)
+	}
+	for _, c := range cases {
+		r := c.license.Covers(c.signature)
+		if r != c.result {
+			t.Errorf("Covers(%s) => got %v, want %v", c.signature, r, c.result)
+		}
+	}
+}
