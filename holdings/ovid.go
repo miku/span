@@ -69,8 +69,13 @@ type Entitlement struct {
 	ToDelay    string `xml:"end>delay" json:"to-delay"`
 }
 
-// License represents a span of time, which a license covers,
-// expressed as a string of the form from:to:delay.
+// License represents a span of time, which a license covers, expressed as a
+// string of the form `from:to:delay`. Both `from` and `to` are expressed as
+// `YYYYvvvvvviiiiii` (year-volume-issue, zero-padded). Since we resort to
+// string comparisons, `0000000000000000` and `ZZZZZZZZZZZZZZZZ` are valid
+// values for unbounded start and end points in time. The delay must be
+// expressed in nanoseconds, e.g. -2Y would be expressed as
+// `-62208000000000000`.
 type License string
 
 // From returns the start of the license range.
@@ -85,13 +90,15 @@ func (l License) To() string {
 	return parts[1]
 }
 
+// Covers returns true, if the given signature falls between the start and end
+// of the license. Moving wall does not play a role here.
 func (l License) Covers(signature string) bool {
-	if signature < l.From() || l.To() < signature {
-		return false
-	}
-	return true
+	return signature >= l.From() && l.To() >= signature
 }
 
+// Delay returns the delay as a duration. This function will halt the world if
+// the license has not passed basic sanity checks. Always use
+// `NewLicenseFromEntitlement` to build a license.
 func (l License) Delay() time.Duration {
 	parts := strings.Split(string(l), ":")
 	v, err := strconv.Atoi(parts[2])
@@ -102,15 +109,17 @@ func (l License) Delay() time.Duration {
 
 }
 
-// Wall returns the licence wall truncated to day.
+// Wall returns the licence wall truncated to day. The moving wall calculation
+// is based on the system current time.
 func (l License) Wall() time.Time {
 	now := time.Now()
 	d := time.Duration(-now.Hour()) * time.Hour
 	return now.Truncate(time.Hour).Add(d + l.Delay())
 }
 
-// NewLicenseFromEntitlement creates a simple License string from the more complex
-// Entitlement structure. If error is nil, the License passed sanity checks.
+// NewLicenseFromEntitlement creates a simple License string from the more
+// complex Entitlement structure. If error is nil, the License passed the
+// sanity checks.
 func NewLicenseFromEntitlement(e Entitlement) (License, error) {
 	if len(e.FromYear) > 4 || len(e.ToYear) > 4 {
 		return emptyLicense, errors.New("invalid year")
@@ -124,7 +133,7 @@ func NewLicenseFromEntitlement(e Entitlement) (License, error) {
 	from := CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
 	to := CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, HighDatum16)
 	if to < from {
-		return License(""), errors.New("invalid range in holdings file")
+		return emptyLicense, errors.New("invalid range in holdings file")
 	}
 	delay := firstNonemptyString(e.FromDelay, e.ToDelay)
 	if delay == "" {
@@ -132,7 +141,7 @@ func NewLicenseFromEntitlement(e Entitlement) (License, error) {
 	}
 	dur, err := parseDelay(delay)
 	if err != nil {
-		return License(""), err
+		return emptyLicense, err
 	}
 	return License(fmt.Sprintf("%s:%s:%d", from, to, dur.Nanoseconds())), nil
 }
