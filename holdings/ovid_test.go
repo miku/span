@@ -76,14 +76,104 @@ func TestParseHoldings(t *testing.T) {
       <available><![CDATA[Konsortiallizenz - Gesamter Zeitraum]]></available>
     </entitlement>
   </entitlements>
-</holding>`), Licenses{"1610-2940": []License{
-			License("1995000001000000:2002000008000000:0"),
-			License("0000000000000000:ZZZZZZZZZZZZZZZZ:0")},
+</holding>`), Licenses{
+			"1610-2940": []License{
+				License("1995000001000000:2002000008000000:0"),
+				License("0000000000000000:ZZZZZZZZZZZZZZZZ:0")},
 			"0948-5023": []License{
 				License("1995000001000000:2002000008000000:0"),
 				License("0000000000000000:ZZZZZZZZZZZZZZZZ:0"),
 			}},
-		}}
+		}, {
+			strings.NewReader(`
+<holding ezb_id = "119">
+  <title><![CDATA[Traumatology]]></title>
+  <publishers><![CDATA[Sage Publications ; HighWire Press ; Academy of Traumatology]]></publishers>
+  <EZBIssns>
+    <p-issn>1534-7656</p-issn>
+    <e-issn>1085-9373</e-issn>
+  </EZBIssns>
+  <entitlements>
+    <entitlement status = "subscribed">
+      <url>http%3A%2F%2Ftmt.sagepub.com%2F</url>
+      <anchor>sage_premier</anchor>
+      <begin>
+        <year>1995</year>
+        <volume>1</volume>
+      </begin>
+      <end>
+        <year>2013</year>
+        <volume>19</volume>
+      </end>
+      <available><![CDATA[DFG-geförderte Allianz-Lizenz]]></available>
+    </entitlement>
+    <entitlement status = "subscribed">
+      <url>http%3A%2F%2Ftmt.sagepub.com%2F</url>
+      <anchor>natli_sage_archive</anchor>
+      <begin>
+        <year>1995</year>
+        <volume>1</volume>
+      </begin>
+      <end>
+        <year>2013</year>
+        <volume>19</volume>
+      </end>
+      <available><![CDATA[Nationallizenz]]></available>
+    </entitlement>
+  </entitlements>
+</holding>`), Licenses{
+				"1534-7656": []License{
+					License("1995000001000000:2013000019000000:0")},
+				"1085-9373": []License{
+					License("1995000001000000:2013000019000000:0")}},
+		},
+		{
+			strings.NewReader(
+				`<holding ezb_id = "20">
+  <title><![CDATA[Behavioral and Brain Sciences]]></title>
+  <publishers><![CDATA[Cambridge University Press]]></publishers>
+  <EZBIssns>
+    <p-issn>0140-525X</p-issn>
+    <e-issn>1469-1825</e-issn>
+  </EZBIssns>
+  <entitlements>
+    <entitlement status = "subscribed">
+      <url>http%3A%2F%2Fjournals.cambridge.org%2FBBS</url>
+      <anchor>natli_cup</anchor>
+      <begin>
+        <year>2012</year>
+        <volume>35</volume>
+        <delay>-2Y</delay>
+      </begin>
+      <end>
+        <delay>-2Y</delay>
+      </end>
+      <available><![CDATA[Nationallizenz]]></available>
+    </entitlement>
+    <entitlement status = "subscribed">
+      <url>http%3A%2F%2Fjournals.cambridge.org%2Fjid_BBS</url>
+      <anchor>cambridge</anchor>
+      <begin>
+        <year>1997</year>
+        <volume>20</volume>
+        <issue>1</issue>
+      </begin>
+      <end>
+        <year>2004</year>
+        <volume>27</volume>
+        <issue>6</issue>
+      </end>
+    </entitlement>
+  </entitlements>
+</holding>`), Licenses{
+				"0140-525X": []License{
+					License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"),
+					License("1997000020000001:2004000027000006:0")},
+				"1469-1825": []License{
+					License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"),
+					License("1997000020000001:2004000027000006:0")}},
+		},
+	}
 	for _, tt := range tests {
 		licenses, err := ParseHoldings(tt.r)
 		if err != nil {
