@@ -43,66 +43,10 @@ func TestParseDelay(t *testing.T) {
 	}
 }
 
-func TestDelay(t *testing.T) {
+func TestParseHoldings(t *testing.T) {
 	var tests = []struct {
-		e   Entitlement
-		d   time.Duration
-		err error
-	}{
-		{Entitlement{FromDelay: "-1M"}, time.Duration(-2592000000000000), nil},
-		{Entitlement{ToDelay: "-1M"}, time.Duration(-2592000000000000), nil},
-		{Entitlement{FromDelay: "-1M", ToDelay: "-1M"}, time.Duration(-2592000000000000), nil},
-		{Entitlement{FromDelay: "-1M", ToDelay: "-2M"}, time.Duration(0), errDelayMismatch},
-		{Entitlement{FromDelay: "-2M", ToDelay: "-1M"}, time.Duration(0), errDelayMismatch},
-	}
-	for _, tt := range tests {
-		d, err := tt.e.Delay()
-		if d != tt.d {
-			t.Errorf("e.Delay() => %v, %v, want %v, %v", d, err, tt.d, tt.err)
-		}
-		if err != nil {
-			if tt.err != nil {
-				if err.Error() != tt.err.Error() {
-					t.Errorf("e.Delay() => %v, %v, want %v, %v", d, err, tt.d, tt.err)
-				}
-			} else {
-				t.Errorf("e.Delay() => %v, %v, want %v, %v", d, err, tt.d, tt.err)
-			}
-		}
-	}
-}
-
-func TestBoundary(t *testing.T) {
-	margin := 100 * time.Microsecond
-	var tests = []struct {
-		e   Entitlement
-		d   time.Time
-		err error
-	}{
-		{Entitlement{FromDelay: "-0M"}, time.Now(), nil},
-		{Entitlement{FromDelay: "0M"}, time.Now(), errUnknownFormat},
-	}
-	for _, tt := range tests {
-		d, err := tt.e.Boundary()
-		if err != nil {
-			if tt.err != nil {
-				if err.Error() != tt.err.Error() {
-					t.Errorf("e.Boundary() => %v, %v, want %v, %v", d, err, tt.d, tt.err)
-				}
-			} else {
-				t.Errorf("e.Boundary() => %v, %v, want %v, %v", d, err, tt.d, tt.err)
-			}
-		}
-		if d.Sub(tt.d) > time.Duration(margin) {
-			t.Errorf("e.Boundary() => %v, %v, want %v, %v", d, err, tt.d, tt.err)
-		}
-	}
-}
-
-func TestHoldingsMap(t *testing.T) {
-	var tests = []struct {
-		r io.Reader
-		m map[string]Holding
+		r        io.Reader
+		licenses Licenses
 	}{
 		{strings.NewReader(`
 <holding ezb_id = "1">
@@ -132,36 +76,21 @@ func TestHoldingsMap(t *testing.T) {
       <available><![CDATA[Konsortiallizenz - Gesamter Zeitraum]]></available>
     </entitlement>
   </entitlements>
-</holding>`), map[string]Holding{
-			"1610-2940": {
-				EZBID:      1,
-				Title:      "Journal of Molecular Modeling",
-				Publishers: "Springer",
-				PISSN:      []string{"1610-2940"},
-				EISSN:      []string{"0948-5023"},
-				Entitlements: []Entitlement{
-					{
-						Status:     "subscribed",
-						URL:        "http://link.springer.com/journal/894",
-						Anchor:     "natli_springer",
-						FromYear:   "1995",
-						FromVolume: "1",
-						ToYear:     "2002",
-						ToVolume:   "8",
-					},
-					{
-						Status: "subscribed",
-						URL:    "http://link.springer.com/journal/894",
-						Anchor: "springer",
-					},
-				},
-			},
-		}},
-	}
+</holding>`), Licenses{"1610-2940": []License{
+			License("1995000001000000:2002000008000000:0"),
+			License("0000000000000000:ZZZZZZZZZZZZZZZZ:0")},
+			"0948-5023": []License{
+				License("1995000001000000:2002000008000000:0"),
+				License("0000000000000000:ZZZZZZZZZZZZZZZZ:0"),
+			}},
+		}}
 	for _, tt := range tests {
-		m := HoldingsMap(tt.r)
-		if reflect.DeepEqual(m, tt.m) {
-			t.Errorf("HoldingsMap(%v) => %+v, want %+v", tt.r, m, tt.m)
+		licenses, err := ParseHoldings(tt.r)
+		if err != nil {
+			t.Error(err)
+		}
+		if !reflect.DeepEqual(licenses, tt.licenses) {
+			t.Errorf("ParseHoldings(%v) => %+v, want %+v", tt.r, licenses, tt.licenses)
 		}
 	}
 }
