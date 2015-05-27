@@ -27,6 +27,9 @@ const (
 	// The format is YYYYvvvvvviiiiii (year-volume-issue, zero-padded).
 	HighDatum16 = "ZZZZZZZZZZZZZZZZ"
 
+	// MaxVolume is the largest year we can sensibly handle.
+	MaxYear = "9999"
+
 	// MaxVolume is the largest volume number we can sensibly handle.
 	MaxVolume = "999999"
 
@@ -128,7 +131,7 @@ func (l License) Wall(ref time.Time) time.Time {
 // complex Entitlement structure. If error is nil, the License passed the
 // sanity checks.
 func NewLicenseFromEntitlement(e Entitlement) (License, error) {
-	if len(e.FromYear) > 4 || len(e.ToYear) > 4 {
+	if len(e.FromYear) > len(MaxYear) || len(e.ToYear) > len(MaxYear) {
 		return emptyLicense, errInvalidYear
 	}
 	if len(e.FromVolume) > len(MaxVolume) || len(e.ToVolume) > len(MaxVolume) {
@@ -170,7 +173,7 @@ func (t Licenses) Add(issn string, license License) {
 
 // CombineDatum combines year, volume and issue into a single value,
 // that preserves the order, if length of year, volume and issue do not
-// exceed 4, 6 and 6, respectively.
+// exceed 4, 6 and 6, respectively: YYYYvvvvvviiiiii.
 func CombineDatum(year, volume, issue string, empty string) string {
 	if year == "" && volume == "" && issue == "" && empty != "" {
 		return empty
@@ -179,6 +182,7 @@ func CombineDatum(year, volume, issue string, empty string) string {
 }
 
 // parseDelay parses delay strings like '-1M', '-3Y', ... into a time.Duration.
+// Will fail on on units other that M and Y.
 func parseDelay(s string) (time.Duration, error) {
 	var d time.Duration
 	if s == "" {
@@ -213,11 +217,14 @@ func firstNonemptyString(v ...string) string {
 	return ""
 }
 
+// ParseHoldings takes a reader and will try to return Licenses, which is just
+// a map from ISSN to []License. Errors are collected and returned as slice.
 func ParseHoldings(r io.Reader) (Licenses, []error) {
-	var errors []error
-	lmap := make(Licenses)
 	decoder := xml.NewDecoder(bufio.NewReader(r))
+	lmap := make(Licenses)
+	var errors []error
 	var tag string
+
 	for {
 		t, err := decoder.Token()
 		if err != nil && err != io.EOF {
