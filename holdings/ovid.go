@@ -19,9 +19,17 @@ const (
 	year  = 12 * month
 
 	// LowDatum16 represents a lowest datum for unspecified start dates.
+	// The format is YYYYvvvvvviiiiii (year-volume-issue, zero-padded).
 	LowDatum16 = "0000000000000000"
 	// HighDatum16 represents a lowest datum for unspecified end dates.
+	// The format is YYYYvvvvvviiiiii (year-volume-issue, zero-padded).
 	HighDatum16 = "ZZZZZZZZZZZZZZZZ"
+	// MaxVolume is the largest volume number we can sensibly handle.
+	MaxVolume = "999999"
+	// MaxVolume is the largest issue number we can sensibly handle.
+	MaxIssue = "999999"
+	// emptyLicense
+	emptyLicense = License("")
 )
 
 // delayPattern is how moving walls are expressed in OVID format.
@@ -104,6 +112,15 @@ func (l License) Wall() time.Time {
 // NewLicenseFromEntitlement creates a simple License string from the more complex
 // Entitlement structure. If error is nil, the License passed sanity checks.
 func NewLicenseFromEntitlement(e Entitlement) (License, error) {
+	if len(e.FromYear) > 4 || len(e.ToYear) > 4 {
+		return emptyLicense, errors.New("invalid year")
+	}
+	if len(e.FromVolume) > len(MaxVolume) || len(e.ToVolume) > len(MaxVolume) {
+		return emptyLicense, errors.New("volume number too big")
+	}
+	if len(e.FromIssue) > len(MaxIssue) || len(e.ToIssue) > len(MaxIssue) {
+		return emptyLicense, errors.New("issue number too big")
+	}
 	from := CombineDatum(e.FromYear, e.FromVolume, e.FromIssue, LowDatum16)
 	to := CombineDatum(e.ToYear, e.ToVolume, e.ToIssue, HighDatum16)
 	if to < from {
