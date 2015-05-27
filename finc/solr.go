@@ -23,7 +23,6 @@ type SolrSchema struct {
 	Series               []string `json:"series,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	SourceID             string   `json:"source_id,omitempty"`
-	SortableTitle        string   `json:"title_sort,omitempty"`
 	Subtitle             string   `json:"title_sub,omitempty"`
 	Title                string   `json:"title,omitempty"`
 	TitleFull            string   `json:"title_full,omitempty"`

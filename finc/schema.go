@@ -229,10 +229,10 @@ func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
 	output.PublishDateSort = is.Date.Year()
 	output.Publishers = is.Publishers
 	output.RecordType = AIRecordType
-	output.SortableTitle = is.SortableTitle()
 	output.Series = append(output.Series, is.JournalTitle)
 	output.SourceID = is.SourceID
 	output.Subtitle = is.ArticleSubtitle
+	output.TitleSort = is.SortableTitle()
 	output.Topics = is.Subjects
 	output.URL = is.URL
 
