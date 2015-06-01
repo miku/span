@@ -1,0 +1,20 @@
+{
+    "dissertation": "book",
+    "book-chapter": "bookitem",
+    "component": "document",
+    "journal": "unknown",
+    "book-series": "bookitem",
+    "report-series": "report",
+    "dataset": "document",
+    "proceedings": "proceeding",
+    "journal-article": "article",
+    "reference-entry": "document",
+    "book-part": "bookitem",
+    "book-section": "bookitem",
+    "report": "report",
+    "reference-book": "book",
+    "journal-issue": "issue",
+    "proceedings-article": "proceeding",
+    "book": "book",
+    "monograph": "book"
+}

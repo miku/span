@@ -1,0 +1,11 @@
+{
+    "ElectronicSerial": "Journal, E-Journal",
+    "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
+    "ElectronicArticle": "Article, E-Article",
+    "eBook": "Book, E-Book",
+    "ElectronicThesis": "Thesis",
+    "ElectronicProceeding": "Proceeding",
+    "ElectronicJournal": "Journal, E-Journal",
+    "Unknown": "Unknown Format",
+    "ElectronicBookPart": "Book, E-Book"
+}

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/container"
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/finc"
 )
 
@@ -31,66 +31,12 @@ var (
 
 var (
 	DefaultFormat = "ElectronicArticle"
-	Formats       = container.StringMap{
-		"book":                "eBook",
-		"book-chapter":        "ElectronicBookPart",
-		"book-part":           "ElectronicBookPart",
-		"book-section":        "ElectronicBookPart",
-		"book-series":         "ElectronicSerial",
-		"component":           "Unknown",
-		"dataset":             "ElectronicResourceRemoteAccess",
-		"dissertation":        "ElectronicThesis",
-		"journal":             "ElectronicJournal",
-		"journal-article":     "ElectronicArticle",
-		"journal-issue":       "ElectronicJournal",
-		"monograph":           "eBook",
-		"proceedings":         "ElectronicProceeding",
-		"proceedings-article": "ElectronicProceeding",
-		"reference-book":      "eBook",
-		"reference-entry":     "ElectronicResourceRemoteAccess",
-		"report":              "ElectronicArticle",
-		"report-series":       "ElectronicSerial",
-	}
-	Genres = container.StringMap{
-		"book":                "book",
-		"book-chapter":        "bookitem",
-		"book-part":           "bookitem",
-		"book-section":        "bookitem",
-		"book-series":         "bookitem",
-		"component":           "document",
-		"dataset":             "document",
-		"dissertation":        "book",
-		"journal":             "unknown",
-		"journal-article":     "article",
-		"journal-issue":       "issue",
-		"monograph":           "book",
-		"proceedings":         "proceeding",
-		"proceedings-article": "proceeding",
-		"reference-book":      "book",
-		"reference-entry":     "document",
-		"report":              "report",
-		"report-series":       "report",
-	}
-	RefTypes = container.StringMap{
-		"book":                "EBOOK",
-		"book-chapter":        "ECHAP",
-		"book-part":           "ECHAP",
-		"book-section":        "ECHAP",
-		"book-series":         "SER",
-		"component":           "GEN",
-		"dataset":             "DATA",
-		"dissertation":        "THES",
-		"journal":             "EJOUR",
-		"journal-article":     "EJOUR",
-		"journal-issue":       "EJOUR",
-		"monograph":           "EBOOK",
-		"proceedings":         "CONF",
-		"proceedings-article": "CONF",
-		"reference-book":      "EBOOK",
-		"reference-entry":     "GEN",
-		"report":              "RPRT",
-		"report-series":       "SER",
-	}
+
+	// Load assets
+	Formats  = assetutil.LoadStringMap("assets/crossref/formats.json")
+	Genres   = assetutil.LoadStringMap("assets/crossref/genres.json")
+	RefTypes = assetutil.LoadStringMap("assets/crossref/reftypes.json")
+
 	// AuthorReplacer is a special cleaner for author names.
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
 )

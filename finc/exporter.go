@@ -106,7 +106,7 @@ func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 	s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
 
 	for _, lang := range is.Languages {
-		s.Languages = append(s.Languages, ReferenceName(lang))
+		s.Languages = append(s.Languages, LanguageMap.Lookup(lang, lang))
 	}
 
 	for _, author := range is.Authors {

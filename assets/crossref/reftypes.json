@@ -1,0 +1,20 @@
+{
+    "dissertation": "THES",
+    "book-chapter": "ECHAP",
+    "component": "GEN",
+    "journal": "EJOUR",
+    "book-series": "SER",
+    "report-series": "SER",
+    "dataset": "DATA",
+    "proceedings": "CONF",
+    "journal-article": "EJOUR",
+    "reference-entry": "GEN",
+    "book-part": "ECHAP",
+    "book-section": "ECHAP",
+    "report": "RPRT",
+    "reference-book": "EBOOK",
+    "journal-issue": "EJOUR",
+    "proceedings-article": "CONF",
+    "book": "EBOOK",
+    "monograph": "EBOOK"
+}

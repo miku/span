@@ -2,12 +2,18 @@
 package container
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 )
 
 // StringMap provides defaults for string map lookups.
 type StringMap map[string]string
+
+func (m StringMap) UnmarshalJSON(data []byte) error {
+	m = make(StringMap, 0)
+	return json.Unmarshal(data, &m)
+}
 
 // Lookup with default value.
 func (m StringMap) Lookup(key, def string) string {

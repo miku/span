@@ -10,18 +10,21 @@ deps:
 imports:
 	goimports -w .
 
+assetutil/bindata.go:
+	go-bindata -o assetutil/bindata.go -pkg assetutil assets/...
+
 cover:
 	go test -cover ./...
 
 all: $(TARGETS)
 
-span-import: imports deps
+span-import: assetutil/bindata.go imports deps
 	go build -o span-import cmd/span-import/main.go
 
-span-export: imports deps
+span-export: assetutil/bindata.go imports deps
 	go build -o span-export cmd/span-export/main.go
 
-span-gh-dump: imports deps
+span-gh-dump: assetutil/bindata.go imports deps
 	go build -o span-gh-dump cmd/span-gh-dump/main.go
 
 clean:
@@ -29,6 +32,7 @@ clean:
 	rm -f span_*deb
 	rm -f span-*rpm
 	rm -rf ./packaging/deb/span/usr
+	rm -f assetutil/bindata.go
 
 deb: $(TARGETS)
 	mkdir -p packaging/deb/span/usr/sbin

@@ -1,0 +1,20 @@
+{
+    "dissertation": "ElectronicThesis",
+    "book-chapter": "ElectronicBookPart",
+    "component": "Unknown",
+    "journal": "ElectronicJournal",
+    "book-series": "ElectronicSerial",
+    "report-series": "ElectronicSerial",
+    "dataset": "ElectronicResourceRemoteAccess",
+    "proceedings": "ElectronicProceeding",
+    "journal-article": "ElectronicArticle",
+    "reference-entry": "ElectronicResourceRemoteAccess",
+    "book-part": "ElectronicBookPart",
+    "book-section": "ElectronicBookPart",
+    "report": "ElectronicArticle",
+    "reference-book": "eBook",
+    "journal-issue": "ElectronicJournal",
+    "proceedings-article": "ElectronicProceeding",
+    "book": "eBook",
+    "monograph": "eBook"
+}

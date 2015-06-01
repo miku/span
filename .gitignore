@@ -34,3 +34,6 @@ span-*.rpm
 /packaging/deb/span/usr
 
 NOTES.md
+
+# do not include bindata for now
+assetutil/bindata.go
