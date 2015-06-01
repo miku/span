@@ -21,7 +21,8 @@ import (
 
 // Options for worker.
 type options struct {
-	tagger span.ISILTagger
+	exporter span.Exporter
+	tagger   span.ISILTagger
 }
 
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
@@ -50,6 +51,7 @@ func parseTagPath(s string) (string, *os.File, error) {
 // worker iterates over string batches
 func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
 	defer wg.Done()
+
 	for batch := range queue {
 		for _, s := range batch {
 			is := new(finc.IntermediateSchema)
@@ -57,12 +59,13 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 			if err != nil {
 				log.Fatal(err)
 			}
-			ss, err := is.ToSolrSchema()
+			output := new(finc.Solr413Schema)
+			attacher, err := output.Export(is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			ss.Institutions = opts.tagger.Tags(*is)
-			b, err := json.Marshal(ss)
+			attacher.Attach(opts.tagger.Tags(*is))
+			b, err := json.Marshal(attacher)
 			if err != nil {
 				log.Fatal(err)
 			}
