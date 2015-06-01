@@ -1,18 +1,26 @@
 package finc
 
 import (
+	"fmt"
+
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
 )
 
-// Attacher adds a list of ISILs to somethings.
-type Attacher interface {
+// Exporter takes an intermediate schema and returns an Attacher.
+type Exporter interface {
+	Export(*IntermediateSchema) error
 	Attach([]string)
 }
 
-// Exporter for next iteration
-type AttacherExporter interface {
-	Export(IntermediateSchema) Attacher
+type DummyExporter struct {
+	Title string `json:"title"`
+}
+
+func (d *DummyExporter) Attach(s []string) {}
+func (d *DummyExporter) Export(is *IntermediateSchema) error {
+	d.Title = fmt.Sprintf("%s (%s)", is.ArticleTitle, is.JournalTitle)
+	return nil
 }
 
 // Solr413Schema is the default solr schema.
@@ -54,7 +62,7 @@ func (s *Solr413Schema) Attach(isils []string) {
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr413Schema) Export(is *IntermediateSchema) (Attacher, error) {
+func (s *Solr413Schema) Export(is *IntermediateSchema) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID
@@ -101,5 +109,5 @@ func (s *Solr413Schema) Export(is *IntermediateSchema) (Attacher, error) {
 	s.AccessFacet = AIAccessFacet
 	s.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
 
-	return s, nil
+	return nil
 }

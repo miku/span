@@ -21,8 +21,14 @@ import (
 
 // Options for worker.
 type options struct {
-	exporter span.Exporter
-	tagger   span.ISILTagger
+	exportFunc func() finc.Exporter
+	tagger     span.ISILTagger
+}
+
+// Exporters holds available export formats
+var Exporters = map[string]func() finc.Exporter{
+	"solr413": func() finc.Exporter { return new(finc.Solr413Schema) },
+	"dummy":   func() finc.Exporter { return new(finc.DummyExporter) },
 }
 
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
@@ -54,18 +60,19 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 
 	for batch := range queue {
 		for _, s := range batch {
+			var err error
 			is := new(finc.IntermediateSchema)
-			err := json.Unmarshal([]byte(s), is)
+			err = json.Unmarshal([]byte(s), is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			output := new(finc.Solr413Schema)
-			attacher, err := output.Export(is)
+			exporter := opts.exportFunc()
+			err = exporter.Export(is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			attacher.Attach(opts.tagger.Tags(*is))
-			b, err := json.Marshal(attacher)
+			exporter.Attach(opts.tagger.Tags(*is))
+			b, err := json.Marshal(exporter)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -88,6 +95,8 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	format := flag.String("o", "solr413", "output format")
+	listFormats := flag.Bool("list", false, "list output formats")
 
 	flag.Parse()
 
@@ -95,6 +104,13 @@ func main() {
 
 	if *showVersion {
 		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
+
+	if *listFormats {
+		for k := range Exporters {
+			fmt.Println(k)
+		}
 		os.Exit(0)
 	}
 
@@ -157,7 +173,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	opts := options{tagger: tagger}
+	exportFunc, ok := Exporters[*format]
+	if !ok {
+		log.Fatal("unknown exporter")
+	}
+	opts := options{tagger: tagger, exportFunc: exportFunc}
 
 	queue := make(chan []string)
 	out := make(chan []byte)
