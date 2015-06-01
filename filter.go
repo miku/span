@@ -113,6 +113,9 @@ func NewListFilter(r io.Reader) (ListFilter, error) {
 		if err == io.EOF {
 			break
 		}
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
 		if err != nil {
 			return f, err
 		}
