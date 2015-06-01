@@ -57,7 +57,6 @@ func parseTagPath(s string) (string, *os.File, error) {
 // worker iterates over string batches
 func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
 	defer wg.Done()
-
 	for batch := range queue {
 		for _, s := range batch {
 			var err error
