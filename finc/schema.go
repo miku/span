@@ -20,7 +20,7 @@ const (
 var NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
 var FormatSite = assetutil.LoadStringMap("assets/finc/formats.json")
 var SubjectMapping = assetutil.LoadStringSliceMap("assets/finc/subjects.json")
-var LanguageMap = assetutil.LoadStringMap("/assets/finc/iso-639-3-language.json")
+var LanguageMap = assetutil.LoadStringMap("assets/finc/iso-639-3-language.json")
 
 // Author representes an author, "inspired" by OpenURL.
 type Author struct {
