@@ -71,6 +71,9 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 				log.Fatal(err)
 			}
 			exporter.Attach(opts.tagger.Tags(*is))
+			// TODO(miku): maybe move marshalling into Exporter, if we have
+			// anything else than JSON - function could be somethings like
+			// func Marshal() ([]byte, error)
 			b, err := json.Marshal(exporter)
 			if err != nil {
 				log.Fatal(err)
