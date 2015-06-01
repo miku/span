@@ -31,6 +31,30 @@ type Exporter interface {
 	ToSolrSchema() (*finc.SolrSchema, error)
 }
 
+// Attacher adds a list of ISILs to somethings.
+// type Attacher interface {
+// 	Attach([]string)
+// }
+
+// Exporter for next iteration
+// type Exporter interface {
+// 	Export(finc.IntermediateSchema) Attacher
+// }
+
+// type Solr413Schema struct {}
+// type Solr413Exporter struct {}
+
+// func (Solr413Schema) Attach(isils []string) {}
+// func (Solr413Exporter) Export(is finc.IntermediateSchema) Attacher {
+// 	// new Solr413Schema ...
+// 	// set fields ...
+// }
+
+// type MarcRecord struct {}
+// type MarcExporter struct {}
+// func (MarcRecord) Attach(isils []string) {}
+// func (MarcExporter) Export(is finc.IntermediateSchema) Attacher {}
+
 // Source can emit records given a reader. What is actually returned is decided
 // by the source, e.g. it may return Importer or Batcher object.
 // Dealing with the various types is responsibility of the call site.
