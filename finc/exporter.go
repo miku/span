@@ -7,10 +7,10 @@ import (
 	"github.com/miku/span/container"
 )
 
-// Exporter encapsulate an export flavour. This will most likely be a struct
-// with fields and methods relevant to the exported format. For the moment we
-// assume, the output is JSON. If formats other than JSON are requested, move
-// the marshalling into this interface.
+// ExportSchema encapsulate an export flavour. This will most likely be a
+// struct with fields and methods relevant to the exported format. For the
+// moment we assume, the output is JSON. If formats other than JSON are
+// requested, move the marshalling into this interface.
 type ExportSchema interface {
 	// Convert takes an intermediate schema record to export. Returns an
 	// error, if conversion failed.
