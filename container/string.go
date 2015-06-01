@@ -1,7 +1,10 @@
 // Package sets implements basic set types.
 package container
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 // StringMap provides defaults for string map lookups.
 type StringMap map[string]string
@@ -82,4 +85,21 @@ func (set *StringSet) SortedValues() (values []string) {
 	}
 	sort.Strings(values)
 	return values
+}
+
+// Define a type named "StringSlice" as a slice of strings.
+// Useful for repeated command line flags.
+type StringSlice []string
+
+// Now, for our new type, implement the two methods of
+// the flag.Value interface...
+// The first method is String() string
+func (i *StringSlice) String() string {
+	return fmt.Sprintf("%s", *i)
+}
+
+// The second method is Set(value string) error
+func (i *StringSlice) Set(value string) error {
+	*i = append(*i, value)
+	return nil
 }

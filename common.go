@@ -1,11 +1,7 @@
 package span
 
 import (
-	"bufio"
-	"fmt"
-	"html"
 	"io"
-	"strings"
 
 	"github.com/miku/span/finc"
 )
@@ -25,49 +21,10 @@ type Importer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
-// Exporter interface might collect all exportable formats.
-// IntermediateSchema is the first and must implement this.
-type Exporter interface {
-	ToSolrSchema() (*finc.SolrSchema, error)
-}
-
 // Source can emit records given a reader. What is actually returned is decided
 // by the source, e.g. it may return Importer or Batcher object.
 // Dealing with the various types is responsibility of the call site.
 // Channel will block on slow consumers and will not drop objects.
 type Source interface {
 	Iterate(io.Reader) (<-chan interface{}, error)
-}
-
-// UnescapeTrim unescapes HTML character references and trims the space of a given string.
-func UnescapeTrim(s string) string {
-	return strings.TrimSpace(html.UnescapeString(s))
-}
-
-// ByteSink is a fan in writer for a byte channel.
-// A newline is appended after each object.
-func ByteSink(w io.Writer, out chan []byte, done chan bool) {
-	f := bufio.NewWriter(w)
-	for b := range out {
-		f.Write(b[:])
-		f.Write([]byte("\n"))
-	}
-	f.Flush()
-	done <- true
-}
-
-// Define a type named "StringSlice" as a slice of strings
-type StringSlice []string
-
-// Now, for our new type, implement the two methods of
-// the flag.Value interface...
-// The first method is String() string
-func (i *StringSlice) String() string {
-	return fmt.Sprintf("%s", *i)
-}
-
-// The second method is Set(value string) error
-func (i *StringSlice) Set(value string) error {
-	*i = append(*i, value)
-	return nil
 }
