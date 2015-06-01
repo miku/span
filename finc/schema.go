@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
 )
 
@@ -210,59 +209,4 @@ func (is *IntermediateSchema) SortableAuthor() string {
 	}
 	buf.WriteString(is.SortableTitle())
 	return buf.String()
-}
-
-// ToSolrSchema converts an intermediate Schema to a finc.Solr schema.
-func (is *IntermediateSchema) ToSolrSchema() (*SolrSchema, error) {
-	output := new(SolrSchema)
-
-	output.Allfields = is.Allfields()
-	output.Formats = append(output.Formats, is.Format)
-	output.Fullrecord = "blob:" + is.RecordID
-	output.Fulltext = is.Fulltext
-	output.HierarchyParentTitle = append(output.HierarchyParentTitle, is.JournalTitle)
-	output.ID = is.RecordID
-	output.Imprint = is.Imprint()
-	output.ISSN = is.ISSNList()
-	output.MegaCollections = append(output.MegaCollections, is.MegaCollection)
-	output.PublishDateSort = is.Date.Year()
-	output.Publishers = is.Publishers
-	output.RecordType = AIRecordType
-	output.Series = append(output.Series, is.JournalTitle)
-	output.SourceID = is.SourceID
-	output.Subtitle = is.ArticleSubtitle
-	output.TitleSort = is.SortableTitle()
-	output.Topics = is.Subjects
-	output.URL = is.URL
-
-	classes := container.NewStringSet()
-	for _, s := range is.Subjects {
-		for _, class := range SubjectMapping.Lookup(s, []string{}) {
-			classes.Add(class)
-		}
-	}
-	output.FincClassFacet = classes.Values()
-
-	sanitized := sanitize.HTML(is.ArticleTitle)
-	output.Title = sanitized
-	output.TitleFull = sanitized
-	output.TitleShort = sanitized
-
-	for _, lang := range is.Languages {
-		output.Languages = append(output.Languages, ReferenceName(lang))
-	}
-
-	for _, author := range is.Authors {
-		output.SecondaryAuthors = append(output.SecondaryAuthors, author.String())
-		output.AuthorFacet = append(output.AuthorFacet, author.String())
-	}
-
-	if len(output.SecondaryAuthors) > 0 {
-		output.Author = output.SecondaryAuthors[0]
-	}
-
-	output.AccessFacet = AIAccessFacet
-	output.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
-
-	return output, nil
 }
