@@ -48,4 +48,4 @@ rpm: $(TARGETS)
 	cp $(HOME)/rpmbuild/RPMS/x86_64/span*.rpm .
 
 cloc:
-	cloc --max-file-size 1 .
+	cloc --max-file-size 1 --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
