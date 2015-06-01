@@ -57,7 +57,7 @@ func batcherWorker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup)
 
 func main() {
 	inputFormat := flag.String("i", "", "input format")
-	listFormats := flag.Bool("l", false, "list formats")
+	listFormats := flag.Bool("list", false, "list formats")
 	members := flag.String("members", "", "path to LDJ file, one member per line")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	logfile := flag.String("log", "", "if given log to file")

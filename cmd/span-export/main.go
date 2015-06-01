@@ -16,12 +16,20 @@ import (
 	"sync"
 
 	"github.com/miku/span"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
 
 // Options for worker.
 type options struct {
-	tagger span.ISILTagger
+	exportFunc func() finc.Exporter
+	tagger     span.ISILTagger
+}
+
+// Exporters holds available export formats
+var Exporters = map[string]func() finc.Exporter{
+	"solr413": func() finc.Exporter { return new(finc.Solr413Schema) },
+	"dummy":   func() finc.Exporter { return new(finc.DummyExporter) },
 }
 
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
@@ -52,17 +60,22 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 	defer wg.Done()
 	for batch := range queue {
 		for _, s := range batch {
+			var err error
 			is := new(finc.IntermediateSchema)
-			err := json.Unmarshal([]byte(s), is)
+			err = json.Unmarshal([]byte(s), is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			ss, err := is.ToSolrSchema()
+			exporter := opts.exportFunc()
+			err = exporter.Export(is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			ss.Institutions = opts.tagger.Tags(*is)
-			b, err := json.Marshal(ss)
+			exporter.Attach(opts.tagger.Tags(*is))
+			// TODO(miku): maybe move marshalling into Exporter, if we have
+			// anything else than JSON - function could be somethings like
+			// func Marshal() ([]byte, error)
+			b, err := json.Marshal(exporter)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -73,7 +86,7 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 
 func main() {
 
-	var hfiles, lfiles, any, source span.StringSlice
+	var hfiles, lfiles, any, source container.StringSlice
 	flag.Var(&hfiles, "f", "ISIL:/path/to/ovid.xml")
 	flag.Var(&lfiles, "l", "ISIL:/path/to/list.txt")
 	flag.Var(&any, "any", "ISIL")
@@ -85,6 +98,8 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	format := flag.String("o", "solr413", "output format")
+	listFormats := flag.Bool("list", false, "list output formats")
 
 	flag.Parse()
 
@@ -92,6 +107,13 @@ func main() {
 
 	if *showVersion {
 		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
+
+	if *listFormats {
+		for k := range Exporters {
+			fmt.Println(k)
+		}
 		os.Exit(0)
 	}
 
@@ -154,7 +176,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	opts := options{tagger: tagger}
+	exportFunc, ok := Exporters[*format]
+	if !ok {
+		log.Fatal("unknown exporter")
+	}
+	opts := options{tagger: tagger, exportFunc: exportFunc}
 
 	queue := make(chan []string)
 	out := make(chan []byte)
