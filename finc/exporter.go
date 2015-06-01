@@ -7,23 +7,35 @@ import (
 	"github.com/miku/span/container"
 )
 
-// Exporter takes an intermediate schema and returns an Attacher.
-type Exporter interface {
-	Export(*IntermediateSchema) error
+// Exporter encapsulate an export flavour. This will most likely be a struct
+// with fields and methods relevant to the exported format. For the moment we
+// assume, the output is JSON. If formats other than JSON are requested, move
+// the marshalling into this interface.
+type ExportSchema interface {
+	// Convert takes an intermediate schema record to export. Returns an
+	// error, if conversion failed.
+	Convert(IntermediateSchema) error
+	// Attach takes a list of strings (here: ISILs) and attaches them to the
+	// current record.
 	Attach([]string)
 }
 
-type DummyExporter struct {
+// DummySchema is an example export schema, that only has one field.
+type DummySchema struct {
 	Title string `json:"title"`
 }
 
-func (d *DummyExporter) Attach(s []string) {}
-func (d *DummyExporter) Export(is *IntermediateSchema) error {
+// Attach is here, so it satisfies the interface, but implementation is a noop.
+func (d *DummySchema) Attach(s []string) {}
+
+// Export converts intermediate schema into this export schema.
+func (d *DummySchema) Convert(is IntermediateSchema) error {
 	d.Title = fmt.Sprintf("%s (%s)", is.ArticleTitle, is.JournalTitle)
 	return nil
 }
 
-// Solr413Schema is the default solr schema.
+// Solr413Schema is the default solr 4 schema. It is based on VuFind 1.3, it
+// does not contain `container_*` fields.
 type Solr413Schema struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet"`
@@ -62,7 +74,7 @@ func (s *Solr413Schema) Attach(isils []string) {
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr413Schema) Export(is *IntermediateSchema) error {
+func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID

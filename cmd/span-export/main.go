@@ -22,14 +22,14 @@ import (
 
 // Options for worker.
 type options struct {
-	exportFunc func() finc.Exporter
-	tagger     span.ISILTagger
+	exportSchemaFunc func() finc.ExportSchema
+	tagger           span.ISILTagger
 }
 
 // Exporters holds available export formats
-var Exporters = map[string]func() finc.Exporter{
-	"solr413": func() finc.Exporter { return new(finc.Solr413Schema) },
-	"dummy":   func() finc.Exporter { return new(finc.DummyExporter) },
+var Exporters = map[string]func() finc.ExportSchema{
+	"dummy":   func() finc.ExportSchema { return new(finc.DummySchema) },
+	"solr413": func() finc.ExportSchema { return new(finc.Solr413Schema) },
 }
 
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
@@ -61,21 +61,21 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 	for batch := range queue {
 		for _, s := range batch {
 			var err error
-			is := new(finc.IntermediateSchema)
-			err = json.Unmarshal([]byte(s), is)
+			is := finc.IntermediateSchema{}
+			err = json.Unmarshal([]byte(s), &is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			exporter := opts.exportFunc()
-			err = exporter.Export(is)
+			schema := opts.exportSchemaFunc()
+			err = schema.Convert(is)
 			if err != nil {
 				log.Fatal(err)
 			}
-			exporter.Attach(opts.tagger.Tags(*is))
+			schema.Attach(opts.tagger.Tags(is))
 			// TODO(miku): maybe move marshalling into Exporter, if we have
 			// anything else than JSON - function could be somethings like
 			// func Marshal() ([]byte, error)
-			b, err := json.Marshal(exporter)
+			b, err := json.Marshal(schema)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -176,11 +176,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	exportFunc, ok := Exporters[*format]
+	exportSchemaFunc, ok := Exporters[*format]
 	if !ok {
-		log.Fatal("unknown exporter")
+		log.Fatal("unknown export schema")
 	}
-	opts := options{tagger: tagger, exportFunc: exportFunc}
+	opts := options{tagger: tagger, exportSchemaFunc: exportSchemaFunc}
 
 	queue := make(chan []string)
 	out := make(chan []byte)
