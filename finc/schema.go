@@ -85,30 +85,29 @@ type IntermediateSchema struct {
 	ArticleNumber string `json:"rft.artnum,omitempty"`
 	ArticleTitle  string `json:"rft.atitle,omitempty"`
 
-	BookTitle    string   `json:"rft.btitle,omitempty"`
-	Chronology   string   `json:"rft.chron,omitempty"`
-	Edition      string   `json:"rft.edition,omitempty"`
-	EISBN        []string `json:"rft.isbn,omitempty"`
-	EISSN        []string `json:"rft.eissn,omitempty"`
-	EndPage      string   `json:"rft.epage,omitempty"`
-	Genre        string   `json:"rft.genre,omitempty"`
-	ISBN         []string `json:"rft.isbn,omitempty"`
-	ISSN         []string `json:"rft.issn,omitempty"`
-	Issue        string   `json:"rft.issue,omitempty"`
-	JournalTitle string   `json:"rft.jtitle,omitempty"`
-	PageCount    string   `json:"rft.tpages,omitempty"`
-	Pages        string   `json:"rft.pages,omitempty"`
-	Part         string   `json:"rft.part,omitempty"`
-	Places       []string `json:"rft.place,omitempty"`
-	Publishers   []string `json:"rft.pub,omitempty"`
-	Quarter      string   `json:"rft.quarter,omitempty"`
-	// RawDate      string    `json:"rft.date,omitempty"`
-	Date       time.Time `json:"x.date,omitempty"`
-	Season     string    `json:"rft.ssn,omitempty"`
-	Series     string    `json:"rft.series,omitempty"`
-	ShortTitle string    `json:"rft.stitle,omitempty"`
-	StartPage  string    `json:"rft.spage,omitempty"`
-	Volume     string    `json:"rft.volume,omitempty"`
+	BookTitle    string    `json:"rft.btitle,omitempty"`
+	Chronology   string    `json:"rft.chron,omitempty"`
+	Edition      string    `json:"rft.edition,omitempty"`
+	EISBN        []string  `json:"rft.isbn,omitempty"`
+	EISSN        []string  `json:"rft.eissn,omitempty"`
+	EndPage      string    `json:"rft.epage,omitempty"`
+	Genre        string    `json:"rft.genre,omitempty"`
+	ISBN         []string  `json:"rft.isbn,omitempty"`
+	ISSN         []string  `json:"rft.issn,omitempty"`
+	Issue        string    `json:"rft.issue,omitempty"`
+	JournalTitle string    `json:"rft.jtitle,omitempty"`
+	PageCount    string    `json:"rft.tpages,omitempty"`
+	Pages        string    `json:"rft.pages,omitempty"`
+	Part         string    `json:"rft.part,omitempty"`
+	Places       []string  `json:"rft.place,omitempty"`
+	Publishers   []string  `json:"rft.pub,omitempty"`
+	Quarter      string    `json:"rft.quarter,omitempty"`
+	Date         time.Time `json:"x.date,omitempty"`
+	Season       string    `json:"rft.ssn,omitempty"`
+	Series       string    `json:"rft.series,omitempty"`
+	ShortTitle   string    `json:"rft.stitle,omitempty"`
+	StartPage    string    `json:"rft.spage,omitempty"`
+	Volume       string    `json:"rft.volume,omitempty"`
 
 	Abstract  string   `json:"abstract,omitempty"`
 	Authors   []Author `json:"authors,omitempty"`
