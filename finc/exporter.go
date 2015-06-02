@@ -96,7 +96,7 @@ func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 
 	classes := container.NewStringSet()
 	for _, s := range is.Subjects {
-		for _, class := range SubjectMapping.Lookup(s, []string{}) {
+		for _, class := range SubjectMapping.LookupDefault(s, []string{}) {
 			classes.Add(class)
 		}
 	}
@@ -106,7 +106,7 @@ func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 	s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
 
 	for _, lang := range is.Languages {
-		s.Languages = append(s.Languages, LanguageMap.Lookup(lang, lang))
+		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
 	}
 
 	for _, author := range is.Authors {
@@ -119,7 +119,7 @@ func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 	}
 
 	s.AccessFacet = AIAccessFacet
-	s.FormatDe15 = []string{FormatSite.Lookup(is.Format, "")}
+	s.FormatDe15 = []string{FormatSite.LookupDefault(is.Format, "")}
 
 	return nil
 }

@@ -2,7 +2,6 @@ package assetutil
 
 import (
 	"encoding/json"
-	"log"
 	"regexp"
 
 	"github.com/miku/span/container"
@@ -19,9 +18,9 @@ type RegexpMap struct {
 	Entries []RegexpMapEntry
 }
 
-// Lookup tries to match a given string against patterns. If none of the
+// LookupDefault tries to match a given string against patterns. If none of the
 // matterns match, return a given default.
-func (r RegexpMap) Lookup(s, def string) string {
+func (r RegexpMap) LookupDefault(s, def string) string {
 	for _, entry := range r.Entries {
 		if entry.Pattern.MatchString(s) {
 			return entry.Value
@@ -30,18 +29,18 @@ func (r RegexpMap) Lookup(s, def string) string {
 	return def
 }
 
-// LoadRegexpMap loads the content of a given asset path into a RegexpMap. It
-// will bail out, if the asset path is not found and will panic if the
-// patterns cannot be compiled.
-func LoadRegexpMap(ap string) RegexpMap {
+// MustLoadRegexpMap loads the content of a given asset path into a RegexpMap. It
+// will panic, if the asset path is not found and if the patterns found in the
+// file cannot be compiled.
+func MustLoadRegexpMap(ap string) RegexpMap {
 	b, err := Asset(ap)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	d := make(map[string]string)
 	err = json.Unmarshal(b, &d)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	remap := RegexpMap{}
 	for k, v := range d {
@@ -50,34 +49,34 @@ func LoadRegexpMap(ap string) RegexpMap {
 	return remap
 }
 
-// LoadStringMap loads a JSON file from an asset path and parses it into a
-// container.StringMap. This function will halt the world, if it is called
-// with an invalid argument.
-func LoadStringMap(ap string) container.StringMap {
+// MustLoadStringMap loads a JSON file from an asset path and parses it into a
+// container.StringMap. This function will panic, if the asset cannot be found
+// or the JSON is erroneous.
+func MustLoadStringMap(ap string) container.StringMap {
 	b, err := Asset(ap)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	d := make(map[string]string)
 	err = json.Unmarshal(b, &d)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return container.StringMap(d)
 }
 
-// LoadStringSliceMap loads a JSON file from an asset path and parses it into
+// MustLoadStringSliceMap loads a JSON file from an asset path and parses it into
 // a container.StringSliceMap. This function will halt the world, if it is
 // called with an invalid argument.
-func LoadStringSliceMap(ap string) container.StringSliceMap {
+func MustLoadStringSliceMap(ap string) container.StringSliceMap {
 	b, err := Asset(ap)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	d := make(map[string][]string)
 	err = json.Unmarshal(b, &d)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	return container.StringSliceMap(d)
 }

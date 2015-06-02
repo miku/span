@@ -20,9 +20,9 @@ const (
 var (
 	NOT_ASSIGNED    = "not assigned"
 	NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
-	FormatSite      = assetutil.LoadStringMap("assets/finc/formats.json")
-	SubjectMapping  = assetutil.LoadStringSliceMap("assets/finc/subjects.json")
-	LanguageMap     = assetutil.LoadStringMap("assets/finc/iso-639-3-language.json")
+	FormatSite      = assetutil.MustLoadStringMap("assets/finc/formats.json")
+	SubjectMapping  = assetutil.MustLoadStringSliceMap("assets/finc/subjects.json")
+	LanguageMap     = assetutil.MustLoadStringMap("assets/finc/iso-639-3-language.json")
 )
 
 // Author representes an author, "inspired" by OpenURL.

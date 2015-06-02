@@ -15,8 +15,8 @@ func (m StringMap) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &m)
 }
 
-// Lookup map with a default value.
-func (m StringMap) Lookup(key, def string) string {
+// LookupDefault map with a default value.
+func (m StringMap) LookupDefault(key, def string) string {
 	val, ok := m[key]
 	if !ok {
 		return def
@@ -27,8 +27,8 @@ func (m StringMap) Lookup(key, def string) string {
 // StringMap provides defaults for string map lookups.
 type StringSliceMap map[string][]string
 
-// Lookup with default value.
-func (m StringSliceMap) Lookup(key string, def []string) []string {
+// LookupDefault with default value.
+func (m StringSliceMap) LookupDefault(key string, def []string) []string {
 	val, ok := m[key]
 	if !ok {
 		return def

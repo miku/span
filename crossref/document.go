@@ -33,9 +33,9 @@ var (
 	DefaultFormat = "ElectronicArticle"
 
 	// Load assets
-	Formats  = assetutil.LoadStringMap("assets/crossref/formats.json")
-	Genres   = assetutil.LoadStringMap("assets/crossref/genres.json")
-	RefTypes = assetutil.LoadStringMap("assets/crossref/reftypes.json")
+	Formats  = assetutil.MustLoadStringMap("assets/crossref/formats.json")
+	Genres   = assetutil.MustLoadStringMap("assets/crossref/genres.json")
+	RefTypes = assetutil.MustLoadStringMap("assets/crossref/reftypes.json")
 
 	// AuthorReplacer is a special cleaner for author names.
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
@@ -297,14 +297,14 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.ArticleTitle = doc.CombinedTitle()
 	output.DOI = doc.DOI
-	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
-	output.Genre = Genres.Lookup(doc.Type, "unknown")
+	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
+	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
 	output.Issue = doc.Issue
 	output.Languages = []string{"eng"}
 	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RecordID = doc.RecordID()
-	output.RefType = RefTypes.Lookup(doc.Type, "GEN")
+	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subjects
 	output.Type = doc.Type
