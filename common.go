@@ -1,6 +1,7 @@
 package span
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/miku/span/finc"
@@ -8,6 +9,14 @@ import (
 
 // AppVersion of span package. Commandline tools will show this on -v.
 const AppVersion = "0.1.35"
+
+type Skip struct {
+	Reason string
+}
+
+func (s Skip) Error() string {
+	return fmt.Sprintf("[skip] %s", s.Reason)
+}
 
 // Batcher groups strings together for batched processing.
 // It is more effective to send one batch over a channel than many strings.
