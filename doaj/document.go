@@ -163,6 +163,8 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan interface{}, error) {
 	return ch, nil
 }
 
+// Date return the document date. Journals entries usually have no date, so
+// they will err.
 func (doc Document) Date() (time.Time, error) {
 	if doc.Index.Date != "" {
 		return time.Parse("2006-01-02T15:04:05Z", doc.Index.Date)
@@ -179,6 +181,8 @@ func (doc Document) Date() (time.Time, error) {
 	return time.Parse("2006-01-02", s)
 }
 
+// ToIntermediateSchema converts a doaj document to intermediate schema. For
+// now any record, that has no usable date will be skipped.
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
 
