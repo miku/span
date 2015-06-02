@@ -33,8 +33,12 @@ var formats = map[string]span.Source{
 	"doaj":      doaj.DOAJ{},
 }
 
+type options struct {
+	verbose bool
+}
+
 // batcherWorker iterates over Batcher objects
-func batcherWorker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup) {
+func batcherWorker(queue chan span.Batcher, out chan []byte, opts options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range queue {
 		for _, item := range batch.Items {
@@ -44,7 +48,14 @@ func batcherWorker(queue chan span.Batcher, out chan []byte, wg *sync.WaitGroup)
 			}
 			output, err := doc.ToIntermediateSchema()
 			if err != nil {
-				log.Fatal(err)
+				switch err.(type) {
+				case span.Skip:
+					if opts.verbose {
+						log.Println(err)
+					}
+				default:
+					log.Fatal(err)
+				}
 			}
 			b, err := json.Marshal(output)
 			if err != nil {
@@ -63,6 +74,7 @@ func main() {
 	logfile := flag.String("log", "", "if given log to file")
 	showVersion := flag.Bool("v", false, "prints current program version")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	verbose := flag.Bool("verbose", false, "more output")
 
 	flag.Parse()
 
@@ -114,10 +126,11 @@ func main() {
 	go span.ByteSink(os.Stdout, out, done)
 
 	var wg sync.WaitGroup
+	opts := options{verbose: *verbose}
 
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go batcherWorker(queue, out, &wg)
+		go batcherWorker(queue, out, opts, &wg)
 	}
 
 	if *logfile != "" {
