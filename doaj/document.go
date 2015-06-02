@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/miku/span"
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
@@ -29,6 +30,11 @@ const (
 )
 
 var errDateMissing = errors.New("date is missing")
+
+var (
+	LCCPatterns = assetutil.LoadRegexpMap("assets/finc/lcc.json")
+	LanguageMap = assetutil.LoadStringMap("assets/doaj/language-iso-639-3.json")
+)
 
 type Response struct {
 	ID     string   `json:"_id"`
@@ -206,7 +212,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	subjects := container.NewStringSet()
 	for _, s := range doc.Index.SchemaCode {
-		class := finc.RegexpResolve(strings.Replace(s, "LCC:", "", -1), finc.LCCFincMap)
+		class := LCCPatterns.Lookup(strings.Replace(s, "LCC:", "", -1), finc.NOT_ASSIGNED)
 		if class != finc.NOT_ASSIGNED {
 			subjects.Add(class)
 		}
