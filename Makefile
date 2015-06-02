@@ -1,7 +1,7 @@
 TARGETS = span-import span-export span-gh-dump
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
-test: deps
+test: assets deps
 	go test -v ./...
 
 deps:
@@ -13,6 +13,7 @@ imports:
 assets: assetutil/bindata.go
 
 assetutil/bindata.go:
+	go get -f -u github.com/jteeuwen/go-bindata/...
 	go-bindata -o assetutil/bindata.go -pkg assetutil assets/...
 
 cover:
@@ -20,13 +21,13 @@ cover:
 
 all: $(TARGETS)
 
-span-import: assetutil/bindata.go imports deps
+span-import: assets imports deps
 	go build -o span-import cmd/span-import/main.go
 
-span-export: assetutil/bindata.go imports deps
+span-export: assets imports deps
 	go build -o span-export cmd/span-export/main.go
 
-span-gh-dump: assetutil/bindata.go imports deps
+span-gh-dump: assets imports deps
 	go build -o span-gh-dump cmd/span-gh-dump/main.go
 
 clean:
