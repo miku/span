@@ -164,7 +164,6 @@ func main() {
 	}
 
 	for _, isil := range any {
-		// Any filter would override any other, so just keep this.
 		tagger[isil] = []span.Filter{span.Any{}}
 	}
 
