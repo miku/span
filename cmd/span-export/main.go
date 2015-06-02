@@ -130,28 +130,28 @@ func main() {
 
 	for _, s := range hfiles {
 		isil, file, err := parseTagPath(s)
-		defer file.Close()
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer file.Close()
 		f, err := span.NewHoldingFilter(file)
-		tagger[isil] = append(tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
+		tagger[isil] = append(tagger[isil], f)
 	}
 
 	for _, s := range lfiles {
 		isil, file, err := parseTagPath(s)
-		defer file.Close()
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer file.Close()
 		f, err := span.NewListFilter(file)
-		tagger[isil] = append(tagger[isil], f)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
+		tagger[isil] = append(tagger[isil], f)
 	}
 
 	for _, s := range source {
