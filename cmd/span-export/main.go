@@ -159,7 +159,8 @@ func main() {
 		if len(ss) != 2 {
 			log.Fatal("use ISIL:SID")
 		}
-		tagger[ss[0]] = append(tagger[ss[0]], span.SourceFilter{SourceID: ss[1]})
+		isil, sid := ss[0], ss[1]
+		tagger[isil] = append(tagger[isil], span.SourceFilter{SourceID: sid})
 	}
 
 	for _, isil := range any {
