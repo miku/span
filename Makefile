@@ -10,6 +10,8 @@ deps:
 imports:
 	goimports -w .
 
+assets: assetutil/bindata.go
+
 assetutil/bindata.go:
 	go-bindata -o assetutil/bindata.go -pkg assetutil assets/...
 
