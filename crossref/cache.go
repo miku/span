@@ -3,6 +3,7 @@ package crossref
 import "sync"
 
 // IntStringCache for int keys and string values with a thread-safe setter.
+// TODO(miku): move to something more generic
 type IntStringCache struct {
 	mu      *sync.RWMutex
 	Entries map[int]string

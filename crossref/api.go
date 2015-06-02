@@ -68,6 +68,7 @@ func FetchMember(id int) (Member, error) {
 }
 
 // cache holds member ids and their primary names
+// TODO(miku): move to something more generic
 var cache = NewIntStringCache()
 
 // LookupMemberName returns the primary name for a member given by its ID.

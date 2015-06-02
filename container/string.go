@@ -7,7 +7,7 @@ import (
 	"sort"
 )
 
-// StringMap provides defaults for string map lookups.
+// StringMap provides defaults for string map lookups with defaults.
 type StringMap map[string]string
 
 func (m StringMap) UnmarshalJSON(data []byte) error {
@@ -15,7 +15,7 @@ func (m StringMap) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &m)
 }
 
-// Lookup with default value.
+// Lookup map with a default value.
 func (m StringMap) Lookup(key, def string) string {
 	val, ok := m[key]
 	if !ok {
