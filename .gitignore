@@ -34,3 +34,5 @@ span-*.rpm
 /packaging/deb/span/usr
 
 NOTES.md
+assetutil/bindata.go
+
