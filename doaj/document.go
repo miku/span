@@ -49,6 +49,8 @@ type Document struct {
 	ID      string  `json:"id"`
 	Index   Index   `json:"index"`
 	Updated string  `json:"last_updated"`
+	// make Response.Type available here
+	Type string
 }
 
 type Index struct {
@@ -124,6 +126,7 @@ func NewBatch(lines []string) span.Batcher {
 			if err != nil {
 				return resp.Source, err
 			}
+			resp.Source.Type = resp.Type
 			return resp.Source, nil
 		}, Items: make([]interface{}, len(lines))}
 	for i, line := range lines {
