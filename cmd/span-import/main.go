@@ -15,6 +15,7 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/crossref"
 	"github.com/miku/span/doaj"
+	"github.com/miku/span/genios"
 	"github.com/miku/span/jats/degruyter"
 	"github.com/miku/span/jats/jstor"
 )
@@ -31,6 +32,7 @@ var formats = map[string]span.Source{
 	"degruyter": degruyter.DeGruyter{},
 	"jstor":     jstor.Jstor{},
 	"doaj":      doaj.DOAJ{},
+	"genios":    genios.Genios{},
 }
 
 type options struct {
