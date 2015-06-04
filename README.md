@@ -26,7 +26,7 @@ Why Go?
 Linux shell scripts have no native XML or JSON support, Python is a bit too
 slow for the casual processing of 100M or more records, Java is a bit too
 verbose - which is why we choose Go. Go comes with XML and JSON support in the
-standard library, nice concurrency primitives and simple single static- binary
+standard library, nice concurrency primitives and simple single static-binary
 deployments.
 
 ----
@@ -53,7 +53,7 @@ A toolkit approach
 ------------------
 
 * `span-import`, anything to intermediate schema
-* `span-export`, intermediate schema to anything (finc.SolrSchema only, at the moment)
+* `span-export`, intermediate schema to anything
 
 The `span-import` tool should require minimal external information (no
 holdings file, etc.) and be mainly concerned with the transformation of fancy
@@ -102,7 +102,7 @@ List available formats:
     degruyter
     jstor
 
-Import crossref LDJ (with cached members API responses) or DeGruyter XML (preprocessed into a single file):
+Import [crossref LDJ](https://github.com/miku/siskin/blob/a08287495526ddf0aaed2537a4ac0a23d0060ec9/siskin/sources/crossref.py#L139) (with [cached members](https://github.com/miku/siskin/blob/a08287495526ddf0aaed2537a4ac0a23d0060ec9/siskin/sources/crossref.py#L221) API responses) or DeGruyter XML ([preprocessed](https://github.com/miku/siskin/blob/a08287495526ddf0aaed2537a4ac0a23d0060ec9/siskin/sources/degruyter.py#L74) into a single file):
 
     $ span-import -i crossref -members members.ldj crossref.ldj > crossref.is.ldj
     $ span-import -i jats degruyter.ldj > degruyter.is.ldj
@@ -115,7 +115,7 @@ Export intermediate schema records to a memcache server with [memcldj](https://g
 
     $ memcldj ai.is.ldj
 
-Export to a fixed (finc) SOLR schema:
+Export to finc 1.3 SOLR 4 schema:
 
     $ span-export -o solr413 -f DE-14:DE-14.xml -f DE-15:DE-15.xml ai.is.ldj > ai.ldj
 
@@ -163,12 +163,12 @@ The exporters need to implement the `finc.Exporter` interface:
 // moment we assume, the output is JSON. If formats other than JSON are
 // requested, move the marshalling into this interface.
 type ExportSchema interface {
-  // Convert takes an intermediate schema record to export. Returns an
-  // error, if conversion failed.
-  Convert(IntermediateSchema) error
-  // Attach takes a list of strings (here: ISILs) and attaches them to the
-  // current record.
-  Attach([]string)
+        // Convert takes an intermediate schema record to export. Returns an
+        // error, if conversion failed.
+        Convert(IntermediateSchema) error
+        // Attach takes a list of strings (here: ISILs) and attaches them to the
+        // current record.
+        Attach([]string)
 }
 ```
 
