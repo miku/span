@@ -17,7 +17,7 @@ be directly imported into SOLR or elasticsearch.
 As a non-goal, the `span` tools do not care, how you obtain your input data.
 The tools expect input *files* and produces *files*. Even more: Bibliographic
 input data must be contained in a *single file* (even if it is 100G
-in size) and the output will be a single file, written to stdout by default.
+in size) and the output will be a single file (stdin and stdout, respectively).
 
 ----
 
