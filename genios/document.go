@@ -3,6 +3,7 @@ package genios
 import (
 	"bufio"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"log"
 	"strings"
@@ -27,8 +28,9 @@ type Document struct {
 	RawDate          string   `xml:"Date"`
 	Volume           string   `xml:"Volume"`
 	Issue            string   `xml:"Issue"`
-	Authors          []string `xml:"Authors>Author"`
+	RawAuthors       []string `xml:"Authors>Author"`
 	Language         string   `xml:"Language"`
+	Abstract         string   `xml:"Abstract"`
 }
 
 var RawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
@@ -48,6 +50,7 @@ func NewBatch(docs []*Document) span.Batcher {
 }
 
 // Iterate emits Converter elements via XML decoding.
+// TODO(miku): abstract this away (and in the other sources as well)
 func (s Genios) Iterate(r io.Reader) (<-chan interface{}, error) {
 	ch := make(chan interface{})
 	i := 0
@@ -91,15 +94,60 @@ func (doc Document) Date() (time.Time, error) {
 	return time.Parse("20060102", raw)
 }
 
+func (doc Document) URL() string {
+	return fmt.Sprintf("https://www.genios.de/document/%s__%s/", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
+}
+
+func IsNN(s string) bool {
+	return strings.ToLower(strings.TrimSpace(s)) == "n.n."
+}
+
+func (doc Document) Authors() []string {
+	var authors []string
+	for _, v := range doc.RawAuthors {
+		fields := strings.Split(v, ";")
+		for _, f := range fields {
+			if !IsNN(f) {
+				authors = append(authors, strings.TrimSpace(f))
+			}
+		}
+	}
+	return authors
+}
+
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
-	log.Println(doc.Authors)
 	output := finc.NewIntermediateSchema()
-	output.ArticleTitle = strings.TrimSpace(doc.Title)
-	output.ISSN = append(output.ISSN, strings.TrimSpace(doc.ISSN))
-	output.Issue = strings.TrimSpace(doc.Issue)
-	output.JournalTitle = strings.TrimSpace(doc.PublicationTitle)
-	output.Volume = strings.TrimSpace(doc.Volume)
+
+	for _, author := range doc.Authors() {
+		output.Authors = append(output.Authors, finc.Author{Name: author})
+	}
+
+	output.URL = append(output.URL, doc.URL())
+
+	if !IsNN(doc.Abstract) {
+		output.Abstract = strings.TrimSpace(doc.Abstract)
+	}
+
+	if !IsNN(doc.Title) {
+		output.ArticleTitle = strings.TrimSpace(doc.Title)
+	}
+
+	if !IsNN(doc.ISSN) {
+		output.ISSN = append(output.ISSN, strings.TrimSpace(doc.ISSN))
+	}
+
+	if !IsNN(doc.Issue) {
+		output.Issue = strings.TrimSpace(doc.Issue)
+	}
+
+	if !IsNN(doc.PublicationTitle) {
+		output.JournalTitle = strings.TrimSpace(doc.PublicationTitle)
+	}
+
+	if !IsNN(doc.Volume) {
+		output.Volume = strings.TrimSpace(doc.Volume)
+	}
 
 	output.Date, err = doc.Date()
 	if err != nil {
