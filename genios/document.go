@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	SourceID  = "48"
-	BatchSize = 2000
+	SourceID   = "48"
+	BatchSize  = 2000
+	Format     = "ElectronicArticle"
+	Collection = "Genios"
 )
 
 type Document struct {
@@ -148,6 +150,9 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if !IsNN(doc.Volume) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
+
+	output.Format = Format
+	output.MegaCollection = Collection
 
 	output.Date, err = doc.Date()
 	if err != nil {
