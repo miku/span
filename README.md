@@ -179,3 +179,28 @@ TODO
 * write wrappers around common inputs like XML, JSON, CSV ...
 * maybe factor out importer interface (like exporter)
 * docs: add example files for each supported data format
+
+Code metrics
+------------
+
+It is a non-functional goal to keep the SLOC count low. As of [d3872bf1b128869
+aef6fd925863efbe4cd4959f7](https://github.com/miku/span/tree/d3872bf1b128869ae
+f6fd925863efbe4cd4959f7) less than 500 SLOC are utilities and the average SLOC
+per data source is less than 400 SLOC (with potential for reduction):
+
+    SLOC  THEME
+
+     393  assetutil
+      75  container
+
+     428  crossref
+     203  doaj
+     258  finc
+     142  genios
+     431  holdings
+     712  jats
+
+    ----
+
+     468  utils
+    2174  six data sources
