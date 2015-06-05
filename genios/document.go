@@ -2,7 +2,6 @@ package genios
 
 import (
 	"bufio"
-	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -111,8 +110,12 @@ func (doc Document) Date() (time.Time, error) {
 	return time.Parse("20060102", raw)
 }
 
+func (doc Document) SourceAndID() string {
+	return fmt.Sprintf("%s__%s", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
+}
+
 func (doc Document) URL() string {
-	return fmt.Sprintf("https://www.wiso-net.de/document/%s__%s/", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
+	return fmt.Sprintf("https://www.wiso-net.de/document/%s", doc.SourceAndID())
 }
 
 func IsNN(s string) bool {
@@ -133,7 +136,7 @@ func (doc Document) Authors() []string {
 }
 
 func (doc Document) RecordID() string {
-	return fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.ID)))
+	return fmt.Sprintf("ai-%s-%s", SourceID, doc.SourceAndID())
 }
 
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
