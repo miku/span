@@ -2,6 +2,7 @@ package genios
 
 import (
 	"bufio"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -141,7 +142,8 @@ func (doc Document) Authors() []string {
 }
 
 func (doc Document) RecordID() string {
-	return fmt.Sprintf("ai-%s-%s", SourceID, doc.SourceAndID())
+	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.SourceAndID())))
+	return strings.TrimRight(enc, "=")
 }
 
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
