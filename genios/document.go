@@ -95,6 +95,14 @@ func (s Genios) Iterate(r io.Reader) (<-chan interface{}, error) {
 	return ch, nil
 }
 
+func (doc Document) Headings() []string {
+	var headings []string
+	for _, s := range strings.Split(doc.Descriptors, ";") {
+		headings = append(headings, strings.TrimSpace(s))
+	}
+	return headings
+}
+
 func (doc Document) Date() (time.Time, error) {
 	raw := strings.TrimSpace(RawDateReplacer.Replace(doc.RawDate))
 	if len(raw) > 8 {
@@ -165,6 +173,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
 	output.Format = Format
+	output.Subjects = doc.Headings()
 	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
 
 	output.Date, err = doc.Date()
