@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/miku/span"
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/finc"
 )
 
@@ -34,9 +35,14 @@ type Document struct {
 	RawAuthors       []string `xml:"Authors>Author"`
 	Language         string   `xml:"Language"`
 	Abstract         string   `xml:"Abstract"`
+	Group            string   `xml:"x-group"`
+	Descriptors      string   `xml:"Descriptors>Descriptor"`
 }
 
-var RawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
+var (
+	RawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
+	collections     = assetutil.MustLoadStringMap("assets/genios/collections.json")
+)
 
 type Genios struct{}
 
@@ -159,7 +165,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
 	output.Format = Format
-	output.MegaCollection = Collection
+	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
 
 	output.Date, err = doc.Date()
 	if err != nil {
