@@ -96,8 +96,11 @@ func (s Genios) Iterate(r io.Reader) (<-chan interface{}, error) {
 
 func (doc Document) Headings() []string {
 	var headings []string
-	for _, s := range strings.Split(doc.Descriptors, ";") {
-		headings = append(headings, strings.TrimSpace(s))
+	fields := strings.FieldsFunc(doc.Descriptors, func(r rune) bool {
+		return r == ';' || r == '/'
+	})
+	for _, f := range fields {
+		headings = append(headings, strings.TrimSpace(f))
 	}
 	return headings
 }
@@ -124,8 +127,10 @@ func IsNN(s string) bool {
 
 func (doc Document) Authors() []string {
 	var authors []string
-	for _, v := range doc.RawAuthors {
-		fields := strings.Split(v, ";")
+	for _, s := range doc.RawAuthors {
+		fields := strings.FieldsFunc(s, func(r rune) bool {
+			return r == ';' || r == '/'
+		})
 		for _, f := range fields {
 			if !IsNN(f) {
 				authors = append(authors, strings.TrimSpace(f))
