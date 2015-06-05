@@ -112,7 +112,7 @@ func (doc Document) Date() (time.Time, error) {
 }
 
 func (doc Document) URL() string {
-	return fmt.Sprintf("https://www.genios.de/document/%s__%s/", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
+	return fmt.Sprintf("https://www.wiso-net.de/document/%s__%s/", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
 }
 
 func IsNN(s string) bool {
