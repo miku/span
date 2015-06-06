@@ -23,6 +23,8 @@ const (
 	Format     = "ElectronicArticle"
 	Collection = "Genios"
 	Genre      = "article"
+	// If no abstract is found accept this number of chars from doc.Text as Abstract.
+	TextAsAbstractCutoff = 2000
 )
 
 type Document struct {
@@ -189,6 +191,12 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	if !IsNN(doc.Abstract) {
 		output.Abstract = strings.TrimSpace(doc.Abstract)
+	} else {
+		cutoff := len(doc.Text)
+		if cutoff > TextAsAbstractCutoff {
+			cutoff = TextAsAbstractCutoff
+		}
+		output.Abstract = strings.TrimSpace(doc.Text[:cutoff])
 	}
 
 	if !IsNN(doc.Title) {
