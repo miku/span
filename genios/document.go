@@ -199,9 +199,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Abstract = strings.TrimSpace(doc.Text[:cutoff])
 	}
 
-	if !IsNN(doc.Title) {
-		output.ArticleTitle = strings.TrimSpace(doc.Title)
-	}
+	output.ArticleTitle = strings.TrimSpace(doc.Title)
+	output.JournalTitle = strings.TrimSpace(doc.PublicationTitle)
 
 	if !IsNN(doc.ISSN) {
 		output.ISSN = append(output.ISSN, strings.TrimSpace(doc.ISSN))
@@ -209,10 +208,6 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	if !IsNN(doc.Issue) {
 		output.Issue = strings.TrimSpace(doc.Issue)
-	}
-
-	if !IsNN(doc.PublicationTitle) {
-		output.JournalTitle = strings.TrimSpace(doc.PublicationTitle)
 	}
 
 	if !IsNN(doc.Volume) {
