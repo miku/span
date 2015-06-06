@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.35
+Version:    0.1.36
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -51,6 +51,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Sat Jun 6 2015 Martin Czygan
+- 0.1.36 release
+- add genios/gbi support
+
 * Mon Jun 1 2015 Martin Czygan
 - 0.1.35 release
 - initial support for multiple exporters
