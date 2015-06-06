@@ -22,6 +22,7 @@ const (
 	BatchSize  = 2000
 	Format     = "ElectronicArticle"
 	Collection = "Genios"
+	Genre      = "article"
 )
 
 type Document struct {
@@ -210,6 +211,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
 
+	output.Genre = "article"
 	output.Languages = doc.Languages()
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
