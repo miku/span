@@ -214,13 +214,13 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
 
+	output.Format = Format
 	output.Genre = "article"
 	output.Languages = doc.Languages()
+	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
-	output.Format = Format
 	output.Subjects = doc.Headings()
-	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
 
 	output.Date, err = doc.Date()
 	if err != nil {
