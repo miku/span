@@ -49,7 +49,7 @@ var (
 	RawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
 	collections     = assetutil.MustLoadStringMap("assets/genios/collections.json")
 	// Restricts the possible languages for detection.
-	acceptedLanguages = container.NewStringSet("deu", "eng", "fra", "ita", "spa")
+	acceptedLanguages = container.NewStringSet("deu", "eng")
 )
 
 type Genios struct{}
