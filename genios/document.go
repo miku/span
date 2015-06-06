@@ -10,8 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kapsteur/franco"
 	"github.com/miku/span"
 	"github.com/miku/span/assetutil"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
 
@@ -37,11 +39,14 @@ type Document struct {
 	Abstract         string   `xml:"Abstract"`
 	Group            string   `xml:"x-group"`
 	Descriptors      string   `xml:"Descriptors>Descriptor"`
+	Text             string   `xml:"Text"`
 }
 
 var (
 	RawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
 	collections     = assetutil.MustLoadStringMap("assets/genios/collections.json")
+	// Restricts the possible languages for detection.
+	acceptedLanguages = container.NewStringSet("deu", "eng", "fra", "ita", "spa")
 )
 
 type Genios struct{}
@@ -146,6 +151,31 @@ func (doc Document) RecordID() string {
 	return strings.TrimRight(enc, "=")
 }
 
+// Languages returns the given and guessed languages
+// found in abstract and fulltext. Note: This is slow.
+// Skip detection on too short strings.
+func (doc Document) Languages() []string {
+	set := container.NewStringSet()
+
+	vals := []string{doc.Title, doc.Text}
+
+	for _, s := range vals {
+		if len(s) < 20 {
+			continue
+		}
+		lang := franco.DetectOne(s)
+		if !acceptedLanguages.Contains(lang.Code) {
+			continue
+		}
+		if lang.Code == "und" {
+			continue
+		}
+		set.Add(lang.Code)
+	}
+
+	return set.Values()
+}
+
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
 	output := finc.NewIntermediateSchema()
@@ -180,6 +210,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
 
+	output.Languages = doc.Languages()
 	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
 	output.Format = Format
