@@ -1,1083 +1,330 @@
 {
-    "Mechanics of Materials": [
-        "Technik"
-    ],
-    "Immunology and Allergy": [
-        "Medizin"
-    ],
-    "Information Systems and Management": [
-        "Informatik"
-    ],
-    "Materials Science(all)": [
-        "Technik"
-    ],
-    "Condensed Matter Physics": [
-        "Physik"
-    ],
-    "Biochemistry": [
-        "Chemie und Pharmazie"
-    ],
-    "Astronomy and Astrophysics": [
-        "Physik"
-    ],
-    "Computer Vision and Pattern Recognition": [
-        "Informatik"
-    ],
-    "Geotechnical Engineering and Engineering Geology": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie",
-        "Technik"
-    ],
-    "Microbiology": [
-        "Biologie"
-    ],
-    "Endocrine and Autonomic Systems": [
-        "Medizin"
-    ],
-    "Hematology": [
-        "Medizin"
-    ],
-    "Health(social science)": [
-        "Medizin"
-    ],
-    "Parasitology": [
-        "Medizin"
-    ],
-    "Political Science and International Relations": [
-        "Politologie"
-    ],
-    "Palaeontology": [
-        "Geologie und Pal\u00e4ontologie"
-    ],
-    "Library and Information Sciences": [
-        "Allgemeines"
-    ],
-    "Community and Home Care": [
-        "Allgemeines"
-    ],
-    "Neuroscience(all)": [
-        "Medizin"
-    ],
-    "Microbiology (medical)": [
-        "Biologie"
-    ],
-    "Anesthesiology and Pain Medicine": [
-        "Medizin"
-    ],
-    "Religious studies": [
-        "Theologie und Religionswissenschaft"
-    ],
-    "Molecular Medicine": [
-        "Medizin"
-    ],
-    "Medical\u2013Surgical": [
-        "Medizin"
-    ],
-    "Emergency": [
-        "Medizin"
-    ],
-    "Inorganic Chemistry": [
-        "Chemie und Pharmazie"
-    ],
-    "Hardware and Architecture": [
-        "Technik"
-    ],
-    "Philosophy": [
-        "Philosophie"
-    ],
-    "Economics, Econometrics and Finance(all)": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Atomic and Molecular Physics, and Optics": [
-        "Physik"
-    ],
-    "Biophysics": [
-        "Biologie",
-        "Physik"
-    ],
-    "Anthropology": [
-        "Ethnologie (Volks- und V\u00f6lkerkunde)"
-    ],
-    "Computer Science(all)": [
-        "Informatik"
-    ],
-    "Pediatrics": [
-        "Medizin"
-    ],
-    "Applied Microbiology and Biotechnology": [
-        "Biologie",
-        "Technik"
-    ],
-    "Chemical Engineering (miscellaneous)": [
-        "Chemie und Pharmazie",
-        "Technik"
-    ],
-    "Endocrinology, Diabetes and Metabolism": [
-        "Medizin"
-    ],
-    "Pathology and Forensic Medicine": [
-        "Medizin"
-    ],
-    "History": [
-        "Geschichte"
-    ],
-    "Mathematics (miscellaneous)": [
-        "Mathematik"
-    ],
-    "Geography, Planning and Development": [
-        "Geographie"
-    ],
-    "LPN and LVN": [
-        "Medizin"
-    ],
-    "Management, Monitoring, Policy and Law": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Fundamentals and skills": [
-        "P\u00e4dagogik"
-    ],
-    "Numerical Analysis": [
-        "Mathematik"
-    ],
-    "Renewable Energy, Sustainability and the Environment": [
-        "Geographie",
-        "Technik"
-    ],
-    "Developmental Biology": [
-        "Biologie"
-    ],
-    "Equine": [
-        "Biologie"
-    ],
-    "Hepatology": [
-        "Medizin"
-    ],
-    "Physical Therapy, Sports Therapy and Rehabilitation": [
-        "Medizin"
-    ],
-    "Animal Science and Zoology": [
-        "Biologie"
-    ],
-    "Oral Surgery": [
-        "Medizin"
-    ],
-    "Issues, ethics and legal aspects": [
-        "Rechtswissenschaft"
-    ],
-    "Clinical Biochemistry": [
-        "Medizin",
-        "Biologie",
-        "Chemie und Pharmazie"
-    ],
-    "Dentistry(all)": [
-        "Medizin"
-    ],
-    "Analysis": [
-        "Mathematik"
-    ],
-    "Geriatrics and Gerontology": [
-        "Medizin"
-    ],
-    "Phychiatric Mental Health": [
-        "Medizin",
-        "Psychologie"
-    ],
-    "Cultural Studies": [
-        "Allgemeines"
-    ],
-    "Computer Science Applications": [
-        "Informatik"
-    ],
-    "Toxicology": [
-        "Chemie und Pharmazie"
-    ],
-    "Earth-Surface Processes": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie"
-    ],
-    "Classics": [
-        "Philosophie",
-        "Klassische Philologie"
-    ],
-    "Environmental Chemistry": [
-        "Technik",
-        "Chemie und Pharmazie"
-    ],
-    "Neuropsychology and Physiological Psychology": [
-        "Medizin",
-        "Psychologie"
-    ],
-    "Anatomy": [
-        "Medizin"
-    ],
-    "Otorhinolaryngology": [
-        "Medizin"
-    ],
-    "Oncology": [
-        "Medizin"
-    ],
-    "Ecology": [
-        "Geographie"
-    ],
-    "Biochemistry, Genetics and Molecular Biology (miscellaneous)": [
-        "Chemie und Pharmazie",
-        "Biologie"
-    ],
-    "Endocrinology": [
-        "Medizin"
-    ],
-    "Complementary and alternative medicine": [
-        "Medizin"
-    ],
-    "Developmental and Educational Psychology": [
-        "Biologie",
-        "Psychologie"
-    ],
-    "Food Science": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Advanced and Specialised Nursing": [
-        "Medizin"
-    ],
-    "Gender Studies": [
-        "Allgemeines",
-        "Philosophie"
-    ],
-    "Mathematical Physics": [
-        "Mathematik",
-        "Physik"
-    ],
-    "Building and Construction": [
-        "Technik"
-    ],
-    "Dermatology": [
-        "Medizin"
-    ],
-    "Clinical Psychology": [
-        "Medizin",
-        "Biologie",
-        "Psychologie"
-    ],
-    "Biological Psychiatry": [
-        "Biologie",
-        "Psychologie"
-    ],
-    "Biochemistry, Genetics and Molecular Biology(all)": [
-        "Chemie und Pharmazie",
-        "Biologie"
-    ],
-    "Neuroscience (miscellaneous)": [
-        "Medizin"
-    ],
-    "Museology": [
-        "Allgemeines"
-    ],
-    "Media Technology": [
-        "Allgemeines",
-        "Technik"
-    ],
-    "Horticulture": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Instrumentation": [
-        "Allgemeines",
-        "Technik"
-    ],
-    "Drug guides": [
-        "Chemie und Pharmazie"
-    ],
-    "Signal Processing": [
-        "Technik"
-    ],
-    "Computational Theory and Mathematics": [
-        "Mathematik"
-    ],
-    "Accounting": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Health, Toxicology and Mutagenesis": [
-        "Medizin"
-    ],
-    "Radiation": [
-        "Physik"
-    ],
-    "Environmental Science (miscellaneous)": [
-        "Technik",
-        "Geographie",
-        "Biologie"
-    ],
-    "Pharmacy": [
-        "Chemie und Pharmazie"
-    ],
-    "Computer Science (miscellaneous)": [
-        "Informatik"
-    ],
-    "Conservation": [
-        "Allgemeines"
-    ],
-    "Aquatic Science": [
-        "Biologie"
-    ],
-    "Management Information Systems": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Computational Mechanics": [
-        "Physik"
-    ],
-    "Control and Systems Engineering": [
-        "Technik"
-    ],
-    "Catalysis": [
-        "Chemie und Pharmazie"
-    ],
-    "Embryology": [
-        "Medizin",
-        "Biologie"
-    ],
-    "Polymers and Plastics": [
-        "Chemie und Pharmazie"
-    ],
-    "Cancer Research": [
-        "Medizin"
-    ],
-    "Statistical and Nonlinear Physics": [
-        "Physik"
-    ],
-    "Soil Science": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Human-Computer Interaction": [
-        "Informatik"
-    ],
-    "Speech and Hearing": [
-        "Allgemeines"
-    ],
-    "Discrete Mathematics and Combinatorics": [
-        "Mathematik",
-        "Informatik"
-    ],
-    "Applied Mathematics": [
-        "Mathematik"
-    ],
-    "Family Practice": [
-        "Allgemeines",
-        "Psychologie"
-    ],
-    "Urban Studies": [
-        "Soziologie",
-        "Geographie"
-    ],
-    "Structural Biology": [
-        "Biologie"
-    ],
-    "Energy (miscellaneous)": [
-        "Physik"
-    ],
-    "Occupational Therapy": [
-        "Medizin"
-    ],
-    "Engineering(all)": [
-        "Technik"
-    ],
-    "Education": [
-        "P\u00e4dagogik"
-    ],
-    "Virology": [
-        "Medizin"
-    ],
-    "Process Chemistry and Technology": [
-        "Chemie und Pharmazie",
-        "Technik"
-    ],
-    "Theoretical Computer Science": [
-        "Informatik"
-    ],
-    "Periodontics": [
-        "Medizin"
-    ],
-    "Health Information Management": [
-        "Medizin",
-        "Informatik"
-    ],
-    "Clinical Neurology": [
-        "Medizin",
-        "Biologie"
-    ],
-    "Immunology": [
-        "Medizin"
-    ],
-    "Electrical and Electronic Engineering": [
-        "Technik",
-        "Mathematik",
-        "Physik"
-    ],
-    "Statistics and Probability": [
-        "Mathematik"
-    ],
-    "Analytical Chemistry": [
-        "Chemie und Pharmazie"
-    ],
-    "Pharmacology, Toxicology and Pharmaceutics (miscellaneous)": [
-        "Chemie und Pharmazie"
-    ],
-    "Food Animals": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Immunology and Microbiology (miscellaneous)": [
-        "Medizin"
-    ],
-    "Fuel Technology": [
-        "Technik"
-    ],
-    "Electrochemistry": [
-        "Technik",
-        "Physik",
-        "Chemie und Pharmazie"
-    ],
-    "Health Policy": [
-        "Medizin"
-    ],
-    "Chemical Health and Safety": [
-        "Chemie und Pharmazie",
-        "Technik",
-        "Medizin"
-    ],
-    "Biomaterials": [
-        "Biologie",
-        "Technik"
-    ],
-    "Architecture": [
-        "Technik"
-    ],
-    "Spectroscopy": [
-        "Physik"
-    ],
-    "Bioengineering": [
-        "Biologie",
-        "Chemie und Pharmazie",
-        "Technik"
-    ],
-    "Computer Networks and Communications": [
-        "Informatik"
-    ],
-    "Biomedical Engineering": [
-        "Biologie",
-        "Medizin",
-        "Technik"
-    ],
-    "Archaeology": [
-        "Klassische Arch\u00e4ologie"
-    ],
-    "Chiropractics": [
-        "Medizin"
-    ],
-    "Electronic, Optical and Magnetic Materials": [
-        "Technik",
-        "Physik"
-    ],
-    "Pharmacology (nursing)": [
-        "Chemie und Pharmazie"
-    ],
-    "Surfaces, Coatings and Films": [
-        "Allgemeines",
-        "Technik"
-    ],
-    "Pulmonary and Respiratory Medicine": [
-        "Medizin"
-    ],
-    "Genetics(clinical)": [
-        "Biologie",
-        "Medizin"
-    ],
-    "Chemical Engineering(all)": [
-        "Chemie und Pharmazie",
-        "Technik"
-    ],
-    "Communication": [
-        "Philosophie",
-        "Technik"
-    ],
-    "Human Factors and Ergonomics": [
-        "Allgemeines"
-    ],
-    "Earth and Planetary Sciences (miscellaneous)": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie"
-    ],
-    "Filtration and Separation": [
-        "Chemie und Pharmazie"
-    ],
-    "Language and Linguistics": [
-        "Allgemeine und vergleichende Sprach- und Literaturwissenschaft",
-        "Indogermanistik",
-        "Au\u00dfereurop\u00e4ische Sprachen und Literaturen"
-    ],
-    "Nutrition and Dietetics": [
-        "Medizin"
-    ],
-    "Automotive Engineering": [
-        "Technik"
-    ],
-    "Pharmacology, Toxicology and Pharmaceutics(all)": [
-        "Chemie und Pharmazie"
-    ],
-    "Urology": [
-        "Medizin"
-    ],
-    "Plant Science": [
-        "Biologie"
-    ],
-    "Business and International Management": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Nature and Landscape Conservation": [
-        "Geographie",
-        "Biologie"
-    ],
-    "Nursing (miscellaneous)": [
-        "Medizin"
-    ],
-    "Computer Graphics and Computer-Aided Design": [
-        "Informatik"
-    ],
-    "Nursing(all)": [
-        "Medizin"
-    ],
-    "veterinary (miscalleneous)": [
-        "Medizin"
-    ],
-    "Molecular Biology": [
-        "Biologie"
-    ],
-    "Agricultural and Biological Sciences (miscellaneous)": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Mathematics(all)": [
-        "Mathematik"
-    ],
-    "Physical and Theoretical Chemistry": [
-        "Chemie und Pharmazie",
-        "Physik"
-    ],
-    "Engineering (miscellaneous)": [
-        "Technik"
-    ],
-    "Forestry": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Pharmacology (medical)": [
-        "Chemie und Pharmazie"
-    ],
-    "Management Science and Operations Research": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Music": [
-        "Musikwissenschaft"
-    ],
-    "Pharmaceutical Science": [
-        "Chemie und Pharmazie"
-    ],
-    "Arts and Humanities (miscellaneous)": [
-        "Kunst und Kunstgeschichte"
-    ],
-    "Metals and Alloys": [
-        "Chemie und Pharmazie"
-    ],
-    "Infectious Diseases": [
-        "Medizin"
-    ],
-    "Ceramics and Composites": [
-        "Technik"
-    ],
-    "Sociology and Political Science": [
-        "Soziologie"
-    ],
-    "Economics and Econometrics": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Life-span and Life-course Studies": [
-        "Medizin"
-    ],
-    "Transportation": [
-        "Allgemeines"
-    ],
-    "Finance": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Mechanical Engineering": [
-        "Technik"
-    ],
-    "Geology": [
-        "Geologie und Pal\u00e4ontologie"
-    ],
-    "Insect Science": [
-        "Biologie"
-    ],
-    "Arts and Humanities(all)": [
-        "Kunst und Kunstgeschichte"
-    ],
-    "History and Philosophy of Science": [
-        "Geschichte",
-        "Philosophie"
-    ],
-    "Reviews and References, Medical": [
-        "Medizin"
-    ],
-    "Ophthalmology": [
-        "Medizin"
-    ],
-    "Small Animals": [
-        "Biologie"
-    ],
-    "Cellular and Molecular Neuroscience": [
-        "Biologie",
-        "Psychologie"
-    ],
-    "Modelling and Simulation": [
-        "Technik"
-    ],
-    "veterinary(all)": [
-        "Medizin"
-    ],
-    "Waste Management and Disposal": [
-        "Geographie",
-        "Technik"
-    ],
-    "Drug Discovery": [
-        "Chemie und Pharmazie"
-    ],
-    "Pollution": [
-        "Geographie"
-    ],
-    "Obstetrics and Gynaecology": [
-        "Medizin"
-    ],
-    "Tourism, Leisure and Hospitality Management": [
-        "Allgemeines"
-    ],
-    "Behavioral Neuroscience": [
-        "Medizin"
-    ],
-    "Internal Medicine": [
-        "Medizin"
-    ],
-    "Environmental Science(all)": [
-        "Technik",
-        "Geographie",
-        "Biologie"
-    ],
-    "Colloid and Surface Chemistry": [
-        "Chemie und Pharmazie"
-    ],
-    "Sensory Systems": [
-        "Technik"
-    ],
-    "Civil and Structural Engineering": [
-        "Technik"
-    ],
-    "Physiology (medical)": [
-        "Biologie"
-    ],
-    "Social Sciences(all)": [
-        "Allgemeines"
-    ],
-    "Ocean Engineering": [
-        "Allgemeine Naturwissenschaft"
-    ],
-    "Reproductive Medicine": [
-        "Medizin"
-    ],
-    "Podiatry": [
-        "Medizin"
-    ],
-    "Care Planning": [
-        "Medizin"
-    ],
-    "Literature and Literary Theory": [
-        "Allgemeine und vergleichende Sprach- und Literaturwissenschaft",
-        "Indogermanistik",
-        "Au\u00dfereurop\u00e4ische Sprachen und Literaturen"
-    ],
-    "Atmospheric Science": [
-        "Physik"
-    ],
-    "Materials Chemistry": [
-        "Chemie und Pharmazie"
-    ],
-    "Aerospace Engineering": [
-        "Technik"
-    ],
-    "Chemistry(all)": [
-        "Chemie und Pharmazie",
-        "Technik"
-    ],
-    "Social Psychology": [
-        "Psychologie"
-    ],
-    "Critical Care and Intensive Care Medicine": [
-        "Medizin"
-    ],
-    "Computational Mathematics": [
-        "Mathematik"
-    ],
-    "Industrial and Manufacturing Engineering": [
-        "Technik"
-    ],
-    "Software": [
-        "Informatik"
-    ],
-    "Organic Chemistry": [
-        "Chemie und Pharmazie"
-    ],
-    "Gerontology": [
-        "Medizin"
-    ],
-    "Information Systems": [
-        "Informatik"
-    ],
-    "Radiological and Ultrasound Technology": [
-        "Medizin",
-        "Technik",
-        "Physik"
-    ],
-    "Public Administration": [
-        "Allgemeines"
-    ],
-    "Energy Engineering and Power Technology": [
-        "Physik"
-    ],
-    "Emergency Medicine": [
-        "Medizin"
-    ],
-    "Safety, Risk, Reliability and Quality": [
-        "Allgemeines"
-    ],
-    "Physiology": [
-        "Biologie"
-    ],
-    "Materials Science (miscellaneous)": [
-        "Technik"
-    ],
-    "Water Science and Technology": [
-        "Geographie",
-        "Technik"
-    ],
-    "Neurology": [
-        "Medizin"
-    ],
-    "Histology": [
-        "Biologie"
-    ],
-    "Visual Arts and Performing Arts": [
-        "Kunst und Kunstgeschichte"
-    ],
-    "Nuclear Energy and Engineering": [
-        "Physik",
-        "Technik"
-    ],
-    "Cardiology and Cardiovascular Medicine": [
-        "Medizin"
-    ],
-    "Psychology(all)": [
-        "Psychologie"
-    ],
-    "Rheumatology": [
-        "Medizin"
-    ],
-    "Control and Optimization": [
-        "Mathematik",
-        "Technik"
-    ],
-    "Ageing": [
-        "Medizin"
-    ],
-    "Critical Care": [
-        "Medizin"
-    ],
-    "Oceanography": [
-        "Allgemeine Naturwissenschaft"
-    ],
-    "Assessment and Diagnosis": [
-        "Medizin"
-    ],
-    "Global and Planetary Change": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie",
-        "Physik"
-    ],
-    "Business, Management and Accounting (miscellaneous)": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Geometry and Topology": [
-        "Mathematik"
-    ],
-    "Review and Exam Preparation": [
-        "Allgemeines"
-    ],
-    "Agronomy and Crop Science": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Health Informatics": [
-        "Medizin",
-        "Informatik"
-    ],
-    "Health Professions (miscellaneous)": [
-        "Medizin"
-    ],
-    "Organizational Behavior and Human Resource Management": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Decision Sciences (miscellaneous)": [
-        "Mathematik",
-        "Technik"
-    ],
-    "Immunology and Microbiology(all)": [
-        "Medizin"
-    ],
-    "Maternity and Midwifery": [
-        "Medizin"
-    ],
-    "Biochemistry, medical": [
-        "Chemie und Pharmazie",
-        "Biologie"
-    ],
-    "Surgery": [
-        "Medizin"
-    ],
-    "Fluid Flow and Transfer Processes": [
-        "Physik"
-    ],
-    "Medicine(all)": [
-        "Medizin"
-    ],
-    "Development": [
-        "Allgemeines"
-    ],
-    "Optometry": [
-        "Medizin"
-    ],
-    "Earth and Planetary Sciences(all)": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie"
-    ],
-    "Nuclear and High Energy Physics": [
-        "Physik",
-        "Technik"
-    ],
-    "Pharmacology": [
-        "Chemie und Pharmazie"
-    ],
-    "Computers in Earth Sciences": [
-        "Informatik",
-        "Geographie",
-        "Geologie und Pal\u00e4ontologie"
-    ],
-    "Space and Planetary Science": [
-        "Physik",
-        "Technik"
-    ],
-    "Marketing": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Developmental Neuroscience": [
-        "Biologie",
-        "Psychologie"
-    ],
-    "Chemistry (miscellaneous)": [
-        "Chemie und Pharmazie",
-        "Technik"
-    ],
-    "Health Professions(all)": [
-        "Medizin"
-    ],
-    "Decision Sciences(all)": [
-        "Mathematik",
-        "Technik"
-    ],
-    "Complementary and Manual Therapy": [
-        "Medizin"
-    ],
-    "Acoustics and Ultrasonics": [
-        "Physik"
-    ],
-    "Geophysics": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie",
-        "Physik"
-    ],
-    "Orthopedics and Sports Medicine": [
-        "Medizin"
-    ],
-    "Social Sciences (miscellaneous)": [
-        "Allgemeines"
-    ],
-    "Epidemiology": [
-        "Medizin"
-    ],
-    "Safety Research": [
-        "Allgemeines"
-    ],
-    "Law": [
-        "Rechtswissenschaft"
-    ],
-    "Psychology (miscellaneous)": [
-        "Psychologie"
-    ],
-    "Leadership and Management": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Dental Assisting": [
-        "Medizin"
-    ],
-    "Experimental and Cognitive Psychology": [
-        "Psychologie"
-    ],
-    "Industrial relations": [
-        "Technik"
-    ],
-    "Medical Laboratory Technology": [
-        "Medizin",
-        "Technik"
-    ],
-    "Economic Geology": [
-        "Geographie",
-        "Wirtschaftswissenschaften"
-    ],
-    "Linguistics and Language": [
-        "Allgemeine und vergleichende Sprach- und Literaturwissenschaft",
-        "Indogermanistik",
-        "Au\u00dfereurop\u00e4ische Sprachen und Literaturen"
-    ],
-    "Economics, Econometrics and Finance (miscellaneous)": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Medicine (miscellaneous)": [
-        "Medizin"
-    ],
-    "Dentistry (miscellaneous)": [
-        "Medizin"
-    ],
-    "Energy(all)": [
-        "Physik"
-    ],
-    "Strategy and Management": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Transplantation": [
-        "Medizin"
-    ],
-    "Algebra and Number Theory": [
-        "Mathematik"
-    ],
-    "Demography": [
-        "Allgemeines"
-    ],
-    "Logic": [
-        "Mathematik"
-    ],
-    "Ecology, Evolution, Behavior and Systematics": [
-        "Geographie"
-    ],
-    "Biotechnology": [
-        "Biologie",
-        "Technik"
-    ],
-    "Pediatrics, Perinatology, and Child Health": [
-        "Medizin"
-    ],
-    "Nephrology": [
-        "Medizin"
-    ],
-    "Stratigraphy": [
-        "Geographie",
-        "Geologie und Pal\u00e4ontologie"
-    ],
-    "Rehabilitation": [
-        "Medizin"
-    ],
-    "Statistics, Probability and Uncertainty": [
-        "Mathematik"
-    ],
-    "Dental Hygiene": [
-        "Medizin"
-    ],
-    "Physics and Astronomy (miscellaneous)": [
-        "Physik"
-    ],
-    "Applied Psychology": [
-        "Psychologie"
-    ],
-    "Orthodontics": [
-        "Medizin"
-    ],
-    "Geochemistry and Petrology": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie",
-        "Chemie und Pharmazie"
-    ],
-    "Public Health, Environmental and Occupational Health": [
-        "Medizin"
-    ],
-    "Cell Biology": [
-        "Biologie"
-    ],
-    "Genetics": [
-        "Biologie"
-    ],
-    "Cognitive Neuroscience": [
-        "Medizin",
-        "Biologie",
-        "Psychologie"
-    ],
-    "Radiology Nuclear Medicine and imaging": [
-        "Medizin"
-    ],
-    "Ecological Modelling": [
-        "Geologie und Pal\u00e4ontologie",
-        "Geographie",
-        "Physik"
-    ],
-    "Agricultural and Biological Sciences(all)": [
-        "Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"
-    ],
-    "Research and Theory": [
-        "Allgemeines"
-    ],
-    "Oncology(nursing)": [
-        "Medizin"
-    ],
-    "Psychiatry and Mental health": [
-        "Medizin",
-        "Psychologie"
-    ],
-    "General": [
-        "Allgemeines"
-    ],
-    "Nurse Assisting": [
-        "Medizin"
-    ],
-    "Management of Technology and Innovation": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Business, Management and Accounting(all)": [
-        "Wirtschaftswissenschaften"
-    ],
-    "Gastroenterology": [
-        "Medizin"
-    ],
-    "Surfaces and Interfaces": [
-        "Allgemeines",
-        "Technik"
-    ],
-    "Environmental Engineering": [
-        "Technik",
-        "Geographie",
-        "Biologie"
-    ],
-    "Physics and Astronomy(all)": [
-        "Physik"
-    ],
-    "Artificial Intelligence": [
-        "Informatik"
-    ]
+    "Accounting":["Wirtschaftswissenschaften"],
+    "Acoustics and Ultrasonics":["Physik"],
+    "Advanced and Specialised Nursing":["Medizin"],
+    "Aerospace Engineering":["Technik"],
+    "Ageing":["Medizin"],
+    "Agricultural and Biological Sciences (miscellaneous)":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Agricultural and Biological Sciences(all)":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Agronomy and Crop Science":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Algebra and Number Theory":["Mathematik"],
+    "Analysis":["Mathematik"],
+    "Analytical Chemistry":["Chemie und Pharmazie"],
+    "Anatomy":["Medizin"],
+    "Anesthesiology and Pain Medicine":["Medizin"],
+    "Animal Science and Zoology":["Biologie"],
+    "Anthropology":["Ethnologie (Volks- und Völkerkunde)"],
+    "Applied Mathematics":["Mathematik"],
+    "Applied Microbiology and Biotechnology":["Biologie","Technik"],
+    "Applied Psychology":["Psychologie"],
+    "Aquatic Science":["Biologie"],
+    "Archaeology":["Klassische Archäologie"],
+    "Architecture":["Technik"],
+    "Artificial Intelligence":["Informatik"],
+    "Arts and Humanities (miscellaneous)":["Kunst und Kunstgeschichte"],
+    "Arts and Humanities(all)":["Kunst und Kunstgeschichte"],
+    "Assessment and Diagnosis":["Medizin"],
+    "Astronomy and Astrophysics":["Physik"],
+    "Atmospheric Science":["Physik"],
+    "Atomic and Molecular Physics, and Optics":["Physik"],
+    "Automotive Engineering":["Technik"],
+    "Behavioral Neuroscience":["Medizin"],
+    "Biochemistry":["Chemie und Pharmazie"],
+    "Biochemistry, Genetics and Molecular Biology (miscellaneous)":["Chemie und Pharmazie","Biologie"],
+    "Biochemistry, Genetics and Molecular Biology(all)":["Chemie und Pharmazie","Biologie"],
+    "Biochemistry, medical":["Chemie und Pharmazie","Biologie"],
+    "Bioengineering":["Biologie","Chemie und Pharmazie","Technik"],
+    "Biological Psychiatry":["Biologie","Psychologie"],
+    "Biomaterials":["Biologie","Technik"],
+    "Biomedical Engineering":["Biologie","Medizin","Technik"],
+    "Biophysics":["Biologie","Physik"],
+    "Biotechnology":["Biologie","Technik"],
+    "Building and Construction":["Technik"],
+    "Business and International Management":["Wirtschaftswissenschaften"],
+    "Business, Management and Accounting (miscellaneous)":["Wirtschaftswissenschaften"],
+    "Business, Management and Accounting(all)":["Wirtschaftswissenschaften"],
+    "Cancer Research":["Medizin"],
+    "Cardiology and Cardiovascular Medicine":["Medizin"],
+    "Care Planning":["Medizin"],
+    "Catalysis":["Chemie und Pharmazie"],
+    "Cell Biology":["Biologie"],
+    "Cellular and Molecular Neuroscience":["Biologie","Psychologie"],
+    "Ceramics and Composites":["Technik"],
+    "Chemical Engineering (miscellaneous)":["Chemie und Pharmazie","Technik"],
+    "Chemical Engineering(all)":["Chemie und Pharmazie","Technik"],
+    "Chemical Health and Safety":["Chemie und Pharmazie","Technik","Medizin"],
+    "Chemistry (miscellaneous)":["Chemie und Pharmazie","Technik"],
+    "Chemistry(all)":["Chemie und Pharmazie","Technik"],
+    "Chiropractics":["Medizin"],
+    "Civil and Structural Engineering":["Technik"],
+    "Classics":["Philosophie","Klassische Philologie"],
+    "Clinical Biochemistry":["Medizin","Biologie","Chemie und Pharmazie"],
+    "Clinical Neurology":["Medizin","Biologie"],
+    "Clinical Psychology":["Medizin","Biologie","Psychologie"],
+    "Cognitive Neuroscience":["Medizin","Biologie","Psychologie"],
+    "Colloid and Surface Chemistry":["Chemie und Pharmazie"],
+    "Communication":["Philosophie","Technik"],
+    "Community and Home Care":["Allgemeines"],
+    "Complementary and alternative medicine":["Medizin"],
+    "Complementary and Manual Therapy":["Medizin"],
+    "Computational Mathematics":["Mathematik"],
+    "Computational Mechanics":["Physik"],
+    "Computational Theory and Mathematics":["Mathematik"],
+    "Computer Graphics and Computer-Aided Design":["Informatik"],
+    "Computer Networks and Communications":["Informatik"],
+    "Computer Science (miscellaneous)":["Informatik"],
+    "Computer Science Applications":["Informatik"],
+    "Computer Science(all)":["Informatik"],
+    "Computer Vision and Pattern Recognition":["Informatik"],
+    "Computers in Earth Sciences":["Informatik","Geographie","Geologie und Paläontologie"],
+    "Condensed Matter Physics":["Physik"],
+    "Conservation":["Allgemeines"],
+    "Control and Optimization":["Mathematik","Technik"],
+    "Control and Systems Engineering":["Technik"],
+    "Critical Care and Intensive Care Medicine":["Medizin"],
+    "Critical Care":["Medizin"],
+    "Cultural Studies":["Allgemeines"],
+    "Decision Sciences (miscellaneous)":["Mathematik","Technik"],
+    "Decision Sciences(all)":["Mathematik","Technik"],
+    "Demography":["Allgemeines"],
+    "Dental Assisting":["Medizin"],
+    "Dental Hygiene":["Medizin"],
+    "Dentistry (miscellaneous)":["Medizin"],
+    "Dentistry(all)":["Medizin"],
+    "Dermatology":["Medizin"],
+    "Development":["Allgemeines"],
+    "Developmental and Educational Psychology":["Biologie","Psychologie"],
+    "Developmental Biology":["Biologie"],
+    "Developmental Neuroscience":["Biologie","Psychologie"],
+    "Discrete Mathematics and Combinatorics":["Mathematik","Informatik"],
+    "Drug Discovery":["Chemie und Pharmazie"],
+    "Drug guides":["Chemie und Pharmazie"],
+    "Earth and Planetary Sciences (miscellaneous)":["Geologie und Paläontologie","Geographie"],
+    "Earth and Planetary Sciences(all)":["Geologie und Paläontologie","Geographie"],
+    "Earth-Surface Processes":["Geologie und Paläontologie","Geographie"],
+    "Ecological Modelling":["Geologie und Paläontologie","Geographie","Physik"],
+    "Ecology":["Geographie"],
+    "Ecology, Evolution, Behavior and Systematics":["Geographie"],
+    "Economic Geology":["Geographie","Wirtschaftswissenschaften"],
+    "Economics and Econometrics":["Wirtschaftswissenschaften"],
+    "Economics, Econometrics and Finance (miscellaneous)":["Wirtschaftswissenschaften"],
+    "Economics, Econometrics and Finance(all)":["Wirtschaftswissenschaften"],
+    "Education":["Pädagogik"],
+    "Electrical and Electronic Engineering":["Technik","Mathematik","Physik"],
+    "Electrochemistry":["Technik","Physik","Chemie und Pharmazie"],
+    "Electronic, Optical and Magnetic Materials":["Technik","Physik"],
+    "Embryology":["Medizin","Biologie"],
+    "Emergency Medicine":["Medizin"],
+    "Emergency":["Medizin"],
+    "Endocrine and Autonomic Systems":["Medizin"],
+    "Endocrinology":["Medizin"],
+    "Endocrinology, Diabetes and Metabolism":["Medizin"],
+    "Energy (miscellaneous)":["Physik"],
+    "Energy Engineering and Power Technology":["Physik"],
+    "Energy(all)":["Physik"],
+    "Engineering (miscellaneous)":["Technik"],
+    "Engineering(all)":["Technik"],
+    "Environmental Chemistry":["Technik","Chemie und Pharmazie"],
+    "Environmental Engineering":["Technik","Geographie","Biologie"],
+    "Environmental Science (miscellaneous)":["Technik","Geographie","Biologie"],
+    "Environmental Science(all)":["Technik","Geographie","Biologie"],
+    "Epidemiology":["Medizin"],
+    "Equine":["Biologie"],
+    "Experimental and Cognitive Psychology":["Psychologie"],
+    "Family Practice":["Allgemeines","Psychologie"],
+    "Filtration and Separation":["Chemie und Pharmazie"],
+    "Finance":["Wirtschaftswissenschaften"],
+    "Fluid Flow and Transfer Processes":["Physik"],
+    "Food Animals":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Food Science":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Forestry":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Fuel Technology":["Technik"],
+    "Fundamentals and skills":["Pädagogik"],
+    "Gastroenterology":["Medizin"],
+    "Gender Studies":["Allgemeines","Philosophie"],
+    "General":["Allgemeines"],
+    "Genetics":["Biologie"],
+    "Genetics(clinical)":["Biologie","Medizin"],
+    "Geochemistry and Petrology":["Geologie und Paläontologie","Geographie","Chemie und Pharmazie"],
+    "Geography, Planning and Development":["Geographie"],
+    "Geology":["Geologie und Paläontologie"],
+    "Geometry and Topology":["Mathematik"],
+    "Geophysics":["Geologie und Paläontologie","Geographie","Physik"],
+    "Geotechnical Engineering and Engineering Geology":["Geologie und Paläontologie","Geographie","Technik"],
+    "Geriatrics and Gerontology":["Medizin"],
+    "Gerontology":["Medizin"],
+    "Global and Planetary Change":["Geologie und Paläontologie","Geographie","Physik"],
+    "Hardware and Architecture":["Technik"],
+    "Health Informatics":["Medizin","Informatik"],
+    "Health Information Management":["Medizin","Informatik"],
+    "Health Policy":["Medizin"],
+    "Health Professions (miscellaneous)":["Medizin"],
+    "Health Professions(all)":["Medizin"],
+    "Health(social science)":["Medizin"],
+    "Health, Toxicology and Mutagenesis":["Medizin"],
+    "Hematology":["Medizin"],
+    "Hepatology":["Medizin"],
+    "Histology":["Biologie"],
+    "History and Philosophy of Science":["Geschichte","Philosophie"],
+    "History":["Geschichte"],
+    "Horticulture":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Human Factors and Ergonomics":["Allgemeines"],
+    "Human-Computer Interaction":["Informatik"],
+    "Immunology and Allergy":["Medizin"],
+    "Immunology and Microbiology (miscellaneous)":["Medizin"],
+    "Immunology and Microbiology(all)":["Medizin"],
+    "Immunology":["Medizin"],
+    "Industrial and Manufacturing Engineering":["Technik"],
+    "Industrial relations":["Technik"],
+    "Infectious Diseases":["Medizin"],
+    "Information Systems and Management":["Informatik"],
+    "Information Systems":["Informatik"],
+    "Inorganic Chemistry":["Chemie und Pharmazie"],
+    "Insect Science":["Biologie"],
+    "Instrumentation":["Allgemeines","Technik"],
+    "Internal Medicine":["Medizin"],
+    "Issues, ethics and legal aspects":["Rechtswissenschaft"],
+    "Language and Linguistics":["Allgemeine und vergleichende Sprach- und Literaturwissenschaft","Indogermanistik","Außereuropäische Sprachen und Literaturen"],
+    "Law":["Rechtswissenschaft"],
+    "Leadership and Management":["Wirtschaftswissenschaften"],
+    "Library and Information Sciences":["Allgemeines"],
+    "Life-span and Life-course Studies":["Medizin"],
+    "Linguistics and Language":["Allgemeine und vergleichende Sprach- und Literaturwissenschaft","Indogermanistik","Außereuropäische Sprachen und Literaturen"],
+    "Literature and Literary Theory":["Allgemeine und vergleichende Sprach- und Literaturwissenschaft","Indogermanistik","Außereuropäische Sprachen und Literaturen"],
+    "Logic":["Mathematik"],
+    "LPN and LVN":["Medizin"],
+    "Management Information Systems":["Wirtschaftswissenschaften"],
+    "Management of Technology and Innovation":["Wirtschaftswissenschaften"],
+    "Management Science and Operations Research":["Wirtschaftswissenschaften"],
+    "Management, Monitoring, Policy and Law":["Wirtschaftswissenschaften"],
+    "Marketing":["Wirtschaftswissenschaften"],
+    "Materials Chemistry":["Chemie und Pharmazie"],
+    "Materials Science (miscellaneous)":["Technik"],
+    "Materials Science(all)":["Technik"],
+    "Maternity and Midwifery":["Medizin"],
+    "Mathematical Physics":["Mathematik","Physik"],
+    "Mathematics (miscellaneous)":["Mathematik"],
+    "Mathematics(all)":["Mathematik"],
+    "Mechanical Engineering":["Technik"],
+    "Mechanics of Materials":["Technik"],
+    "Media Technology":["Allgemeines","Technik"],
+    "Medical Laboratory Technology":["Medizin","Technik"],
+    "Medical–Surgical":["Medizin"],
+    "Medicine (miscellaneous)":["Medizin"],
+    "Medicine(all)":["Medizin"],
+    "Metals and Alloys":["Chemie und Pharmazie"],
+    "Microbiology (medical)":["Biologie"],
+    "Microbiology":["Biologie"],
+    "Modelling and Simulation":["Technik"],
+    "Molecular Biology":["Biologie"],
+    "Molecular Medicine":["Medizin"],
+    "Museology":["Allgemeines"],
+    "Music":["Musikwissenschaft"],
+    "Nature and Landscape Conservation":["Geographie","Biologie"],
+    "Nephrology":["Medizin"],
+    "Neurology":["Medizin"],
+    "Neuropsychology and Physiological Psychology":["Medizin","Psychologie"],
+    "Neuroscience (miscellaneous)":["Medizin"],
+    "Neuroscience(all)":["Medizin"],
+    "Nuclear and High Energy Physics":["Physik","Technik"],
+    "Nuclear Energy and Engineering":["Physik","Technik"],
+    "Numerical Analysis":["Mathematik"],
+    "Nurse Assisting":["Medizin"],
+    "Nursing (miscellaneous)":["Medizin"],
+    "Nursing(all)":["Medizin"],
+    "Nutrition and Dietetics":["Medizin"],
+    "Obstetrics and Gynaecology":["Medizin"],
+    "Occupational Therapy":["Medizin"],
+    "Ocean Engineering":["Allgemeine Naturwissenschaft"],
+    "Oceanography":["Allgemeine Naturwissenschaft"],
+    "Oncology":["Medizin"],
+    "Oncology(nursing)":["Medizin"],
+    "Ophthalmology":["Medizin"],
+    "Optometry":["Medizin"],
+    "Oral Surgery":["Medizin"],
+    "Organic Chemistry":["Chemie und Pharmazie"],
+    "Organizational Behavior and Human Resource Management":["Wirtschaftswissenschaften"],
+    "Orthodontics":["Medizin"],
+    "Orthopedics and Sports Medicine":["Medizin"],
+    "Otorhinolaryngology":["Medizin"],
+    "Palaeontology":["Geologie und Paläontologie"],
+    "Parasitology":["Medizin"],
+    "Pathology and Forensic Medicine":["Medizin"],
+    "Pediatrics":["Medizin"],
+    "Pediatrics, Perinatology, and Child Health":["Medizin"],
+    "Periodontics":["Medizin"],
+    "Pharmaceutical Science":["Chemie und Pharmazie"],
+    "Pharmacology (medical)":["Chemie und Pharmazie"],
+    "Pharmacology (nursing)":["Chemie und Pharmazie"],
+    "Pharmacology":["Chemie und Pharmazie"],
+    "Pharmacology, Toxicology and Pharmaceutics (miscellaneous)":["Chemie und Pharmazie"],
+    "Pharmacology, Toxicology and Pharmaceutics(all)":["Chemie und Pharmazie"],
+    "Pharmacy":["Chemie und Pharmazie"],
+    "Philosophy":["Philosophie"],
+    "Phychiatric Mental Health":["Medizin","Psychologie"],
+    "Physical and Theoretical Chemistry":["Chemie und Pharmazie","Physik"],
+    "Physical Therapy, Sports Therapy and Rehabilitation":["Medizin"],
+    "Physics and Astronomy (miscellaneous)":["Physik"],
+    "Physics and Astronomy(all)":["Physik"],
+    "Physiology (medical)":["Biologie"],
+    "Physiology":["Biologie"],
+    "Plant Science":["Biologie"],
+    "Podiatry":["Medizin"],
+    "Political Science and International Relations":["Politologie"],
+    "Pollution":["Geographie"],
+    "Polymers and Plastics":["Chemie und Pharmazie"],
+    "Process Chemistry and Technology":["Chemie und Pharmazie","Technik"],
+    "Psychiatry and Mental health":["Medizin","Psychologie"],
+    "Psychology (miscellaneous)":["Psychologie"],
+    "Psychology(all)":["Psychologie"],
+    "Public Administration":["Allgemeines"],
+    "Public Health, Environmental and Occupational Health":["Medizin"],
+    "Pulmonary and Respiratory Medicine":["Medizin"],
+    "Radiation":["Physik"],
+    "Radiological and Ultrasound Technology":["Medizin","Technik","Physik"],
+    "Radiology Nuclear Medicine and imaging":["Medizin"],
+    "Rehabilitation":["Medizin"],
+    "Religious studies":["Theologie und Religionswissenschaft"],
+    "Renewable Energy, Sustainability and the Environment":["Geographie","Technik"],
+    "Reproductive Medicine":["Medizin"],
+    "Research and Theory":["Allgemeines"],
+    "Review and Exam Preparation":["Allgemeines"],
+    "Reviews and References, Medical":["Medizin"],
+    "Rheumatology":["Medizin"],
+    "Safety Research":["Allgemeines"],
+    "Safety, Risk, Reliability and Quality":["Allgemeines"],
+    "Sensory Systems":["Technik"],
+    "Signal Processing":["Technik"],
+    "Small Animals":["Biologie"],
+    "Social Psychology":["Psychologie"],
+    "Social Sciences (miscellaneous)":["Allgemeines"],
+    "Social Sciences(all)":["Allgemeines"],
+    "Sociology and Political Science":["Soziologie"],
+    "Software":["Informatik"],
+    "Soil Science":["Land- und Forstwirtschaft, Gartenbau, Fischereiwirtschaft, Hauswirtschaft"],
+    "Space and Planetary Science":["Physik","Technik"],
+    "Spectroscopy":["Physik"],
+    "Speech and Hearing":["Allgemeines"],
+    "Statistical and Nonlinear Physics":["Physik"],
+    "Statistics and Probability":["Mathematik"],
+    "Statistics, Probability and Uncertainty":["Mathematik"],
+    "Strategy and Management":["Wirtschaftswissenschaften"],
+    "Stratigraphy":["Geographie","Geologie und Paläontologie"],
+    "Structural Biology":["Biologie"],
+    "Surfaces and Interfaces":["Allgemeines","Technik"],
+    "Surfaces, Coatings and Films":["Allgemeines","Technik"],
+    "Surgery":["Medizin"],
+    "Theoretical Computer Science":["Informatik"],
+    "Tourism, Leisure and Hospitality Management":["Allgemeines"],
+    "Toxicology":["Chemie und Pharmazie"],
+    "Transplantation":["Medizin"],
+    "Transportation":["Allgemeines"],
+    "Urban Studies":["Soziologie","Geographie"],
+    "Urology":["Medizin"],
+    "veterinary (miscalleneous)":["Medizin"],
+    "veterinary(all)":["Medizin"],
+    "Virology":["Medizin"],
+    "Visual Arts and Performing Arts":["Kunst und Kunstgeschichte"],
+    "Waste Management and Disposal":["Geographie","Technik"],
+    "Water Science and Technology":["Geographie","Technik"]
 }

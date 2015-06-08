@@ -1,6 +1,6 @@
 {
-    "wiwi": "Wirtschaftswissenschaften",
-    "sowi": "Sozialwissenschaften",
     "fzs": "Fachzeitschriften",
-    "recht": "Recht"
+    "recht": "Recht",
+    "sowi": "Sozialwissenschaften",
+    "wiwi": "Wirtschaftswissenschaften"
 }
