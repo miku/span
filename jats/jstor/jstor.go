@@ -86,8 +86,15 @@ func (s Jstor) Iterate(r io.Reader) (<-chan interface{}, error) {
 // Identifiers returns the doi and the dependent url and recordID in a struct.
 // Records from this source do not need a DOI necessarily.
 func (article *Article) Identifiers() (jats.Identifiers, error) {
-	doi, _ := article.DOI()
 	locator := article.Front.Article.SelfURI.Value
+
+	// guess DOI from jstor stable URL
+	var candidate, doi string
+	candidate = strings.Replace(locator, "http://www.jstor.org/stable/", "", -1)
+	if strings.Contains(candidate, "/") {
+		doi = candidate
+	}
+
 	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.URLEncoding.EncodeToString([]byte(locator)))
 	recordID := strings.TrimRight(enc, "=")
 	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
