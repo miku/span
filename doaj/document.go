@@ -193,7 +193,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.SourceID = SourceID
-	output.RecordID = doc.ID
+	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, doc.ID)
 	output.MegaCollection = Collection
 	output.Format = Format
 
