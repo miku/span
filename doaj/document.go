@@ -189,7 +189,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 	output.Date, err = doc.Date()
 	if err != nil {
-		return output, err
+		return output, span.Skip{Reason: err.Error()}
 	}
 
 	output.SourceID = SourceID
