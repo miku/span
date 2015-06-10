@@ -215,7 +215,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.Format = Format
-	output.Genre = "article"
+	output.Genre = Genre
 	output.Languages = doc.Languages()
 	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
 	output.RecordID = doc.RecordID()
