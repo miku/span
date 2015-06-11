@@ -1,42 +1,14 @@
-package finc
+package exporter
 
 import (
-	"fmt"
-
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
+	"github.com/miku/span/finc"
 )
 
-// ExportSchema encapsulate an export flavour. This will most likely be a
-// struct with fields and methods relevant to the exported format. For the
-// moment we assume, the output is JSON. If formats other than JSON are
-// requested, move the marshalling into this interface.
-type ExportSchema interface {
-	// Convert takes an intermediate schema record to export. Returns an
-	// error, if conversion failed.
-	Convert(IntermediateSchema) error
-	// Attach takes a list of strings (here: ISILs) and attaches them to the
-	// current record.
-	Attach([]string)
-}
-
-// DummySchema is an example export schema, that only has one field.
-type DummySchema struct {
-	Title string `json:"title"`
-}
-
-// Attach is here, so it satisfies the interface, but implementation is a noop.
-func (d *DummySchema) Attach(s []string) {}
-
-// Export converts intermediate schema into this export schema.
-func (d *DummySchema) Convert(is IntermediateSchema) error {
-	d.Title = fmt.Sprintf("%s (%s)", is.ArticleTitle, is.JournalTitle)
-	return nil
-}
-
-// Solr413Schema is the default solr 4 schema. It is based on VuFind 1.3, it
-// does not contain `container_*` fields.
-type Solr413Schema struct {
+// Solr4vu13v2 is the default solr 4 schema. It contains more site-specific
+// formats and support for container_* fields.
+type Solr4Vufind13v2 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet"`
 	Allfields            string   `json:"allfields,omitempty"`
@@ -65,16 +37,34 @@ type Solr413Schema struct {
 	TitleSort            string   `json:"title_sort,omitempty"`
 	Topics               []string `json:"topic,omitempty"`
 	URL                  []string `json:"url,omitempty"`
-	FormatDe15           []string `json:"format_de15"`
+
+	// New container volumes.
+	ContainerVolume    string `json:"container_volume,omitempty"`
+	ContainerIssue     string `json:"container_issue,omitempty"`
+	ContainerStartPage string `json:"container_start_page,omitempty"`
+	ContainerTitle     string `json:"container_title,omitempty"`
+
+	// Site specific formats, TODO(miku): abstract this away
+	FormatDe105  []string `json:"format_de105,omitempty"`
+	FormatDe15   []string `json:"format_de15,omitempty"`
+	FormatDe520  []string `json:"format_de520,omitempty"`
+	FormatDe540  []string `json:"format_de540,omitempty"`
+	FormatDeCh1  []string `json:"format_dech1,omitempty"`
+	FormatDed117 []string `json:"format_ded117,omitempty"`
+	FormatDel152 []string `json:"format_del152,omitempty"`
+	FormatDel189 []string `json:"format_del189,omitempty"`
+	FormatDeZi4  []string `json:"format_dezi4,omitempty"`
+	FormatDeZwi2 []string `json:"format_dezwi2,omitempty"`
+	FormatDeGla1 []string `json:"format_degla1,omitempty"`
 }
 
 // Attach attaches the ISILs to a record.
-func (s *Solr413Schema) Attach(isils []string) {
+func (s *Solr4Vufind13v2) Attach(isils []string) {
 	s.Institutions = isils
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr413Schema) Convert(is IntermediateSchema) error {
+func (s *Solr4Vufind13v2) Convert(is finc.IntermediateSchema) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID
@@ -86,7 +76,7 @@ func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 	s.MegaCollections = append(s.MegaCollections, is.MegaCollection)
 	s.PublishDateSort = is.Date.Year()
 	s.Publishers = is.Publishers
-	s.RecordType = AIRecordType
+	s.RecordType = finc.AIRecordType
 	s.Series = append(s.Series, is.JournalTitle)
 	s.SourceID = is.SourceID
 	s.Subtitle = is.ArticleSubtitle
@@ -119,7 +109,13 @@ func (s *Solr413Schema) Convert(is IntermediateSchema) error {
 	}
 
 	s.AccessFacet = AIAccessFacet
-	s.FormatDe15 = []string{FormatSite.LookupDefault(is.Format, "")}
+	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
+	s.FormatDeGla1 = []string{FormatDeGla1.LookupDefault(is.Format, "")}
+
+	s.ContainerVolume = is.Volume
+	s.ContainerIssue = is.Issue
+	s.ContainerStartPage = is.StartPage
+	s.ContainerTitle = is.JournalTitle
 
 	return nil
 }

@@ -7,23 +7,30 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/miku/span/assetutil"
 )
 
 const (
 	AIRecordType              = "ai"
-	AIAccessFacet             = "Electronic Resources"
 	IntermediateSchemaVersion = "0.9"
 )
 
 var (
 	NOT_ASSIGNED    = "not assigned"
 	NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
-	FormatSite      = assetutil.MustLoadStringMap("assets/finc/formats.json")
-	SubjectMapping  = assetutil.MustLoadStringSliceMap("assets/finc/subjects.json")
-	LanguageMap     = assetutil.MustLoadStringMap("assets/finc/iso-639-3-language.json")
 )
+
+// ExportSchema encapsulate an export flavour. This will most likely be a
+// struct with fields and methods relevant to the exported format. For the
+// moment we assume, the output is JSON. If formats other than JSON are
+// requested, move the marshalling into this interface.
+type ExportSchema interface {
+	// Convert takes an intermediate schema record to export. Returns an
+	// error, if conversion failed.
+	Convert(IntermediateSchema) error
+	// Attach takes a list of strings (here: ISILs) and attaches them to the
+	// current record.
+	Attach([]string)
+}
 
 // Author representes an author, "inspired" by OpenURL.
 type Author struct {
