@@ -18,13 +18,16 @@ import (
 )
 
 const (
-	SourceID   = "48"
-	BatchSize  = 2000
-	Format     = "ElectronicArticle"
+	SourceID = "48"
+
+	Format = "ElectronicArticle"
+	// Collection is the base name of the collection.
 	Collection = "Genios"
 	Genre      = "article"
 	// If no abstract is found accept this number of chars from doc.Text as Abstract.
-	TextAsAbstractCutoff = 2000
+	textAsAbstractCutoff = 2000
+	// Process records in batches. TODO(miku): batch size is no concern of the source.
+	batchSize = 2000
 )
 
 type Document struct {
@@ -46,7 +49,7 @@ type Document struct {
 }
 
 var (
-	RawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
+	rawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
 	collections     = assetutil.MustLoadStringMap("assets/genios/collections.json")
 	// Restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
@@ -103,6 +106,7 @@ func (s Genios) Iterate(r io.Reader) (<-chan interface{}, error) {
 	return ch, nil
 }
 
+// Headings returns subject headings.
 func (doc Document) Headings() []string {
 	var headings []string
 	fields := strings.FieldsFunc(doc.Descriptors, func(r rune) bool {
@@ -114,26 +118,33 @@ func (doc Document) Headings() []string {
 	return headings
 }
 
+// Date returns the date as noted in the document.
 func (doc Document) Date() (time.Time, error) {
-	raw := strings.TrimSpace(RawDateReplacer.Replace(doc.RawDate))
+	raw := strings.TrimSpace(rawDateReplacer.Replace(doc.RawDate))
 	if len(raw) > 8 {
 		raw = raw[:8]
 	}
 	return time.Parse("20060102", raw)
 }
 
+// SourceAndID will probably be a unique identifier. An ID alone might not be enough.
 func (doc Document) SourceAndID() string {
 	return fmt.Sprintf("%s__%s", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
 }
 
+// URL returns a constructed URL at the publishers site.
 func (doc Document) URL() string {
 	return fmt.Sprintf("https://www.wiso-net.de/document/%s", doc.SourceAndID())
 }
 
+// NomenNescio returns true, if the field is de-facto empty.
 func NomenNescio(s string) bool {
-	return strings.ToLower(strings.TrimSpace(s)) == "n.n."
+	t := strings.ToLower(strings.TrimSpace(s))
+	return t == "n.n." || t == ""
 }
 
+// Authors returns a list of authors. Formatting is not cleaned up, so you'll
+// get any combination of surname and given names.
 func (doc Document) Authors() []string {
 	var authors []string
 	for _, s := range doc.RawAuthors {
@@ -149,14 +160,14 @@ func (doc Document) Authors() []string {
 	return authors
 }
 
+// RecordID uses SourceAndID as starting point.
 func (doc Document) RecordID() string {
 	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.SourceAndID())))
 	return strings.TrimRight(enc, "=")
 }
 
-// Languages returns the given and guessed languages
-// found in abstract and fulltext. Note: This is slow.
-// Skip detection on too short strings.
+// Languages returns the given and guessed languages found in abstract and
+// fulltext. Note: This is slow. Skip detection on too short strings.
 func (doc Document) Languages() []string {
 	set := container.NewStringSet()
 
@@ -179,9 +190,16 @@ func (doc Document) Languages() []string {
 	return set.Values()
 }
 
+// ToIntermediateSchema converts a genios document into an intermediate schema document.
+// Will fail/skip records with unusable dates.
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
 	output := finc.NewIntermediateSchema()
+
+	output.Date, err = doc.Date()
+	if err != nil {
+		return output, span.Skip{Reason: err.Error()}
+	}
 
 	for _, author := range doc.Authors() {
 		output.Authors = append(output.Authors, finc.Author{Name: author})
@@ -193,8 +211,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Abstract = strings.TrimSpace(doc.Abstract)
 	} else {
 		cutoff := len(doc.Text)
-		if cutoff > TextAsAbstractCutoff {
-			cutoff = TextAsAbstractCutoff
+		if cutoff > textAsAbstractCutoff {
+			cutoff = textAsAbstractCutoff
 		}
 		output.Abstract = strings.TrimSpace(doc.Text[:cutoff])
 	}
@@ -222,9 +240,5 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = SourceID
 	output.Subjects = doc.Headings()
 
-	output.Date, err = doc.Date()
-	if err != nil {
-		return output, span.Skip{Reason: err.Error()}
-	}
 	return output, nil
 }
