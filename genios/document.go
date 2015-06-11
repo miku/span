@@ -92,7 +92,7 @@ func (s Genios) Iterate(r io.Reader) (<-chan interface{}, error) {
 					}
 					i++
 					docs = append(docs, doc)
-					if i == BatchSize {
+					if i == batchSize {
 						ch <- NewBatch(docs)
 						docs = docs[:0]
 						i = 0
