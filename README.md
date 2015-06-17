@@ -15,13 +15,11 @@ format](https://github.com/miku/span/tree/master/schema) or formats, that can
 be directly imported into SOLR or elasticsearch.
 
 As a non-goal, the `span` tools do not care, how you obtain your input data.
-The tools expect input *files* and produces *files*. Even more: Bibliographic
-input data must be contained in a *single file* (even if it is 100G
-in size) and the output will be a single file (stdin and stdout, respectively).
+The tools expect a single input *file* and produce a single output *file* (stdin and stdout, respectively).
 
 ----
 
-Why Go?
+Why we choose Go as implementation language?
 
 Linux shell scripts have no native XML or JSON support, Python is a bit too
 slow for the casual processing of 100M or more records, Java is a bit too
@@ -102,7 +100,7 @@ List available formats:
     degruyter
     jstor
 
-Import [crossref LDJ](https://github.com/miku/siskin/blob/a08287495526ddf0aaed2537a4ac0a23d0060ec9/siskin/sources/crossref.py#L139) (with [cached members](https://github.com/miku/siskin/blob/a08287495526ddf0aaed2537a4ac0a23d0060ec9/siskin/sources/crossref.py#L221) API responses) or DeGruyter XML ([preprocessed](https://github.com/miku/siskin/blob/a08287495526ddf0aaed2537a4ac0a23d0060ec9/siskin/sources/degruyter.py#L74) into a single file):
+Import [crossref LDJ](https://github.com/miku/siskin/blob/3d34d786f054ca153be37a514e53eea420748a8f/siskin/sources/crossref.py#L138) (with [cached members](https://github.com/miku/siskin/blob/3d34d786f054ca153be37a514e53eea420748a8f/siskin/sources/crossref.py#L224) API responses) or DeGruyter XML ([preprocessed](https://github.com/miku/siskin/blob/3d34d786f054ca153be37a514e53eea420748a8f/siskin/sources/degruyter.py#L59) into a single file):
 
     $ span-import -i crossref -members members.ldj crossref.ldj > crossref.is.ldj
     $ span-import -i jats degruyter.ldj > degruyter.is.ldj
@@ -203,4 +201,4 @@ per data source is less than 400 SLOC (with potential for reduction):
     ----
 
      468  utils
-    2174  six data sources
+    2174  data sources
