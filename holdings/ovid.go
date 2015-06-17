@@ -204,7 +204,6 @@ func parseDelay(s string) (time.Duration, error) {
 	default:
 		return d, errUnknownUnit
 	}
-	return d, nil
 }
 
 // firstNonemptyString returns the first value that is not the empty string.
