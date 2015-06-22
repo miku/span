@@ -181,6 +181,15 @@ func (doc Document) Date() (time.Time, error) {
 	return time.Parse("2006-01-02", s)
 }
 
+func (doc Document) DOI() string {
+	for _, identifier := range doc.BibJson.Identifier {
+		if identifier.Type == "doi" {
+			return identifier.ID
+		}
+	}
+	return ""
+}
+
 // ToIntermediateSchema converts a doaj document to intermediate schema. For
 // now any record, that has no usable date will be skipped.
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
@@ -192,10 +201,11 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: err.Error()}
 	}
 
-	output.SourceID = SourceID
-	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, doc.ID)
-	output.MegaCollection = Collection
+	output.DOI = doc.DOI()
 	output.Format = Format
+	output.MegaCollection = Collection
+	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, doc.ID)
+	output.SourceID = SourceID
 
 	output.ISSN = doc.Index.ISSN
 	output.ArticleTitle = doc.BibJson.Title
