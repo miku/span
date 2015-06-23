@@ -55,6 +55,7 @@ func batcherWorker(queue chan span.Batcher, out chan []byte, opts options, wg *s
 					if opts.verbose {
 						log.Println(err)
 					}
+					continue
 				default:
 					log.Fatal(err)
 				}
