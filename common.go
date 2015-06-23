@@ -8,7 +8,7 @@ import (
 )
 
 // AppVersion of span package. Commandline tools will show this on -v.
-const AppVersion = "0.1.38"
+const AppVersion = "0.1.39"
 
 type Skip struct {
 	Reason string
