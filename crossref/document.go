@@ -295,6 +295,12 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, errNoURL
 	}
 
+	id := doc.RecordID()
+	if len(id) > span.KeyLengthLimit {
+		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
+	}
+	output.RecordID = id
+
 	output.ArticleTitle = doc.CombinedTitle()
 	output.DOI = doc.DOI
 	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
@@ -303,7 +309,6 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Issue = doc.Issue
 	output.Languages = []string{"eng"}
 	output.Publishers = append(output.Publishers, doc.Publisher)
-	output.RecordID = doc.RecordID()
 	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subjects

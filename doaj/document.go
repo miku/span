@@ -201,10 +201,15 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: err.Error()}
 	}
 
+	id := fmt.Sprintf("ai-%s-%s", SourceID, doc.ID)
+	if len(id) > span.KeyLengthLimit {
+		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
+	}
+	output.RecordID = id
+
 	output.DOI = doc.DOI()
 	output.Format = Format
 	output.MegaCollection = Collection
-	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, doc.ID)
 	output.SourceID = SourceID
 
 	output.ISSN = doc.Index.ISSN

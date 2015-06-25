@@ -141,7 +141,13 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		return output, err
 	}
 	output.DOI = ids.DOI
-	output.RecordID = ids.RecordID
+
+	id := ids.RecordID
+	if len(id) > span.KeyLengthLimit {
+		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
+	}
+	output.RecordID = id
+
 	output.URL = append(output.URL, ids.URL)
 
 	output.Authors = article.Authors()
