@@ -236,7 +236,17 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genre
 	output.Languages = doc.Languages()
 	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
-	output.RecordID = doc.RecordID()
+	id := doc.RecordID()
+	// 250 is a limit on memcached keys; offending key was:
+	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
+	// dTdGV1ZXJ1bmdzYmF1IMK3SW5kdXN0cmllLUVsZWt0cm9uaWsgwr\
+	// dFbGVrdHJvbWFzY2hpbmVuYmF1IMK3SW5kdXN0cmllLVNlcnZpY2\
+	// UgwrdEYW5mb3NzLVN5c3RlbXBhcnRuZXIgwrdEYW5mb3NzIERyaX\
+	// ZlcyBDZW50ZXIgwrdNYXJ0aW4gU2ljaGVyaGVpdHN0ZWNobmlr
+	if len(id) > 250 {
+		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
+	}
+	output.RecordID = id
 	output.SourceID = SourceID
 	output.Subjects = doc.Headings()
 
