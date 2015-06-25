@@ -19,11 +19,11 @@ The tools expect a single input *file* and produce a single output *file* (stdin
 
 ----
 
-Why we choose Go as implementation language?
+Why in Go?
 
 Linux shell scripts have no native XML or JSON support, Python is a bit too
 slow for the casual processing of 100M or more records, Java is a bit too
-verbose - which is why we choose Go. Go comes with XML and JSON support in the
+verbose - which is why we chose Go. Go comes with XML and JSON support in the
 standard library, nice concurrency primitives and simple single static-binary
 deployments.
 
