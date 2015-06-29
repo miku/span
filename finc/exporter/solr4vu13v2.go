@@ -111,6 +111,7 @@ func (s *Solr4Vufind13v2) Convert(is finc.IntermediateSchema) error {
 	s.AccessFacet = AIAccessFacet
 	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
 	s.FormatDeGla1 = []string{FormatDeGla1.LookupDefault(is.Format, "")}
+	s.FormatDe105 = []string{FormatDe105.LookupDefault(is.Format, "")}
 
 	s.ContainerVolume = is.Volume
 	s.ContainerIssue = is.Issue

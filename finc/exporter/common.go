@@ -9,4 +9,5 @@ var (
 
 	FormatDe15   = assetutil.MustLoadStringMap("assets/finc/formats/de15.json")
 	FormatDeGla1 = assetutil.MustLoadStringMap("assets/finc/formats/degla1.json")
+	FormatDe105  = assetutil.MustLoadStringMap("assets/finc/formats/de105.json")
 )
