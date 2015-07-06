@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kapsteur/franco"
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 	"golang.org/x/text/language"
@@ -413,14 +413,14 @@ func (article *Article) Languages() []string {
 		if len(s) < 20 {
 			continue
 		}
-		lang := franco.DetectOne(s)
-		if !acceptedLanguages.Contains(lang.Code) {
+		lang, err := span.DetectLang3(s)
+		if !acceptedLanguages.Contains(lang) {
 			continue
 		}
-		if lang.Code == "und" {
+		if lang == "und" {
 			continue
 		}
-		set.Add(lang.Code)
+		set.Add(lang)
 	}
 
 	return set.Values()

@@ -176,7 +176,6 @@ func (doc Document) Languages() []string {
 		if len(s) < 20 {
 			continue
 		}
-		// lang := franco.DetectOne(s)
 		lang, err := span.DetectLang3(s)
 		if err != nil {
 			continue
