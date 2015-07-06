@@ -414,10 +414,10 @@ func (article *Article) Languages() []string {
 			continue
 		}
 		lang, err := span.DetectLang3(s)
-		if !acceptedLanguages.Contains(lang) {
+		if err != nil || lang == "und" {
 			continue
 		}
-		if lang == "und" {
+		if !acceptedLanguages.Contains(lang) {
 			continue
 		}
 		set.Add(lang)
