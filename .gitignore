@@ -36,3 +36,5 @@ span-*.rpm
 NOTES.md
 assetutil/bindata.go
 .vagrant/*
+vagrant.key
+
