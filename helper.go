@@ -5,6 +5,9 @@ import (
 	"html"
 	"io"
 	"strings"
+
+	"github.com/rainycape/cld2"
+	"golang.org/x/text/language"
 )
 
 // UnescapeTrim unescapes HTML character references and trims the space of a given string.
@@ -22,4 +25,14 @@ func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	}
 	f.Flush()
 	done <- true
+}
+
+// DetectLang3 returns the best guess 3-letter language code for a given text.
+func DetectLang3(text string) (string, error) {
+	c := cld2.Detect(text)
+	b, err := language.ParseBase(c)
+	if err != nil {
+		return "", err
+	}
+	return b.ISO3(), nil
 }

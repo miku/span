@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kapsteur/franco"
 	"github.com/miku/span"
 	"github.com/miku/span/assetutil"
 	"github.com/miku/span/container"
@@ -177,14 +176,18 @@ func (doc Document) Languages() []string {
 		if len(s) < 20 {
 			continue
 		}
-		lang := franco.DetectOne(s)
-		if !acceptedLanguages.Contains(lang.Code) {
+		// lang := franco.DetectOne(s)
+		lang, err := span.DetectLang3(s)
+		if err != nil {
 			continue
 		}
-		if lang.Code == "und" {
+		if !acceptedLanguages.Contains(lang) {
 			continue
 		}
-		set.Add(lang.Code)
+		if lang == "und" {
+			continue
+		}
+		set.Add(lang)
 	}
 
 	return set.Values()
