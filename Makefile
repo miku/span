@@ -83,6 +83,10 @@ cloc:
 #
 # A span-<version>-0.x86_64.rpm file should appear on your host machine, that
 # has been built againts CentOS' 6.5 libc.
+#
+# Cleanup VM:
+#
+#     $ vagrant destroy --force
 
 PORT = 2222
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p $(PORT)
