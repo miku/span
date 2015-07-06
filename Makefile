@@ -62,9 +62,21 @@ cloc:
 
 # ==== vm-based packaging
 #
-# $ vagrant up
-# $ make setup # if asked for password: vagrant
-# $ make rpm-compatible
+# Initially, setup a CentOS 6.5 machine, install some dependencies and make git clone:
+#
+#     $ vagrant up
+#     $ make setup
+#
+# To build an rpm, subsequently run:
+#
+#     $ make rpm-compatible
+#
+# If vagrant ssh runs on a port other than 2222, adjust (e.g. to port 2200):
+#
+#     $ make rpm-compatible PORT=2200
+#
+# A span-<version>-0.x86_64.rpm file should appear on your host machine, that
+# has been built againts CentOS' 6.5 libc.
 
 PORT = 2222
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p $(PORT)
