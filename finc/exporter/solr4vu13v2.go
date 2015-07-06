@@ -46,6 +46,7 @@ type Solr4Vufind13v2 struct {
 
 	// Site specific formats, TODO(miku): abstract this away
 	FormatDe105  []string `json:"format_de105,omitempty"`
+	FormatDe14   []string `json:"format_de14,omitempty"`
 	FormatDe15   []string `json:"format_de15,omitempty"`
 	FormatDe520  []string `json:"format_de520,omitempty"`
 	FormatDe540  []string `json:"format_de540,omitempty"`
@@ -109,9 +110,20 @@ func (s *Solr4Vufind13v2) Convert(is finc.IntermediateSchema) error {
 	}
 
 	s.AccessFacet = AIAccessFacet
-	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
-	s.FormatDeGla1 = []string{FormatDeGla1.LookupDefault(is.Format, "")}
+
+	// site specific formats
 	s.FormatDe105 = []string{FormatDe105.LookupDefault(is.Format, "")}
+	s.FormatDe14 = []string{FormatDe14.LookupDefault(is.Format, "")}
+	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
+	s.FormatDe520 = []string{FormatDe520.LookupDefault(is.Format, "")}
+	s.FormatDe540 = []string{FormatDe540.LookupDefault(is.Format, "")}
+	s.FormatDeCh1 = []string{FormatDeCh1.LookupDefault(is.Format, "")}
+	s.FormatDed117 = []string{FormatDed117.LookupDefault(is.Format, "")}
+	s.FormatDeGla1 = []string{FormatDeGla1.LookupDefault(is.Format, "")}
+	s.FormatDel152 = []string{FormatDel152.LookupDefault(is.Format, "")}
+	s.FormatDel189 = []string{FormatDel189.LookupDefault(is.Format, "")}
+	s.FormatDeZi4 = []string{FormatDeZi4.LookupDefault(is.Format, "")}
+	s.FormatDeZwi2 = []string{FormatDeZwi2.LookupDefault(is.Format, "")}
 
 	s.ContainerVolume = is.Volume
 	s.ContainerIssue = is.Issue
