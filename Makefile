@@ -1,3 +1,4 @@
+SHELL = /bin/bash
 TARGETS = span-import span-export span-gh-dump
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
@@ -55,3 +56,30 @@ rpm: $(TARGETS)
 
 cloc:
 	cloc --max-file-size 1 --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
+
+# ==== vm-based packaging
+#
+# $ vagrant up
+# $ make setup # if asked for password: vagrant
+#
+
+PORT = 2222
+SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p $(PORT)
+SCPCMD = scp -o port=$(PORT) -o StrictHostKeyChecking=no -i vagrant.key
+
+# Helper to build RPM on a RHEL6 VM, to link against glibc 2.12
+vagrant.key:
+	curl -sL "https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant" > vagrant.key
+	chmod 0600 vagrant.key
+
+# Don't forget to vagrant up :) - and add your public key to the guests authorized_keys
+setup: vagrant.key
+	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
+	$(SSHCMD) "sudo yum install -y golang git rpm-build gcc-c++"
+	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone https://github.com/miku/span.git"
+
+rpm-compatible: vagrant.key
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && GOPATH=/home/vagrant go get ./... && GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/..."
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && git pull origin master && pwd && GOPATH=/home/vagrant make clean rpm"
+	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/span/*rpm .
