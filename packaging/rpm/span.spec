@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.40
+Version:    0.1.41
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -51,6 +51,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Mon Jul 6 2015 Martin Czygan
+- 0.1.41 release
+- much faster language detection with cld2 (libc sensible)
+
 * Sat Jun 6 2015 Martin Czygan
 - 0.1.36 release
 - add genios/gbi support
