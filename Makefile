@@ -60,9 +60,15 @@ rpm: $(TARGETS)
 cloc:
 	cloc --max-file-size 1 --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
 
-# ==== vm-based packaging
+# ==== vm-based packaging ====
 #
-# Initially, setup a CentOS 6.5 machine, install some dependencies and make git clone:
+# Required, if development and deployment OS have different versions of libc.
+# Examples: CentOS 6.5 has 2.12 (2010-08-03), Ubuntu 14.04 2.19 (2014-02-07).
+# Usually, libc is backwards compatible, so the older OS wins.
+#
+# ----
+#
+# Initially, setup a CentOS 6.5 machine, install dependencies and git clone:
 #
 #     $ vagrant up
 #     $ make setup
