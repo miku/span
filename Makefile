@@ -61,7 +61,7 @@ cloc:
 #
 # $ vagrant up
 # $ make setup # if asked for password: vagrant
-#
+# $ make rpm-compatible
 
 PORT = 2222
 SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p $(PORT)
@@ -80,6 +80,6 @@ setup: vagrant.key
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone https://github.com/miku/span.git"
 
 rpm-compatible: vagrant.key
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && GOPATH=/home/vagrant go get ./... && GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/..."
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && GOPATH=/home/vagrant go get ./... && GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/... golang.org/x/tools/cmd/goimports"
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && git pull origin master && pwd && GOPATH=/home/vagrant make clean rpm"
 	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/span/*rpm .
