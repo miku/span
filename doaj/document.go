@@ -200,6 +200,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err != nil {
 		return output, span.Skip{Reason: err.Error()}
 	}
+	output.RawDate = output.Date.Format("2006-01-02")
 
 	id := fmt.Sprintf("ai-%s-%s", SourceID, doc.ID)
 	if len(id) > span.KeyLengthLimit {

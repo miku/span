@@ -121,7 +121,7 @@ func (l License) Delay() time.Duration {
 }
 
 // Wall returns the licence wall truncated to day. The moving wall calculation
-// is based on the system current time.
+// is based on the time given in ref.
 func (l License) Wall(ref time.Time) time.Time {
 	d := time.Duration(-ref.Hour()) * time.Hour
 	return ref.Truncate(time.Hour).Add(d + l.Delay())

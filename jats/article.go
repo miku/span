@@ -432,6 +432,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output := finc.NewIntermediateSchema()
 
 	output.Date = article.Date()
+	output.RawDate = output.Date.Format("2006-01-02")
 
 	output.Abstract = string(article.Front.Article.Abstract.Value)
 	output.ArticleTitle = article.CombinedTitle()

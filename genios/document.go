@@ -202,6 +202,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err != nil {
 		return output, span.Skip{Reason: err.Error()}
 	}
+	output.RawDate = output.Date.Format("2006-01-02")
 
 	for _, author := range doc.Authors() {
 		output.Authors = append(output.Authors, finc.Author{Name: author})
