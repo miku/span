@@ -102,6 +102,7 @@ func main() {
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 	format := flag.String("o", "solr4vu13v2", "output format")
 	listFormats := flag.Bool("list", false, "list output formats")
+	gzipOutput := flag.Bool("z", false, "gzip output")
 
 	flag.Parse()
 
@@ -187,7 +188,12 @@ func main() {
 	queue := make(chan []string)
 	out := make(chan []byte)
 	done := make(chan bool)
-	go span.ByteSink(os.Stdout, out, done)
+
+	if *gzipOutput {
+		go span.GzipSink(os.Stdout, out, done)
+	} else {
+		go span.ByteSink(os.Stdout, out, done)
+	}
 
 	var wg sync.WaitGroup
 
