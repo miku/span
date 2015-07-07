@@ -118,10 +118,9 @@ func NewListFilter(r io.Reader) (ListFilter, error) {
 			return f, err
 		}
 		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
+		if line != "" {
+			f.Set.Add(line)
 		}
-		f.Set.Add(line)
 	}
 	return f, nil
 }
