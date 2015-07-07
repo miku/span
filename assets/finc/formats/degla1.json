@@ -2,10 +2,10 @@
     "eBook": "Book, E-Book",
     "ElectronicArticle": "E-Article",
     "ElectronicBookPart": "E-Book",
-    "ElectronicJournal": "Journal, E-Journal",
-    "ElectronicProceeding": "Journal, E-Journal",
+    "ElectronicJournal": "E-Journal",
+    "ElectronicProceeding": "E-Journal",
     "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
-    "ElectronicSerial": "Journal, E-Journal",
+    "ElectronicSerial": "E-Journal",
     "ElectronicThesis": "Thesis",
     "Unknown": "Unknown Format"
 }
