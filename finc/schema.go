@@ -102,6 +102,7 @@ type IntermediateSchema struct {
 	Places       []string  `json:"rft.place,omitempty"`
 	Publishers   []string  `json:"rft.pub,omitempty"`
 	Quarter      string    `json:"rft.quarter,omitempty"`
+	RawDate      string    `json:"rft.date,omitempty"`
 	Date         time.Time `json:"x.date,omitempty"`
 	Season       string    `json:"rft.ssn,omitempty"`
 	Series       string    `json:"rft.series,omitempty"`

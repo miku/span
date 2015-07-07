@@ -290,6 +290,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err != nil {
 		return output, err
 	}
+	output.RawDate = output.Date.Format("2006-01-02")
 
 	if doc.URL == "" {
 		return output, errNoURL
