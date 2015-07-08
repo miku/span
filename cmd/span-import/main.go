@@ -150,11 +150,10 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer ff.Close()
 		bw := bufio.NewWriter(ff)
-		defer bw.Flush()
 		logger = log.New(bw, "", 0)
-		logger.Println("Hi")
+		defer ff.Close()
+		defer bw.Flush()
 	}
 
 	filename := flag.Arg(0)
