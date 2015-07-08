@@ -92,6 +92,11 @@ type Article struct {
 					Type    string   `xml:"abbrev-type,attr"`
 				}
 			}
+			AbbreviatedTitle struct {
+				XMLName xml.Name `xml:"abbrev-journal-title"`
+				Title   string   `xml:",chardata"`
+				Type    string   `xml:"abbrev-type,attr"`
+			}
 			Publisher struct {
 				XMLName xml.Name `xml:"publisher"`
 				Name    struct {
@@ -299,6 +304,17 @@ func (article *Article) CombinedTitle() string {
 	return ""
 }
 
+// JournalTitle will look in various fields for a journal title.
+func (article *Article) JournalTitle() string {
+	if article.Front.Journal.TitleGroup.JournalTitle.Title != "" {
+		return article.Front.Journal.TitleGroup.JournalTitle.Title
+	}
+	if article.Front.Journal.TitleGroup.AbbreviatedTitle.Title != "" {
+		return article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
+	}
+	return article.Front.Journal.AbbreviatedTitle.Title
+}
+
 // ISSN returns a list of ISSNs associated with this article.
 func (article *Article) ISSN() (issns []string) {
 	for _, issn := range article.Front.Journal.ISSN {
@@ -443,13 +459,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Headings = article.Headings()
 	output.ISSN = article.ISSN()
 	output.Issue = article.Front.Article.Issue.Value
-
-	if article.Front.Journal.TitleGroup.JournalTitle.Title != "" {
-		output.JournalTitle = article.Front.Journal.TitleGroup.JournalTitle.Title
-	} else {
-		output.JournalTitle = article.Front.Journal.TitleGroup.AbbreviatedTitle.Title
-	}
-
+	output.JournalTitle = article.JournalTitle()
 	output.Languages = article.Languages()
 	output.Publishers = append(output.Publishers, article.Front.Journal.Publisher.Name.Value)
 	output.Subjects = article.Subjects()
