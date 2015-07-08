@@ -296,13 +296,16 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, errNoURL
 	}
 
-	id := doc.RecordID()
-	if len(id) > span.KeyLengthLimit {
-		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
+	output.RecordID = doc.RecordID()
+	if len(output.RecordID) > span.KeyLengthLimit {
+		return output, span.Skip{Reason: fmt.Sprintf("ID_TOO_LONG %s", output.RecordID)}
 	}
-	output.RecordID = id
 
 	output.ArticleTitle = doc.CombinedTitle()
+	if len(output.ArticleTitle) == 0 {
+		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.RecordID)}
+	}
+
 	output.DOI = doc.DOI
 	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
 	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
@@ -319,6 +322,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = span.UnescapeTrim(doc.ContainerTitle[0])
+	} else {
+		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.RecordID)}
 	}
 
 	if len(doc.Subtitle) > 0 {
@@ -329,6 +334,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Authors = append(output.Authors, finc.Author{
 			FirstName: author.GivenCleaned(),
 			LastName:  author.FamilyCleaned()})
+	}
+
+	if len(output.Authors) == 0 {
+		return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.RecordID)}
 	}
 
 	pi := doc.PageInfo()
