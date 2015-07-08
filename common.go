@@ -21,7 +21,7 @@ type Skip struct {
 }
 
 func (s Skip) Error() string {
-	return fmt.Sprintf("[skip] %s", s.Reason)
+	return fmt.Sprintf("SKIP %s", s.Reason)
 }
 
 // Batcher groups strings together for batched processing.
