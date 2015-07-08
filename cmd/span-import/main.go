@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -25,6 +26,8 @@ var (
 	errFormatUnsupported = errors.New("input format not supported")
 	errCannotConvert     = errors.New("cannot convert type")
 )
+
+var logger *log.Logger = log.New(os.Stderr, "", log.LstdFlags)
 
 // Available input formats and their source type.
 var formats = map[string]span.Source{
@@ -53,7 +56,7 @@ func batcherWorker(queue chan span.Batcher, out chan []byte, opts options, wg *s
 				switch err.(type) {
 				case span.Skip:
 					if opts.verbose {
-						log.Println(err)
+						logger.Println(err)
 					}
 					continue
 				default:
@@ -147,7 +150,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.SetOutput(ff)
+		defer ff.Close()
+		bw := bufio.NewWriter(ff)
+		defer bw.Flush()
+		logger = log.New(bw, "", 0)
+		logger.Println("Hi")
 	}
 
 	filename := flag.Arg(0)
