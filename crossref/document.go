@@ -304,6 +304,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: fmt.Sprintf("ID_TOO_LONG %s", output.RecordID)}
 	}
 
+	if doc.Type == "journal-issue" {
+		return output, span.Skip{Reason: fmt.Sprintf("JOURNAL_ISSUE %s", output.RecordID)}
+	}
+
 	output.ArticleTitle = doc.CombinedTitle()
 	if len(output.ArticleTitle) == 0 {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.RecordID)}
