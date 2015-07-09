@@ -39,6 +39,9 @@ var (
 
 	// AuthorReplacer is a special cleaner for author names.
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
+
+	// ArticleTitleBlocker will trigger skips, if article title matches exactly.
+	ArticleTitleBlocker = []string{"Titelei", "Front Matter"}
 )
 
 // Crossref source.
@@ -304,6 +307,12 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ArticleTitle = doc.CombinedTitle()
 	if len(output.ArticleTitle) == 0 {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.RecordID)}
+	}
+
+	for _, title := range ArticleTitleBlocker {
+		if output.ArticleTitle == title {
+			return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.RecordID)}
+		}
 	}
 
 	output.DOI = doc.DOI
