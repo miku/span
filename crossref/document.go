@@ -349,9 +349,11 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 			LastName:  author.FamilyCleaned()})
 	}
 
-	if len(output.Authors) == 0 {
-		return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.RecordID)}
-	}
+	// TODO(miku): do we need a config for these things?
+	// Maybe a generic filter (in js?) that will gather exclusion rules?
+	// if len(output.Authors) == 0 {
+	// 	return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.RecordID)}
+	// }
 
 	pi := doc.PageInfo()
 	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
