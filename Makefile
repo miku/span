@@ -12,6 +12,7 @@ deps:
 	go get ./...
 
 imports:
+	go get golang.org/x/tools/cmd/goimports
 	goimports -w .
 
 assets: assetutil/bindata.go
