@@ -27,6 +27,7 @@ const (
 	Collection = "DOAJ Directory of Open Access Journals"
 	// Format for all records
 	Format = "ElectronicArticle"
+	Genre  = "article"
 )
 
 var errDateMissing = errors.New("date is missing")
@@ -207,6 +208,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
 	}
 	output.RecordID = id
+	output.Genre = Genre
 
 	output.DOI = doc.DOI()
 	output.Format = Format
