@@ -32,6 +32,7 @@ var Exporters = map[string]func() finc.ExportSchema{
 	"dummy":       func() finc.ExportSchema { return new(exporter.DummySchema) },
 	"solr4vu13v1": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v1) },
 	"solr4vu13v2": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v2) },
+	"solr4vu13v3": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v3) },
 }
 
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
@@ -100,7 +101,7 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	format := flag.String("o", "solr4vu13v2", "output format")
+	format := flag.String("o", "solr4vu13v3", "output format")
 	listFormats := flag.Bool("list", false, "list output formats")
 	gzipOutput := flag.Bool("z", false, "gzip output")
 
