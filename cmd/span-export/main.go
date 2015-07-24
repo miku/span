@@ -89,9 +89,10 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 
 func main() {
 
-	var hfiles, lfiles, any, source container.StringSlice
+	var hfiles, lfiles, cfiles, any, source container.StringSlice
 	flag.Var(&hfiles, "f", "ISIL:/path/to/ovid.xml")
 	flag.Var(&lfiles, "l", "ISIL:/path/to/list.txt")
+	flag.Var(&cfiles, "c", "ISIL:/path/to/collections.txt")
 	flag.Var(&any, "any", "ISIL")
 	flag.Var(&source, "source", "ISIL:SID")
 
@@ -139,6 +140,19 @@ func main() {
 		}
 		defer file.Close()
 		f, err := span.NewHoldingFilter(file)
+		if err != nil && !*skip {
+			log.Fatal(err)
+		}
+		tagger[isil] = append(tagger[isil], f)
+	}
+
+	for _, s := range cfiles {
+		isil, file, err := parseTagPath(s)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		f, err := span.NewCollectionFilter(file)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
