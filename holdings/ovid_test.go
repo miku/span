@@ -181,6 +181,29 @@ func TestParseHoldings(t *testing.T) {
 					License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"),
 					License("1997000020000001:2004000027000006:0")}},
 		},
+		{
+			strings.NewReader(`
+<holding ezb_id = "23110">
+  <title><![CDATA[Rethinking History. (via EBSCO Host)]]></title>
+  <publishers><![CDATA[via EBSCO Host]]></publishers>
+  <EZBIssns>
+    <p-issn>1364-2529</p-issn>
+  </EZBIssns>
+  <entitlements>
+    <entitlement status = "subscribed">
+      <url>http%3A%2F%2Fsearch.ebscohost.com%2Fdirect.asp%3Fdb%3Daph%26jid%3D5C5%26scope%3Dsite</url>
+      <anchor>ebsco_aph</anchor>
+      <end>
+        <delay>-18M</delay>
+      </end>
+      <available><![CDATA[Academic Search Premier: 1998-03-01 -]]></available>
+    </entitlement>
+  </entitlements>
+</holding>`), Licenses{
+				"1364-2529": []License{
+					License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"),
+				}},
+		},
 	}
 	for _, tt := range tests {
 		licenses, err := ParseHoldings(tt.r)
@@ -204,6 +227,7 @@ func TestCovers(t *testing.T) {
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2018000034000000", true},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2012000034000000", false},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2011000035000000", false},
+		{License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"), "2014000000000000", false},
 	}
 	for _, c := range cases {
 		r := c.license.Covers(c.signature)
@@ -225,6 +249,7 @@ func TestWall(t *testing.T) {
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2014-02-02"), true},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2013-02-02"), true},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2018-09-02"), true},
+		{License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"), mustParse("2015-07-24"), true},
 	}
 	for _, c := range cases {
 		r := c.t.After(c.license.Wall(c.t))
