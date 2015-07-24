@@ -90,6 +90,7 @@ func (f HoldingFilter) CoveredAndValid(signature, issn string) bool {
 
 // HoldingFilter compares the (year, volume, issue) of an intermediate schema
 // record with licensing information, including moving walls.
+// TODO(miku): pass record directly to CoveredAndValid, since we might need the full date for moving wall.
 func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 	signature := holdings.CombineDatum(fmt.Sprintf("%d", is.Date.Year()), is.Volume, is.Issue, "")
 	for _, issn := range append(is.ISSN, is.EISSN...) {
