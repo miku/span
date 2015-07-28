@@ -227,7 +227,7 @@ func TestCovers(t *testing.T) {
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2018000034000000", true},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2012000034000000", false},
 		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), "2011000035000000", false},
-		{License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"), "2014000000000000", false},
+		{License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"), "2014000000000000", true},
 	}
 	for _, c := range cases {
 		r := c.license.Covers(c.signature)
@@ -241,20 +241,30 @@ func TestCovers(t *testing.T) {
 func TestWall(t *testing.T) {
 	var cases = []struct {
 		license License
-		t       time.Time
+		docTime time.Time
+		refTime time.Time
 		result  bool
 	}{
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2012-02-02"), false},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2011-02-02"), false},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2014-02-02"), true},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2013-02-02"), true},
-		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2018-09-02"), true},
-		{License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"), mustParse("2015-07-24"), true},
+		// -18M, -46656000000000000
+		// -2Y, 62208000000000000
+		{License("0000000000000000:ZZZZZZZZZZZZZZZZ:-46656000000000000"), mustParse("2012-02-02"), mustParse("2015-07-24"), true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2012-02-02"), mustParse("2012-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2012-02-02"), mustParse("2012-09-02"), false},
+
+		// not exactly two years, but 720 days
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2012-02-12"), mustParse("2014-02-02"), true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2012-02-13"), mustParse("2014-02-02"), false},
+
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2012-02-02"), mustParse("2014-02-02"), true},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2014-02-02"), mustParse("2013-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:-62208000000000000"), mustParse("2016-02-02"), mustParse("2012-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2012-02-02"), mustParse("2012-02-02"), false},
+		{License("2012000035000000:ZZZZZZZZZZZZZZZZ:0"), mustParse("2012-02-03"), mustParse("2012-02-02"), false},
 	}
 	for _, c := range cases {
-		r := c.t.After(c.license.Wall(c.t))
+		r := c.docTime.Before(c.license.Wall(c.refTime))
 		if r != c.result {
-			t.Errorf("%s, Wall() => got %v, want %v", c.t, r, c.result)
+			t.Errorf("%s, %s, Wall() => got %v, want %v", c.docTime, c.refTime, r, c.result)
 		}
 	}
 }

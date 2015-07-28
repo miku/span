@@ -69,34 +69,26 @@ func (f HoldingFilter) MarshalJSON() ([]byte, error) {
 	return json.Marshal(f.Table)
 }
 
-// CoveredAndValid checks coverage and moving wall. If there is no entry for
-// an ISSN in the holdings file, we assume, there is no valid license. The
-// given signature is a string, that encodes an items location in time.
-func (f HoldingFilter) CoveredAndValid(signature, issn string) bool {
-	licenses, ok := f.Table[issn]
-	if !ok {
-		return false
-	}
-	for _, license := range licenses {
-		if !license.Covers(signature) {
-			continue
-		}
-		if f.Ref.After(license.Wall(f.Ref)) {
-			return true
-		}
-	}
-	return false
-}
-
 // HoldingFilter compares the (year, volume, issue) of an intermediate schema
 // record with licensing information, including moving walls.
 // TODO(miku): pass record directly to CoveredAndValid, since we might need the full date for moving wall.
 func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 	signature := holdings.CombineDatum(fmt.Sprintf("%d", is.Date.Year()), is.Volume, is.Issue, "")
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		if f.CoveredAndValid(signature, issn) {
-			return true
+		licenses, ok := f.Table[issn]
+		if !ok {
+			return false
 		}
+		for _, license := range licenses {
+			if !license.Covers(signature) {
+				continue
+			}
+			if is.Date.After(license.Wall(f.Ref)) {
+				return true
+			}
+		}
+		return false
+
 	}
 	return false
 }
