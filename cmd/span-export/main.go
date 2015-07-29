@@ -17,6 +17,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
+	"github.com/miku/span/filter"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/finc/exporter"
 )
@@ -24,7 +25,7 @@ import (
 // Options for worker.
 type options struct {
 	exportSchemaFunc func() finc.ExportSchema
-	tagger           span.ISILTagger
+	tagger           filter.ISILTagger
 }
 
 // Exporters holds available export formats
@@ -131,7 +132,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	tagger := make(span.ISILTagger)
+	tagger := make(filter.ISILTagger)
 
 	for _, s := range hfiles {
 		isil, file, err := parseTagPath(s)
@@ -139,7 +140,7 @@ func main() {
 			log.Fatal(err)
 		}
 		defer file.Close()
-		f, err := span.NewHoldingFilter(file)
+		f, err := filter.NewHoldingFilter(file)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
@@ -152,7 +153,7 @@ func main() {
 			log.Fatal(err)
 		}
 		defer file.Close()
-		f, err := span.NewCollectionFilter(file)
+		f, err := filter.NewCollectionFilter(file)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
@@ -165,7 +166,7 @@ func main() {
 			log.Fatal(err)
 		}
 		defer file.Close()
-		f, err := span.NewListFilter(file)
+		f, err := filter.NewListFilter(file)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}
@@ -178,11 +179,11 @@ func main() {
 			log.Fatal("use ISIL:SID")
 		}
 		isil, sid := ss[0], ss[1]
-		tagger[isil] = append(tagger[isil], span.SourceFilter{SourceID: sid})
+		tagger[isil] = append(tagger[isil], filter.SourceFilter{SourceID: sid})
 	}
 
 	for _, isil := range any {
-		tagger[isil] = []span.Filter{span.Any{}}
+		tagger[isil] = []filter.Filter{filter.Any{}}
 	}
 
 	if *dumpFilters {

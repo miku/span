@@ -1,4 +1,4 @@
-package span
+package filter
 
 import (
 	"bufio"
@@ -83,7 +83,7 @@ func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 			if !license.Covers(signature) {
 				continue
 			}
-			if is.Date.After(license.Wall(f.Ref)) {
+			if is.Date.Before(license.Wall(f.Ref)) {
 				return true
 			}
 		}
