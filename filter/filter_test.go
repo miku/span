@@ -13,45 +13,11 @@ import (
 func TestHoldingsFilterApply(t *testing.T) {
 	b := []byte(`
 	{
-	  "finc.format": "ElectronicArticle",
-	  "finc.mega_collection": "Informa UK Limited (CrossRef)",
-	  "finc.record_id": "ai-49-aHR0cDovL2R4LmRvaS5vcmcvMTAuMTA4MC8xMzY0MjUyOS4yMDE0LjkzMjA3OQ",
-	  "finc.source_id": "49",
-	  "ris.type": "EJOUR",
-	  "rft.atitle": "History, power and visual communication artefacts",
-	  "rft.epage": "22",
-	  "rft.genre": "article",
 	  "rft.issn": [
 	    "1364-2529",
 	    "1470-1154"
 	  ],
-	  "rft.jtitle": "Rethinking History",
-	  "rft.tpages": "21",
-	  "rft.pages": "1-22",
-	  "rft.pub": [
-	    "Informa UK Limited"
-	  ],
-	  "rft.date": "2014-08-13",
-	  "x.date": "2014-08-13T00:00:00Z",
-	  "rft.spage": "1",
-	  "authors": [
-	    {
-	      "rft.aulast": "Hepworth",
-	      "rft.aufirst": "Katherine"
-	    }
-	  ],
-	  "doi": "10.1080/13642529.2014.932079",
-	  "languages": [
-	    "eng"
-	  ],
-	  "url": [
-	    "http://dx.doi.org/10.1080/13642529.2014.932079"
-	  ],
-	  "version": "0.9",
-	  "x.subjects": [
-	    "History"
-	  ],
-	  "x.type": "journal-article"
+	  "x.date": "2014-08-13T00:00:00Z"
 	}
 	`)
 
