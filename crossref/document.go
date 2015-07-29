@@ -42,6 +42,9 @@ var (
 
 	// ArticleTitleBlocker will trigger skips, if article title matches exactly.
 	ArticleTitleBlocker = []string{"Titelei", "Front Matter"}
+
+	// Future, if a publication date lies beyond it, it gets skipped.
+	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
 )
 
 // Crossref source.
@@ -290,9 +293,15 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	output.Date, err = doc.Issued.Date()
+
 	if err != nil {
 		return output, err
 	}
+
+	if output.Date.After(Future) {
+		return output, span.Skip{Reason: fmt.Sprintf("TOO_FUTURISTIC %s", output.RecordID)}
+	}
+
 	output.RawDate = output.Date.Format("2006-01-02")
 
 	if doc.URL == "" {
