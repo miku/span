@@ -298,10 +298,6 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, err
 	}
 
-	if output.Date.After(Future) {
-		return output, span.Skip{Reason: fmt.Sprintf("TOO_FUTURISTIC %s", output.RecordID)}
-	}
-
 	output.RawDate = output.Date.Format("2006-01-02")
 
 	if doc.URL == "" {
@@ -311,6 +307,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RecordID = doc.RecordID()
 	if len(output.RecordID) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("ID_TOO_LONG %s", output.RecordID)}
+	}
+
+	if output.Date.After(Future) {
+		return output, span.Skip{Reason: fmt.Sprintf("TOO_FUTURISTIC %s", output.RecordID)}
 	}
 
 	if doc.Type == "journal-issue" {
