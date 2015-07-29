@@ -56,7 +56,7 @@ func TestHoldingsFilterApply(t *testing.T) {
 		t time.Time
 		r bool
 	}{
-		// for a record with date 2014-08-13 and -18M wall expires on 2016-02-05
+		// A record with date 2014-08-13 and -18M wall gets available on 2016-02-05.
 		{time.Date(2015, 7, 29, 0, 0, 0, 0, time.UTC), false},
 		{time.Date(2016, 2, 4, 0, 0, 0, 0, time.UTC), false},
 		{time.Date(2016, 2, 5, 0, 0, 0, 0, time.UTC), true},
