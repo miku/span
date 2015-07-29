@@ -86,12 +86,6 @@ func TestHoldingsFilterApply(t *testing.T) {
 		t.Error(err)
 	}
 
-	hf.Ref = time.Now()
-	result := hf.Apply(is)
-	if result != false {
-		t.Errorf("Apply got %+v, want %v", result, false)
-	}
-
 	var cases = []struct {
 		t time.Time
 		r bool
