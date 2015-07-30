@@ -83,12 +83,10 @@ func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 			if !license.Covers(signature) {
 				continue
 			}
-			if is.Date.Before(license.Wall(f.Ref)) {
+			if license.Delay() == 0 || is.Date.Before(license.Wall(f.Ref)) {
 				return true
 			}
 		}
-		return false
-
 	}
 	return false
 }
