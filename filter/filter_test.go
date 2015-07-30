@@ -71,3 +71,56 @@ func TestHoldingsFilterApply(t *testing.T) {
 		}
 	}
 }
+
+// TestHoldingsFilterZeroDelay test IS record from the future and zero delay.
+func TestHoldingsFilterZeroDelay(t *testing.T) {
+	b := []byte(`
+	{
+	  "rft.issn": [
+	    "1364-2529"
+	  ],
+	  "x.date": "2014-08-13T00:00:00Z"
+	}
+	`)
+
+	h := `
+	<holding ezb_id = "X">
+	  <EZBIssns>
+	    <p-issn>1364-2529</p-issn>
+	  </EZBIssns>
+	  <entitlements>
+	    <entitlement status = "subscribed">
+	    </entitlement>
+	  </entitlements>
+	</holding>
+	`
+
+	var is finc.IntermediateSchema
+	err := json.Unmarshal(b, &is)
+	if err != nil {
+		t.Error(err)
+	}
+
+	hf, err := NewHoldingFilter(strings.NewReader(h))
+	if err != nil {
+		t.Error(err)
+	}
+
+	var cases = []struct {
+		t time.Time
+		r bool
+	}{
+		{time.Date(1970, 1, 10, 0, 0, 0, 0, time.UTC), true},
+		{time.Date(2014, 8, 13, 0, 0, 0, 0, time.UTC), true},
+		{time.Date(2016, 8, 13, 0, 0, 0, 0, time.UTC), true},
+		{time.Date(2800, 8, 13, 0, 0, 0, 0, time.UTC), true},
+	}
+
+	for _, c := range cases {
+		hf.Ref = c.t
+		r := hf.Apply(is)
+		if r != c.r {
+			t.Errorf("Apply with ref date %v got %v, want %v", c.t, r, c.r)
+		}
+	}
+}
