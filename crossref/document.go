@@ -374,6 +374,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err == nil {
 		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
 	} else {
+		// TODO(miku): Use publisher as fallback, refs. #4833
 		output.MegaCollection = fmt.Sprintf("X-U (CrossRef)")
 	}
 
