@@ -19,8 +19,22 @@ Library data conversions.
 # needs to have a top level directory inside called my_maintenance _scripts
 # %setup -n %{name}
 
+# The %build scriptlet is the second scriptlet executed during a build, immediately after %prep.
 %build
-# this section is empty for this example as we're not actually building anything
+
+# The %pre scriptlet executes just before the package is to be installed.
+# This section is used to purge files, that this update intends to recreate.
+%pre
+type taskhome > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+	rm -vrf $(taskhome)/028/DOAJIntermediateSchema
+	rm -vrf $(taskhome)/048/GBIIntermediateSchema
+	rm -vrf $(taskhome)/ai/AIExport
+	rm -vrf $(taskhome)/ai/AIIntermediateSchema
+	rm -vrf $(taskhome)/crossref/CrossrefIntermediateSchema
+	rm -vrf $(taskhome)/degruyter/DegruyterIntermediateSchema
+	rm -vrf $(taskhome)/jstor/JstorIntermediateSchema
+fi
 
 %install
 # create directories where the files will be located
