@@ -67,21 +67,34 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 		for _, s := range batch {
 			var err error
 			is := finc.IntermediateSchema{}
-			for _, f := range opts.filters {
-				if !f.Apply(is) {
-					continue
-				}
-			}
 			err = json.Unmarshal([]byte(s), &is)
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			// Skip things, e.g. blacklisted DOIs.
+			filtered := false
+			for _, f := range opts.filters {
+				if !f.Apply(is) {
+					filtered = true
+					break
+				}
+			}
+
+			if filtered {
+				continue
+			}
+
+			// Get export format.
 			schema := opts.exportSchemaFunc()
 			err = schema.Convert(is)
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			// Get list of ISILs to attach.
 			schema.Attach(opts.tagger.Tags(is))
+
 			// TODO(miku): maybe move marshalling into Exporter, if we have
 			// anything else than JSON - function could be somethings like
 			// func Marshal() ([]byte, error)
