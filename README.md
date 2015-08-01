@@ -177,3 +177,11 @@ TODO
 * write wrappers around common inputs like XML, JSON, CSV ...
 * maybe factor out importer interface (like exporter)
 * docs: add example files for each supported data format
+
+A filtering pipeline.
+
+The final processing step from an intermediate schema to an export format
+includes various decisions.
+
+* Should an ISIL be attached to a record or not?
+* Should a record be excluded, due to an expired or deleted DOI?
