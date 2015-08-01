@@ -64,6 +64,7 @@ func parseTagPath(s string) (string, *os.File, error) {
 func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range queue {
+	Loop:
 		for _, s := range batch {
 			var err error
 			is := finc.IntermediateSchema{}
@@ -73,16 +74,10 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 			}
 
 			// Skip things, e.g. blacklisted DOIs.
-			filtered := false
 			for _, f := range opts.filters {
 				if !f.Apply(is) {
-					filtered = true
-					break
+					continue Loop
 				}
-			}
-
-			if filtered {
-				continue
 			}
 
 			// Get export format.
