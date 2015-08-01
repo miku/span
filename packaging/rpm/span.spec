@@ -27,13 +27,13 @@ Library data conversions.
 %pre
 type taskhome > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-	rm -vrf $(taskhome)/028/DOAJIntermediateSchema
-	rm -vrf $(taskhome)/048/GBIIntermediateSchema
-	rm -vrf $(taskhome)/ai/AIExport
-	rm -vrf $(taskhome)/ai/AIIntermediateSchema
-	rm -vrf $(taskhome)/crossref/CrossrefIntermediateSchema
-	rm -vrf $(taskhome)/degruyter/DegruyterIntermediateSchema
-	rm -vrf $(taskhome)/jstor/JstorIntermediateSchema
+    rm -vrf $(taskhome)/028/DOAJIntermediateSchema
+    rm -vrf $(taskhome)/048/GBIIntermediateSchema
+    rm -vrf $(taskhome)/ai/AIExport
+    rm -vrf $(taskhome)/ai/AIIntermediateSchema
+    rm -vrf $(taskhome)/crossref/CrossrefIntermediateSchema
+    rm -vrf $(taskhome)/degruyter/DegruyterIntermediateSchema
+    rm -vrf $(taskhome)/jstor/JstorIntermediateSchema
 fi
 
 %install
