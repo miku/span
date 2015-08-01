@@ -91,6 +91,7 @@ func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 }
 
 // ListFilter will include records, whose ISSN is contained in a given set.
+// TODO(miku): The name ListFilter is much too generic for an ISSNFilter.
 type ListFilter struct {
 	Set *container.StringSet
 }
@@ -132,6 +133,7 @@ func (f ListFilter) Apply(is finc.IntermediateSchema) bool {
 
 // CollectionFilter allows any record that belongs to a collection, that is
 // listed in Names.
+// TODO(miku): better: MegaCollectionFilter?
 type CollectionFilter struct {
 	Set *container.StringSet
 }
@@ -166,6 +168,45 @@ func (f CollectionFilter) Apply(is finc.IntermediateSchema) bool {
 		return true
 	}
 	return false
+}
+
+// DOIFilter will exclude DOIs, that are listed in Set.
+type DOIFilter struct {
+	Set *container.StringSet
+}
+
+// TODO(miku): Simplify set filters: ISSNFilter, MegaCollectionFilter,
+// DOIFilter, ...
+func NewDOIFilter(r io.Reader) (DOIFilter, error) {
+	br := bufio.NewReader(r)
+	f := DOIFilter{Set: container.NewStringSet()}
+	for {
+		line, err := br.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return f, err
+		}
+		line = strings.TrimSpace(line)
+		if line != "" {
+			f.Set.Add(line)
+		}
+	}
+	return f, nil
+}
+
+// MarshalJSON provides custom serialization.
+func (f DOIFilter) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.Set.Values())
+}
+
+// Apply filter.
+func (f DOIFilter) Apply(is finc.IntermediateSchema) bool {
+	if f.Set.Contains(is.DOI) {
+		return false
+	}
+	return true
 }
 
 // ISILTagger maps ISILs to one or more Filters. If any of these filters
