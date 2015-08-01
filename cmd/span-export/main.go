@@ -24,6 +24,7 @@ import (
 
 // Options for worker.
 type options struct {
+	filters          []filter.Filter
 	exportSchemaFunc func() finc.ExportSchema
 	tagger           filter.ISILTagger
 }
@@ -66,7 +67,11 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 		for _, s := range batch {
 			var err error
 			is := finc.IntermediateSchema{}
-			// TODO(miku): apply filters here, too, like DOI filter
+			for _, f := range opts.filters {
+				if !f.Apply(is) {
+					continue
+				}
+			}
 			err = json.Unmarshal([]byte(s), &is)
 			if err != nil {
 				log.Fatal(err)
@@ -107,6 +112,7 @@ func main() {
 	format := flag.String("o", "solr4vu13v3", "output format")
 	listFormats := flag.Bool("list", false, "list output formats")
 	gzipOutput := flag.Bool("z", false, "gzip output")
+	doiBlacklist := flag.String("doi-blacklist", "", "a list of DOIs to skip")
 
 	flag.Parse()
 
@@ -196,11 +202,26 @@ func main() {
 		os.Exit(0)
 	}
 
+	// TODO(miku): stutter less
+	var filters []filter.Filter
+
+	if *doiBlacklist != "" {
+		file, err := os.Open(*doiBlacklist)
+		if err != nil {
+			log.Fatal(err)
+		}
+		f, err := filter.NewDOIFilter(bufio.NewReader(file))
+		if err != nil {
+			log.Fatal(err)
+		}
+		filters = append(filters, f)
+	}
+
 	exportSchemaFunc, ok := Exporters[*format]
 	if !ok {
 		log.Fatal("unknown export schema")
 	}
-	opts := options{tagger: tagger, exportSchemaFunc: exportSchemaFunc}
+	opts := options{tagger: tagger, exportSchemaFunc: exportSchemaFunc, filters: filters}
 
 	queue := make(chan []string)
 	out := make(chan []byte)
