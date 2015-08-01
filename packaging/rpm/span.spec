@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.47
+Version:    0.1.48
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -65,6 +65,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 
 %changelog
+* Sat Aug 1 2015 Martin Czygan
+- 0.1.48 release
+- add -doi-blacklist flag
+
 * Mon Jul 6 2015 Martin Czygan
 - 0.1.41 release
 - much faster language detection with cld2 (libc sensible)
