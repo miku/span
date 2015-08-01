@@ -66,6 +66,7 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 		for _, s := range batch {
 			var err error
 			is := finc.IntermediateSchema{}
+			// TODO(miku): apply filters here, too, like DOI filter
 			err = json.Unmarshal([]byte(s), &is)
 			if err != nil {
 				log.Fatal(err)
