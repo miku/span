@@ -186,6 +186,17 @@ type Article struct {
 				XMLName xml.Name `xml:"lpage"`
 				Value   string   `xml:",chardata"`
 			}
+			Product struct {
+				XMLName xml.Name `xml:"product"`
+				Source  struct {
+					XMLName xml.Name `xml:"source"`
+					Value   string   `xml:",chardata"`
+				}
+				StringName struct {
+					XMLName xml.Name `xml:"string-name"`
+					Value   string   `xml:",chardata"`
+				}
+			}
 			Permissions struct {
 				XMLName       xml.Name `xml:"permissions"`
 				CopyrightYear struct {

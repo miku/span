@@ -164,5 +164,15 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	}
 	output.ISSN = normalized
 
+	// refs #5686
+	for _, s := range output.Subjects {
+		if s == "Book Reviews" {
+			if output.ArticleTitle == "" {
+				output.ArticleTitle = article.Front.Article.Product.Source.Value
+			}
+			break
+		}
+	}
+
 	return output, nil
 }
