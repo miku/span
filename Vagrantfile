@@ -52,14 +52,7 @@ sudo chmod +x /etc/bash_completion.d/siskin_completion.sh
 #
 # extra tools required by siskin or just useful
 sudo yum install -y jq xmlstarlet lftp vim tmux bash-completion tree
-# our tools required by siskin
-# sudo yum install -y https://github.com/miku/esbulk/releases/download/v0.3.3/esbulk-0.3.3-0.x86_64.rpm
-# sudo yum install -y https://github.com/miku/filterline/releases/download/v0.1.3/filterline-0.1.3-0.x86_64.rpm
-# sudo yum install -y https://github.com/miku/hurrly/releases/download/v0.1.4/hurrly-0.1.4-0.x86_64.rpm
-# sudo yum install -y https://github.com/miku/ldjtab/releases/download/v0.1.3/ldjtab-0.1.3-0.x86_64.rpm
-# sudo yum install -y https://github.com/miku/memcldj/releases/download/v1.3.0/memcldj-1.3.0-0.x86_64.rpm
-# sudo yum install -y https://github.com/miku/solrbulk/releases/download/v0.1.5.3/solrbulk-0.1.5.3-0.x86_64.rpm
-# sudo yum install -y https://github.com/miku/span/releases/download/v0.1.49/span-0.1.49-0.x86_64.rpm
+
 SCRIPT
 
 VAGRANTFILE_API_VERSION = "2"
