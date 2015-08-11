@@ -14,19 +14,15 @@ URL:        https://github.com/miku/span
 Library data conversions.
 
 %prep
-# the set up macro unpacks the source bundle and changes in to the represented by
-# %{name} which in this case would be my_maintenance_scripts. So your source bundle
-# needs to have a top level directory inside called my_maintenance _scripts
-# %setup -n %{name}
 
-# The %build scriptlet is the second scriptlet executed during a build, immediately after %prep.
 %build
 
-# The %pre scriptlet executes just before the package is to be installed.
-# This section is used to purge files, that this update intends to recreate.
 %pre
+PATH=$PATH:/usr/local/bin:/usr/local/sbin
+
 type taskhome > /dev/null 2>&1
 if [ $? -eq 0 ]; then
+    echo "SPAN: Purging obsolete data artifacts..."
     rm -vrf $(taskhome)/028/DOAJIntermediateSchema
     rm -vrf $(taskhome)/048/GBIIntermediateSchema
     rm -vrf $(taskhome)/ai/AIExport
@@ -34,35 +30,30 @@ if [ $? -eq 0 ]; then
     rm -vrf $(taskhome)/crossref/CrossrefIntermediateSchema
     rm -vrf $(taskhome)/degruyter/DegruyterIntermediateSchema
     rm -vrf $(taskhome)/jstor/JstorIntermediateSchema
+else
+    echo "SPAN: Nothing to do for pre or siskin not installed and configured."
 fi
 
-%install
-# create directories where the files will be located
-mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 
-# put the files in to the relevant directories.
-# the argument on -m is the permissions expressed as octal. (See chmod man page for details.)
+%install
+mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-gh-dump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
 
-
 %post
-# the post section is where you can run commands after the rpm is installed.
-# insserv /etc/init.d/my_maintenance
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 rm -rf %{_tmppath}/%{name}
 rm -rf %{_topdir}/BUILD/%{name}
 
-# list files owned by the package here
 %files
 %defattr(-,root,root)
+
 /usr/local/sbin/span-export
 /usr/local/sbin/span-gh-dump
 /usr/local/sbin/span-import
-
 
 %changelog
 * Sat Aug 1 2015 Martin Czygan
