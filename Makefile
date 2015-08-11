@@ -103,7 +103,7 @@ setup: vagrant.key
 	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
 	$(SSHCMD) "sudo yum install -y golang git rpm-build gcc-c++"
 	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone https://github.com/miku/span.git"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone /vagrant/.git span"
 
 rpm-compatible: vagrant.key
 	$(SSHCMD) "GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/... golang.org/x/tools/cmd/goimports"
