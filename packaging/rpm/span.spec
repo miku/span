@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.49
+Version:    0.1.50
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -56,6 +56,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-import
 
 %changelog
+* Tue Aug 11 2015 Martin Czygan
+- 0.1.50 release
+- use a pre-script to purge affected artifacts
+
 * Sat Aug 1 2015 Martin Czygan
 - 0.1.48 release
 - add -doi-blacklist flag
