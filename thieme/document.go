@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/miku/span"
@@ -19,6 +20,13 @@ const (
 	Genre      = "article"
 	batchSize  = 2000
 )
+
+func leftPad(s string, padStr string, overallLen int) string {
+	var padCountInt int
+	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
+	var retStr = strings.Repeat(padStr, padCountInt) + s
+	return retStr[(len(retStr) - overallLen):]
+}
 
 type Thieme struct{}
 
@@ -76,6 +84,24 @@ type Document struct {
 	Metadata struct {
 		ArticleSet struct {
 			Article struct {
+				VernacularTitle struct {
+					VernacularLanguage struct {
+						Abstract struct {
+							Value string `xml:",chardata"`
+						} `xml:"abstract"`
+						AuthorList struct {
+							Author []struct {
+								FirstName struct {
+								} `xml:"firstname"`
+								LastName struct {
+								} `xml:"lastname"`
+							} `xml:"author"`
+						} `xml:"authorlist"`
+					} `xml:"vernacularlanguage"`
+				} `xml:"vernaculartitle"`
+				Title struct {
+					Value string `xml:",chardata"`
+				} `xml:"articletitle"`
 				Journal struct {
 					Publisher struct {
 						Name string `xml:",chardata"`
@@ -114,16 +140,26 @@ type Document struct {
 
 func (doc Document) Date() (time.Time, error) {
 	pd := doc.Metadata.ArticleSet.Article.Journal.PubDate
+
+	if pd.Month.Value == "0" {
+		pd.Month.Value = "01"
+	}
+	if pd.Day.Value == "0" {
+		pd.Day.Value = "01"
+	}
+
 	if pd.Year.Value != "" && pd.Month.Value != "" && pd.Day.Value != "" {
-		s := fmt.Sprintf("%s-%s-%s", pd.Year.Value, pd.Month.Value, pd.Day.Value)
+		s := fmt.Sprintf("%s-%s-%s", leftPad(pd.Year.Value, "0", 4),
+			leftPad(pd.Month.Value, "0", 2), leftPad(pd.Day.Value, "0", 2))
 		return time.Parse("2006-01-02", s)
 	}
 	if pd.Year.Value != "" && pd.Month.Value != "" {
-		s := fmt.Sprintf("%s-%s-01", pd.Year.Value, pd.Month.Value)
+		s := fmt.Sprintf("%s-%s-01", leftPad(pd.Year.Value, "0", 4),
+			leftPad(pd.Month.Value, "0", 2))
 		return time.Parse("2006-01-02", s)
 	}
 	if pd.Year.Value != "" {
-		s := fmt.Sprintf("%s-01-01", pd.Year.Value)
+		s := fmt.Sprintf("%s-01-01", leftPad(pd.Year.Value, "0", 4))
 		return time.Parse("2006-01-02", s)
 	}
 	return time.Time{}, fmt.Errorf("invalid date")
@@ -149,7 +185,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	if journal.Title.Value == "" {
-		return output, span.Skip{Reason: fmt.Sprintf("SKIP NO_JTITLE %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.RecordID)}
 	}
 
 	output.JournalTitle = journal.Title.Value
@@ -157,6 +193,14 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.EISSN = append(output.EISSN, journal.ISSN.Value)
 	output.Volume = journal.Volume.Value
 	output.Issue = journal.Issue.Value
+
+	article := doc.Metadata.ArticleSet.Article
+	if article.Title.Value == "" {
+		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.RecordID)}
+	}
+
+	output.ArticleTitle = article.Title.Value
+	output.Abstract = article.VernacularTitle.VernacularLanguage.Abstract.Value
 
 	return output, nil
 }
