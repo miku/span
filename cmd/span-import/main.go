@@ -19,6 +19,7 @@ import (
 	"github.com/miku/span/genios"
 	"github.com/miku/span/jats/degruyter"
 	"github.com/miku/span/jats/jstor"
+	"github.com/miku/span/thieme"
 )
 
 var (
@@ -36,6 +37,7 @@ var formats = map[string]span.Source{
 	"jstor":     jstor.Jstor{},
 	"doaj":      doaj.DOAJ{},
 	"genios":    genios.Genios{},
+	"thieme":    thieme.Thieme{},
 }
 
 type options struct {
