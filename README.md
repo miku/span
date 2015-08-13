@@ -136,7 +136,8 @@ For the moment, a new data source has to implement is the [span.Source](https://
 // performance (1000 x 1000 docs vs 1000000 x 1 doc).
 type Source interface {
         Iterate(io.Reader) (<-chan []Importer, error)
-}```
+}
+```
 
 Channels in APIs [might](http://www.informit.com/articles/article.aspx?p=2359758) not be the optimum, though we deal with a kind of unbounded streams here.
 
