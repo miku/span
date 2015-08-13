@@ -2,12 +2,10 @@
 package doaj
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -118,50 +116,16 @@ type BibJson struct {
 
 type DOAJ struct{}
 
-// NewBatch wraps up a new batch for channel com.
-func NewBatch(lines []string) span.Batcher {
-	batch := span.Batcher{
-		Apply: func(s interface{}) (span.Importer, error) {
-			resp := new(Response)
-			err := json.Unmarshal([]byte(s.(string)), resp)
-			if err != nil {
-				return resp.Source, err
-			}
-			resp.Source.Type = resp.Type
-			return resp.Source, nil
-		}, Items: make([]interface{}, len(lines))}
-	for i, line := range lines {
-		batch.Items[i] = line
-	}
-	return batch
-}
-
-func (s DOAJ) Iterate(r io.Reader) (<-chan interface{}, error) {
-	ch := make(chan interface{})
-	reader := bufio.NewReader(r)
-	i := 0
-	var lines []string
-	go func() {
-		for {
-			line, err := reader.ReadString('\n')
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			i++
-			lines = append(lines, line)
-			if i == BatchSize {
-				ch <- NewBatch(lines)
-				lines = lines[:0]
-				i = 0
-			}
+func (s DOAJ) Iterate(r io.Reader) (<-chan []span.Importer, error) {
+	return span.FromJSON(r, func(s string) (span.Importer, error) {
+		resp := new(Response)
+		err := json.Unmarshal([]byte(s), resp)
+		if err != nil {
+			return resp.Source, err
 		}
-		ch <- NewBatch(lines)
-		close(ch)
-	}()
-	return ch, nil
+		resp.Source.Type = resp.Type
+		return resp.Source, nil
+	})
 }
 
 // Date return the document date. Journals entries usually have no date, so

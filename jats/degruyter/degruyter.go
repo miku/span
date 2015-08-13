@@ -1,12 +1,10 @@
 package degruyter
 
 import (
-	"bufio"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 
 	"github.com/miku/span"
@@ -33,52 +31,13 @@ type Article struct {
 	jats.Article
 }
 
-// NewBatch wraps up a new batch for channel com.
-func NewBatch(docs []*Article) span.Batcher {
-	batch := span.Batcher{
-		Apply: func(s interface{}) (span.Importer, error) {
-			return s.(span.Importer), nil
-		}, Items: make([]interface{}, len(docs))}
-	for i, doc := range docs {
-		batch.Items[i] = doc
-	}
-	return batch
-}
-
 // Iterate emits Converter elements via XML decoding.
-func (s DeGruyter) Iterate(r io.Reader) (<-chan interface{}, error) {
-	ch := make(chan interface{})
-	i := 0
-	var docs []*Article
-	go func() {
-		decoder := xml.NewDecoder(bufio.NewReader(r))
-		for {
-			t, _ := decoder.Token()
-			if t == nil {
-				break
-			}
-			switch se := t.(type) {
-			case xml.StartElement:
-				if se.Name.Local == "article" {
-					doc := new(Article)
-					err := decoder.DecodeElement(&doc, &se)
-					if err != nil {
-						log.Fatal(err)
-					}
-					i++
-					docs = append(docs, doc)
-					if i == BatchSize {
-						ch <- NewBatch(docs)
-						docs = docs[:0]
-						i = 0
-					}
-				}
-			}
-		}
-		ch <- NewBatch(docs)
-		close(ch)
-	}()
-	return ch, nil
+func (s DeGruyter) Iterate(r io.Reader) (<-chan []span.Importer, error) {
+	return span.FromXML(r, "article", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
+		article := new(Article)
+		err := d.DecodeElement(&article, &se)
+		return article, err
+	})
 }
 
 // Identifiers returns the doi and the dependent url and recordID in a struct.

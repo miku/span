@@ -1,12 +1,10 @@
 package genios
 
 import (
-	"bufio"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 	"time"
 
@@ -56,53 +54,13 @@ var (
 
 type Genios struct{}
 
-// NewBatch wraps up a new batch for channel com.
-func NewBatch(docs []*Document) span.Batcher {
-	batch := span.Batcher{
-		Apply: func(s interface{}) (span.Importer, error) {
-			return s.(span.Importer), nil
-		}, Items: make([]interface{}, len(docs))}
-	for i, doc := range docs {
-		batch.Items[i] = doc
-	}
-	return batch
-}
-
 // Iterate emits Converter elements via XML decoding.
-// TODO(miku): abstract this away (and in the other sources as well)
-func (s Genios) Iterate(r io.Reader) (<-chan interface{}, error) {
-	ch := make(chan interface{})
-	i := 0
-	var docs []*Document
-	go func() {
-		decoder := xml.NewDecoder(bufio.NewReader(r))
-		for {
-			t, _ := decoder.Token()
-			if t == nil {
-				break
-			}
-			switch se := t.(type) {
-			case xml.StartElement:
-				if se.Name.Local == "Document" {
-					doc := new(Document)
-					err := decoder.DecodeElement(&doc, &se)
-					if err != nil {
-						log.Fatal(err)
-					}
-					i++
-					docs = append(docs, doc)
-					if i == batchSize {
-						ch <- NewBatch(docs)
-						docs = docs[:0]
-						i = 0
-					}
-				}
-			}
-		}
-		ch <- NewBatch(docs)
-		close(ch)
-	}()
-	return ch, nil
+func (s Genios) Iterate(r io.Reader) (<-chan []span.Importer, error) {
+	return span.FromXML(r, "Document", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
+		doc := new(Document)
+		err := d.DecodeElement(&doc, &se)
+		return doc, err
+	})
 }
 
 // Headings returns subject headings.

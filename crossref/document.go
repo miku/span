@@ -1,13 +1,11 @@
 package crossref
 
 import (
-	"bufio"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -50,52 +48,12 @@ var (
 // Crossref source.
 type Crossref struct{}
 
-// NewBatch wraps up a new batch for channel com.
-func NewBatch(lines []string) span.Batcher {
-	batch := span.Batcher{
-		Apply: func(s interface{}) (span.Importer, error) {
-			doc := new(Document)
-			err := json.Unmarshal([]byte(s.(string)), doc)
-			if err != nil {
-				return doc, err
-			}
-			return doc, nil
-		}, Items: make([]interface{}, len(lines))}
-	for i, line := range lines {
-		batch.Items[i] = line
-	}
-	return batch
-}
-
-// Iterate returns a channel which carries batches. The processor function
-// is just plain JSON deserialization. It is ok to halt the world,
-// if there some error during reading.
-func (c Crossref) Iterate(r io.Reader) (<-chan interface{}, error) {
-	ch := make(chan interface{})
-	reader := bufio.NewReader(r)
-	i := 0
-	var lines []string
-	go func() {
-		for {
-			line, err := reader.ReadString('\n')
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-			i++
-			lines = append(lines, line)
-			if i == BatchSize {
-				ch <- NewBatch(lines)
-				lines = lines[:0]
-				i = 0
-			}
-		}
-		ch <- NewBatch(lines)
-		close(ch)
-	}()
-	return ch, nil
+func (c Crossref) Iterate(r io.Reader) (<-chan []span.Importer, error) {
+	return span.FromJSON(r, func(s string) (span.Importer, error) {
+		doc := new(Document)
+		err := json.Unmarshal([]byte(s), doc)
+		return doc, err
+	})
 }
 
 // Author is given by family and given name.

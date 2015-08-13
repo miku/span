@@ -44,15 +44,10 @@ type options struct {
 	verbose bool
 }
 
-// batcherWorker iterates over Batcher objects
-func batcherWorker(queue chan span.Batcher, out chan []byte, opts options, wg *sync.WaitGroup) {
+func worker(queue chan []span.Importer, out chan []byte, opts options, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range queue {
-		for _, item := range batch.Items {
-			doc, err := batch.Apply(item)
-			if err != nil {
-				log.Fatal(err)
-			}
+		for _, doc := range batch {
 			output, err := doc.ToIntermediateSchema()
 			if err != nil {
 				switch err.(type) {
@@ -129,10 +124,11 @@ func main() {
 		log.Fatal("input file required")
 	}
 
-	queue := make(chan span.Batcher)
+	queue := make(chan []span.Importer)
 	out := make(chan []byte)
 	done := make(chan bool)
 
+	// TODO(miku): de-uglify
 	if *gzipOutput {
 		go span.GzipSink(os.Stdout, out, done)
 	} else {
@@ -144,7 +140,7 @@ func main() {
 
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
-		go batcherWorker(queue, out, opts, &wg)
+		go worker(queue, out, opts, &wg)
 	}
 
 	if *logfile != "" {
@@ -171,24 +167,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for item := range ch {
-		switch item.(type) {
-		case span.Importer:
-			doc := item.(span.Importer)
-			output, err := doc.ToIntermediateSchema()
-			if err != nil {
-				log.Fatal(err)
-			}
-			b, err := json.Marshal(output)
-			if err != nil {
-				log.Fatal(err)
-			}
-			out <- b
-		case span.Batcher:
-			queue <- item.(span.Batcher)
-		default:
-			log.Fatal(errCannotConvert)
-		}
+	for batch := range ch {
+		queue <- batch
 	}
 
 	close(queue)
