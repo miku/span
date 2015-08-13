@@ -131,14 +131,12 @@ Adding new sources
 For the moment, a new data source has to implement is the [span.Source](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/common.go#L36) interface:
 
 ```go
-// Source can emit records given a reader. What is actually returned is decided
-// by the source, e.g. it may return Importer or Batcher object.
-// Dealing with the various types is responsibility of the call site.
-// Channel will block on slow consumers and will not drop objects.
+// Source can emit records given a reader. The channel is of type []Importer,
+// to allow the source to send objects over the channel in batches for
+// performance (1000 x 1000 docs vs 1000000 x 1 doc).
 type Source interface {
-        Iterate(io.Reader) (<-chan interface{}, error)
-}
-```
+        Iterate(io.Reader) (<-chan []Importer, error)
+}```
 
 Channels in APIs [might](http://www.informit.com/articles/article.aspx?p=2359758) not be the optimum, though we deal with a kind of unbounded streams here.
 
@@ -173,8 +171,6 @@ type ExportSchema interface {
 TODO
 ----
 
-* decouple batching (performance) from record stream generation (content)
-* write wrappers around common inputs like XML, JSON, CSV ...
 * maybe factor out importer interface (like exporter)
 * docs: add example files for each supported data format
 
@@ -185,3 +181,19 @@ includes various decisions.
 
 * Should an ISIL be attached to a record or not?
 * Should a record be excluded, due to an expired or deleted DOI?
+
+Provide a middleware-ish processing interface (similar to flow, metafacture)?
+
+    pl := Pipeline{}
+    pl.Add(DOIFilter)
+    pl.Add(ISILAttacher)
+    pl.Add(QualityAssuranceTests)
+    pl.Add(Exporter)
+
+    err := pl.Run(input)
+
+Done
+----
+
+* decouple batching (performance) from record stream generation (content)
+* write wrappers around common inputs like XML, JSON, CSV ...
