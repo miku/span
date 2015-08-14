@@ -99,7 +99,7 @@ type JSONDecoderFunc func(s string) (Importer, error)
 
 // FromJSON returns a channel of slices of importable objects.
 func FromJSON(r io.Reader, decoder JSONDecoderFunc) (chan []Importer, error) {
-	return FromJSONSize(r, decoder, 10000)
+	return FromJSONSize(r, decoder, 20000)
 }
 
 // FromJSONSize returns a channel of slices of importable objects, given a

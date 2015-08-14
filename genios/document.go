@@ -23,8 +23,6 @@ const (
 	Genre      = "article"
 	// If no abstract is found accept this number of chars from doc.Text as Abstract.
 	textAsAbstractCutoff = 2000
-	// Process records in batches. TODO(miku): batch size is no concern of the source.
-	batchSize = 2000
 )
 
 type Document struct {

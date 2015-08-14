@@ -16,7 +16,6 @@ const (
 	// Format   = "ElectronicArticle"
 	Collection = "Thieme"
 	Genre      = "article"
-	batchSize  = 2000
 )
 
 func leftPad(s string, padStr string, overallLen int) string {

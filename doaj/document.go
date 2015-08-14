@@ -19,8 +19,6 @@ import (
 const (
 	// Internal bookkeeping.
 	SourceID = "28"
-	// BatchSize for grouped channel transport.
-	BatchSize = 25000
 	// Collection name
 	Collection = "DOAJ Directory of Open Access Journals"
 	// Format for all records
