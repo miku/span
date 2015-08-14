@@ -78,7 +78,6 @@ func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 	verbose := flag.Bool("verbose", false, "more output")
-	gzipOutput := flag.Bool("z", false, "gzip output")
 
 	flag.Parse()
 
@@ -128,12 +127,7 @@ func main() {
 	out := make(chan []byte)
 	done := make(chan bool)
 
-	// TODO(miku): de-uglify
-	if *gzipOutput {
-		go span.GzipSink(os.Stdout, out, done)
-	} else {
-		go span.ByteSink(os.Stdout, out, done)
-	}
+	go span.ByteSink(os.Stdout, out, done)
 
 	var wg sync.WaitGroup
 	opts := options{verbose: *verbose}
