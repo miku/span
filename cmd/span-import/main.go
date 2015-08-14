@@ -19,7 +19,7 @@ import (
 	"github.com/miku/span/genios"
 	"github.com/miku/span/jats/degruyter"
 	"github.com/miku/span/jats/jstor"
-	"github.com/miku/span/thieme"
+	"github.com/miku/span/jats/thieme"
 )
 
 var (

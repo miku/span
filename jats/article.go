@@ -98,12 +98,10 @@ type Article struct {
 				Type    string   `xml:"abbrev-type,attr"`
 			}
 			Publisher struct {
-				XMLName xml.Name `xml:"publisher"`
-				Name    struct {
-					XMLName xml.Name `xml:"publisher-name"`
-					Value   string   `xml:",chardata"`
-				}
-			}
+				Name struct {
+					Value string `xml:",chardata"`
+				} `xml:"publisher-name"`
+			} `xml:"publisher"`
 		} `xml:"journal-meta"`
 		Article struct {
 			XMLName xml.Name `xml:"article-meta"`
