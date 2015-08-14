@@ -1,5 +1,5 @@
 Package: span
-Version: 0.1.50
+Version: 0.1.51
 Section: utils
 Priority: optional
 Architecture: amd64

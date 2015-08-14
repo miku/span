@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.50
+Version:    0.1.51
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -56,6 +56,12 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-import
 
 %changelog
+* Fri Aug 14 2015 Martin Czygan
+- 0.1.51 release
+- no new features, just internal refactoring
+- XML and JSON sources are now simpler to get started with FromJSON, FromXML
+- slight performance gains
+
 * Tue Aug 11 2015 Martin Czygan
 - 0.1.50 release
 - use a pre-script to purge affected artifacts
