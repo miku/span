@@ -21,10 +21,12 @@ const (
 	KeyLengthLimit = 250
 )
 
+// Skip marks records to skip.
 type Skip struct {
 	Reason string
 }
 
+// Error returns the reason for skipping.
 func (s Skip) Error() string {
 	return fmt.Sprintf("SKIP %s", s.Reason)
 }
@@ -103,14 +105,10 @@ func FromJSON(r io.Reader, decoder JSONDecoderFunc) (chan []Importer, error) {
 }
 
 // FromJSONSize returns a channel of slices of importable objects, given a
-// reader, decoder and number of documents to batch. TODO(miku): Internally,
-// the parsing is spread across available cores.
+// reader, decoder and number of documents to batch.
 func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Importer, error) {
-	reader := bufio.NewReader(r)
-	ch := make(chan []Importer)
 
-	// helper to parallelize JSON decoding
-	workerFunc := func(queue chan []string, out chan Importer, wg *sync.WaitGroup) {
+	worker := func(queue chan []string, out chan Importer, wg *sync.WaitGroup) {
 		defer wg.Done()
 		for batch := range queue {
 			for _, s := range batch {
@@ -123,7 +121,8 @@ func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Import
 		}
 	}
 
-	// batcher takes a channel of docs, groups and sends them out
+	ch := make(chan []Importer)
+
 	batcher := func(in chan Importer, done chan bool) {
 		var docs []Importer
 		var i int
@@ -150,18 +149,17 @@ func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Import
 
 	var wg sync.WaitGroup
 
-	// send parsed docs out in batches
 	go batcher(out, done)
 
-	// start workers
 	for i := 0; i < runtime.NumCPU(); i++ {
 		wg.Add(1)
-		go workerFunc(queue, out, &wg)
+		go worker(queue, out, &wg)
 	}
 
-	// group input lines and send the to the queue
+	reader := bufio.NewReader(r)
 	var lines []string
 	var i int
+
 	go func() {
 		for {
 			line, err := reader.ReadString('\n')
