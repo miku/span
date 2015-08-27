@@ -7,7 +7,7 @@ import (
 )
 
 // Solr4vu13v4 tries to sanitize author names a bit more, refs #5702.
-type Solr4Vufind13v4 struct {
+type Solr4Vufind13v5 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet"`
 	Allfields            string   `json:"allfields,omitempty"`
@@ -59,12 +59,12 @@ type Solr4Vufind13v4 struct {
 }
 
 // Attach attaches the ISILs to a record.
-func (s *Solr4Vufind13v4) Attach(isils []string) {
+func (s *Solr4Vufind13v5) Attach(isils []string) {
 	s.Institutions = isils
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr4Vufind13v4) Convert(is finc.IntermediateSchema) error {
+func (s *Solr4Vufind13v5) Convert(is finc.IntermediateSchema) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID
@@ -103,13 +103,16 @@ func (s *Solr4Vufind13v4) Convert(is finc.IntermediateSchema) error {
 		if sanitized == "" {
 			continue
 		}
-		s.SecondaryAuthors = append(s.SecondaryAuthors, sanitized)
+		// first, random author goes into author field, others into secondary field, refs. #5778
+		if s.Author == "" {
+			s.Author = sanitized
+		} else {
+			s.SecondaryAuthors = append(s.SecondaryAuthors, sanitized)
+		}
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
 	}
 
-	if len(s.SecondaryAuthors) > 0 {
-		s.Author = s.SecondaryAuthors[0]
-	} else {
+	if s.Author == "" {
 		s.Author = finc.NOT_ASSIGNED
 	}
 

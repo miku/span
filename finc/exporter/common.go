@@ -1,6 +1,10 @@
 package exporter
 
-import "github.com/miku/span/assetutil"
+import (
+	"strings"
+
+	"github.com/miku/span/assetutil"
+)
 
 var (
 	SubjectMapping = assetutil.MustLoadStringSliceMap("assets/finc/subjects.json")
@@ -20,3 +24,20 @@ var (
 	FormatDeZi4  = assetutil.MustLoadStringMap("assets/finc/formats/dezi4.json")
 	FormatDeZwi2 = assetutil.MustLoadStringMap("assets/finc/formats/dezwi2.json")
 )
+
+// AuthorReplacer is a special cleaner for author names.
+var AuthorReplacer = strings.NewReplacer(
+	"- -", "",
+	"anonym", "",
+	"Anonymous", "",
+	"EB", "",
+	"keine Angabe", "",
+	"mg", "",
+	"MM", "",
+	"mm", "",
+	"No authorship indicated", "",
+	"Not Available, Not Available", "",
+	"O.V.", "",
+	"ps", "",
+	"rb", "",
+	"et al", "")
