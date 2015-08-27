@@ -18,22 +18,6 @@ Library data conversions.
 %build
 
 %pre
-PATH=$PATH:/usr/local/bin:/usr/local/sbin
-
-type taskhome > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-    echo "SPAN: Purging obsolete data artifacts..."
-    rm -vrf $(taskhome)/028/DOAJIntermediateSchema
-    rm -vrf $(taskhome)/048/GBIIntermediateSchema
-    rm -vrf $(taskhome)/ai/AIExport
-    rm -vrf $(taskhome)/ai/AIIntermediateSchema
-    rm -vrf $(taskhome)/crossref/CrossrefIntermediateSchema
-    rm -vrf $(taskhome)/degruyter/DegruyterIntermediateSchema
-    rm -vrf $(taskhome)/jstor/JstorIntermediateSchema
-else
-    echo "SPAN: Nothing to do for pre or siskin not installed and configured."
-fi
-
 
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
