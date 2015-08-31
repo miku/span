@@ -215,7 +215,11 @@ func (f DOIFilter) Apply(is finc.IntermediateSchema) bool {
 type ISILTagger map[string][]Filter
 
 // Tags returns all ISILs that could be attached to a given intermediate
-// schema record.
+// schema record. If an ISIL has multiple filters, each filter is applied in
+// order, if any matches, the ISIL is added. TODO(miku): maybe we need order,
+// like "attach any record, but filter out those, that contain x in field y"
+// or attach all records where x == y, but of those ignore those, that are
+// given in this list, etc.
 func (t ISILTagger) Tags(is finc.IntermediateSchema) []string {
 	isils := container.NewStringSet()
 	for isil, filters := range t {
