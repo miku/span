@@ -107,7 +107,7 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 func main() {
 
 	// TODO(miku): find better way specify custom filters
-	var hfiles, lfiles, cfiles, any, source container.StringSlice
+	var hfiles, lfiles, cfiles, dfiles, any, source container.StringSlice
 	flag.Var(&hfiles, "f", "ISIL:/path/to/ovid.xml")
 	flag.Var(&lfiles, "l", "ISIL:/path/to/list.txt")
 	flag.Var(&cfiles, "c", "ISIL:/path/to/collections.txt")
