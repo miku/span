@@ -27,6 +27,8 @@ const (
 
 type Document struct {
 	ID               string   `xml:"ID,attr"`
+	DB               string   `xml:"DB,attr"`
+	IDNAME           string   `xml:"IDNAME,attr"`
 	ISSN             string   `xml:"ISSN"`
 	Source           string   `xml:"Source"`
 	PublicationTitle string   `xml:"Publication-Title"`
