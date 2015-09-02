@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
-Copyright (c) 2015 Leipzig University Library, http://www.ub.uni-leipzig.de
+Copyright (c) 2015 Leipzig University Library, http://www.ub.uni-leipzig.de,
+                   The Finc Project, https://finc.info,
                    Martin Czygan <martin.czygan@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,3 +21,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+----
+
+This software (span) makes use of
+
+Compact Language Detector 2, Dick Sites dsites@google.com,
+https://github.com/CLD2Owners/cld2, Apache License Version 2.0
