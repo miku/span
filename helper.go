@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"html"
 	"io"
+	"log"
 	"strings"
 
 	"github.com/rainycape/cld2"
@@ -20,10 +21,16 @@ func UnescapeTrim(s string) string {
 func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	f := bufio.NewWriter(w)
 	for b := range out {
-		f.Write(b[:])
-		f.Write([]byte("\n"))
+		if _, err := f.Write(b[:]); err != nil {
+			log.Fatal(err)
+		}
+		if _, err := f.Write([]byte("\n")); err != nil {
+			log.Fatal(err)
+		}
 	}
-	f.Flush()
+	if err := f.Flush(); err != nil {
+		log.Fatal(err)
+	}
 	done <- true
 }
 
