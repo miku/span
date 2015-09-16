@@ -41,7 +41,7 @@ type Response struct {
 }
 
 type Document struct {
-	BibJson BibJson `json:"bibjson"`
+	BibJson BibJSON `json:"bibjson"`
 	Created string  `json:"created_date"`
 	ID      string  `json:"id"`
 	Index   Index   `json:"index"`
@@ -98,7 +98,7 @@ type Identifier struct {
 	Type string `json:"type"`
 }
 
-type BibJson struct {
+type BibJSON struct {
 	Abstract   string       `json:"abstract"`
 	Author     []Author     `json:"author"`
 	EndPage    string       `json:"end_page"`
