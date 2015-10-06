@@ -169,6 +169,14 @@ type ExportSchema interface {
 }
 ```
 
+Licence
+-------
+
+* GPL
+* [CLD2](https://github.com/CLD2Owners/cld2): Compact Language Detector 2, Dick Sites dsites@google.com, Apache License Version 2.0
+
+----
+
 TODO
 ----
 
