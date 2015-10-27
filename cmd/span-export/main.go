@@ -33,6 +33,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"sort"
 	"strings"
 	"sync"
 
@@ -156,9 +157,12 @@ func main() {
 	}
 
 	if *listFormats {
-		for k := range Exporters {
-			fmt.Println(k)
+		var keys []string
+		for key := range Exporters {
+			keys = append(keys, key)
 		}
+		sort.Strings(keys)
+		fmt.Println(strings.Join(keys, "\n"))
 		os.Exit(0)
 	}
 
