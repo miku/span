@@ -165,6 +165,11 @@ func (is *IntermediateSchema) ISSNList() []string {
 	return issns
 }
 
+func (is *IntermediateSchema) ParsedDate() time.Time {
+	t, _ := time.Parse("2006-01-02", is.RawDate)
+	return t
+}
+
 // Allfields returns a combination of various fields.
 func (is *IntermediateSchema) Allfields() string {
 	var authors []string
