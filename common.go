@@ -28,6 +28,7 @@ import (
 	"io"
 	"log"
 	"runtime"
+	"strings"
 	"sync"
 
 	"github.com/miku/span/finc"
@@ -189,6 +190,9 @@ func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Import
 			}
 			if err != nil {
 				log.Fatal(err)
+			}
+			if strings.TrimSpace(line) == "" {
+				continue
 			}
 			i++
 			lines = append(lines, line)

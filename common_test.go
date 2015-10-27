@@ -36,7 +36,9 @@ func unroll(ch chan []Importer) []Importer {
 	return docs
 }
 
-var mockReader = strings.NewReader(`{"name": "Anna"}
+var mockReader = strings.NewReader(`
+			{"name": "Anna"}
+
 			{"name": "Beryl"}
 			{"name": "Coran"}
 `)
