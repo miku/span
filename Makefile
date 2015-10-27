@@ -8,6 +8,9 @@ export PATH := /home/vagrant/bin:$(PATH)
 test: assets deps
 	go test -v ./...
 
+bench:
+	go test -bench .
+
 deps:
 	go get ./...
 

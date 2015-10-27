@@ -78,3 +78,66 @@ func TestFromJSONSize(t *testing.T) {
 		}
 	}
 }
+
+type mockSchemaReader struct {
+	current int
+	size    int
+}
+
+var sampleLine = []byte(`{"name": "TESTVALUE"}\n`)
+
+func (r *mockSchemaReader) Read(p []byte) (n int, err error) {
+	if r.current == r.size {
+		return 0, io.EOF
+	}
+	n = len(p)
+	if n == 0 {
+		return 0, nil
+	}
+	n = copy(p, sampleLine)
+	r.current += 1
+	return n, nil
+}
+
+func BenchmarkMockSchemaReader10k(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		rdr := &mockSchemaReader{size: 10000}
+		for {
+			p := make([]byte, 24)
+			_, err := rdr.Read(p)
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				b.Error(err)
+			}
+		}
+	}
+}
+
+func BenchmarkFromJSONSize10kDocs10Batch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := FromJSONSize(&mockSchemaReader{size: 10000}, mockDecoder, 10)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkFromJSONSize10kDocs100Batch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := FromJSONSize(&mockSchemaReader{size: 10000}, mockDecoder, 100)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkFromJSONSize10kDocs1kBatch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := FromJSONSize(&mockSchemaReader{size: 10000}, mockDecoder, 1000)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
