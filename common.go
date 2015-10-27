@@ -187,6 +187,7 @@ func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Import
 
 	go func() {
 		for {
+			// TODO(miku): []byte slice should be more appropriate
 			line, err := reader.ReadString('\n')
 			if err == io.EOF {
 				break
