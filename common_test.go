@@ -10,22 +10,26 @@ import (
 	"github.com/miku/span/finc"
 )
 
+// mockSchema is a toy schema.
 type mockSchema struct {
 	Name string `json:"name"`
 }
 
+// ToIntermediateSchema is a toy converter.
 func (s mockSchema) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is := finc.NewIntermediateSchema()
 	is.ArticleTitle = s.Name
 	return is, nil
 }
 
+// mockDecoder is a toy decoder.
 func mockDecoder(s string) (Importer, error) {
 	var target mockSchema
 	err := json.Unmarshal([]byte(s), &target)
 	return target, err
 }
 
+// unroll turns a chan of importer batches into a slice of importers.
 func unroll(ch chan []Importer) []Importer {
 	var docs []Importer
 	for batch := range ch {
@@ -36,6 +40,7 @@ func unroll(ch chan []Importer) []Importer {
 	return docs
 }
 
+// mockReader is a sample JSON input file.
 var mockReader = strings.NewReader(`
 			{"name": "Anna"}
 
@@ -43,7 +48,7 @@ var mockReader = strings.NewReader(`
 			{"name": "Coran"}
 `)
 
-// func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Importer, error) {
+// TestFromJSONSize reading a JSON file into span.Importer values.
 func TestFromJSONSize(t *testing.T) {
 	var cases = []struct {
 		r       io.Reader
@@ -55,6 +60,7 @@ func TestFromJSONSize(t *testing.T) {
 		{
 			mockReader,
 			mockDecoder,
+			// if size is 1, the goroutines start to randomize the output order
 			3,
 			[]Importer{mockSchema{Name: "Anna"}, mockSchema{Name: "Beryl"}, mockSchema{Name: "Coran"}},
 			nil,

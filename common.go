@@ -69,7 +69,8 @@ type Source interface {
 // start element.
 type XMLDecoderFunc func(*xml.Decoder, xml.StartElement) (Importer, error)
 
-// FromXML is like FromXMLSize, with a default batch size of 2000 XML documents.
+// FromXML is like FromXMLSize, with a default batch size of 2000 XML
+// documents.
 func FromXML(r io.Reader, name string, decoderFunc XMLDecoderFunc) (chan []Importer, error) {
 	return FromXMLSize(r, name, decoderFunc, 2000)
 }
@@ -77,7 +78,7 @@ func FromXML(r io.Reader, name string, decoderFunc XMLDecoderFunc) (chan []Impor
 // FromXMLSize returns a channel of importable document slices given a reader
 // over XML, a name of the XML start element, a XMLDecoderFunc callback that
 // deserializes an XML snippet and a batch size. TODO(miku): more idiomatic
-// error handling, e.g. over error channel
+// error handling, e.g. over error channel.
 func FromXMLSize(r io.Reader, name string, decoderFunc XMLDecoderFunc, size int) (chan []Importer, error) {
 	ch := make(chan []Importer)
 
@@ -118,16 +119,18 @@ func FromXMLSize(r io.Reader, name string, decoderFunc XMLDecoderFunc, size int)
 	return ch, nil
 }
 
-// JSONDecoderFunc turns a string into an importable object.
+// JSONDecoderFunc turns a string into a single importable object.
 type JSONDecoderFunc func(s string) (Importer, error)
 
-// FromJSON returns a channel of slices of importable objects.
+// FromJSON returns a channel of slices of importable objects with a default
+// batch size of 20000 docs.
 func FromJSON(r io.Reader, decoder JSONDecoderFunc) (chan []Importer, error) {
 	return FromJSONSize(r, decoder, 20000)
 }
 
-// FromJSONSize returns a channel of slices of importable objects, given a
-// reader, decoder and number of documents to batch.
+// FromJSONSize returns a channel of slices of importable values, given a
+// reader, decoder (for a single value) and number of documents to batch.
+// Important: Due to fan-out input and output order will differ.
 func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Importer, error) {
 
 	worker := func(queue chan []string, out chan Importer, wg *sync.WaitGroup) {
