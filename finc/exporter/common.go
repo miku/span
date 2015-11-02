@@ -63,4 +63,7 @@ var AuthorReplacer = strings.NewReplacer(
 	"rb", "",
 	"et al", "",
 	"index", "",
-	"Index", "")
+	"Index", "",
+	"Author Index", "",
+	"AUTHOR Index", "",
+	"AUTHOR INDEX", "")
