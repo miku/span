@@ -95,6 +95,7 @@ type Document struct {
 				LastPage           string   `xml:"LastPage"`
 				VernacularLanguage string   `xml:"VernacularLanguage"`
 				Language           string   `xml:"Language"`
+				Subject            []string `xml:"subject"`
 				Links              []string `xml:"Links>Link"`
 				History            []struct {
 					PubDate struct {
@@ -182,6 +183,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, link := range article.Links {
 		output.URL = append(output.URL, link)
 	}
+
+	output.Subjects = article.Subject
 
 	if article.Language != "" {
 		output.Languages = append(output.Languages, strings.ToLower(article.Language))
