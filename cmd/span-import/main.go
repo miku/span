@@ -32,6 +32,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"sort"
 	"sync"
 
 	"github.com/miku/span"
@@ -119,8 +120,13 @@ func main() {
 	runtime.GOMAXPROCS(*numWorkers)
 
 	if *listFormats {
+		var names []string
 		for k := range formats {
-			fmt.Println(k)
+			names = append(names, k)
+		}
+		sort.Strings(names)
+		for _, name := range names {
+			fmt.Println(name)
 		}
 		os.Exit(0)
 	}
