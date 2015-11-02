@@ -33,8 +33,8 @@ import (
 )
 
 const (
-	SourceID = "60"
-	// Format   = "ElectronicArticle"
+	SourceID   = "60"
+	Format     = "ElectronicArticle"
 	Collection = "Thieme"
 	Genre      = "article"
 )
@@ -58,88 +58,86 @@ func (s Thieme) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 }
 
 type Document struct {
-	Identifier struct {
-		Value string `xml:",chardata"`
-	} `xml:"header>identifier"`
-	Metadata struct {
+	Identifier string `xml:"header>identifier"`
+	Metadata   struct {
 		ArticleSet struct {
 			Article struct {
-				VernacularTitle struct {
-					VernacularLanguage struct {
-						Abstract struct {
-							Value string `xml:",chardata"`
-						} `xml:"abstract"`
-						AuthorList struct {
-							Author []struct {
-								FirstName struct {
-								} `xml:"firstname"`
-								LastName struct {
-								} `xml:"lastname"`
-							} `xml:"author"`
-						} `xml:"authorlist"`
-					} `xml:"vernacularlanguage"`
-				} `xml:"vernaculartitle"`
-				Title struct {
-					Value string `xml:",chardata"`
-				} `xml:"articletitle"`
 				Journal struct {
-					Publisher struct {
-						Name string `xml:",chardata"`
-					} `xml:"publishername"`
-					Title struct {
-						Value string `xml:",chardata"`
-					} `xml:"journaltitle"`
-					ISSN struct {
-						Value string `xml:",chardata"`
-					} `xml:"issn"`
-					EISSN struct {
-						Value string `xml:",chardata"`
-					} `xml:"e-issn"`
-					Volume struct {
-						Value string `xml:",chardata"`
-					} `xml:"volume"`
-					Issue struct {
-						Value string `xml:",chardata"`
-					} `xml:"issue"`
+					PublisherName string `xml:"PublisherName"`
+					JournalTitle  string `xml:"JournalTitle"`
+					ISSN          string `xml:"Issn"`
+					EISSN         string `xml:"E-Issn"`
+					Volume        string `xml:"Volume"`
+					Issue         string `xml:"Issue"`
+					PubDate       struct {
+						Year  string `xml:"Year"`
+						Month string `xml:"Month"`
+						Day   string `xml:"Day"`
+					} `xml:"PubDate"`
+				} `xml:"Journal"`
+				AuthorList struct {
+					Author []struct {
+						FirstName string `xml:"FirstName"`
+						LastName  string `xml:"LastName"`
+					} `xml:"Author"`
+				} `xml:"AuthorList"`
+				ArticleIdList []struct {
+					ArticleId struct {
+						OpenAccess string `xml:"OpenAccess,attr"`
+						IdType     string `xml:"IdType,attr"`
+						Id         string `xml:",chardata"`
+					}
+				} `xml:"ArticleIdList"`
+				ArticleType        string   `xml:"ArticleType"`
+				ArticleTitle       string   `xml:"ArticleTitle"`
+				VernacularTitle    string   `xml:"VernacularTitle"`
+				FirstPage          string   `xml:"FirstPage"`
+				LastPage           string   `xml:"LastPage"`
+				VernacularLanguage string   `xml:"VernacularLanguage"`
+				Language           string   `xml:"Language"`
+				Links              []string `xml:"Links>Link"`
+				History            []struct {
 					PubDate struct {
-						Year struct {
-							Value string `xml:",chardata"`
-						} `xml:"year"`
-						Month struct {
-							Value string `xml:",chardata"`
-						} `xml:"month"`
-						Day struct {
-							Value string `xml:",chardata"`
-						} `xml:"day"`
-					} `xml:"pubdate"`
-				} `xml:"journal"`
-			} `xml:"article"`
-		} `xml:"articleset"`
+						Status string `xml:"PubStatus,attr"`
+						Year   string `xml:"Year"`
+						Month  string `xml:"Month"`
+						Day    string `xml:"Day"`
+					} `xml:"PubDate"`
+				} `xml:"History"`
+				Abstract           string `xml:"Abstract"`
+				VernacularAbstract string `xml:"VernacularAbstract"`
+				Format             struct {
+					HTML string `xml:"html,attr"`
+					PDF  string `xml:"pdf,attr"`
+				} `xml:"format"`
+				CopyrightInformation string `xml:"CopyrightInformation"`
+			} `xml:"Article"`
+		} `xml:"ArticleSet"`
 	} `xml:"metadata"`
 }
 
 func (doc Document) Date() (time.Time, error) {
 	pd := doc.Metadata.ArticleSet.Article.Journal.PubDate
 
-	if pd.Month.Value == "0" {
-		pd.Month.Value = "01"
+	if pd.Month == "0" {
+		pd.Month = "01"
 	}
-	if pd.Day.Value == "0" {
-		pd.Day.Value = "01"
+	if pd.Day == "0" {
+		pd.Day = "01"
 	}
 
-	if pd.Year.Value != "" && pd.Month.Value != "" && pd.Day.Value != "" {
-		s := fmt.Sprintf("%s-%s-%s", leftPad(pd.Year.Value, "0", 4),
-			leftPad(pd.Month.Value, "0", 2), leftPad(pd.Day.Value, "0", 2))
+	if pd.Year != "" && pd.Month != "" && pd.Day != "" {
+		s := fmt.Sprintf("%s-%s-%s", leftPad(pd.Year, "0", 4),
+			leftPad(pd.Month, "0", 2), leftPad(pd.Day, "0", 2))
 		return time.Parse("2006-01-02", s)
 	}
-	if pd.Year.Value != "" && pd.Month.Value != "" {
-		s := fmt.Sprintf("%s-%s-01", leftPad(pd.Year.Value, "0", 4),
-			leftPad(pd.Month.Value, "0", 2))
+	if pd.Year != "" && pd.Month != "" {
+		s := fmt.Sprintf("%s-%s-01", leftPad(pd.Year, "0", 4),
+			leftPad(pd.Month, "0", 2))
 		return time.Parse("2006-01-02", s)
 	}
-	if pd.Year.Value != "" {
-		s := fmt.Sprintf("%s-01-01", leftPad(pd.Year.Value, "0", 4))
+	if pd.Year != "" {
+		s := fmt.Sprintf("%s-01-01", leftPad(pd.Year, "0", 4))
 		return time.Parse("2006-01-02", s)
 	}
 	return time.Time{}, fmt.Errorf("invalid date")
@@ -148,7 +146,7 @@ func (doc Document) Date() (time.Time, error) {
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	output.RecordID = doc.Identifier.Value
+	output.RecordID = doc.Identifier
 	output.SourceID = SourceID
 	output.MegaCollection = Collection
 	output.Genre = Genre
@@ -160,27 +158,38 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Date = date
 
 	journal := doc.Metadata.ArticleSet.Article.Journal
-	if journal.Publisher.Name != "" {
-		output.Publishers = append(output.Publishers, journal.Publisher.Name)
+	if journal.PublisherName != "" {
+		output.Publishers = append(output.Publishers, journal.PublisherName)
 	}
 
-	if journal.Title.Value == "" {
+	if journal.JournalTitle == "" {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.RecordID)}
 	}
 
-	output.JournalTitle = journal.Title.Value
-	output.ISSN = append(output.ISSN, journal.ISSN.Value)
-	output.EISSN = append(output.EISSN, journal.ISSN.Value)
-	output.Volume = journal.Volume.Value
-	output.Issue = journal.Issue.Value
+	output.JournalTitle = journal.JournalTitle
+	output.ISSN = append(output.ISSN, journal.ISSN)
+	output.EISSN = append(output.EISSN, journal.EISSN)
+	output.Volume = journal.Volume
+	output.Issue = journal.Issue
 
 	article := doc.Metadata.ArticleSet.Article
-	if article.Title.Value == "" {
-		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.RecordID)}
+
+	output.Abstract = article.Abstract
+	if output.Abstract == "" {
+		output.Abstract = article.VernacularAbstract
 	}
 
-	output.ArticleTitle = article.Title.Value
-	output.Abstract = article.VernacularTitle.VernacularLanguage.Abstract.Value
+	for _, link := range article.Links {
+		output.URL = append(output.URL, link)
+	}
+
+	if article.Language != "" {
+		output.Languages = append(output.Languages, strings.ToLower(article.Language))
+	} else {
+		if article.VernacularLanguage != "" {
+			output.Languages = append(output.Languages, strings.ToLower(article.VernacularLanguage))
+		}
+	}
 
 	return output, nil
 }
