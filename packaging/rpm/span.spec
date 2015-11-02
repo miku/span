@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.52
+Version:    0.1.53
 Release:    0
 License:    MIT
 BuildArch:  x86_64
@@ -40,6 +40,21 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-import
 
 %changelog
+* Mon Nov 2 2015 Martin Czygan
+- 0.1.53 release
+- span-import: sort format name output
+- thieme: add subject
+- thieme: rework XML parsing
+- exporter: add more words to author blacklist
+- export: strip Index from author field, refs #6326
+- add simple test for TestFromJSONSize
+- export: fix date and rawdate, refs #6266
+- span-export -list sorted output formats
+- embed and reuse export structs
+- update LICENCE to GPL
+- span-export: allow DOI filter per ISIL as well
+- genios: add two more document attributes
+
 * Fri Aug 14 2015 Martin Czygan
 - 0.1.51 release
 - no new features, just internal refactoring
