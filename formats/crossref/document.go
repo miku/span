@@ -15,7 +15,8 @@ type DateField struct {
 	Timestamp int64      `json:"timestamp"`
 }
 
-// Document is a example 'works' API response.
+// Document is a example 'works' API response message.
+// http://api.crossref.org/works/10.1002/14651858.cd000179
 type Document struct {
 	Authors        []Author  `json:"author"`
 	ContainerTitle []string  `json:"container-title"`
