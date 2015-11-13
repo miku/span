@@ -58,7 +58,7 @@ var (
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
 
 	// ArticleTitleBlocker will trigger skips, if article title matches exactly.
-	ArticleTitleBlocker = []string{"Titelei", "Front Matter"}
+	ArticleTitleBlocker = []string{"Titelei", "Front Matter", "Advertisement", "Advertisement:"}
 
 	// Future, if a publication date lies beyond it, it gets skipped.
 	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
