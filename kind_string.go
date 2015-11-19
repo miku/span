@@ -4,9 +4,9 @@ package span
 
 import "fmt"
 
-const _Kind_name = "KeyTooLongInvalidStartPageInvalidEndPageEndPageBeforeStartPageInvalidURL"
+const _Kind_name = "KeyTooLongInvalidStartPageInvalidEndPageEndPageBeforeStartPageInvalidURLSuspiciousPageCount"
 
-var _Kind_index = [...]uint8{0, 10, 26, 40, 62, 72}
+var _Kind_index = [...]uint8{0, 10, 26, 40, 62, 72, 91}
 
 func (i Kind) String() string {
 	if i < 0 || i+1 >= Kind(len(_Kind_index)) {
