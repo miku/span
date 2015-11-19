@@ -198,7 +198,6 @@ func (d *DateField) Date() (t time.Time, err error) {
 	switch len(parts) {
 	case 1:
 		ds = fmt.Sprintf("%04d-01-01", parts[0])
-		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-01-01", parts[0]))
 	case 2:
 		ds = fmt.Sprintf("%04d-%02d-01", parts[0], parts[1])
 	case 3:
