@@ -147,6 +147,13 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 	})
 }
 
+func (doc Document) Authors() (authors []finc.Author) {
+	for _, author := range doc.BibJson.Author {
+		authors = append(authors, finc.Author{Name: author.Name})
+	}
+	return authors
+}
+
 // Date return the document date. Journals entries usually have no date, so
 // they will err.
 func (doc Document) Date() (time.Time, error) {
@@ -190,19 +197,19 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(id) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
 	}
-	output.RecordID = id
-	output.Genre = Genre
 
+	output.ArticleTitle = doc.BibJson.Title
+	output.Authors = doc.Authors()
 	output.DOI = doc.DOI()
 	output.Format = Format
-	output.MegaCollection = Collection
-	output.SourceID = SourceID
-
+	output.Genre = Genre
 	output.ISSN = doc.Index.ISSN
-	output.ArticleTitle = doc.BibJson.Title
 	output.JournalTitle = doc.BibJson.Journal.Title
-	output.Volume = doc.BibJson.Journal.Volume
+	output.MegaCollection = Collection
 	output.Publishers = append(output.Publishers, doc.BibJson.Journal.Publisher)
+	output.RecordID = id
+	output.SourceID = SourceID
+	output.Volume = doc.BibJson.Journal.Volume
 
 	for _, link := range doc.BibJson.Link {
 		output.URL = append(output.URL, link.URL)
@@ -236,10 +243,6 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		languages.Add(LanguageMap.LookupDefault(l, "und"))
 	}
 	output.Languages = languages.Values()
-
-	for _, author := range doc.BibJson.Author {
-		output.Authors = append(output.Authors, finc.Author{Name: author.Name})
-	}
 
 	return output, nil
 }
