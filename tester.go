@@ -25,7 +25,7 @@ const (
 
 var (
 	// EarliestDate is the earliest publication date we accept.
-	EarliestDate, _ = time.Parse("2006", "1458")
+	EarliestDate = time.Date(1458, 1, 1, 0, 0, 0, 0, time.UTC)
 	// LatestDate represents the latest publication date we accept.
 	LatestDate = time.Now().AddDate(5, 0, 0)
 )
