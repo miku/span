@@ -9,7 +9,7 @@ import (
 var ErrInvalidISSN = errors.New("invalid ISSN")
 
 var (
-	replacer = strings.NewReplacer("-", "")
+	replacer = strings.NewReplacer("-", "", " ", "")
 	pattern  = regexp.MustCompile("^[0-9]{7}[0-9X]$")
 )
 
@@ -28,5 +28,8 @@ func (s ISSN) Validate() error {
 
 func (s ISSN) String() string {
 	t := strings.TrimSpace(strings.ToUpper(replacer.Replace(string(s))))
+	if len(t) != 8 {
+		return string(s)
+	}
 	return t[:4] + "-" + t[4:]
 }
