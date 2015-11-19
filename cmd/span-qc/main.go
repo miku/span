@@ -13,6 +13,8 @@ import (
 	"github.com/miku/span/finc"
 )
 
+var tests = span.DefaultTests
+
 func main() {
 	flag.Parse()
 
@@ -26,7 +28,6 @@ func main() {
 	}
 
 	reader := bufio.NewReader(file)
-	tests := span.DefaultTests
 
 	var i, issues int
 
@@ -35,10 +36,15 @@ func main() {
 
 	dist := make(map[span.Kind]int)
 
-	go func() {
-		<-c
+	printSummary := func() {
 		log.Printf("%v total, %v ok, %v or %0.3f%% with issues", i, i-issues, issues, float64(issues)/float64(i-issues)*100)
 		log.Println(dist)
+	}
+
+	// handle signal
+	go func() {
+		<-c
+		printSummary()
 		os.Exit(0)
 	}()
 
@@ -60,13 +66,21 @@ func main() {
 		for _, t := range tests {
 			err := t.TestRecord(is)
 			if err != nil {
-				log.Println(err)
 				hasIssues = true
-				dist[err.(span.QualityIssue).Kind]++
+				switch e := err.(type) {
+				case span.QualityIssue:
+					dist[e.Kind]++
+				default:
+					log.Fatalf("invalid error type: %T", err)
+				}
 			}
 		}
 		if hasIssues {
 			issues++
 		}
+		if i%1000000 == 0 {
+			log.Println(i)
+		}
 	}
+	printSummary()
 }
