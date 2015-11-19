@@ -194,24 +194,17 @@ func (d *DateField) Date() (t time.Time, err error) {
 		return t, errNoDate
 	}
 	parts := d.DateParts[0]
+	var ds string
 	switch len(parts) {
 	case 1:
+		ds = fmt.Sprintf("%04d-01-01", parts[0])
 		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-01-01", parts[0]))
-		if err != nil {
-			return t, err
-		}
 	case 2:
-		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-01", parts[0], parts[1]))
-		if err != nil {
-			return t, err
-		}
+		ds = fmt.Sprintf("%04d-%02d-01", parts[0], parts[1])
 	case 3:
-		t, err = time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", parts[0], parts[1], parts[2]))
-		if err != nil {
-			return t, err
-		}
+		ds = fmt.Sprintf("%04d-%02d-%02d", parts[0], parts[1], parts[2])
 	}
-	return t, err
+	return time.Parse("2006-01-02", ds)
 }
 
 // CombinedTitle returns a longish title.
