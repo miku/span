@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
 
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
@@ -26,7 +27,20 @@ func main() {
 
 	reader := bufio.NewReader(file)
 	tests := span.DefaultTests
-	i := 0
+
+	var i, issues int
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	dist := make(map[span.Kind]int)
+
+	go func() {
+		<-c
+		log.Printf("%v total, %v ok, %v or %0.3f%% with issues", i, i-issues, issues, float64(issues)/float64(i-issues)*100)
+		log.Println(dist)
+		os.Exit(0)
+	}()
 
 	for {
 		b, err := reader.ReadBytes('\n')
@@ -42,11 +56,17 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		hasIssues := false
 		for _, t := range tests {
 			err := t.TestRecord(is)
 			if err != nil {
 				log.Println(err)
+				hasIssues = true
+				dist[err.(span.QualityIssue).Kind]++
 			}
+		}
+		if hasIssues {
+			issues++
 		}
 	}
 }
