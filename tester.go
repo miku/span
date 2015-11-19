@@ -2,6 +2,7 @@ package span
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 
 	"github.com/miku/span/finc"
@@ -12,8 +13,10 @@ type Kind int
 
 const (
 	KeyTooLong Kind = iota
-	InvalidPage
+	InvalidStartPage
+	InvalidEndPage
 	EndPageBeforeStartPage
+	InvalidURL
 )
 
 type QualityError struct {
@@ -29,11 +32,21 @@ func (e QualityError) Error() string {
 var DefaultTests = []RecordTester{
 	RecordTesterFunc(KeyLength),
 	RecordTesterFunc(PlausiblePageCount),
+	RecordTesterFunc(ValidURL),
 }
 
 func KeyLength(is finc.IntermediateSchema) error {
 	if len(is.RecordID) > 250 {
 		return QualityError{Kind: KeyTooLong, RecordID: is.RecordID, Message: "key too long"}
+	}
+	return nil
+}
+
+func ValidURL(is finc.IntermediateSchema) error {
+	for _, s := range is.URL {
+		if _, err := url.Parse(s); err != nil {
+			return QualityError{Kind: InvalidURL, RecordID: is.RecordID, Message: s}
+		}
 	}
 	return nil
 }
@@ -46,10 +59,10 @@ func PlausiblePageCount(is finc.IntermediateSchema) error {
 					return QualityError{Kind: EndPageBeforeStartPage, RecordID: is.RecordID, Message: fmt.Sprintf("%v-%v", s, e)}
 				}
 			} else {
-				return QualityError{Kind: InvalidPage, RecordID: is.RecordID, Message: fmt.Sprintf("end page: %v", e)}
+				return QualityError{Kind: InvalidEndPage, RecordID: is.RecordID, Message: fmt.Sprintf("%v", e)}
 			}
 		} else {
-			return QualityError{Kind: InvalidPage, RecordID: is.RecordID, Message: fmt.Sprintf("start page: %v", s)}
+			return QualityError{Kind: InvalidStartPage, RecordID: is.RecordID, Message: fmt.Sprintf("%v", s)}
 		}
 	}
 	return nil
