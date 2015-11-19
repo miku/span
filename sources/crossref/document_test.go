@@ -27,24 +27,6 @@ import (
 	"time"
 )
 
-func TestAuthorString(t *testing.T) {
-	var tests = []struct {
-		a Author
-		s string
-	}{
-		{a: Author{Given: "John", Family: "Doe"}, s: "Doe, John"},
-		{a: Author{Family: "Doe"}, s: "Doe"},
-		{a: Author{Given: "John"}, s: "John"},
-	}
-
-	for _, tt := range tests {
-		s := tt.a.String()
-		if s != tt.s {
-			t.Errorf("Author.String(): got %v, want %v", s, tt.s)
-		}
-	}
-}
-
 func MustParse(layout, s string) time.Time {
 	t, err := time.Parse(layout, s)
 	if err != nil {

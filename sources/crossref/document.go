@@ -186,6 +186,8 @@ func (d *DateField) Date() (t time.Time, err error) {
 		ds = fmt.Sprintf("%04d-%02d-01", parts[0], parts[1])
 	case 3:
 		ds = fmt.Sprintf("%04d-%02d-%02d", parts[0], parts[1], parts[2])
+	default:
+		return t, nil
 	}
 	return time.Parse("2006-01-02", ds)
 }

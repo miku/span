@@ -23,9 +23,9 @@ func (s mockSchema) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 }
 
 // mockDecoder is a toy decoder.
-func mockDecoder(s string) (Importer, error) {
+func mockDecoder(b []byte) (Importer, error) {
 	var target mockSchema
-	err := json.Unmarshal([]byte(s), &target)
+	err := json.Unmarshal(b, &target)
 	return target, err
 }
 
@@ -49,10 +49,10 @@ var mockReader = strings.NewReader(`
 `)
 
 // TestFromJSONSize reading a JSON file into span.Importer values.
-func TestFromJSONSize(t *testing.T) {
+func TestFromLinesSize(t *testing.T) {
 	var cases = []struct {
 		r       io.Reader
-		decoder JSONDecoderFunc
+		decoder ImporterFunc
 		size    int
 		result  []Importer
 		err     error
@@ -68,7 +68,7 @@ func TestFromJSONSize(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		result, err := FromJSONSize(c.r, c.decoder, c.size)
+		result, err := FromLinesSize(c.r, c.decoder, c.size)
 		docs := unroll(result)
 		if err != c.err {
 			t.Errorf("got %v, want %v", err, c.err)
@@ -117,7 +117,7 @@ func BenchmarkMockSchemaReader10k(b *testing.B) {
 
 func BenchmarkFromJSONSize10kDocs10Batch(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, err := FromJSONSize(&mockSchemaReader{size: 10000}, mockDecoder, 10)
+		_, err := FromLinesSize(&mockSchemaReader{size: 10000}, mockDecoder, 10)
 		if err != nil {
 			b.Error(err)
 		}
@@ -126,7 +126,7 @@ func BenchmarkFromJSONSize10kDocs10Batch(b *testing.B) {
 
 func BenchmarkFromJSONSize10kDocs100Batch(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, err := FromJSONSize(&mockSchemaReader{size: 10000}, mockDecoder, 100)
+		_, err := FromLinesSize(&mockSchemaReader{size: 10000}, mockDecoder, 100)
 		if err != nil {
 			b.Error(err)
 		}
@@ -135,7 +135,7 @@ func BenchmarkFromJSONSize10kDocs100Batch(b *testing.B) {
 
 func BenchmarkFromJSONSize10kDocs1kBatch(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, err := FromJSONSize(&mockSchemaReader{size: 10000}, mockDecoder, 1000)
+		_, err := FromLinesSize(&mockSchemaReader{size: 10000}, mockDecoder, 1000)
 		if err != nil {
 			b.Error(err)
 		}
