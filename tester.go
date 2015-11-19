@@ -19,14 +19,14 @@ const (
 	InvalidURL
 )
 
-type QualityError struct {
-	Kind     Kind
-	RecordID string
-	Message  string
+type QualityIssue struct {
+	Kind    Kind
+	Record  finc.IntermediateSchema
+	Message string
 }
 
-func (e QualityError) Error() string {
-	return fmt.Sprintf("%s: %s: %s", e.RecordID, e.Kind, e.Message)
+func (e QualityIssue) Error() string {
+	return fmt.Sprintf("%s: %s: %s", e.Record.RecordID, e.Kind, e.Message)
 }
 
 var DefaultTests = []RecordTester{
@@ -37,7 +37,7 @@ var DefaultTests = []RecordTester{
 
 func KeyLength(is finc.IntermediateSchema) error {
 	if len(is.RecordID) > 250 {
-		return QualityError{Kind: KeyTooLong, RecordID: is.RecordID, Message: "key too long"}
+		return QualityIssue{Kind: KeyTooLong, Record: is}
 	}
 	return nil
 }
@@ -45,7 +45,7 @@ func KeyLength(is finc.IntermediateSchema) error {
 func ValidURL(is finc.IntermediateSchema) error {
 	for _, s := range is.URL {
 		if _, err := url.Parse(s); err != nil {
-			return QualityError{Kind: InvalidURL, RecordID: is.RecordID, Message: s}
+			return QualityIssue{Kind: InvalidURL, Record: is, Message: s}
 		}
 	}
 	return nil
@@ -56,13 +56,13 @@ func PlausiblePageCount(is finc.IntermediateSchema) error {
 		if s, err := strconv.Atoi(is.StartPage); err == nil {
 			if e, err := strconv.Atoi(is.EndPage); err == nil {
 				if e < s {
-					return QualityError{Kind: EndPageBeforeStartPage, RecordID: is.RecordID, Message: fmt.Sprintf("%v-%v", s, e)}
+					return QualityIssue{Kind: EndPageBeforeStartPage, Record: is, Message: fmt.Sprintf("%v-%v", s, e)}
 				}
 			} else {
-				return QualityError{Kind: InvalidEndPage, RecordID: is.RecordID, Message: fmt.Sprintf("%v", e)}
+				return QualityIssue{Kind: InvalidEndPage, Record: is, Message: is.EndPage}
 			}
 		} else {
-			return QualityError{Kind: InvalidStartPage, RecordID: is.RecordID, Message: fmt.Sprintf("%v", s)}
+			return QualityIssue{Kind: InvalidStartPage, Record: is, Message: is.StartPage}
 		}
 	}
 	return nil
