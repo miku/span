@@ -75,34 +75,6 @@ func (c Crossref) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 	})
 }
 
-// Author is given by family and given name.
-type Author struct {
-	Family string `json:"family"`
-	Given  string `json:"given"`
-}
-
-// FamilyCleaned returns a mostly clean family name.
-func (author *Author) FamilyCleaned() string {
-	return AuthorReplacer.Replace(span.UnescapeTrim(author.Family))
-}
-
-// GivenCleaned returns a mostly clean family name.
-func (author *Author) GivenCleaned() string {
-	return AuthorReplacer.Replace(span.UnescapeTrim(author.Given))
-}
-
-// String pretty prints the author.
-func (author *Author) String() string {
-	var given, family = author.GivenCleaned(), author.FamilyCleaned()
-	if given != "" {
-		if family != "" {
-			return fmt.Sprintf("%s, %s", family, given)
-		}
-		return given
-	}
-	return family
-}
-
 // DatePart consists of up to three int, representing year, month, day.
 type DatePart []int
 
@@ -112,9 +84,12 @@ type DateField struct {
 	Timestamp int64      `json:"timestamp"`
 }
 
-// Document is a example 'works' API response.
+// Document is a example 'works' API response - message part only.
 type Document struct {
-	Authors        []Author  `json:"author"`
+	Author []struct {
+		Family string `json:"family"`
+		Given  string `json:"given"`
+	} `json:"author"`
 	ContainerTitle []string  `json:"container-title"`
 	Deposited      DateField `json:"deposited"`
 	DOI            string    `json:"DOI"`
@@ -153,6 +128,16 @@ func (pi *PageInfo) PageCount() int {
 		}
 	}
 	return 0
+}
+
+func (doc *Document) Authors() (authors []finc.Author) {
+	for _, ra := range doc.Author {
+		authors = append(authors, finc.Author{
+			FirstName: AuthorReplacer.Replace(span.UnescapeTrim(ra.Given)),
+			LastName:  AuthorReplacer.Replace(span.UnescapeTrim(ra.Family)),
+		})
+	}
+	return authors
 }
 
 // RecordID is of the form <kind>-<source-id>-<id-base64-unpadded>
@@ -321,11 +306,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.ArticleSubtitle = span.UnescapeTrim(doc.Subtitle[0])
 	}
 
-	for _, author := range doc.Authors {
-		output.Authors = append(output.Authors, finc.Author{
-			FirstName: author.GivenCleaned(),
-			LastName:  author.FamilyCleaned()})
-	}
+	output.Authors = doc.Authors()
 
 	// TODO(miku): do we need a config for these things?
 	// Maybe a generic filter (in js?) that will gather exclusion rules?
