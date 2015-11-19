@@ -80,6 +80,7 @@ func main() {
 		}
 		if i%1000000 == 0 {
 			log.Println(i)
+			printSummary()
 		}
 	}
 	printSummary()

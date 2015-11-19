@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/miku/span/finc"
 )
@@ -18,6 +19,15 @@ const (
 	EndPageBeforeStartPage
 	InvalidURL
 	SuspiciousPageCount
+	PublicationDateTooEarly
+	PublicationDateTooLate
+)
+
+var (
+	// EarliestDate is the earliest publication date we accept.
+	EarliestDate, _ = time.Parse("2006", "1458")
+	// LatestDate represents the latest publication date we accept.
+	LatestDate = time.Now().AddDate(5, 0, 0)
 )
 
 type QualityIssue struct {
@@ -34,6 +44,7 @@ var DefaultTests = []RecordTester{
 	RecordTesterFunc(KeyLength),
 	RecordTesterFunc(PlausiblePageCount),
 	RecordTesterFunc(ValidURL),
+	RecordTesterFunc(PlausibleDate),
 }
 
 // KeyLength checks the length of the record id.
@@ -50,6 +61,16 @@ func ValidURL(is finc.IntermediateSchema) error {
 		if _, err := url.Parse(s); err != nil {
 			return QualityIssue{Kind: InvalidURL, Record: is, Message: s}
 		}
+	}
+	return nil
+}
+
+func PlausibleDate(is finc.IntermediateSchema) error {
+	if is.Date.Before(EarliestDate) {
+		return QualityIssue{Kind: PublicationDateTooEarly, Record: is, Message: is.Date.String()}
+	}
+	if is.Date.After(LatestDate) {
+		return QualityIssue{Kind: PublicationDateTooLate, Record: is, Message: is.Date.String()}
 	}
 	return nil
 }
