@@ -12,7 +12,8 @@ func TestISSNCompact(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		issn, err := NewISSN(c.s)
+		issn := ISSN(c.s)
+		err := issn.Validate()
 		if err != c.err {
 			t.Errorf("want %v, got %v", c.err, err)
 		}

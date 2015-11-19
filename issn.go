@@ -13,21 +13,20 @@ var (
 	pattern  = regexp.MustCompile("^[0-9]{7}[0-9X]$")
 )
 
-type ISSN struct {
-	issn string
-}
+type ISSN string
 
-func NewISSN(s string) (ISSN, error) {
-	t := strings.TrimSpace(strings.ToUpper(replacer.Replace(s)))
+func (s ISSN) Validate() error {
+	t := strings.TrimSpace(strings.ToUpper(replacer.Replace(string(s))))
 	if len(t) != 8 {
-		return ISSN{}, ErrInvalidISSN
+		return ErrInvalidISSN
 	}
 	if !pattern.Match([]byte(t)) {
-		return ISSN{}, ErrInvalidISSN
+		return ErrInvalidISSN
 	}
-	return ISSN{t[:4] + "-" + t[4:]}, nil
+	return nil
 }
 
 func (s ISSN) String() string {
-	return s.issn
+	t := strings.TrimSpace(strings.ToUpper(replacer.Replace(string(s))))
+	return t[:4] + "-" + t[4:]
 }
