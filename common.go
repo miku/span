@@ -53,6 +53,30 @@ func (s Skip) Error() string {
 	return fmt.Sprintf("SKIP %s", s.Reason)
 }
 
+// TestSuite is a group of tests.
+type TestSuite []RecordTester
+
+// RecordTester is a intermediate record checker.
+type RecordTester interface {
+	TestRecord(finc.IntermediateSchema) error
+}
+
+// DelegatingRecordTester delegates testing to a passed in function.
+type DelegatingRecordTester struct {
+	f func(finc.IntermediateSchema) error
+}
+
+// TestRecord fulfills the interface.
+func (t DelegatingRecordTester) TestRecord(is finc.IntermediateSchema) error {
+	return t.f(is)
+
+}
+
+// RecordTesterFunc turns any function into a RecordTester.
+func RecordTesterFunc(tester func(finc.IntermediateSchema) error) RecordTester {
+	return DelegatingRecordTester{f: tester}
+}
+
 // Importer objects can be converted into an intermediate schema.
 type Importer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
