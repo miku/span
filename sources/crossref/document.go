@@ -145,8 +145,7 @@ func (doc *Document) Authors() (authors []finc.Author) {
 // to a safer alphabet. Since the base64 part is not meant to be decoded
 // we drop the padding. It is simple enough to recover the original value.
 func (doc *Document) RecordID() string {
-	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.URLEncoding.EncodeToString([]byte(doc.URL)))
-	return strings.TrimRight(enc, "=")
+	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.URL)))
 }
 
 // PageInfo parses a page specfication in a best effort manner into a PageInfo struct.

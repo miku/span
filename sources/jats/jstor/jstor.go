@@ -75,8 +75,7 @@ func (article *Article) Identifiers() (jats.Identifiers, error) {
 		doi = candidate
 	}
 
-	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.URLEncoding.EncodeToString([]byte(locator)))
-	recordID := strings.TrimRight(enc, "=")
+	recordID := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
 	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
 }
 

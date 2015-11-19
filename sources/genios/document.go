@@ -140,8 +140,7 @@ func (doc Document) Authors() []string {
 
 // RecordID uses SourceAndID as starting point.
 func (doc Document) RecordID() string {
-	enc := fmt.Sprintf("ai-%s-%s", SourceID, base64.StdEncoding.EncodeToString([]byte(doc.SourceAndID())))
-	return strings.TrimRight(enc, "=")
+	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.SourceAndID())))
 }
 
 // Languages returns the given and guessed languages found in abstract and
