@@ -36,12 +36,12 @@ import (
 	"sync"
 
 	"github.com/miku/span"
-	"github.com/miku/span/crossref"
-	"github.com/miku/span/doaj"
-	"github.com/miku/span/genios"
-	"github.com/miku/span/jats/degruyter"
-	"github.com/miku/span/jats/jstor"
-	"github.com/miku/span/thieme"
+	"github.com/miku/span/sources/crossref"
+	"github.com/miku/span/sources/doaj"
+	"github.com/miku/span/sources/genios"
+	"github.com/miku/span/sources/jats/degruyter"
+	"github.com/miku/span/sources/jats/jstor"
+	"github.com/miku/span/sources/thieme"
 )
 
 var (
