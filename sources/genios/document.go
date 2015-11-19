@@ -123,15 +123,14 @@ func NomenNescio(s string) bool {
 
 // Authors returns a list of authors. Formatting is not cleaned up, so you'll
 // get any combination of surname and given names.
-func (doc Document) Authors() []string {
-	var authors []string
+func (doc Document) Authors() (authors []finc.Author) {
 	for _, s := range doc.RawAuthors {
 		fields := strings.FieldsFunc(s, func(r rune) bool {
 			return r == ';' || r == '/'
 		})
 		for _, f := range fields {
 			if !NomenNescio(f) {
-				authors = append(authors, strings.TrimSpace(f))
+				authors = append(authors, finc.Author{Name: strings.TrimSpace(f)})
 			}
 		}
 	}
@@ -182,9 +181,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.RawDate = output.Date.Format("2006-01-02")
 
-	for _, author := range doc.Authors() {
-		output.Authors = append(output.Authors, finc.Author{Name: author})
-	}
+	output.Authors = doc.Authors()
 
 	output.URL = append(output.URL, doc.URL())
 
