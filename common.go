@@ -119,25 +119,25 @@ func FromXMLSize(r io.Reader, name string, decoderFunc XMLDecoderFunc, size int)
 	return ch, nil
 }
 
-// JSONDecoderFunc turns a string into a single importable object.
-type JSONDecoderFunc func(s string) (Importer, error)
+// ImporterFunc turns a byte slice into a single importable object.
+type ImporterFunc func(b []byte) (Importer, error)
 
-// FromJSON returns a channel of slices of importable objects with a default
+// FromLines returns a channel of slices of importable objects with a default
 // batch size of 20000 docs.
-func FromJSON(r io.Reader, decoder JSONDecoderFunc) (chan []Importer, error) {
-	return FromJSONSize(r, decoder, 20000)
+func FromLines(r io.Reader, f ImporterFunc) (chan []Importer, error) {
+	return FromLinesSize(r, f, 20000)
 }
 
-// FromJSONSize returns a channel of slices of importable values, given a
-// reader, decoder (for a single value) and number of documents to batch.
-// Important: Due to fan-out input and output order will differ.
-func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Importer, error) {
+// FromLinesSize returns a channel of slices of importable values, given a
+// reader, f (for a single value) and number of documents to batch.
+// Important: Due to fan-out input and output order will not be preserved.
+func FromLinesSize(r io.Reader, f ImporterFunc, size int) (chan []Importer, error) {
 
-	worker := func(queue chan []string, out chan Importer, wg *sync.WaitGroup) {
+	worker := func(queue chan [][]byte, out chan Importer, wg *sync.WaitGroup) {
 		defer wg.Done()
 		for batch := range queue {
 			for _, s := range batch {
-				doc, err := decoder(s)
+				doc, err := f(s)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -168,7 +168,7 @@ func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Import
 		done <- true
 	}
 
-	queue := make(chan []string)
+	queue := make(chan [][]byte)
 	out := make(chan Importer)
 	done := make(chan bool)
 
@@ -182,35 +182,35 @@ func FromJSONSize(r io.Reader, decoder JSONDecoderFunc, size int) (chan []Import
 	}
 
 	reader := bufio.NewReader(r)
-	var lines []string
+	var lines [][]byte
 	var i int
 
 	go func() {
 		for {
-			// TODO(miku): []byte slice should be more appropriate
-			line, err := reader.ReadString('\n')
+			line, err := reader.ReadBytes('\n')
 			if err == io.EOF {
 				break
 			}
 			if err != nil {
 				log.Fatal(err)
 			}
-			if strings.TrimSpace(line) == "" {
+			if strings.TrimSpace(string(line)) == "" {
 				continue
 			}
 			i++
 			lines = append(lines, line)
 			if i == size {
-				batch := make([]string, size)
+				batch := make([][]byte, size)
 				copy(batch, lines)
 				queue <- batch
 				lines = lines[:0]
 				i = 0
 			}
 		}
-		batch := make([]string, len(lines))
+		batch := make([][]byte, len(lines))
 		copy(batch, lines)
 		queue <- batch
+
 		close(queue)
 		wg.Wait()
 		close(out)

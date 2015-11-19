@@ -136,9 +136,9 @@ type BibJSON struct {
 type DOAJ struct{}
 
 func (s DOAJ) Iterate(r io.Reader) (<-chan []span.Importer, error) {
-	return span.FromJSON(r, func(s string) (span.Importer, error) {
+	return span.FromLines(r, func(b []byte) (span.Importer, error) {
 		resp := new(Response)
-		err := json.Unmarshal([]byte(s), resp)
+		err := json.Unmarshal(b, resp)
 		if err != nil {
 			return resp.Source, err
 		}

@@ -68,9 +68,9 @@ var (
 type Crossref struct{}
 
 func (c Crossref) Iterate(r io.Reader) (<-chan []span.Importer, error) {
-	return span.FromJSON(r, func(s string) (span.Importer, error) {
+	return span.FromLines(r, func(b []byte) (span.Importer, error) {
 		doc := new(Document)
-		err := json.Unmarshal([]byte(s), doc)
+		err := json.Unmarshal(b, doc)
 		return doc, err
 	})
 }
