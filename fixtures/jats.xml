@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD with OASIS Tables v1.0 20120330//EN" "JATS-journalpublishing-oasis-article1.dtd">
+<article>
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="publisher-id">evthx</journal-id>
+      <journal-id journal-id-type="journal-code">evthx</journal-id>
+      <journal-title-group>
+        <journal-title>Evangelische xxxxx</journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">2198-0470</issn>
+      <publisher>
+        <publisher-name>xxxx Verlagshaus</publisher-name>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="publisher-id">xxxx-1964-0701</article-id>
+      <article-id pub-id-type="doi">10.14315/xxxx-1964-0701</article-id>
+      <article-categories/>
+      <title-group>
+        <article-title>Die xxxxx Leistung des xxxx</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Schweixxxx</surname>
+            <given-names>Eduxxx</given-names>
+          </name>
+        </contrib>
+      </contrib-group>
+      <pub-date pub-type="ppub">
+        <day>1</day>
+        <month>2</month>
+        <year>1961</year>
+      </pub-date>
+      <volume>22</volume>
+      <issue>7</issue>
+      <fpage>350</fpage>
+      <lpage>352</lpage>
+      <permissions>
+        <copyright-statement>© xxxx by xxxx xxxx</copyright-statement>
+        <copyright-year>2011</copyright-year>
+      </permissions>
+      <related-article xmlns:xlink="http://www.w3.org/1999/xlink" related-article-type="pdf" xlink.href="xxxx-1964-0701.pdf"/>
+      <post-process status="nothing-found">2014-07-05T17:11:43.912002+02:00</post-process>
+      <original type="pdf" xlink.href="xxxx-1964-0701.pdf"/>
+      <counts>
+        <page-count count="2"/>
+      </counts>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="index_only"/>
+  </body>
+</article>
