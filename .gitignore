@@ -26,7 +26,7 @@ _testmain.go
 /ihparse
 /crparse
 /span-*
-/fixtures
+/fixtures/private
 /tmp
 
 span_*.deb
