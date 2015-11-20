@@ -45,6 +45,10 @@ func (e QualityIssue) Error() string {
 	return fmt.Sprintf("%s: %s: %s", e.Record.RecordID, e.Kind, e.Message)
 }
 
+func (e QualityIssue) TSV() string {
+	return fmt.Sprintf("%s\t%s\t%s", e.Record.RecordID, e.Kind, e.Message)
+}
+
 var DefaultTests = []RecordTester{
 	RecordTesterFunc(KeyLength),
 	RecordTesterFunc(PlausiblePageCount),

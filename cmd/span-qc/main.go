@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -16,6 +17,7 @@ import (
 var tests = span.DefaultTests
 
 func main() {
+	verbose := flag.Bool("verbose", false, "show every error")
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
@@ -69,6 +71,9 @@ func main() {
 				hasIssues = true
 				switch e := err.(type) {
 				case span.QualityIssue:
+					if *verbose {
+						fmt.Println(e.TSV())
+					}
 					dist[e.Kind]++
 				default:
 					log.Fatalf("invalid error type: %T", err)
