@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/finc"
 )
 
@@ -21,6 +22,7 @@ const (
 	SuspiciousPageCount
 	PublicationDateTooEarly
 	PublicationDateTooLate
+	InvalidCollection
 )
 
 var (
@@ -28,6 +30,9 @@ var (
 	EarliestDate = time.Date(1458, 1, 1, 0, 0, 0, 0, time.UTC)
 	// LatestDate represents the latest publication date we accept.
 	LatestDate = time.Now().AddDate(5, 0, 0)
+
+	// AllowedMegaCollections
+	AllowedCollections = assetutil.MustLoadStringSet("assets/qc/collections/collections.tsv", "assets/qc/collections/crossref.tsv")
 )
 
 type QualityIssue struct {
@@ -45,6 +50,7 @@ var DefaultTests = []RecordTester{
 	RecordTesterFunc(PlausiblePageCount),
 	RecordTesterFunc(ValidURL),
 	RecordTesterFunc(PlausibleDate),
+	RecordTesterFunc(AllowedCollectionNames),
 }
 
 // KeyLength checks the length of the record id.
@@ -102,6 +108,13 @@ func PlausiblePageCount(is finc.IntermediateSchema) error {
 		} else {
 			return QualityIssue{Kind: InvalidStartPage, Record: is, Message: is.StartPage}
 		}
+	}
+	return nil
+}
+
+func AllowedCollectionNames(is finc.IntermediateSchema) error {
+	if !AllowedCollections.Contains(is.MegaCollection) {
+		return QualityIssue{Kind: InvalidCollection, Record: is, Message: is.MegaCollection}
 	}
 	return nil
 }

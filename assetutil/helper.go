@@ -22,8 +22,12 @@
 package assetutil
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
+	"io"
 	"regexp"
+	"strings"
 
 	"github.com/miku/span/container"
 )
@@ -70,11 +74,37 @@ func MustLoadRegexpMap(ap string) RegexpMap {
 	return remap
 }
 
+func MustLoadStringSet(paths ...string) *container.StringSet {
+	s := container.NewStringSet()
+	for _, path := range paths {
+		b, err := Asset(path)
+		if err != nil {
+			panic(err)
+		}
+		rdr := bufio.NewReader(bytes.NewReader(b))
+		for {
+			line, err := rdr.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				panic(err)
+			}
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			s.Add(line)
+		}
+	}
+	return s
+}
+
 // MustLoadStringMap loads a JSON file from an asset path and parses it into a
 // container.StringMap. This function will panic, if the asset cannot be found
 // or the JSON is erroneous.
-func MustLoadStringMap(ap string) container.StringMap {
-	b, err := Asset(ap)
+func MustLoadStringMap(path string) container.StringMap {
+	b, err := Asset(path)
 	if err != nil {
 		panic(err)
 	}
@@ -89,8 +119,8 @@ func MustLoadStringMap(ap string) container.StringMap {
 // MustLoadStringSliceMap loads a JSON file from an asset path and parses it into
 // a container.StringSliceMap. This function will halt the world, if it is
 // called with an invalid argument.
-func MustLoadStringSliceMap(ap string) container.StringSliceMap {
-	b, err := Asset(ap)
+func MustLoadStringSliceMap(path string) container.StringSliceMap {
+	b, err := Asset(path)
 	if err != nil {
 		panic(err)
 	}
