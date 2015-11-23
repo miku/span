@@ -115,8 +115,8 @@ func (doc Document) URL() string {
 	return fmt.Sprintf("https://www.wiso-net.de/document/%s", doc.SourceAndID())
 }
 
-// NomenNescio returns true, if the field is de-facto empty.
-func NomenNescio(s string) bool {
+// nomenNescio returns true, if the field is de-facto empty.
+func nomenNescio(s string) bool {
 	t := strings.ToLower(strings.TrimSpace(s))
 	return t == "n.n." || t == ""
 }
@@ -129,7 +129,7 @@ func (doc Document) Authors() (authors []finc.Author) {
 			return r == ';' || r == '/'
 		})
 		for _, f := range fields {
-			if !NomenNescio(f) {
+			if !nomenNescio(f) {
 				authors = append(authors, finc.Author{Name: strings.TrimSpace(f)})
 			}
 		}
@@ -185,7 +185,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.URL = append(output.URL, doc.URL())
 
-	if !NomenNescio(doc.Abstract) {
+	if !nomenNescio(doc.Abstract) {
 		output.Abstract = strings.TrimSpace(doc.Abstract)
 	} else {
 		cutoff := len(doc.Text)
@@ -198,15 +198,15 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
 	output.JournalTitle = strings.TrimSpace(doc.PublicationTitle)
 
-	if !NomenNescio(doc.ISSN) {
+	if !nomenNescio(doc.ISSN) {
 		output.ISSN = append(output.ISSN, strings.TrimSpace(doc.ISSN))
 	}
 
-	if !NomenNescio(doc.Issue) {
+	if !nomenNescio(doc.Issue) {
 		output.Issue = strings.TrimSpace(doc.Issue)
 	}
 
-	if !NomenNescio(doc.Volume) {
+	if !nomenNescio(doc.Volume) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
 
