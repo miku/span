@@ -12,7 +12,7 @@ bench:
 	go test -bench .
 
 deps:
-	go get ./...
+	go get -u -f -v ./...
 
 imports:
 	go get golang.org/x/tools/cmd/goimports
