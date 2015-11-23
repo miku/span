@@ -31,7 +31,7 @@ var (
 	// LatestDate represents the latest publication date we accept.
 	LatestDate = time.Now().AddDate(5, 0, 0)
 
-	// AllowedMegaCollections
+	// AllowedCollections
 	AllowedCollections = assetutil.MustLoadStringSet("assets/qc/collections/collections.tsv", "assets/qc/collections/crossref.tsv")
 )
 
