@@ -85,6 +85,5 @@ Alle xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxx.<BR/>www.xxxxxxxx.de
 			t.Log(diff)
 			t.Errorf("got %+v, want %+v", doc, c.doc)
 		}
-
 	}
 }
