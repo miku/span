@@ -398,6 +398,7 @@ func (article *Article) PageCount() (s string) {
 }
 
 // parsePubDate tries to get a date out of a pubdate.
+// TODO(miku): this does not need an article, generalize
 func (article *Article) parsePubDate(pd PubDate) (t time.Time) {
 	var s string
 	if pd.Day.Value == "" {
