@@ -6,13 +6,14 @@ export PATH := /home/vagrant/bin:$(PATH)
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test: assets deps
+	go get github.com/kylelemons/godebug/pretty
 	go test -v ./...
 
 bench:
 	go test -bench .
 
 deps:
-	go get -u -f -v ./...
+	go get ./...
 
 imports:
 	go get golang.org/x/tools/cmd/goimports
