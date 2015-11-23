@@ -73,6 +73,7 @@ func (t DelegatingRecordTester) TestRecord(is finc.IntermediateSchema) error {
 }
 
 // RecordTesterFunc turns any function into a RecordTester.
+// TODO(miku): convert RecordTesterFunc to type
 func RecordTesterFunc(tester func(finc.IntermediateSchema) error) RecordTester {
 	return DelegatingRecordTester{f: tester}
 }
