@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/miku/span/assetutil"
@@ -23,6 +24,7 @@ const (
 	PublicationDateTooEarly
 	PublicationDateTooLate
 	InvalidCollection
+	RepeatedSubtitle
 )
 
 var (
@@ -55,6 +57,7 @@ var DefaultTests = []RecordTester{
 	RecordTesterFunc(ValidURL),
 	RecordTesterFunc(PlausibleDate),
 	RecordTesterFunc(AllowedCollectionNames),
+	RecordTesterFunc(SubtitleRepetition),
 }
 
 // KeyLength checks the length of the record id.
@@ -119,6 +122,15 @@ func PlausiblePageCount(is finc.IntermediateSchema) error {
 func AllowedCollectionNames(is finc.IntermediateSchema) error {
 	if !AllowedCollections.Contains(is.MegaCollection) {
 		return QualityIssue{Kind: InvalidCollection, Record: is, Message: is.MegaCollection}
+	}
+	return nil
+}
+
+// SubtitleRepetition, refs #
+func SubtitleRepetition(is finc.IntermediateSchema) error {
+	if strings.Contains(is.ArticleTitle, is.ArticleSubtitle) {
+		return QualityIssue{Kind: RepeatedSubtitle, Record: is,
+			Message: fmt.Sprintf("%s: %s", is.ArticleTitle, is.ArticleSubtitle)}
 	}
 	return nil
 }

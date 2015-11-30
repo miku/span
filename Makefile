@@ -31,15 +31,18 @@ vet:
 cover:
 	go test -cover ./...
 
+generate:
+	go generate
+
 all: $(TARGETS)
 
-span-import: assets imports deps
+span-import: assets imports deps generate
 	go build -o span-import cmd/span-import/main.go
 
-span-export: assets imports deps
+span-export: assets imports deps generate
 	go build -o span-export cmd/span-export/main.go
 
-span-gh-dump: assets imports deps
+span-gh-dump: assets imports deps generate
 	go build -o span-gh-dump cmd/span-gh-dump/main.go
 
 clean:
