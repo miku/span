@@ -126,7 +126,7 @@ func AllowedCollectionNames(is finc.IntermediateSchema) error {
 	return nil
 }
 
-// SubtitleRepetition, refs #
+// SubtitleRepetition, refs #6553
 func SubtitleRepetition(is finc.IntermediateSchema) error {
 	if strings.Contains(is.ArticleTitle, is.ArticleSubtitle) {
 		return QualityIssue{Kind: RepeatedSubtitle, Record: is,
