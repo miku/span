@@ -134,6 +134,7 @@ func SubtitleRepetition(is finc.IntermediateSchema) error {
 		return QualityIssue{Kind: RepeatedSubtitle, Record: is,
 			Message: fmt.Sprintf("%s: %s", is.ArticleTitle, is.ArticleSubtitle)}
 	}
+	return nil
 }
 
 // currencyPattern is a rather narrow pattern: http://rubular.com/r/WjcnjhckZq
