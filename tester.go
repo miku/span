@@ -60,6 +60,7 @@ var DefaultTests = []RecordTester{
 	RecordTesterFunc(PlausibleDate),
 	RecordTesterFunc(AllowedCollectionNames),
 	RecordTesterFunc(SubtitleRepetition),
+	RecordTesterFunc(NoCurrencyInTitle),
 }
 
 // KeyLength checks the length of the record id.
