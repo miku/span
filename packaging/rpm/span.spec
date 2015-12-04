@@ -2,7 +2,7 @@ Summary:    Library data conversions.
 Name:       span
 Version:    0.1.55
 Release:    0
-License:    MIT
+License:    GPL
 BuildArch:  x86_64
 BuildRoot:  %{_tmppath}/%{name}-build
 Group:      System/Base
@@ -11,7 +11,7 @@ URL:        https://github.com/miku/span
 
 %description
 
-Library data conversions.
+Library data format conversions.
 
 %prep
 
