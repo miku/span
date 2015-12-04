@@ -206,7 +206,12 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ISSN = doc.Index.ISSN
 	output.JournalTitle = doc.BibJson.Journal.Title
 	output.MegaCollection = Collection
-	output.Publishers = append(output.Publishers, doc.BibJson.Journal.Publisher)
+
+	publisher := strings.TrimSpace(doc.BibJson.Journal.Publisher)
+	if publisher != "" {
+		output.Publishers = append(output.Publishers, publisher)
+	}
+
 	output.RecordID = id
 	output.SourceID = SourceID
 	output.Volume = doc.BibJson.Journal.Volume
