@@ -220,6 +220,11 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.URL = append(output.URL, link.URL)
 	}
 
+	// refs. #6634
+	if len(output.URL) == 0 {
+		output.URL = append(output.URL, "https://doaj.org/article/"+doc.ID)
+	}
+
 	output.StartPage = doc.BibJson.StartPage
 	output.EndPage = doc.BibJson.EndPage
 
