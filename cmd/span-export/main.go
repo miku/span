@@ -39,6 +39,7 @@ var Exporters = map[string]func() finc.ExportSchema{
 	"solr4vu13v4": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v4) },
 	"solr4vu13v5": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v5) },
 	"solr4vu13v6": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v6) },
+	"solr4vu13v7": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v7) },
 }
 
 // parseTagPathString turns TAG:/path/to into single strings and returns them.
