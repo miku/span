@@ -145,6 +145,7 @@ type IntermediateSchema struct {
 	Headings        []string `json:"x.headings,omitempty"`
 	Subjects        []string `json:"x.subjects,omitempty"`
 	Type            string   `json:"x.type,omitempty"`
+	Indicator       string   `json:"x.indicator,omitempty"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {

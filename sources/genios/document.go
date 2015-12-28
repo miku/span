@@ -61,9 +61,10 @@ type Document struct {
 	RawAuthors       []string `xml:"Authors>Author"`
 	Language         string   `xml:"Language"`
 	Abstract         string   `xml:"Abstract"`
-	Group            string   `xml:"x-group"`
 	Descriptors      string   `xml:"Descriptors>Descriptor"`
 	Text             string   `xml:"Text"`
+	XGroup           string   `xml:"x-group"`
+	XIssue           string   `xml:"x-issue"`
 }
 
 var (
@@ -216,7 +217,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Format = Format
 	output.Genre = Genre
 	output.Languages = doc.Languages()
-	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.Group])
+	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.XGroup])
 	id := doc.RecordID()
 	// 250 is a limit on memcached keys; offending key was:
 	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
@@ -230,6 +231,9 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RecordID = id
 	output.SourceID = SourceID
 	output.Subjects = doc.Headings()
+
+	// keep the date indicator, so we can create an update order
+	output.Indicator = doc.XIssue
 
 	return output, nil
 }
