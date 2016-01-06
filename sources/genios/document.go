@@ -217,7 +217,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Format = Format
 	output.Genre = Genre
 	output.Languages = doc.Languages()
-	output.Package = doc.XGroup
+	output.Package = doc.DB
 	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.XGroup])
 	id := doc.RecordID()
 	// 250 is a limit on memcached keys; offending key was:

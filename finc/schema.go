@@ -148,7 +148,7 @@ type IntermediateSchema struct {
 
 	// Indicator can hold update related information, e.g. in GBI the filedate
 	Indicator string `json:"x.indicator,omitempty"`
-	// Package can hold set information, e.g. in GBI the licenced package
+	// Package can hold set information, e.g. in GBI the licenced package or GBI database
 	Package string `json:"x.package,omitempty"`
 }
 
