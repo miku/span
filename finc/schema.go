@@ -145,7 +145,11 @@ type IntermediateSchema struct {
 	Headings        []string `json:"x.headings,omitempty"`
 	Subjects        []string `json:"x.subjects,omitempty"`
 	Type            string   `json:"x.type,omitempty"`
-	Indicator       string   `json:"x.indicator,omitempty"`
+
+	// Indicator can hold update related information, e.g. in GBI the filedate
+	Indicator string `json:"x.indicator,omitempty"`
+	// Package can hold set information, e.g. in GBI the licenced package
+	Package string `json:"x.package,omitempty"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {
