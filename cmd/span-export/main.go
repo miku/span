@@ -111,11 +111,12 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 func main() {
 
 	// TODO(miku): find better way specify custom filters
-	var hfiles, lfiles, cfiles, dfiles, any, source container.StringSlice
+	var hfiles, lfiles, cfiles, dfiles, pfiles, any, source container.StringSlice
 	flag.Var(&hfiles, "f", "ISIL:/path/to/ovid.xml")
 	flag.Var(&lfiles, "l", "ISIL:/path/to/list.txt")
 	flag.Var(&cfiles, "c", "ISIL:/path/to/collections.txt")
 	flag.Var(&dfiles, "d", "ISIL:/path/to/doi-blacklist.txt")
+	flag.Var(&pfiles, "p", "ISIL:/path/to/package-list.txt")
 	flag.Var(&any, "any", "ISIL")
 	flag.Var(&source, "source", "ISIL:SID")
 
@@ -198,6 +199,7 @@ func main() {
 		tagger[isil] = append(tagger[isil], f)
 	}
 
+	// list of ISSNs
 	for _, s := range lfiles {
 		isil, file, err := parseTagPath(s)
 		if err != nil {
@@ -205,6 +207,20 @@ func main() {
 		}
 		defer file.Close()
 		f, err := filter.NewListFilter(file)
+		if err != nil && !*skip {
+			log.Fatal(err)
+		}
+		tagger[isil] = append(tagger[isil], f)
+	}
+
+	// package files
+	for _, s := range pfiles {
+		isil, file, err := parseTagPath(s)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		f, err := filter.NewPackageFilter(file)
 		if err != nil && !*skip {
 			log.Fatal(err)
 		}

@@ -230,6 +230,45 @@ func (f DOIFilter) Apply(is finc.IntermediateSchema) bool {
 	return true
 }
 
+// DOIFilter will exclude DOIs, that are listed in Set.
+type PackageFilter struct {
+	Set *container.StringSet
+}
+
+// TODO(miku): Simplify set filters: ISSNFilter, MegaCollectionFilter,
+// DOIFilter, ...
+func NewPackageFilter(r io.Reader) (PackageFilter, error) {
+	br := bufio.NewReader(r)
+	f := PackageFilter{Set: container.NewStringSet()}
+	for {
+		line, err := br.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return f, err
+		}
+		line = strings.TrimSpace(line)
+		if line != "" {
+			f.Set.Add(line)
+		}
+	}
+	return f, nil
+}
+
+// MarshalJSON provides custom serialization.
+func (f PackageFilter) MarshalJSON() ([]byte, error) {
+	return json.Marshal(f.Set.Values())
+}
+
+// Apply filter.
+func (f PackageFilter) Apply(is finc.IntermediateSchema) bool {
+	if f.Set.Contains(is.Package) {
+		return true
+	}
+	return false
+}
+
 // ISILTagger maps ISILs to one or more Filters. If any of these filters
 // return true, the ISIL shall be attached (therefore order of the filters
 // does not matter).
