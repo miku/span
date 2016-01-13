@@ -199,7 +199,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
-	output.JournalTitle = strings.TrimSpace(doc.PublicationTitle)
+	output.JournalTitle = strings.Replace(strings.TrimSpace(doc.PublicationTitle), "\n", " ", -1)
 
 	if !isNomenNescio(doc.ISSN) {
 		output.ISSN = append(output.ISSN, strings.TrimSpace(doc.ISSN))
