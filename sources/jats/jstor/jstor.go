@@ -108,7 +108,8 @@ func (article *Article) Languages() []string {
 	return set.Values()
 }
 
-// ToInternalSchema converts an article into an internal schema.
+// ToInternalSchema converts an article into an internal schema. There are a
+// couple of content-dependent choices here.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
 	if err != nil {
@@ -144,13 +145,12 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.ISSN = normalized
 
 	// refs #5686
-	for _, s := range output.Subjects {
-		if s == "Book Reviews" {
-			if output.ArticleTitle == "" {
-				output.ArticleTitle = article.Front.Article.Product.Source.Value
-			}
-			break
-		}
+	// approx. type distribution: https://git.io/vzlCr
+	switch article.Type {
+	case "book-review", "book-reviews", "Book Review":
+		output.ArticleTitle = fmt.Sprintf("Review: %s", article.Front.Article.Product.Source.Value)
+	case "misc", "other", "front-matter", "back-matter", "announcement", "font-matter", "fm", "fornt-matter":
+		return output, span.Skip{Reason: fmt.Sprintf("suppressed format: %s", article.Type)}
 	}
 
 	return output, nil

@@ -89,6 +89,7 @@ type PubDate struct {
 // Article mirrors a JATS article element.
 type Article struct {
 	XMLName xml.Name `xml:"article"`
+	Type    string   `xml:"article-type,attr"`
 	Front   struct {
 		XMLName xml.Name `xml:"front"`
 		Journal struct {
