@@ -42,8 +42,6 @@ const (
 	SourceName = "JSTOR"
 	// Format for intermediate schema.
 	Format = "ElectronicArticle"
-	// Batchsize number of documents per batch.
-	BatchSize = 2000
 )
 
 // Jstor source.
