@@ -26,6 +26,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 
 	"github.com/miku/span"
@@ -42,6 +43,15 @@ const (
 	SourceName = "JSTOR"
 	// Format for intermediate schema.
 	Format = "ElectronicArticle"
+)
+
+var (
+	// ArticleTitleBlockPatterns
+	ArticleTitleBlockPatterns = []*regexp.Regexp{
+		regexp.MustCompile(`(?i)front\s*matter`),
+		regexp.MustCompile(`(?i)back\s*matter`),
+		regexp.MustCompile(`(?i)table\s*of\s*content[s]?`),
+	}
 )
 
 // Jstor source.
@@ -143,7 +153,18 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.ISSN = normalized
 
 	// refs #5686
-	// approx. type distribution: https://git.io/vzlCr
+	if output.Date.IsZero() {
+		return output, span.Skip{Reason: fmt.Sprintf("zero date: %s", output.RecordID)}
+	}
+
+	// refs #5686
+	for _, p := range ArticleTitleBlockPatterns {
+		if p.MatchString(output.ArticleTitle) {
+			return output, span.Skip{Reason: fmt.Sprintf("title blacklisted: %s", output.ArticleTitle)}
+		}
+	}
+
+	// refs #5686, approx. article type distribution: https://git.io/vzlCr
 	switch article.Type {
 	case "book-review", "book-reviews", "Book Review":
 		output.ArticleTitle = fmt.Sprintf("Review: %s", article.Front.Article.Product.Source.Value)
