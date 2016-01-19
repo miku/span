@@ -48,8 +48,7 @@ const (
 var (
 	// ArticleTitleBlockPatterns
 	ArticleTitleBlockPatterns = []*regexp.Regexp{
-		regexp.MustCompile(`(?i)front\s*matter`),
-		regexp.MustCompile(`(?i)back\s*matter`),
+		regexp.MustCompile(`(?i)(front|back)\s*matter`),
 		regexp.MustCompile(`(?i)table\s*of\s*content[s]?`),
 	}
 )
