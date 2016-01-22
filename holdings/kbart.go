@@ -8,29 +8,29 @@ import (
 // KBART: Knowledge Bases And Related Tools working group. A single holding
 // file entry.
 type KBART struct {
-	PublicationTitle         string `json:"title"`
-	PrintIdentifier          string `json:"print-identifier"`
-	OnlineIdentifier         string `json:"online-identifier"`
-	FirstIssueDate           string `json:"first-issue-date"`
-	FirstVolume              string `json:"first-volume"`
-	FirstIssue               string `json:"first-issue"`
-	LastIssueDate            string `json:"last-issue-date"`
-	LastVolume               string `json:"last-volume"`
-	LastIssue                string `json:"last-issue"`
-	TitleURL                 string `json:"title-url"`
-	FirstAuthor              string `json:"first-author"`
-	TitleID                  string `json:"title-id"`
-	Embargo                  string `json:"embargo"`
-	CoverageDepth            string `json:"coverage-depth"`
-	CoverageNotes            string `json:"coverage-notes"`
-	PublisherName            string `json:"publisher-name"`
-	InterlibraryRelevance    string `json:"relevance"`
-	InterlibraryNationwide   string `json:"nationwide"`
-	InterlibraryTransmission string `json:"transmission"`
-	InterlibraryComment      string `json:"comment"`
-	Publisher                string `json:"publisher"`
-	Anchor                   string `json:"anchor"`
-	ZDBID                    string `json:"zdb-id"`
+	PublicationTitle         string
+	PrintIdentifier          string
+	OnlineIdentifier         string
+	FirstIssueDate           string
+	FirstVolume              string
+	FirstIssue               string
+	LastIssueDate            string
+	LastVolume               string
+	LastIssue                string
+	TitleURL                 string
+	FirstAuthor              string
+	TitleID                  string
+	Embargo                  string
+	CoverageDepth            string
+	CoverageNotes            string
+	PublisherName            string
+	InterlibraryRelevance    string
+	InterlibraryNationwide   string
+	InterlibraryTransmission string
+	InterlibraryComment      string
+	Publisher                string
+	Anchor                   string
+	ZDBID                    string
 }
 
 // KBARTEntries are a list of holding file entries.
