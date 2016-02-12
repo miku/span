@@ -37,4 +37,5 @@ NOTES.md
 assetutil/bindata.go
 .vagrant/*
 vagrant.key
+Notes.md
 
