@@ -16,7 +16,11 @@ import (
 )
 
 func main() {
-	tag := span.TaggedFlag("tag", span.Tagged{}, "label:holding-file pair")
+
+	// tags collects all -tag X:Y arguments
+	var tags span.TagSlice
+
+	flag.Var(&tags, "tag", "label:holding-file pair")
 	version := flag.Bool("v", false, "show version")
 
 	flag.Parse()
@@ -26,9 +30,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	if tag.Value == "" {
-		log.Fatal("holding -file required")
+	if len(tags) == 0 {
+		log.Fatal("at least one -tag is required")
 	}
+
+	// only use the first for now
+	tag := tags[0]
 
 	// reader for intermediate schema
 	var r *bufio.Reader

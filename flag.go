@@ -3,7 +3,6 @@ package span
 import (
 	"flag"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -12,12 +11,16 @@ type Tagged struct {
 	Value string
 }
 
+func (t *Tagged) String() string {
+	return fmt.Sprintf("%s:%s", t.Tag, t.Value)
+}
+
 type taggedFlag struct {
 	Tagged
 }
 
 func (v *taggedFlag) String() string {
-	return fmt.Sprintf("%s:%s", v.Tag, v.Value)
+	return v.Tagged.String()
 }
 
 func (v *taggedFlag) Set(s string) error {
@@ -35,8 +38,22 @@ func TaggedFlag(name string, value Tagged, usage string) *Tagged {
 	return &f.Tagged
 }
 
-func main() {
-	t := TaggedFlag("x", Tagged{}, "tag path in the form: TAG:PATH")
-	flag.Parse()
-	log.Println(t)
+// TagSlice collects a number of tags.
+type TagSlice []Tagged
+
+func (s *TagSlice) String() string {
+	var ss []string
+	for _, tag := range *s {
+		ss = append(ss, tag.String())
+	}
+	return strings.Join(ss, ", ")
+}
+
+func (s *TagSlice) Set(value string) error {
+	tag := taggedFlag{}
+	if err := tag.Set(value); err != nil {
+		return err
+	}
+	*s = append(*s, tag.Tagged)
+	return nil
 }
