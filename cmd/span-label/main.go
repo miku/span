@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	filename := flag.String("file", "", "path to holdings file")
+	tag := span.TaggedFlag("tag", span.Tagged{}, "label:holding-file pair")
 	version := flag.Bool("v", false, "show version")
 
 	flag.Parse()
@@ -26,7 +26,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *filename == "" {
+	if tag.Value == "" {
 		log.Fatal("holding -file required")
 	}
 
@@ -44,7 +44,7 @@ func main() {
 	}
 
 	// generic holding file, autodetect format
-	file, err := generic.New(*filename)
+	file, err := generic.New(tag.Value)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,6 +97,11 @@ func main() {
 			}
 		}
 
-		fmt.Printf("%s\t%v\n", is.RecordID, valid)
+		if valid {
+			fmt.Printf("%s\t%v\n", is.RecordID, tag.Tag)
+		} else {
+			fmt.Printf("%s\t%v\n", is.RecordID, "X")
+		}
+
 	}
 }
