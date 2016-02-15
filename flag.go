@@ -41,14 +41,16 @@ func TaggedFlag(name string, value Tagged, usage string) *Tagged {
 // TagSlice collects a number of tags.
 type TagSlice []Tagged
 
+// String prints all tags.
 func (s *TagSlice) String() string {
 	var ss []string
 	for _, tag := range *s {
 		ss = append(ss, tag.String())
 	}
-	return strings.Join(ss, ", ")
+	return fmt.Sprintf("[%s]", strings.Join(ss, ", "))
 }
 
+// Set adds a value to the slice.
 func (s *TagSlice) Set(value string) error {
 	tag := taggedFlag{}
 	if err := tag.Set(value); err != nil {
