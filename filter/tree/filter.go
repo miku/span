@@ -6,6 +6,7 @@ package tree
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/miku/holdings"
 	"github.com/miku/holdings/generic"
@@ -184,6 +185,8 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
+
+	log.Printf("loading holdings: %s", s.Holdings.Filename)
 
 	file, err := generic.New(s.Holdings.Filename)
 	if err != nil {
