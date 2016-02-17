@@ -1,6 +1,6 @@
 // span-tag takes an intermediate schema file and a configuration trees of
-// filters for various tags and runs all filters on every record of the  input
-// to produce a tagged records.
+// filters for various tags and runs all filters on every record of the input
+// to produce a stream of tagged records.
 //
 // $ span-tag -c <(echo '{"DE-15": {"any": {}}}') input.ldj > output.ldj
 package main
