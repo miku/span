@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.59
+Version:    0.1.60
 Release:    0
 License:    GPL
 BuildArch:  x86_64
@@ -38,8 +38,14 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-export
 /usr/local/sbin/span-gh-dump
 /usr/local/sbin/span-import
+/usr/local/sbin/span-tag
 
 %changelog
+
+* Wed Feb 17 2016 Martin Czygan
+- 0.1.60 release
+- first appearance of span-tag, ISIL tagger
+
 * Mon Nov 2 2015 Martin Czygan
 - 0.1.53 release
 - span-import: sort format name output
