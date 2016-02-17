@@ -59,6 +59,7 @@ func main() {
 	}
 
 	// iterate over records
+	// TODO(miku): parallelize
 	for {
 		line, err := r.ReadBytes('\n')
 		if err == io.EOF {
