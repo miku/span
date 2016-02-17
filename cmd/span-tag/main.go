@@ -61,6 +61,8 @@ func main() {
 
 	// iterate over records
 	// TODO(miku): parallelize
+	// sequencial: 12441 records/s
+	// parallel: TBA
 	for {
 		line, err := r.ReadBytes('\n')
 		if err == io.EOF {
