@@ -24,6 +24,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-gh-dump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
 
 %post
 
