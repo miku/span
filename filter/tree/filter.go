@@ -123,6 +123,33 @@ func (f *SourceFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
+// PackageFilter allows all records of one of the given package name.
+type PackageFilter struct {
+	values []string
+}
+
+// Apply filters collections.
+func (f *PackageFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, v := range f.values {
+		if v == is.Package {
+			return true
+		}
+	}
+	return false
+}
+
+// UnmarshalJSON turns a config fragment into a ISSN filter.
+func (f *PackageFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Packages []string `json:"package"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.values = s.Packages
+	return nil
+}
+
 // HoldingsFilter uses a holdingsfile.
 type HoldingsFilter struct {
 	entries holdings.Entries
@@ -206,6 +233,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 	// add more filters here
 	case "any":
 		var filter AnyFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "package":
+		var filter PackageFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
