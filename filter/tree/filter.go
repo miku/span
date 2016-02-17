@@ -1,6 +1,24 @@
 // Package tree collect the next version of filters using trees. Eventually
 // the old filters will be sorted out and this will move back into span/filter
 // package namespace.
+//
+// Flexible ISIL attachments with expression trees (serialized as JSON).
+//
+// {
+//   "DE-Brt1": {
+//     "holdings": {
+//       "file": "/tmp/amsl/AMSLHoldingsFile/date-2016-02-17-isil-DE-Brt1.tsv"
+//     }
+//   },
+//   "DE-Zi4": {
+//     "or": [
+//         {"collection": ["A", "B"]},
+//         {"holdings": {"file": "/tmp/amsl/AMSLHoldingsFile/date-2016-02-17-isil-DE-Zi4.tsv"}}
+//     ]
+//   }
+//   ...
+// }
+
 package tree
 
 import (
