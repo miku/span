@@ -24,23 +24,22 @@ package tree
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/miku/holdings"
 	"github.com/miku/holdings/generic"
 	"github.com/miku/span/finc"
 )
 
-// Filter return go or no for a given record.
+// Filter returns go or no for a given record.
 type Filter interface {
 	Apply(finc.IntermediateSchema) bool
 }
 
-// FuncFilter turns a function into a filter.
-type FuncFilter func(finc.IntermediateSchema) bool
+// FilterFunc makes a function satisfy an interface.
+type FilterFunc func(finc.IntermediateSchema) bool
 
 // Apply just calls the function.
-func (f FuncFilter) Apply(is finc.IntermediateSchema) bool {
+func (f FilterFunc) Apply(is finc.IntermediateSchema) bool {
 	return f(is)
 }
 
@@ -48,7 +47,7 @@ func (f FuncFilter) Apply(is finc.IntermediateSchema) bool {
 type AnyFilter struct{}
 
 // Apply will just return true.
-func (f *AnyFilter) Apply(_ finc.IntermediateSchema) bool { return true }
+func (f *AnyFilter) Apply(finc.IntermediateSchema) bool { return true }
 
 // UnmarshalJSON turns a config fragment into a ISSN filter.
 func (f *AnyFilter) UnmarshalJSON(p []byte) error {
@@ -61,7 +60,7 @@ func (f *AnyFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// CollectionFilter allows all records of one of the given collections.
+// CollectionFilter validates all records matching one of the given collections.
 type CollectionFilter struct {
 	values []string
 }
@@ -206,8 +205,6 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 
-	log.Printf("loading holdings: %s", s.Holdings.Filename)
-
 	file, err := generic.New(s.Holdings.Filename)
 	if err != nil {
 		return err
@@ -310,7 +307,6 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 // firstKey returns the top level key of an object, given as a raw JSON
 // message. It peeks into the fragment. An empty document will cause an error.
 func firstKey(raw json.RawMessage) (string, error) {
-	// peeker helps us to get the top level key out
 	var peeker = make(map[string]interface{})
 	if err := json.Unmarshal(raw, &peeker); err != nil {
 		return "", err
@@ -363,10 +359,10 @@ func (f *AndFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Filters []json.RawMessage `json:"and"`
 	}
-	var err error
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
+	var err error
 	f.filters, err = unmarshalFilterList(s.Filters)
 	return err
 }
