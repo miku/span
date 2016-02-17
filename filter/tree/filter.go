@@ -177,7 +177,7 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
-			Filename string `json:"filename"`
+			Filename string `json:"file"`
 		} `json:"holdings"`
 	}
 
