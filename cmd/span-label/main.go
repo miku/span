@@ -17,10 +17,10 @@ import (
 
 func main() {
 
-	// tags collects all -tag X:Y arguments
-	var tags span.TagSlice
+	// tags collects all -g X:Y for holding files
+	var holdingtags span.TagSlice
 
-	flag.Var(&tags, "tag", "label:holding-file pair")
+	flag.Var(&holdingtags, "g", "label:holding-file")
 	version := flag.Bool("v", false, "show version")
 
 	flag.Parse()
@@ -30,12 +30,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	if len(tags) == 0 {
+	if len(holdingtags) == 0 {
 		log.Fatal("at least one -tag is required")
 	}
 
 	// only use the first for now
-	tag := tags[0]
+	tag := holdingtags[0]
 
 	// reader for intermediate schema
 	var r *bufio.Reader
@@ -58,7 +58,6 @@ func main() {
 
 	// all license entries
 	entries, err := file.ReadEntries()
-
 	if err != nil {
 		log.Fatal(err)
 	}
