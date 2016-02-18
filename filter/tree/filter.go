@@ -22,8 +22,12 @@
 package tree
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"strings"
 
 	"github.com/miku/holdings"
 	"github.com/miku/holdings/generic"
@@ -106,12 +110,41 @@ func (f *ISSNFilter) Apply(is finc.IntermediateSchema) bool {
 // UnmarshalJSON turns a config fragment into a filter.
 func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
-		ISSN []string `json:"issn"`
+		ISSN struct {
+			Values []string `json:"list"`
+			File   string   `json:"file"`
+		} `json:"issn"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = s.ISSN
+	var values []string
+	if s.ISSN.File != "" {
+		file, err := os.Open(s.ISSN.File)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		reader := bufio.NewReader(file)
+		for {
+			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			values = append(values, line)
+		}
+	}
+	for _, v := range s.ISSN.Values {
+		values = append(values, v)
+	}
+	f.values = values
 	return nil
 }
 
