@@ -18,6 +18,8 @@
 //   }
 //   ...
 // }
+//
+// TODO(miku): add a small cache to reuse holding file filters, used in multiple places.
 
 package tree
 
