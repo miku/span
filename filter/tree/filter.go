@@ -26,6 +26,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -120,6 +121,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	}
 	var values []string
 	if s.ISSN.File != "" {
+		log.Println(s.ISSN.File)
 		file, err := os.Open(s.ISSN.File)
 		if err != nil {
 			return err
@@ -238,6 +240,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 
+	log.Printf("holdings file: %s", s.Holdings.Filename)
 	file, err := generic.New(s.Holdings.Filename)
 	if err != nil {
 		return err
@@ -286,6 +289,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 	// add more filters here
 	case "any":
 		var filter AnyFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "issn":
+		var filter ISSNFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
