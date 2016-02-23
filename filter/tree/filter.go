@@ -210,6 +210,7 @@ func (f *PackageFilter) UnmarshalJSON(p []byte) error {
 // create blacklists.
 type DOIFilter struct {
 	values []string
+	file   string
 }
 
 // Apply filters packages.
@@ -225,12 +226,42 @@ func (f *DOIFilter) Apply(is finc.IntermediateSchema) bool {
 // UnmarshalJSON turns a config fragment into a filter.
 func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
-		DOIList []string `json:"doi"`
+		DOI struct {
+			Values []string `json:"list"`
+			File   string   `json:"file"`
+		} `json:"doi"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = s.DOIList
+	var values []string
+	if s.DOI.File != "" {
+		log.Println(s.DOI.File)
+		file, err := os.Open(s.DOI.File)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		reader := bufio.NewReader(file)
+		for {
+			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			values = append(values, line)
+		}
+	}
+	for _, v := range s.DOI.Values {
+		values = append(values, v)
+	}
+	f.values = values
 	return nil
 }
 
