@@ -206,6 +206,34 @@ func (f *PackageFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
+// DOIFilter allows records with a given DOI. Use in conjuction with "not" to
+// create blacklists.
+type DOIFilter struct {
+	values []string
+}
+
+// Apply filters packages.
+func (f *DOIFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, v := range f.values {
+		if v == is.DOI {
+			return true
+		}
+	}
+	return false
+}
+
+// UnmarshalJSON turns a config fragment into a filter.
+func (f *DOIFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		DOIList []string `json:"doi"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.values = s.DOIList
+	return nil
+}
+
 // HoldingsFilter filters a record against a holding file. The holding file
 // might be in KBART, Ovid or Google format. TODO(miku): move moving wall
 // logic under `.Covers`.
@@ -291,6 +319,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 	// add more filters here
 	case "any":
 		var filter AnyFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "doi":
+		var filter DOIFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
