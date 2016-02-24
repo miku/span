@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-TARGETS = span-import span-export span-gh-dump span-tag
+TARGETS = span-import span-export span-gh-dump span-tag span-solr
 
 # find go-bindata executable on vm
 export PATH := /home/vagrant/bin:$(PATH)
@@ -47,6 +47,9 @@ span-gh-dump: assets imports deps generate
 
 span-tag: assets imports deps generate
 	go build -o span-tag cmd/span-tag/main.go
+
+span-solr: assets imports deps generate
+	go build -o span-solr cmd/span-solr/main.go
 
 clean:
 	rm -f $(TARGETS)

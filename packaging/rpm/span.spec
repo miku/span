@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.63
+Version:    0.1.64
 Release:    0
 License:    GPL
 BuildArch:  x86_64
@@ -25,6 +25,7 @@ install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-gh-dump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-solr $RPM_BUILD_ROOT/usr/local/sbin
 
 %post
 
@@ -40,6 +41,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-gh-dump
 /usr/local/sbin/span-import
 /usr/local/sbin/span-tag
+/usr/local/sbin/span-solr
 
 %changelog
 

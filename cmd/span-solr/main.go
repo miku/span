@@ -1,4 +1,4 @@
-// span-tosolr will be the next span-export
+// span-solr will be the next span-export.
 package main
 
 import (
