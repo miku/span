@@ -45,6 +45,5 @@ func (s *Solr4Vufind13v8) Convert(is finc.IntermediateSchema) error {
 		return err
 	}
 	s.Institutions = is.Labels
-	s.Fullrecord = string(b)
 	return nil
 }
