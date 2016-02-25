@@ -102,6 +102,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	for i := 0; i < runtime.NumCPU(); i++ {
+		wg.Add(1)
 		go worker(queue, out, &wg)
 	}
 
