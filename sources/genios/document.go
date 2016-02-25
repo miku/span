@@ -70,8 +70,10 @@ type Document struct {
 var (
 	rawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
 	collections     = assetutil.MustLoadStringMap("assets/genios/collections.json")
-	// Restricts the possible languages for detection.
+	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
+	// dbmap maps a database name to one or more "package names"
+	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
 )
 
 type Genios struct{}
@@ -218,7 +220,14 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genre
 	output.Languages = doc.Languages()
 	output.Package = doc.DB
-	output.MegaCollection = fmt.Sprintf("Genios (%s)", collections[doc.XGroup])
+
+	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
+	if len(packageNames) > 0 {
+		output.MegaCollection = fmt.Sprintf("Genios (%s)", packageNames[0])
+	} else {
+		output.MegaCollection = fmt.Sprintf("Genios")
+	}
+
 	id := doc.RecordID()
 	// 250 is a limit on memcached keys; offending key was:
 	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
