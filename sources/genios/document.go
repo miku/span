@@ -26,6 +26,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 	"time"
 
@@ -225,6 +226,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(packageNames) > 0 {
 		output.MegaCollection = fmt.Sprintf("Genios (%s)", packageNames[0])
 	} else {
+		log.Printf("genios: db is not associated with package: %s, using generic default", doc.DB)
 		output.MegaCollection = fmt.Sprintf("Genios")
 	}
 
