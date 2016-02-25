@@ -93,11 +93,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// iterate over records
-	// TODO(miku): parallelize
-	// sequencial: 12441 records/s
-	// parallel: TBA
-
 	queue := make(chan [][]byte)
 	out := make(chan string)
 	done := make(chan bool)
@@ -137,8 +132,6 @@ func main() {
 	payload := make([][]byte, len(batch))
 	copy(payload, batch)
 	queue <- payload
-	batch = batch[:0]
-	i = 0
 
 	close(queue)
 	wg.Wait()
