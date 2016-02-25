@@ -27,6 +27,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -71,6 +72,9 @@ func (c Crossref) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 	return span.FromLines(r, func(b []byte) (span.Importer, error) {
 		doc := new(Document)
 		err := json.Unmarshal(b, doc)
+		if err != nil {
+			log.Printf("%s", string(b))
+		}
 		return doc, err
 	})
 }

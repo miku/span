@@ -58,12 +58,12 @@ func worker(queue chan []span.Importer, out chan []byte, opts options, wg *sync.
 					}
 					continue
 				default:
-					log.Fatal(err)
+					log.Fatalf("doc.ToIntermediateSchema: %v, %v", err, output)
 				}
 			}
 			b, err := json.Marshal(output)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("json.Marshal: %v, %v", err, output)
 			}
 			out <- b
 		}
