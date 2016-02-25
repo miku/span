@@ -13,11 +13,42 @@ import (
 	"io"
 	"log"
 	"os"
+	"runtime"
+	"sync"
 
 	"github.com/miku/span"
 	"github.com/miku/span/filter/tree"
 	"github.com/miku/span/finc"
 )
+
+var tagger tree.Tagger
+
+func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for batch := range queue {
+		for _, b := range batch {
+			var is finc.IntermediateSchema
+			if err := json.Unmarshal(b, &is); err != nil {
+				log.Fatal(err)
+			}
+
+			tagged := tagger.Tag(is)
+
+			b, err := json.Marshal(tagged)
+			if err != nil {
+				log.Fatal(err)
+			}
+			out <- string(b)
+		}
+	}
+}
+
+func writer(sc chan string, done chan bool) {
+	for s := range sc {
+		fmt.Println(s)
+	}
+	done <- true
+}
 
 func main() {
 	config := flag.String("c", "", "JSON config file for filters")
@@ -53,7 +84,6 @@ func main() {
 	}
 
 	dec := json.NewDecoder(file)
-	var tagger tree.Tagger
 
 	if err := dec.Decode(&tagger); err != nil {
 		log.Fatal(err)
@@ -63,6 +93,22 @@ func main() {
 	// TODO(miku): parallelize
 	// sequencial: 12441 records/s
 	// parallel: TBA
+
+	queue := make(chan [][]byte)
+	out := make(chan string)
+	done := make(chan bool)
+
+	go writer(out, done)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < runtime.NumCPU(); i++ {
+		go worker(queue, out, &wg)
+	}
+
+	var batch [][]byte
+	var i int
+
 	for {
 		line, err := r.ReadBytes('\n')
 		if err == io.EOF {
@@ -72,18 +118,26 @@ func main() {
 			log.Fatal(err)
 		}
 
-		var is finc.IntermediateSchema
-		if err := json.Unmarshal(line, &is); err != nil {
-			log.Fatal(err)
+		if i == 20000 {
+			payload := make([][]byte, len(batch))
+			copy(payload, batch)
+			queue <- payload
+			batch = batch[:0]
+			i = 0
 		}
 
-		// run filters
-		tagged := tagger.Tag(is)
-
-		b, err := json.Marshal(tagged)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(string(b))
+		batch = append(batch, line)
+		i++
 	}
+
+	payload := make([][]byte, len(batch))
+	copy(payload, batch)
+	queue <- payload
+	batch = batch[:0]
+	i = 0
+
+	close(queue)
+	wg.Wait()
+	close(out)
+	<-done
 }
