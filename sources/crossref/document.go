@@ -224,13 +224,12 @@ func (doc *Document) ShortTitle() (s string) {
 }
 
 // MemberName resolves the primary name of the member.
-func (doc *Document) MemberName() (name string, err error) {
+func (doc *Document) MemberName() (string, error) {
 	id, err := doc.parseMemberID()
 	if err != nil {
-		return
+		return "", err
 	}
-	name, err = LookupMemberName(id)
-	return
+	return LookupMemberName(id)
 }
 
 // ParseMemberID extracts the numeric member id.
