@@ -44,9 +44,13 @@ func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
 }
 
 func writer(sc chan string, done chan bool) {
+	w := bufio.NewWriter(os.Stdout)
 	for s := range sc {
-		fmt.Println(s)
+		if _, err := io.WriteString(w, s); err != nil {
+			log.Fatal(err)
+		}
 	}
+	w.Flush()
 	done <- true
 }
 
