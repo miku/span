@@ -21,13 +21,9 @@
 //
 package exporter
 
-import (
-	"encoding/json"
+import "github.com/miku/span/finc"
 
-	"github.com/miku/span/finc"
-)
-
-// Solr4vu13v6 add missing publishDate field (#6266)
+// Solr4vu13v8 uses labels from intermediate schema as institutions.
 type Solr4Vufind13v8 struct {
 	Solr4Vufind13v7
 }
@@ -38,10 +34,6 @@ func (s *Solr4Vufind13v8) Attach(_ []string) {}
 // Export method from intermediate schema to solr 4/13 schema.
 func (s *Solr4Vufind13v8) Convert(is finc.IntermediateSchema) error {
 	if err := s.Solr4Vufind13v6.Convert(is); err != nil {
-		return err
-	}
-	b, err := json.Marshal(is)
-	if err != nil {
 		return err
 	}
 	s.Institutions = is.Labels
