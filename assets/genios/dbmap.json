@@ -30,7 +30,7 @@
   "IFKP": [
   ],
   "KUSE": [
-    "Recht"
+    "Fachzeitschriften"
   ],
   "IJAR": [
     "Sozialwissenschaften"
@@ -162,7 +162,7 @@
     "Wirtschaftswissenschaften"
   ],
   "SOLI": [
-    "Sozialwissenschaften"
+    "Fachzeitschriften"
   ],
   "TRE": [
     "Wirtschaftswissenschaften"
@@ -208,7 +208,7 @@
     "Technik"
   ],
   "IFOL": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "FS": [
     "Wirtschaftswissenschaften"
@@ -327,8 +327,7 @@
     "Technik"
   ],
   "SOFI": [
-    "Wirtschaftswissenschaften",
-    "Sozialwissenschaften"
+    "Fachzeitschriften"
   ],
   "SOFO": [
     "Sozialwissenschaften"
@@ -354,7 +353,7 @@
     "Recht"
   ],
   "IWPR": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "SOC": [
     "Psychologie",
@@ -400,7 +399,7 @@
     "Wirtschaftswissenschaften"
   ],
   "ECON": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "KMAG": [
     "Wirtschaftswissenschaften"
@@ -422,7 +421,7 @@
     "Recht"
   ],
   "FOGR": [
-    "Technik"
+    "Fachzeitschriften"
   ],
   "AWCH": [
     "Wirtschaftswissenschaften"
@@ -464,7 +463,7 @@
     "Wirtschaftswissenschaften"
   ],
   "HWWA": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "HORS": [
     "Wirtschaftswissenschaften"
@@ -479,7 +478,7 @@
     "Wirtschaftswissenschaften"
   ],
   "PSYT": [
-    "Psychologie"
+    "Fachzeitschriften"
   ],
   "GMST": [
     "Wirtschaftswissenschaften",
@@ -642,7 +641,7 @@
     "Wirtschaftswissenschaften"
   ],
   "BEFO": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "PAFO": [
     "Wirtschaftswissenschaften"
@@ -678,7 +677,7 @@
     "Recht"
   ],
   "INFO": [
-    "Technik"
+    "Fachzeitschriften"
   ],
   "BVPE": [
     "Wirtschaftswissenschaften",
@@ -770,7 +769,7 @@
     "Wirtschaftswissenschaften"
   ],
   "HOLZ": [
-    "Technik"
+    "Fachzeitschriften"
   ],
   "VERW": [
     "Wirtschaftswissenschaften",
@@ -813,12 +812,10 @@
     "Technik"
   ],
   "IHSL": [
-    "Wirtschaftswissenschaften",
-    "Sozialwissenschaften"
+    "Fachzeitschriften"
   ],
   "DZI": [
-    "Wirtschaftswissenschaften",
-    "Sozialwissenschaften"
+    "Fachzeitschriften"
   ],
   "ZFR": [
     "Recht",
@@ -896,7 +893,7 @@
     "Wirtschaftswissenschaften"
   ],
   "CEAB": [
-    "Technik"
+    "Fachzeitschriften"
   ],
   "DVZB": [
     "Wirtschaftswissenschaften"
@@ -1045,7 +1042,7 @@
     "Recht"
   ],
   "WAO": [
-    "Sozialwissenschaften"
+    "Fachzeitschriften"
   ],
   "CO": [
     "Wirtschaftswissenschaften",
@@ -1108,7 +1105,7 @@
     "Technik"
   ],
   "IFOK": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "IFOD": [
     "Wirtschaftswissenschaften"
@@ -1117,7 +1114,7 @@
     "Technik"
   ],
   "XPSY": [
-    "Psychologie"
+    "Fachzeitschriften"
   ],
   "INSP": [
     "Technik"
@@ -1232,8 +1229,7 @@
     "Technik"
   ],
   "BLIS": [
-    "Wirtschaftswissenschaften",
-    "Sozialwissenschaften"
+    "Fachzeitschriften"
   ],
   "BW": [
     "Wirtschaftswissenschaften"
@@ -1242,7 +1238,7 @@
     "Wirtschaftswissenschaften"
   ],
   "KOEL": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "GRER": [
     "Wirtschaftswissenschaften"
@@ -1394,7 +1390,7 @@
     "Sozialwissenschaften"
   ],
   "ESTE": [
-    "Technik"
+    "Fachzeitschriften"
   ],
   "ESTB": [
     "Wirtschaftswissenschaften",
@@ -1443,7 +1439,7 @@
     "Wirtschaftswissenschaften"
   ],
   "MIND": [
-    "Wirtschaftswissenschaften"
+    "Fachzeitschriften"
   ],
   "DNK": [
     "Wirtschaftswissenschaften"
