@@ -273,6 +273,7 @@ type HoldingsFilter struct {
 }
 
 // Apply tests validity against holding file.
+// TODO(miku): holdings file indentifiers can be ISSNs, ISBNs or DOIs
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	signature := holdings.Signature{
 		Date:   is.Date.Format("2006-01-02"),
