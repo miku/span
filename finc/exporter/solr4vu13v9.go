@@ -23,7 +23,7 @@ package exporter
 
 import "github.com/miku/span/finc"
 
-// Solr4vu13v8 uses labels from intermediate schema as institutions.
+// Solr4Vufind13v9 supresses author facet for sid 48, refs. #7111.
 type Solr4Vufind13v9 struct {
 	Solr4Vufind13v8
 }
