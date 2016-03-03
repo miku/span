@@ -36,6 +36,7 @@ var Exporters = map[string]func() finc.ExportSchema{
 	"solr4vu13v6": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v6) },
 	"solr4vu13v7": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v7) },
 	"solr4vu13v8": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v8) },
+	"solr4vu13v9": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v9) },
 }
 
 // worker iterates over string batches
@@ -75,7 +76,7 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	format := flag.String("o", "solr4vu13v8", "output format")
+	format := flag.String("o", "solr4vu13v9", "output format")
 	listFormats := flag.Bool("list", false, "list output formats")
 
 	flag.Parse()
