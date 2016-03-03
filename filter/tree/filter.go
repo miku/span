@@ -34,6 +34,7 @@ import (
 
 	"github.com/miku/holdings"
 	"github.com/miku/holdings/generic"
+	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
 
@@ -69,17 +70,12 @@ func (f *AnyFilter) UnmarshalJSON(p []byte) error {
 
 // CollectionFilter validates all records matching one of the given collections.
 type CollectionFilter struct {
-	values []string
+	values container.StringSet
 }
 
 // Apply filters collections.
 func (f *CollectionFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.values {
-		if v == is.MegaCollection {
-			return true
-		}
-	}
-	return false
+	return f.values.Contains(is.MegaCollection)
 }
 
 // UnmarshalJSON turns a config fragment into a ISSN filter.
@@ -90,21 +86,19 @@ func (f *CollectionFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = s.Collections
+	f.values = *container.NewStringSet(s.Collections...)
 	return nil
 }
 
 // ISSNFilter allows records with a certain ISSN.
 type ISSNFilter struct {
-	values []string
+	values container.StringSet
 }
 
 func (f *ISSNFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.values {
-		for _, issn := range append(is.ISSN, is.EISSN...) {
-			if v == issn {
-				return true
-			}
+	for _, issn := range append(is.ISSN, is.EISSN...) {
+		if f.values.Contains(issn) {
+			return true
 		}
 	}
 	return false
@@ -121,9 +115,8 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	var values []string
+	f.values = *container.NewStringSet()
 	if s.ISSN.File != "" {
-		log.Println(s.ISSN.File)
 		file, err := os.Open(s.ISSN.File)
 		if err != nil {
 			return err
@@ -142,13 +135,12 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			if line == "" {
 				continue
 			}
-			values = append(values, line)
+			f.values.Add(line)
 		}
 	}
 	for _, v := range s.ISSN.Values {
-		values = append(values, v)
+		f.values.Add(v)
 	}
-	f.values = values
 	return nil
 }
 
