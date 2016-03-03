@@ -171,6 +171,8 @@ func (is *IntermediateSchema) ISSNList() []string {
 	return issns
 }
 
+// ParsedDate turns tries to turn a raw date string into a date.
+// TODO(miku): sources need to enforce a format, maybe enforce it here, too?
 func (is *IntermediateSchema) ParsedDate() time.Time {
 	t, _ := time.Parse("2006-01-02", is.RawDate)
 	return t
