@@ -20,6 +20,11 @@ Formats
 * Various FINC [SOLR Schema](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/solr.go#L4)
 * GENIOS Profile XML
 
+Development
+-----------
+
+Install [glide](https://github.com/Masterminds/glide) for vendoring, then `glide up` to install the dependencies.
+
 Licence
 -------
 

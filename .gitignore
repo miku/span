@@ -38,3 +38,4 @@ assetutil/bindata.go
 .vagrant/*
 vagrant.key
 Notes.md
+/vendor

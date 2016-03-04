@@ -1,0 +1,18 @@
+hash: 081b25d654c03cf74e18f8dce409d96b6962bd82ad7fa6b1afdc74ef36ec0e1f
+updated: 2016-03-04T12:04:07.723917887+01:00
+imports:
+- name: github.com/kennygrant/sanitize
+  version: ce9fd1f6ce32afaa38b51feea32320fc8875e8e4
+- name: github.com/rainycape/cld2
+  version: 08654a83284e4ca708214e8afef6a1e0fd55d334
+- name: golang.org/x/net
+  version: d58ca6618b994150e624f6888d871f4709db51a0
+  subpackages:
+  - html
+  - html/atom
+- name: golang.org/x/text
+  version: a71fd10341b064c10f4a81ceac72bcf70f26ea34
+  subpackages:
+  - language
+  - internal/tag
+devImports: []

@@ -1,0 +1,7 @@
+package: github.com/miku/span
+import:
+- package: github.com/kennygrant/sanitize
+- package: github.com/rainycape/cld2
+- package: golang.org/x/text
+  subpackages:
+  - language
