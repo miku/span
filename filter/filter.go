@@ -32,10 +32,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/miku/holdings"
-	"github.com/miku/holdings/generic"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
+	"github.com/miku/span/holdings"
+	"github.com/miku/span/holdings/generic"
 )
 
 // Filter returns go or no for a given record.
