@@ -6,7 +6,7 @@ export PATH := /home/vagrant/bin:$(PATH)
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test: assets deps
-	go get github.com/kylelemons/godebug/pretty
+	go get github.com/kr/pretty
 	go test -v ./...
 
 bench:
