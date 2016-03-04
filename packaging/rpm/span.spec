@@ -22,10 +22,8 @@ Library data format conversions.
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-gh-dump $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-solr $RPM_BUILD_ROOT/usr/local/sbin
 
 %post
 
@@ -38,10 +36,8 @@ rm -rf %{_topdir}/BUILD/%{name}
 %defattr(-,root,root)
 
 /usr/local/sbin/span-export
-/usr/local/sbin/span-gh-dump
 /usr/local/sbin/span-import
 /usr/local/sbin/span-tag
-/usr/local/sbin/span-solr
 
 %changelog
 
