@@ -8,13 +8,13 @@ export PATH := /home/vagrant/bin:$(PATH)
 test: assets deps
 	go get github.com/kylelemons/godebug/pretty
 	go get github.com/kr/pretty
-	go test -v ./...
+	go test -v $(glide novendor)
 
 bench:
 	go test -bench .
 
 deps:
-	go get ./...
+	go get $(glide novendor)
 
 imports:
 	go get golang.org/x/tools/cmd/goimports
@@ -27,10 +27,10 @@ assetutil/bindata.go:
 	go-bindata -o assetutil/bindata.go -pkg assetutil assets/...
 
 vet:
-	go vet ./...
+	go vet $(glide novendor)
 
 cover:
-	go test -cover ./...
+	go test -cover $(glide novendor)
 
 generate:
 	go generate
@@ -105,12 +105,14 @@ vagrant.key:
 	curl -sL "https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant" > vagrant.key
 	chmod 0600 vagrant.key
 
-# Don't forget to vagrant up :) - and add your public key to the guests authorized_keys
 setup: vagrant.key
 	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
 	$(SSHCMD) "sudo yum install -y golang git rpm-build gcc-c++"
 	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
 	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone /vagrant/.git span"
+	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/Masterminds"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/Masterminds && git clone https://github.com/Masterminds/glide.git"
+	$(SSHCMD) "GO15VENDOREXPERIMENT=1 cd /home/vagrant/src/github.com/Masterminds/glide && make bootstrap && make build && sudo cp glide ./glide /usr/local/bin"
 
 rpm-compatible: vagrant.key
 	$(SSHCMD) "GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/... golang.org/x/tools/cmd/goimports"
