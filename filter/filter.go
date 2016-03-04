@@ -1,24 +1,26 @@
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+// Package tree collect the next version of filters using trees. Eventually
+// the old filters will be sorted out and this will move back into span/filter
+// package namespace.
 //
-// This file is part of some open source application.
+// Flexible ISIL attachments with expression trees (serialized as JSON).
 //
-// Some open source application is free software: you can redistribute
-// it and/or modify it under the terms of the GNU General Public
-// License as published by the Free Software Foundation, either
-// version 3 of the License, or (at your option) any later version.
+// {
+//   "DE-Brt1": {
+//     "holdings": {
+//       "file": "/tmp/amsl/AMSLHoldingsFile/date-2016-02-17-isil-DE-Brt1.tsv"
+//     }
+//   },
+//   "DE-Zi4": {
+//     "or": [
+//         {"collection": ["A", "B"]},
+//         {"holdings": {"file": "/tmp/amsl/AMSLHoldingsFile/date-2016-02-17-isil-DE-Zi4.tsv"}}
+//     ]
+//   }
+//   ...
+// }
 //
-// Some open source application is distributed in the hope that it will
-// be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-// of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-//
-// @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
+// TODO(miku): add a small cache to reuse holding file filters, used in multiple places.
+
 package filter
 
 import (
@@ -27,83 +29,252 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strings"
-	"time"
 
+	"github.com/miku/holdings"
+	"github.com/miku/holdings/generic"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
-	"github.com/miku/span/holdings"
 )
 
-// Filter wraps the decision, whether a given IntermediateSchema record should
-// be attached or not. The decision may be based on record properties, simple
-// ISSN lists or more involved holdings files.
+// Filter returns go or no for a given record.
 type Filter interface {
 	Apply(finc.IntermediateSchema) bool
 }
 
-// Any always returns true.
-type Any struct{}
+// FilterFunc makes a function satisfy an interface.
+type FilterFunc func(finc.IntermediateSchema) bool
 
-// Apply filter.
-func (f Any) Apply(is finc.IntermediateSchema) bool { return true }
-
-// SourceFilter allows to attach ISIL on records of a given source.
-type SourceFilter struct {
-	SourceID string
+// Apply just calls the function.
+func (f FilterFunc) Apply(is finc.IntermediateSchema) bool {
+	return f(is)
 }
 
-// Apply filter.
-func (f SourceFilter) Apply(is finc.IntermediateSchema) bool {
-	return is.SourceID == f.SourceID
-}
+// AnyFilter validates any record.
+type AnyFilter struct{}
 
-// MarshalJSON provides custom serialization.
-func (f SourceFilter) MarshalJSON() ([]byte, error) {
-	return json.Marshal(f.SourceID)
-}
+// Apply will just return true.
+func (f *AnyFilter) Apply(finc.IntermediateSchema) bool { return true }
 
-// HoldingFilter looks at licensing information from an OVID files. Ref is the
-// reference date for moving wall calculations and Table contains a map from
-// ISSNs to licenses.
-type HoldingFilter struct {
-	Ref   time.Time
-	Table holdings.Licenses
-}
-
-// NewHoldingFilter loads the holdings information for a single institution.
-// Returns a single error, if one or more errors have been encountered.
-func NewHoldingFilter(r io.Reader) (HoldingFilter, error) {
-	licenses, errs := holdings.ParseHoldings(r)
-	if len(errs) > 0 {
-		for _, e := range errs {
-			log.Println(e)
-		}
-		err := fmt.Errorf("%d errors in holdings file", len(errs))
-		return HoldingFilter{Ref: time.Now(), Table: licenses}, err
+// UnmarshalJSON turns a config fragment into a ISSN filter.
+func (f *AnyFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Any struct{} `json:"any"`
 	}
-	return HoldingFilter{Ref: time.Now(), Table: licenses}, nil
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	return nil
 }
 
-// MarshalJSON provides custom serialization.
-func (f HoldingFilter) MarshalJSON() ([]byte, error) {
-	return json.Marshal(f.Table)
+// CollectionFilter validates all records matching one of the given collections.
+type CollectionFilter struct {
+	values container.StringSet
 }
 
-// HoldingFilter compares the (year, volume, issue) of an intermediate schema
-// record with licensing information, including moving walls.
-func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
-	signature := holdings.CombineDatum(fmt.Sprintf("%d", is.Date.Year()), is.Volume, is.Issue, "")
+// Apply filters collections.
+func (f *CollectionFilter) Apply(is finc.IntermediateSchema) bool {
+	return f.values.Contains(is.MegaCollection)
+}
+
+// UnmarshalJSON turns a config fragment into a ISSN filter.
+func (f *CollectionFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Collections []string `json:"collection"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.values = *container.NewStringSet(s.Collections...)
+	return nil
+}
+
+// ISSNFilter allows records with a certain ISSN.
+type ISSNFilter struct {
+	values container.StringSet
+}
+
+func (f *ISSNFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		licenses, ok := f.Table[issn]
-		if !ok {
-			return false
+		if f.values.Contains(issn) {
+			return true
 		}
-		for _, license := range licenses {
-			if !license.Covers(signature) {
+	}
+	return false
+}
+
+// UnmarshalJSON turns a config fragment into a filter.
+func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		ISSN struct {
+			Values []string `json:"list"`
+			File   string   `json:"file"`
+		} `json:"issn"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.values = *container.NewStringSet()
+	if s.ISSN.File != "" {
+		file, err := os.Open(s.ISSN.File)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		reader := bufio.NewReader(file)
+		for {
+			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			line = strings.TrimSpace(line)
+			if line == "" {
 				continue
 			}
-			if license.Delay() == 0 || is.Date.Before(license.Wall(f.Ref)) {
+			f.values.Add(line)
+		}
+	}
+	for _, v := range s.ISSN.Values {
+		f.values.Add(v)
+	}
+	return nil
+}
+
+// CollectionFilter allows all records of one of the given collections.
+type SourceFilter struct {
+	values []string
+}
+
+// Apply filters source ids.
+func (f *SourceFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, v := range f.values {
+		if v == is.SourceID {
+			return true
+		}
+	}
+	return false
+}
+
+// UnmarshalJSON turns a config fragment into a filter.
+func (f *SourceFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Collections []string `json:"source"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.values = s.Collections
+	return nil
+}
+
+// PackageFilter allows all records of one of the given package name.
+type PackageFilter struct {
+	values []string
+}
+
+// Apply filters packages.
+func (f *PackageFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, v := range f.values {
+		if v == is.Package {
+			return true
+		}
+	}
+	return false
+}
+
+// UnmarshalJSON turns a config fragment into a filter.
+func (f *PackageFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Packages []string `json:"package"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.values = s.Packages
+	return nil
+}
+
+// DOIFilter allows records with a given DOI. Use in conjuction with "not" to
+// create blacklists.
+type DOIFilter struct {
+	values []string
+	file   string
+}
+
+// Apply filters packages.
+func (f *DOIFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, v := range f.values {
+		if v == is.DOI {
+			return true
+		}
+	}
+	return false
+}
+
+// UnmarshalJSON turns a config fragment into a filter.
+func (f *DOIFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		DOI struct {
+			Values []string `json:"list"`
+			File   string   `json:"file"`
+		} `json:"doi"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	var values []string
+	if s.DOI.File != "" {
+		log.Println(s.DOI.File)
+		file, err := os.Open(s.DOI.File)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		reader := bufio.NewReader(file)
+		for {
+			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			values = append(values, line)
+		}
+	}
+	for _, v := range s.DOI.Values {
+		values = append(values, v)
+	}
+	f.values = values
+	return nil
+}
+
+// HoldingsFilter filters a record against a holding file. The holding file
+// might be in KBART, Ovid or Google format. TODO(miku): move moving wall
+// logic under `.Covers`.
+type HoldingsFilter struct {
+	entries holdings.Entries
+}
+
+// Apply tests validity against holding file.
+// TODO(miku): holdings file indentifiers can be ISSNs, ISBNs or DOIs
+func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
+	signature := holdings.Signature{
+		Date:   is.Date.Format("2006-01-02"),
+		Volume: is.Volume,
+		Issue:  is.Issue,
+	}
+	for _, issn := range append(is.ISSN, is.EISSN...) {
+		for _, license := range f.entries.Licenses(issn) {
+			if err := license.Covers(signature); err == nil {
 				return true
 			}
 		}
@@ -111,183 +282,272 @@ func (f HoldingFilter) Apply(is finc.IntermediateSchema) bool {
 	return false
 }
 
-// ListFilter will include records, whose ISSN is contained in a given set.
-// TODO(miku): The name ListFilter is much too generic for an ISSNFilter.
-type ListFilter struct {
-	Set *container.StringSet
-}
-
-// NewAttachByList reads one record per line from reader. Empty lines are ignored.
-func NewListFilter(r io.Reader) (ListFilter, error) {
-	br := bufio.NewReader(r)
-	f := ListFilter{Set: container.NewStringSet()}
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return f, err
-		}
-		line = strings.TrimSpace(line)
-		if line != "" {
-			f.Set.Add(line)
-		}
+// UnmarshalJSON unwraps a JSON into a HoldingsFilter.
+func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Holdings struct {
+			Filename string `json:"file"`
+		} `json:"holdings"`
 	}
-	return f, nil
+
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+
+	log.Printf("holdings file: %s", s.Holdings.Filename)
+	file, err := generic.New(s.Holdings.Filename)
+	if err != nil {
+		return err
+	}
+
+	f.entries, err = file.ReadEntries()
+	return err
 }
 
-// MarshalJSON provides custom serialization.
-func (f ListFilter) MarshalJSON() ([]byte, error) {
-	return json.Marshal(f.Set.Values())
+// OrFilter returns true, if there is at least one filter matching.
+type OrFilter struct {
+	filters []Filter
 }
 
-// Apply filter.
-func (f ListFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, issn := range append(is.ISSN, is.EISSN...) {
-		if f.Set.Contains(issn) {
+// Apply returns true, if any of the filters returns true. Short circuited.
+func (f *OrFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, f := range f.filters {
+		if f.Apply(is) {
 			return true
 		}
 	}
 	return false
 }
 
-// CollectionFilter allows any record that belongs to a collection, that is
-// listed in Names.
-// TODO(miku): better: MegaCollectionFilter?
-type CollectionFilter struct {
-	Set *container.StringSet
+// UnmarshalJSON turns a config fragment into a or filter.
+func (f *OrFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Filters []json.RawMessage `json:"or"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	filters, err := unmarshalFilterList(s.Filters)
+	if err != nil {
+		return err
+	}
+	f.filters = filters
+	return nil
 }
 
-func NewCollectionFilter(r io.Reader) (CollectionFilter, error) {
-	br := bufio.NewReader(r)
-	f := CollectionFilter{Set: container.NewStringSet()}
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			break
+// unmarshalFilter takes a name of a filter and a raw JSON message and
+// unmarshals the appropriate filter. All filters must be registered here.
+// Unknown filters cause an error.
+func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
+	switch name {
+	// add more filters here
+	case "any":
+		var filter AnyFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
 		}
+		return &filter, nil
+	case "doi":
+		var filter DOIFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "issn":
+		var filter ISSNFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "package":
+		var filter PackageFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "holdings":
+		var filter HoldingsFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "collection":
+		var filter CollectionFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "source":
+		var filter SourceFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "or":
+		var filter OrFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "and":
+		var filter AndFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "not":
+		var filter NotFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	default:
+		return nil, fmt.Errorf("unknown filter: %s", name)
+	}
+}
+
+// firstKey returns the top level key of an object, given as a raw JSON
+// message. It peeks into the fragment. An empty document will cause an error.
+func firstKey(raw json.RawMessage) (string, error) {
+	var peeker = make(map[string]interface{})
+	if err := json.Unmarshal(raw, &peeker); err != nil {
+		return "", err
+	}
+	var keys []string
+	for k, _ := range peeker {
+		keys = append(keys, k)
+	}
+	if len(keys) == 0 {
+		return "", fmt.Errorf("no key found")
+	}
+	return keys[0], nil
+}
+
+// unmarshalFilterList returns filters from a list of JSON fragments. Unknown
+// filter names will cause an error.
+func unmarshalFilterList(r []json.RawMessage) ([]Filter, error) {
+	var filters []Filter
+	for _, raw := range r {
+		name, err := firstKey(raw)
 		if err != nil {
-			return f, err
+			return filters, err
 		}
-		line = strings.TrimSpace(line)
-		if line != "" {
-			f.Set.Add(line)
-		}
-	}
-	return f, nil
-}
-
-// MarshalJSON provides custom serialization.
-func (f CollectionFilter) MarshalJSON() ([]byte, error) {
-	return json.Marshal(f.Set.Values())
-}
-
-// Apply filter.
-func (f CollectionFilter) Apply(is finc.IntermediateSchema) bool {
-	if f.Set.Contains(is.MegaCollection) {
-		return true
-	}
-	return false
-}
-
-// DOIFilter will exclude DOIs, that are listed in Set.
-type DOIFilter struct {
-	Set *container.StringSet
-}
-
-// TODO(miku): Simplify set filters: ISSNFilter, MegaCollectionFilter,
-// DOIFilter, ...
-func NewDOIFilter(r io.Reader) (DOIFilter, error) {
-	br := bufio.NewReader(r)
-	f := DOIFilter{Set: container.NewStringSet()}
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
+		filter, err := unmarshalFilter(name, raw)
 		if err != nil {
-			return f, err
+			return filters, err
 		}
-		line = strings.TrimSpace(line)
-		if line != "" {
-			f.Set.Add(line)
-		}
+		filters = append(filters, filter)
 	}
-	return f, nil
+	return filters, nil
 }
 
-// MarshalJSON provides custom serialization.
-func (f DOIFilter) MarshalJSON() ([]byte, error) {
-	return json.Marshal(f.Set.Values())
+// AndFilter returns true, only if all filters return true.
+type AndFilter struct {
+	filters []Filter
 }
 
-// Apply filter.
-func (f DOIFilter) Apply(is finc.IntermediateSchema) bool {
-	if f.Set.Contains(is.DOI) {
-		return false
+// Apply returns false if any of the filters returns false. Short circuited.
+func (f *AndFilter) Apply(is finc.IntermediateSchema) bool {
+	for _, f := range f.filters {
+		if !f.Apply(is) {
+			return false
+		}
 	}
 	return true
 }
 
-// DOIFilter will exclude DOIs, that are listed in Set.
-type PackageFilter struct {
-	Set *container.StringSet
+// UnmarshalJSON turns a config fragment into a or filter.
+func (f *AndFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Filters []json.RawMessage `json:"and"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	var err error
+	f.filters, err = unmarshalFilterList(s.Filters)
+	return err
 }
 
-// TODO(miku): Simplify set filters: ISSNFilter, MegaCollectionFilter,
-// DOIFilter, ...
-func NewPackageFilter(r io.Reader) (PackageFilter, error) {
-	br := bufio.NewReader(r)
-	f := PackageFilter{Set: container.NewStringSet()}
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return f, err
-		}
-		line = strings.TrimSpace(line)
-		if line != "" {
-			f.Set.Add(line)
+// NotFilter inverts a filter.
+type NotFilter struct {
+	filter Filter
+}
+
+// NotFilter inverts a filter.
+func (f *NotFilter) Apply(is finc.IntermediateSchema) bool {
+	return !f.filter.Apply(is)
+}
+
+// UnmarshalJSON turns a config fragment into a or filter.
+func (f *NotFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Filter json.RawMessage `json:"not"`
+	}
+	var err error
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	filters, err := unmarshalFilterList([]json.RawMessage{s.Filter})
+	if err != nil {
+		return err
+	}
+	if len(filters) == 0 {
+		return fmt.Errorf("no filter to invert")
+	}
+	f.filter = filters[0]
+	return nil
+}
+
+// FilterTree allows polymorphic filters.
+type FilterTree struct {
+	root Filter
+}
+
+// UnmarshalJSON will decide which filter is the top level one, by peeking
+// into the file.
+func (f *FilterTree) UnmarshalJSON(p []byte) error {
+	name, err := firstKey(p)
+	if err != nil {
+		return err
+	}
+	filter, err := unmarshalFilter(name, p)
+	if err != nil {
+		return err
+	}
+	f.root = filter
+	return nil
+}
+
+// Apply just applies the root filter.
+func (f *FilterTree) Apply(is finc.IntermediateSchema) bool {
+	return f.root.Apply(is)
+}
+
+// Tagger is takes a list of tags (ISILs) and annotates and intermediate
+// schema accroding to a number of filter, defined per label. The tagger can
+// be loaded directly from JSON.
+type Tagger struct {
+	filtermap map[string]FilterTree
+}
+
+// Tag takes an intermediate schema and returns a labeled version of that schema.
+func (t *Tagger) Tag(is finc.IntermediateSchema) finc.IntermediateSchema {
+	var tags []string
+	for tag, filter := range t.filtermap {
+		if filter.Apply(is) {
+			tags = append(tags, tag)
 		}
 	}
-	return f, nil
+	is.Labels = tags
+	return is
 }
 
-// MarshalJSON provides custom serialization.
-func (f PackageFilter) MarshalJSON() ([]byte, error) {
-	return json.Marshal(f.Set.Values())
-}
-
-// Apply filter.
-func (f PackageFilter) Apply(is finc.IntermediateSchema) bool {
-	if f.Set.Contains(is.Package) {
-		return true
+func (t *Tagger) UnmarshalJSON(p []byte) error {
+	var fm = make(map[string]FilterTree)
+	if err := json.Unmarshal(p, &fm); err != nil {
+		return err
 	}
-	return false
-}
-
-// ISILTagger maps ISILs to one or more Filters. If any of these filters
-// return true, the ISIL shall be attached (therefore order of the filters
-// does not matter).
-type ISILTagger map[string][]Filter
-
-// Tags returns all ISILs that could be attached to a given intermediate
-// schema record. If an ISIL has multiple filters, each filter is applied in
-// order, if any matches, the ISIL is added. TODO(miku): maybe we need order,
-// like "attach any record, but filter out those, that contain x in field y"
-// or attach all records where x == y, but of those ignore those, that are
-// given in this list, etc.
-func (t ISILTagger) Tags(is finc.IntermediateSchema) []string {
-	isils := container.NewStringSet()
-	for isil, filters := range t {
-		for _, f := range filters {
-			if f.Apply(is) {
-				isils.Add(isil)
-			}
-		}
-	}
-	return isils.Values()
+	t.filtermap = fm
+	return nil
 }

@@ -17,11 +17,11 @@ import (
 	"sync"
 
 	"github.com/miku/span"
-	"github.com/miku/span/filter/tree"
+	"github.com/miku/span/filter"
 	"github.com/miku/span/finc"
 )
 
-var tagger tree.Tagger
+var tagger filter.Tagger
 
 func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
