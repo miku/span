@@ -2,6 +2,7 @@
 package qa
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -80,12 +81,19 @@ func (f TesterFunc) TestRecord(is finc.IntermediateSchema) error {
 }
 
 type Issue struct {
-	Err    error
-	Record finc.IntermediateSchema
+	Err    error                   `json:"err"`
+	Record finc.IntermediateSchema `json:"record"`
 }
 
 func (i Issue) Error() string {
 	return fmt.Sprintf("%s: %+v", i.Error, i.Record)
+}
+
+func (i Issue) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]interface{}{
+		"err":    i.Err.Error(),
+		"record": i.Record,
+	})
 }
 
 // TestKeyLength checks the length of the record id. memcachedb limits is 250 bytes.
