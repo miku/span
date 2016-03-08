@@ -322,13 +322,14 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 			return err
 		}
 
-		// test for zip file
-		r, err := zip.OpenReader(dltmp.Name())
-		if err != nil {
-			// it's not a zip, so use use it as it is
-			filename = dltmp.Name()
-		} else {
-			// it's a zip file, extract all members into a single file
+		// assume zip file, extract all members into a single file
+		err = func() error {
+			r, err := zip.OpenReader(dltmp.Name())
+			if err != nil {
+				return err
+			}
+			defer r.Close()
+
 			tmp, err := ioutil.TempFile("", "span-")
 			if err != nil {
 				return err
@@ -345,10 +346,15 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 				}
 				rc.Close()
 			}
-
 			filename = tmp.Name()
+			return nil
+		}()
+
+		// if zip errs, use the downloaded file directly
+		if err != nil {
+			filename = dltmp.Name()
 		}
-		defer r.Close()
+
 	}
 
 	if s.Holdings.Filename != "" {
