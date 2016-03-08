@@ -305,6 +305,8 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		if err != nil {
 			return err
 		}
+		filename = tmpfile.Name()
+		defer os.Remove(tmpfile.Name()) // clean up
 
 		resp, err := http.Get(s.Holdings.Link)
 		if err != nil {
@@ -317,8 +319,6 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		if err := tmpfile.Close(); err != nil {
 			return err
 		}
-
-		filename = tmpfile.Name()
 	}
 
 	if s.Holdings.Filename != "" {
