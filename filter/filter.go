@@ -309,6 +309,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		}
 		defer os.Remove(dltmp.Name()) // clean up
 
+		log.Printf("fetching (to %s): %s", dltmp.Name(), s.Holdings.Link)
 		resp, err := http.Get(s.Holdings.Link)
 		if err != nil {
 			return err
@@ -321,6 +322,8 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		if err := dltmp.Close(); err != nil {
 			return err
 		}
+
+		log.Printf("probing for zip...")
 
 		// assume zip file, extract all members into a single file
 		err = func() error {
@@ -352,6 +355,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 
 		// if zip errs, use the downloaded file directly
 		if err != nil {
+			log.Printf("not a zip (%s), using downloaded file directly: %s", err, dltmp.Name())
 			filename = dltmp.Name()
 		}
 
