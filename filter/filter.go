@@ -349,6 +349,9 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 				}
 				rc.Close()
 			}
+			if err := tmp.Close(); err != nil {
+				return err
+			}
 			filename = tmp.Name()
 			return nil
 		}()
