@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
@@ -121,11 +122,11 @@ func (article *Article) ReviewedProduct() string {
 		return ""
 	}
 	if article.Front.Article.Products[0].Source.Value != "" {
-		return article.Front.Article.Products[0].Source.Value
+		return strings.TrimSpace(sanitize.HTML(article.Front.Article.Products[0].Source.Value))
 	}
 	// refs. #7111
 	if article.Front.Article.Products[0].StringName.Value != "" {
-		return article.Front.Article.Products[0].StringName.Value
+		return strings.TrimSpace(sanitize.HTML(article.Front.Article.Products[0].StringName.Value))
 	}
 	return ""
 }

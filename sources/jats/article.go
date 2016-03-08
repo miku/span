@@ -209,16 +209,15 @@ type Article struct {
 				Value   string   `xml:",chardata"`
 			}
 			Products []struct {
-				XMLName xml.Name `xml:"product"`
-				Source  struct {
+				Source struct {
 					XMLName xml.Name `xml:"source"`
-					Value   string   `xml:",chardata"`
+					Value   string   `xml:",innerxml"`
 				}
 				StringName struct {
 					XMLName xml.Name `xml:"string-name"`
-					Value   string   `xml:",chardata"`
+					Value   string   `xml:",innerxml"`
 				}
-			}
+			} `xml:"product"`
 			Permissions struct {
 				XMLName       xml.Name `xml:"permissions"`
 				CopyrightYear struct {
