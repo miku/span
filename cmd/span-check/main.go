@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/miku/span"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/qa"
 )
@@ -17,6 +18,17 @@ import (
 var stats = make(map[string]int)
 
 func main() {
+
+	verbose := flag.Bool("verbose", false, "be verbose")
+	showVersion := flag.Bool("v", false, "prints current program version")
+
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
+
 	var readers []io.Reader
 
 	if flag.NArg() == 0 {
@@ -55,16 +67,18 @@ func main() {
 						log.Fatalf("unexpected error: %s", err)
 					}
 					stats[issue.Err.Error()]++
-					// b, err := json.Marshal(issue)
-					// if err != nil {
-					// 	log.Fatal(err)
-					// }
-					// fmt.Println(string(b))
+					if *verbose {
+						b, err := json.Marshal(issue)
+						if err != nil {
+							log.Fatal(err)
+						}
+						fmt.Println(string(b))
+					}
 				}
 			}
 		}
 	}
-	b, err := json.Marshal(stats)
+	b, err := json.Marshal(map[string]interface{}{"stats": stats})
 	if err != nil {
 		log.Fatal(err)
 	}
