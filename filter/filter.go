@@ -28,7 +28,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -282,11 +284,13 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	return false
 }
 
-// UnmarshalJSON unwraps a JSON into a HoldingsFilter.
+// UnmarshalJSON unwraps a JSON into a HoldingsFilter. Can use holding file
+// from file or URL, if both are given, file is preferred.
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
 			Filename string `json:"file"`
+			Link     string `json:"url"`
 		} `json:"holdings"`
 	}
 
@@ -294,8 +298,36 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 
-	log.Printf("holdings file: %s", s.Holdings.Filename)
-	file, err := generic.New(s.Holdings.Filename)
+	var filename string
+
+	if s.Holdings.Link != "" {
+		tmpfile, err := ioutil.TempFile("", "span-")
+		if err != nil {
+			return err
+		}
+
+		resp, err := http.Get(s.Holdings.Link)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if _, err = io.Copy(tmpfile, resp.Body); err != nil {
+			return err
+		}
+		if err := tmpfile.Close(); err != nil {
+			return err
+		}
+
+		filename = tmpfile.Name()
+	}
+
+	if s.Holdings.Filename != "" {
+		filename = s.Holdings.Filename
+	}
+
+	log.Printf("using holding file: %s", filename)
+
+	file, err := generic.New(filename)
 	if err != nil {
 		return err
 	}
