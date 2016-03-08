@@ -208,7 +208,7 @@ type Article struct {
 				XMLName xml.Name `xml:"lpage"`
 				Value   string   `xml:",chardata"`
 			}
-			Product struct {
+			Products []struct {
 				XMLName xml.Name `xml:"product"`
 				Source  struct {
 					XMLName xml.Name `xml:"source"`

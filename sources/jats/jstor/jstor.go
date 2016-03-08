@@ -115,6 +115,21 @@ func (article *Article) Languages() []string {
 	return set.Values()
 }
 
+// ReviewedProduct returns the string of the reviewed thing in a best-effort way.
+func (article *Article) ReviewedProduct() string {
+	if len(article.Front.Article.Products) == 0 {
+		return ""
+	}
+	if article.Front.Article.Products[0].Source.Value != "" {
+		return article.Front.Article.Products[0].Source.Value
+	}
+	// refs. #7111
+	if article.Front.Article.Products[0].StringName.Value != "" {
+		return article.Front.Article.Products[0].StringName.Value
+	}
+	return ""
+}
+
 // ToInternalSchema converts an article into an internal schema. There are a
 // couple of content-dependent choices here.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
@@ -166,7 +181,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	// refs #5686, approx. article type distribution: https://git.io/vzlCr
 	switch article.Type {
 	case "book-review", "book-reviews", "Book Review":
-		output.ArticleTitle = fmt.Sprintf("Review: %s", article.Front.Article.Product.Source.Value)
+		output.ArticleTitle = fmt.Sprintf("Review: %s", article.ReviewedProduct())
 	case "misc", "other", "front-matter", "back-matter", "announcement", "font-matter", "fm", "fornt-matter":
 		return output, span.Skip{Reason: fmt.Sprintf("suppressed format: %s", article.Type)}
 	}
