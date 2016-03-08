@@ -307,7 +307,6 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		if err != nil {
 			return err
 		}
-		defer os.Remove(dltmp.Name()) // clean up
 
 		log.Printf("fetching (to %s): %s", dltmp.Name(), s.Holdings.Link)
 		resp, err := http.Get(s.Holdings.Link)
@@ -337,7 +336,6 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 			if err != nil {
 				return err
 			}
-			defer os.Remove(tmp.Name())
 
 			for _, f := range r.File {
 				rc, err := f.Open()
