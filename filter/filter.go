@@ -365,6 +365,10 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		filename = s.Holdings.Filename
 	}
 
+	if filename == "" {
+		return fmt.Errorf("holdings filter: either filename or url must be given")
+	}
+
 	file, err := generic.New(filename)
 	if err != nil {
 		return err
