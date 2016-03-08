@@ -24,6 +24,7 @@
 package filter
 
 import (
+	"archive/zip"
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -300,25 +301,54 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 
 	var filename string
 
+	// support direct links to holding files (zipped or unzipped) in configuration
 	if s.Holdings.Link != "" {
-		tmpfile, err := ioutil.TempFile("", "span-")
+		dltmp, err := ioutil.TempFile("", "span-")
 		if err != nil {
 			return err
 		}
-		filename = tmpfile.Name()
-		defer os.Remove(tmpfile.Name()) // clean up
+		defer os.Remove(dltmp.Name()) // clean up
 
 		resp, err := http.Get(s.Holdings.Link)
 		if err != nil {
 			return err
 		}
 		defer resp.Body.Close()
-		if _, err = io.Copy(tmpfile, resp.Body); err != nil {
+
+		if _, err = io.Copy(dltmp, resp.Body); err != nil {
 			return err
 		}
-		if err := tmpfile.Close(); err != nil {
+		if err := dltmp.Close(); err != nil {
 			return err
 		}
+
+		// test for zip file
+		r, err := zip.OpenReader(dltmp.Name())
+		if err != nil {
+			// it's not a zip, so use use it as it is
+			filename = dltmp.Name()
+		} else {
+			// it's a zip file, extract all members into a single file
+			tmp, err := ioutil.TempFile("", "span-")
+			if err != nil {
+				return err
+			}
+			defer os.Remove(tmp.Name())
+
+			for _, f := range r.File {
+				rc, err := f.Open()
+				if err != nil {
+					return err
+				}
+				if _, err = io.Copy(tmp, rc); err != nil {
+					return err
+				}
+				rc.Close()
+			}
+
+			filename = tmp.Name()
+		}
+		defer r.Close()
 	}
 
 	if s.Holdings.Filename != "" {
