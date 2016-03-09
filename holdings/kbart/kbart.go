@@ -206,8 +206,8 @@ func (r *Reader) Read() (columns, holdings.Entry, error) {
 		return cols, entry, err
 	}
 	// usually 23 columns, but might be only 19, refs. #7004
-	if len(record) < 23 {
-		log.Printf("warning: KBART line has %d columns, expected 23", len(record))
+	if len(record) < 19 {
+		log.Printf("warning: KBART line has (about) %d columns, expected 19 or 23", len(record))
 	}
 
 	// if less than 13, bail out, refs. #7004
