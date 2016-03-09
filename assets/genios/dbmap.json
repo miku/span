@@ -1,1620 +1,2040 @@
 {
-  "PMGC": [
-    "Fachzeitschriften"
-  ],
-  "TWA": [
-    "Fachzeitschriften"
-  ],
-  "AHOR": [
-    "Fachzeitschriften"
-  ],
-  "VDIA": [
-    "Fachzeitschriften"
-  ],
-  "LMZA": [
-    "Fachzeitschriften"
-  ],
-  "AHGA": [
-    "Fachzeitschriften"
-  ],
-  "GVPA": [
-    "Fachzeitschriften"
-  ],
-  "FSA": [
-    "Fachzeitschriften"
-  ],
-  "HANA": [
-    "Fachzeitschriften"
-  ],
-  "FLWA": [
-    "Fachzeitschriften"
-  ],
-  "FSEA": [
-    "Fachzeitschriften"
-  ],
-  "PMGI": [
-    "Fachzeitschriften"
-  ],
-  "VDIA": [
-    "Fachzeitschriften"
-  ],
-  "WEN": [
-    "Fachzeitschriften"
-  ],
-  "IFKP": [
-    "Fachzeitschriften"
-  ],
-  "KUSE": [
-    "Fachzeitschriften"
-  ],
   "IJAR": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "ZAAA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "POPS": [
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "WLB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "TAWI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
-  "ZFS": [
-    "Psychologie",
+  "DZI": [
+    "Wirtschaftswissenschaften",
     "Sozialwissenschaften"
   ],
   "BIKE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BWI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VM": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "NDV": [
+    "Fachzeitschriften",
     "Recht",
     "Sozialwissenschaften"
   ],
   "TAI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "HAND": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GG": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WRP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "FJSB": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "DLGM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MAR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WUW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WUV": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LAK": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "NPE": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "ASSC": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WUB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "PACK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GITL": [
+    "Fachzeitschriften",
     "Technik"
   ],
-  "PUA": [
+  "AUON": [
     "Wirtschaftswissenschaften",
-    "Psychologie"
+    "Fachzeitschriften"
   ],
   "DTZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PCH": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "SBAN": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KOCA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "THEX": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SOBE": [
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "FLWI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WUWE": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "JEEM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "ZM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "DSZ": [
-    "Wirtschaftswissenschaften"
-  ],
-  "SOLI": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
   ],
+  "ZM": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "DSZ": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "SOLI": [
+    "Sozialwissenschaften"
+  ],
   "TRE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DST": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "STBG": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "ZVS": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "VDIN": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "DSB": [
+    "Fachzeitschriften",
     "Recht",
     "Technik"
   ],
   "WTRE": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "MF": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "DBWV": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "VCNE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MT": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IFOL": [
-    "Fachzeitschriften"
+    "Wirtschaftswissenschaften"
   ],
   "FS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AFZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WEBE": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "FB": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FH": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "ZNER": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
-  "MAV": [
-    "Wirtschaftswissenschaften",
-    "Technik"
-  ],
   "FM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SMA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MDA": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "PHAM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MDR": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "BOND": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AUA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "AUB": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DFI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VEC": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AUW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "REFA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VRAG": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LMZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "RLH": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MARC": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
-  "AUON": [
-    "Wirtschaftswissenschaften"
+  "PUA": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Psychologie"
   ],
   "IMWI": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "SB": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ERP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "OMNI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BBLO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CAV": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "IBF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ANKR": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "FERT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "ABAU": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KOR": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "CAD": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "SOFI": [
-    "Fachzeitschriften"
+    "Wirtschaftswissenschaften",
+    "Sozialwissenschaften"
   ],
   "SOFO": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "LI": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "HIF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ONR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PROJ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "STB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "ZRP": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "IWPR": [
-    "Fachzeitschriften"
+    "Wirtschaftswissenschaften"
   ],
   "SOC": [
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "UNTE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "STS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ABZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MREV": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BANK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CFO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "QJIA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MAKR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "TAXI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DKT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "GA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GHR": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "JFAV": [
-    "Wirtschaftswissenschaften"
-  ],
-  "ECON": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
   ],
-  "KMAG": [
+  "ECON": [
     "Wirtschaftswissenschaften"
+  ],
+  "KMAG": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MID": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WEFO": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "TRUC": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "JOR": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "AOB": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "FOGR": [
-    "Fachzeitschriften"
+    "Technik"
   ],
   "AWCH": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "RAU": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "WIME": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie",
     "Recht"
   ],
   "OEWI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "HBNI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFGK": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "CHX": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BUIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFGG": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DBM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DBL": [
-    "Wirtschaftswissenschaften"
-  ],
-  "HWWA": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
+  ],
+  "MAV": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Technik"
   ],
   "HORS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KUK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DBW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PSYT": [
-    "Fachzeitschriften"
+    "Psychologie"
   ],
   "GMST": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "EXFO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ABES": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DINM": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "BAMA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZWF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CLIN": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PSYA": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
-  "PSYC": [
-    "Psychologie"
+  "STAA": [
+    "Fachzeitschriften",
+    "Recht",
+    "Sozialwissenschaften"
   ],
   "WFP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "GAST": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "NGZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CAIT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "PKV": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "SBRE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FLOW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "RTH": [
+    "Fachzeitschriften",
     "Recht",
     "Sozialwissenschaften"
   ],
   "RTJ": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IP": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "HMD": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "EDBW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZKF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EM": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "ED": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EA": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "EB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "RAAK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SHF": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "DLT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AFP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
-  ],
-  "MCKW": [
-    "Wirtschaftswissenschaften"
-  ],
-  "SSP": [
-    "Wirtschaftswissenschaften",
-    "Technik"
-  ],
-  "CIPA": [
-    "Wirtschaftswissenschaften"
-  ],
-  "USTB": [
-    "Wirtschaftswissenschaften"
-  ],
-  "OGEM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "IM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "PROD": [
-    "Technik"
-  ],
-  "PROC": [
-    "Technik"
-  ],
-  "HORA": [
-    "Wirtschaftswissenschaften"
-  ],
-  "ISR": [
-    "Wirtschaftswissenschaften",
-    "Technik"
-  ],
-  "IA": [
-    "Wirtschaftswissenschaften",
-    "Technik"
-  ],
-  "ISI": [
-    "Sozialwissenschaften"
-  ],
-  "VJH": [
-    "Wirtschaftswissenschaften",
-    "Sozialwissenschaften"
-  ],
-  "EJOP": [
-    "Psychologie"
-  ],
-  "MUM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "JBM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "EUSO": [
-    "Wirtschaftswissenschaften"
-  ],
-  "ASP": [
-    "Wirtschaftswissenschaften",
-    "Technik"
-  ],
-  "ASW": [
-    "Wirtschaftswissenschaften"
   ],
   "BEFO": [
     "Wirtschaftswissenschaften"
   ],
-  "PAFO": [
-    "Wirtschaftswissenschaften"
+  "SSP": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Technik"
   ],
-  "JFNS": [
-    "Wirtschaftswissenschaften"
+  "CIPA": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "USTB": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "OGEM": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "IM": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "PROD": [
+    "Fachzeitschriften",
+    "Technik"
+  ],
+  "PROC": [
+    "Fachzeitschriften",
+    "Technik"
+  ],
+  "HORA": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "ISR": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Technik"
+  ],
+  "IA": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Technik"
+  ],
+  "ISI": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "VJH": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "EJOP": [
+    "Fachzeitschriften",
+    "Psychologie"
+  ],
+  "MUM": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "JBM": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "EUSO": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "ASP": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Technik"
+  ],
+  "ASW": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "MCKW": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "PAFO": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "TETE": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "IMC": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "BBL": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "OEKZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BUMT": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "BBA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "OEKO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CARD": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "INFO": [
-    "Fachzeitschriften"
+    "Technik"
   ],
   "BVPE": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "KEM": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "HVM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SPAO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KE": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "ITG": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "BVPN": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "KH": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ITB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "KM": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AATG": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KU": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SPAR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ITT": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KEP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AAA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZSR": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "SINV": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DD": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AUBI": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "KRES": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EUFI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ABIL": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SWW": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "BIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ERBS": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "AECO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "UNED": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
-  "HOLZ": [
+  "JFNS": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
   ],
   "VERW": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "RBS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CWT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "VERK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CYBI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GOP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LGK": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IMMO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "IMMA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "QZ": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "WJ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "QE": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IHSL": [
-    "Fachzeitschriften"
+    "Wirtschaftswissenschaften",
+    "Sozialwissenschaften"
   ],
-  "DZI": [
-    "Fachzeitschriften"
+  "ZFS": [
+    "Fachzeitschriften",
+    "Psychologie",
+    "Sozialwissenschaften"
   ],
   "ZFR": [
+    "Fachzeitschriften",
     "Recht",
     "Sozialwissenschaften"
   ],
   "WM": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "ZFP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "COWI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFT": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "WW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFO": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "WP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "DTRS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GFKM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "IWB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "BUSR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "HSR": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "IWT": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "JUKA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "RISK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "IAA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "IAC": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "PASS": [
-    "Wirtschaftswissenschaften"
-  ],
-  "FVW": [
-    "Wirtschaftswissenschaften"
-  ],
-  "VALU": [
-    "Wirtschaftswissenschaften"
-  ],
-  "AAS": [
-    "Wirtschaftswissenschaften"
-  ],
-  "CEAB": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
   ],
+  "FVW": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "VALU": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "AAS": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "CEAB": [
+    "Technik"
+  ],
   "DVZB": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ETEC": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AEQ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SVER": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PORT": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
-  "UMPS": [
+  "ZOE": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "PP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "GEW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "HMDS": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "GET": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "STIF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BUS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BUW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BUM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MALE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PM": [
-    "Wirtschaftswissenschaften"
-  ],
-  "ZOE": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "UMPS": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "DDS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFAA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "DDH": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WPSY": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "EXTR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ORDO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WWT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "KAFU": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AUIN": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
-  "CBIL": [
+  "ANT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "PSS": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "KURS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BSPI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EMAR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FSE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BULK": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "STGU": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GWW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GWP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DVZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "OELA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DVP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FLUI": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "VRR": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "THBE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "JCSM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CASH": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VRA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "WAO": [
-    "Fachzeitschriften"
+    "Sozialwissenschaften"
   ],
   "CO": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "WWGR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ADIW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CF": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "CZ": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "MUAR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WAX": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "CS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "CW": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "CT": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "BILA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BILN": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GELD": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PLM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ENEV": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "DIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LOG": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IFOK": [
-    "Fachzeitschriften"
-  ],
-  "IFOD": [
     "Wirtschaftswissenschaften"
   ],
+  "IFOD": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
   "HDLG": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "XPSY": [
-    "Fachzeitschriften"
+    "Psychologie"
   ],
   "INSP": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "INST": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "IHKK": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "IFOS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
-  "ANT": [
+  "CBIL": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "DIBA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "OWG": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "PPS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GEPR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LEDI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFWP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFWU": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "IX": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AUTO": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "IT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AUTH": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AUTI": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "VR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "VV": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KONP": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "MTA": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "KONT": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EPRA": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "TW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "HOLZ": [
+    "Technik"
   ],
   "MCDB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "PWI": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "BE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "BM": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "BI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EPP": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "BLIS": [
-    "Fachzeitschriften"
+    "Wirtschaftswissenschaften",
+    "Sozialwissenschaften"
   ],
   "BW": [
-    "Wirtschaftswissenschaften"
-  ],
-  "FIWI": [
-    "Wirtschaftswissenschaften"
-  ],
-  "KOEL": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
   ],
-  "GRER": [
+  "FIWI": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "KOEL": [
     "Wirtschaftswissenschaften"
   ],
+  "GRER": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
   "MFZB": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "EJCO": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "LMZS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MTME": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "IJPR": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "FAMR": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "LOGI": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "VUV": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "BFUP": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AKTS": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "PUGK": [
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "OP": [
+    "Fachzeitschriften",
     "Technik"
   ],
-  "LKH": [
+  "HWWA": [
     "Wirtschaftswissenschaften"
+  ],
+  "LKH": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FINR": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "ZFBF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VERS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FLW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DEI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "EEK": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "SMF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DIWW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DIWR": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "FLF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KUSI": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "CMAG": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "PUUM": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "EUZW": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "ZFKO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZFKE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KUST": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "EWK": [
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "DSTZ": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "SCOP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "LABO": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "OEIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KONS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GEBM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VOB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht",
     "Technik"
   ],
   "FBIE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AHGZ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "UR": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "HTT": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "FPP": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "SUG": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "ESTE": [
-    "Fachzeitschriften"
+    "Technik"
   ],
   "ESTB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "SOSY": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "ACQ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ACAS": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ZUG": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BLEC": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AWOE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "SOSI": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "GOV": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "AUEL": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "JSPP": [
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "GFGH": [
-    "Wirtschaftswissenschaften"
-  ],
-  "PMJ": [
-    "Wirtschaftswissenschaften"
-  ],
-  "KFZB": [
-    "Wirtschaftswissenschaften"
-  ],
-  "REND": [
-    "Wirtschaftswissenschaften"
-  ],
-  "MIND": [
+    "Wirtschaftswissenschaften",
     "Fachzeitschriften"
   ],
-  "DNK": [
+  "PMJ": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "KFZB": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "REND": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "MIND": [
     "Wirtschaftswissenschaften"
+  ],
+  "DNK": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "QUAL": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "NEEN": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "SJB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "RCUA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WIM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "LAPR": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "MAMI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "VUNM": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "WIR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MAMA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "GDI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DIST": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CID": [
+    "Fachzeitschriften",
     "Technik"
   ],
-  "STAA": [
-    "Recht",
-    "Sozialwissenschaften"
+  "PSYC": [
+    "Fachzeitschriften",
+    "Psychologie"
   ],
   "MSR": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "FEMS": [
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ],
   "TWP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Psychologie"
   ],
   "JBWW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GVPR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DAE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CFLA": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "THPH": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "WIRO": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "TT": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "TR": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "HDJ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "TJ": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "KFZW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "DAR": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Recht"
   ],
   "CITL": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "REGA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "MIET": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "AWPA": [
+    "Fachzeitschriften",
     "Psychologie",
     "Sozialwissenschaften"
   ],
   "HOE": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AE": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "DWW": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AF": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AEZT": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "ADCO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "NOTB": [
+    "Fachzeitschriften",
     "Recht"
   ],
   "AO": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "GLIP": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Technik"
   ],
   "HOR": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "AT": [
+    "Fachzeitschriften",
     "Technik"
   ],
   "VST": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "BRAU": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "CATI": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "PEMA": [
-    "Wirtschaftswissenschaften"
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
   ],
   "INDB": [
     "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
     "Sozialwissenschaften"
   ]
 }

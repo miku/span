@@ -176,13 +176,13 @@ func (f *SourceFilter) UnmarshalJSON(p []byte) error {
 
 // PackageFilter allows all records of one of the given package name.
 type PackageFilter struct {
-	values []string
+	values container.StringSet
 }
 
 // Apply filters packages.
 func (f *PackageFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.values {
-		if v == is.Package {
+	for _, pkg := range is.Packages {
+		if f.values.Contains(pkg) {
 			return true
 		}
 	}
@@ -197,7 +197,7 @@ func (f *PackageFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = s.Packages
+	f.values = *container.NewStringSet(s.Packages...)
 	return nil
 }
 

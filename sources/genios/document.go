@@ -220,9 +220,13 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Format = Format
 	output.Genre = Genre
 	output.Languages = doc.Languages()
-	output.Package = doc.DB
 
 	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
+
+	// Note DB name as well as package name (Wiwi, Sowi, Recht, etc.) as well
+	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
+	output.Packages = append([]string{doc.DB}, packageNames...)
+
 	if len(packageNames) > 0 {
 		output.MegaCollection = fmt.Sprintf("Genios (%s)", packageNames[0])
 	} else {
