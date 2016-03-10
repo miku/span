@@ -71,3 +71,65 @@ type Dataset struct {
 		} `xml:"journal-item"`
 	} `xml:"dataset-content"`
 }
+
+type SerialIssue struct {
+	IssueInfo struct {
+		PII               string
+		JID               string
+		VolumeIssueNumber struct {
+			VolFirst string `xml:"vol-first"`
+			IssFirst string `xml:"iss-first"`
+			IssLast  string `xml:"iss-last"`
+		} `xml:"volume-issue-number"`
+	} `xml:"issue-info"`
+	IssueData struct {
+		CoverDate struct {
+			StartDate string `xml:"start-date"`
+			EndDate   string `xml:"end-date"`
+		} `xml:"cover-date"`
+		Pages struct {
+			FirstPage string `xml:"first-page"`
+			LastPage  string `xml:"last-page"`
+		} `xml:"pages"`
+		CoverImage struct {
+			Figure struct {
+				Link struct {
+					Locator string `xml:"locator,attr"`
+				} `xml:"link"`
+			} `xml:"figure"`
+		} `xml:"cover-image"`
+		TitleEditorsGroup struct {
+			Title   string `xml:"title"`
+			Editors struct {
+				AuthorGroup []struct {
+					Author struct {
+						GivenName string `xml:"given-name"`
+						Surname   string `xml:"surname"`
+					} `xml:"author"`
+				} `xml:"author-group"`
+			} `xml:"editors"`
+		}
+	} `xml:"issue-data"`
+
+	IssueBody struct {
+		IncludeItems []struct {
+			PII   string `xml:"pii"`
+			DOI   string `xml:"doi"`
+			Pages struct {
+				FirstPage string `xml:"first-page"`
+				LastPage  string `xml:"last-page"`
+			} `xml:"pages"`
+		} `xml:"include-item"`
+		IssueSections []struct {
+			SectionTitle string `xml:"section-title"`
+			IncludeItem  struct {
+				PII   string `xml:"pii"`
+				DOI   string `xml:"doi"`
+				Pages struct {
+					FirstPage string `xml:"first-page"`
+					LastPage  string `xml:"last-page"`
+				} `xml:"pages"`
+			}
+		} `xml:"issue-sec"`
+	} `xml:"issue-body"`
+}
