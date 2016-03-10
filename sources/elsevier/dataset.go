@@ -1,6 +1,9 @@
 package elsevier
 
+import "encoding/xml"
+
 type Dataset struct {
+	XMLName          xml.Name `xml:"dataset"`
 	DatasetUniqueIDs struct {
 		ProfileCode      string `xml:"profile-code"`
 		ProfileDatasetId string `xml:"profile-dataset-id"`
@@ -51,7 +54,7 @@ type Dataset struct {
 				JIDAid struct {
 					PII  string `xml:"jid"`
 					ISSN string `xml:"issn"`
-					Aid  string `xml:"aid"`
+					AID  string `xml:"aid"`
 				} `xml:"jid-aid"`
 			} `xml:"journal-item-unique-ids"`
 			JournalItemProperties struct {
@@ -73,6 +76,7 @@ type Dataset struct {
 }
 
 type SerialIssue struct {
+	XMLName   xml.Name `xml:"serial-issue"`
 	IssueInfo struct {
 		PII               string
 		JID               string
@@ -132,4 +136,50 @@ type SerialIssue struct {
 			}
 		} `xml:"issue-sec"`
 	} `xml:"issue-body"`
+}
+
+type SimpleArticle struct {
+	XMLName  xml.Name `xml:"simple-article"`
+	ItemInfo struct {
+		JID       string `xml:"jid"`
+		AID       string `xml:"aid"`
+		PII       string `xml:"ce:pii"`
+		DOI       string `xml:"ce:doi"`
+		Copyright struct {
+			Type string `xml:"type,attr"`
+			Year string `xml:"year,attr"`
+		} `xml:"ce:copyright"`
+	} `xml:"ce:item-info"`
+
+	SimpleHead struct {
+		DocHead struct {
+			TextFn string `xml:"ce:textfn"`
+		} `xml:"ce:dochead"`
+		Title       string `xml:"ce:title"`
+		AuthorGroup []struct {
+			Author struct {
+				ID                string `xml:"id,attr"`
+				GivenName         string `xml:"ce:given-name"`
+				Surname           string `xml:"ce:surname"`
+				ElectronicAddress struct {
+					Type  string `xml:"type,attr"`
+					Value string `xml:",chardata"`
+				} `xml:"ce:e-address"`
+				Affiliation struct {
+					TextFn string `xml:"ce:textfn"`
+				} `xml:"ce:affilitaion"`
+				Crossref struct {
+					RefID string `xml:"refid,attr"`
+					Sup   struct {
+						Loc string `xml:"loc,attr"`
+					}
+				} `xml:"ce:cross-ref"`
+				Correspondence struct {
+					ID    string `xml:"id,attr"`
+					Label string `xml:"ce:label"`
+					Text  string `xml:"ce:text"`
+				} `xml:"ce:correspondence"`
+			} `xml:"ce:author"`
+		} `xml:"ce:author-group"`
+	} `xml:"ce:simple-head"`
 }
