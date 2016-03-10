@@ -61,6 +61,10 @@ type Dataset struct {
 				PIT                   string `xml:"pit"`
 				ProductionType        string `xml:"production-type"`
 				OnlinePublicationDate string `xml:"online-publication-date"`
+				SponsoredAccess       struct {
+					Type string `xml:"type"`
+				} `xml:"sponsored-access"`
+				FundingBodyId string `xml:"funding-body-id"`
 			} `xml:"journal-item-properties"`
 			FilesInfo struct {
 				ML struct {
@@ -69,6 +73,11 @@ type Dataset struct {
 					Purpose    string `xml:"purpose"`
 					DTDVersion string `xml:"dtd-version"`
 					Weight     string `xml:"weight"`
+					Assets     []struct {
+						Pathname string `xml:"pathname"`
+						Filesize string `xml:"filesize"`
+						Type     string `xml:"type"`
+					} `xml:"assets"`
 				} `xml:"ml"`
 			} `xml:"files-info"`
 		} `xml:"journal-item"`
