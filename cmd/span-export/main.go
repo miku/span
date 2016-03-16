@@ -27,16 +27,17 @@ type options struct {
 
 // Exporters holds available export formats
 var Exporters = map[string]func() finc.ExportSchema{
-	"dummy":       func() finc.ExportSchema { return new(exporter.DummySchema) },
-	"solr4vu13v1": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v1) },
-	"solr4vu13v2": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v2) },
-	"solr4vu13v3": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v3) },
-	"solr4vu13v4": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v4) },
-	"solr4vu13v5": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v5) },
-	"solr4vu13v6": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v6) },
-	"solr4vu13v7": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v7) },
-	"solr4vu13v8": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v8) },
-	"solr4vu13v9": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v9) },
+	"dummy":        func() finc.ExportSchema { return new(exporter.DummySchema) },
+	"solr4vu13v1":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v1) },
+	"solr4vu13v2":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v2) },
+	"solr4vu13v3":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v3) },
+	"solr4vu13v4":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v4) },
+	"solr4vu13v5":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v5) },
+	"solr4vu13v6":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v6) },
+	"solr4vu13v7":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v7) },
+	"solr4vu13v8":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v8) },
+	"solr4vu13v9":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v9) },
+	"solr4vu13v10": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v10) },
 }
 
 // worker iterates over string batches
