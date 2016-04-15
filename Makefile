@@ -74,7 +74,6 @@ cloc:
 # Initially, setup a CentOS 6.5 machine, install dependencies and git clone:
 #
 #     $ vagrant up
-#     $ make setup
 #
 # To build an rpm, subsequently run:
 #
@@ -100,13 +99,7 @@ vagrant.key:
 	curl -sL "https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant" > vagrant.key
 	chmod 0600 vagrant.key
 
-setup: vagrant.key
-	$(SSHCMD) "sudo yum install -y sudo yum install http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm"
-	$(SSHCMD) "sudo yum install -y golang git rpm-build gcc-c++"
-	$(SSHCMD) "mkdir -p /home/vagrant/src/github.com/miku"
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku && git clone /vagrant/.git span"
-
 rpm-compatible: vagrant.key
 	$(SSHCMD) "GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/... golang.org/x/tools/cmd/goimports"
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && git pull origin master && pwd && GOPATH=/home/vagrant make clean rpm"
+	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && git pull origin master && pwd && GOPATH=/home/vagrant make clean && GOPATH=/home/vagrant make all rpm"
 	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/span/*rpm .
