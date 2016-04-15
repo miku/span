@@ -54,7 +54,7 @@ deb: $(TARGETS)
 	cd packaging/deb && fakeroot dpkg-deb --build span .
 	mv packaging/deb/span_*.deb .
 
-rpm: $(TARGETS)
+rpm: all
 	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
 	cp ./packaging/rpm/span.spec $(HOME)/rpmbuild/SPECS
 	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
