@@ -38,6 +38,7 @@ var Exporters = map[string]func() finc.ExportSchema{
 	"solr4vu13v8":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v8) },
 	"solr4vu13v9":  func() finc.ExportSchema { return new(exporter.Solr4Vufind13v9) },
 	"solr4vu13v10": func() finc.ExportSchema { return new(exporter.Solr4Vufind13v10) },
+	"solr5vu3v11":  func() finc.ExportSchema { return new(exporter.Solr5Vufind3v11) },
 }
 
 // worker iterates over string batches

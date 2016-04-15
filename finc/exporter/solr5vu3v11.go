@@ -7,13 +7,48 @@ import (
 	"github.com/miku/span/finc"
 )
 
+// Attach attaches the ISILs to a record. Noop.
+func (s *Solr5Vufind3v11) Attach(_ []string) {}
+
 // WIP: Solr5Vufind3v11 is the basic solr 5 schema as of 2016-04-14. It is based on
 // VuFind 3. TODO(miku): adjust fields.
+//
+// <!-- finc:vufind1 -->
+// <field name="vf1_author" type="textProper" indexed="true" stored="true" termVectors="true"/>
+// <field name="vf1_author_orig" type="textProper" indexed="true" stored="true" multiValued="false"/>
+// <field name="vf1_author2" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="vf1_author2_orig" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="vf1_author_corp" type="textProper" indexed="true" stored="true" termVectors="true"/>
+// <field name="vf1_author_corp_orig" type="textProper" indexed="true" stored="true" multiValued="false"/>
+// <field name="vf1_author_corp2" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="vf1_author_corp2_orig" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="vf1_author2-role" type="string" indexed="true" stored="true" multiValued="true"/>
+//
+// <!-- finc:vufind3 -->
+// <field name="author" type="textProper" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+// <field name="author_orig" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_variant" type="text" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+// <field name="author_role" type="string" indexed="true" stored="true" multiValued="true"/>
+// <field name="author2" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author2_orig" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author2_variant" type="text" indexed="true" stored="true" multiValued="true"/>
+// <field name="author2_role" type="string" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_corporate" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_corporate_orig" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_corporate_role" type="string" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_corporate2" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_corporate2_orig" type="textProper" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_corporate2_role" type="string" indexed="true" stored="true" multiValued="true"/>
+// <field name="author_fuller" type="textProper" indexed="true" stored="true" multiValued="true" />
+// <field name="author2_fuller" type="textProper" indexed="true" stored="true" multiValued="true" />
+// <field name="author_additional" type="textProper" indexed="true" stored="true" multiValued="true"/>
+
 type Solr5Vufind3v11 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
-	AuthorFacet          []string `json:"author_facet"`
+	AuthorFacet          []string `json:"author_facet,omitempty"`
+	Authors              []string `json:"author,omitempty"`
+	SecondaryAuthors     []string `json:"author2,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
-	Author               string   `json:"author,omitempty"`
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
@@ -29,7 +64,6 @@ type Solr5Vufind3v11 struct {
 	Publishers           []string `json:"publisher,omitempty"`
 	RecordType           string   `json:"recordtype,omitempty"`
 	Series               []string `json:"series,omitempty"`
-	SecondaryAuthors     []string `json:"author2,omitempty"`
 	SourceID             string   `json:"source_id,omitempty"`
 	Subtitle             string   `json:"title_sub,omitempty"`
 	Title                string   `json:"title,omitempty"`
@@ -40,6 +74,9 @@ type Solr5Vufind3v11 struct {
 	URL                  []string `json:"url,omitempty"`
 	PublishDate          []string `json:"publishDate,omitempty"`
 
+	VF1Author           string   `json:"vf1_author,omitempty"`
+	VF1SecondaryAuthors []string `json:"vf1_author2,omitempty"`
+
 	ContainerIssue     string `json:"container_issue,omitempty"`
 	ContainerStartPage string `json:"container_start_page,omitempty"`
 	ContainerTitle     string `json:"container_title,omitempty"`
@@ -47,7 +84,7 @@ type Solr5Vufind3v11 struct {
 
 	FormatDe105  []string `json:"format_de105,omitempty"`
 	FormatDe14   []string `json:"format_de14,omitempty"`
-	FormatDe15   []string `json:"format_de15"`
+	FormatDe15   []string `json:"format_de15,omitempty"`
 	FormatDe520  []string `json:"format_de520,omitempty"`
 	FormatDe540  []string `json:"format_de540,omitempty"`
 	FormatDeCh1  []string `json:"format_dech1,omitempty"`
@@ -95,22 +132,32 @@ func (s *Solr5Vufind3v11) Convert(is finc.IntermediateSchema) error {
 		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
 	}
 
+	// collect sanizized authors
+	var authors []string
 	for _, author := range is.Authors {
 		sanitized := AuthorReplacer.Replace(author.String())
 		if sanitized == "" {
 			continue
 		}
+		authors = append(authors, sanitized)
+
 		// first, random author goes into author field, others into secondary field, refs. #5778
-		if s.Author == "" {
-			s.Author = sanitized
+		if s.VF1Author == "" {
+			s.VF1Author = sanitized
 		} else {
-			s.SecondaryAuthors = append(s.SecondaryAuthors, sanitized)
+			s.VF1SecondaryAuthors = append(s.VF1SecondaryAuthors, sanitized)
 		}
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
 	}
 
-	if s.Author == "" {
-		s.Author = finc.NOT_ASSIGNED
+	if s.VF1Author == "" {
+		s.VF1Author = finc.NOT_ASSIGNED
+	}
+
+	if len(authors) == 0 {
+		s.Authors = []string{finc.NOT_ASSIGNED}
+	} else {
+		s.Authors = authors
 	}
 
 	s.AccessFacet = AIAccessFacet
