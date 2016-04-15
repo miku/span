@@ -36,7 +36,7 @@ cover:
 generate:
 	go generate
 
-all: $(TARGETS)
+all: assets deps $(TARGETS)
 
 $(TARGETS): %: cmd/%/main.go
 	go build -o $@ $<
