@@ -202,6 +202,9 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
+	if len(output.ArticleTitle) > 32766 {
+		return output, span.Skip{Reason: fmt.Sprintf("article title too long: %d", len(output.ArticleTitle))}
+	}
 	output.JournalTitle = strings.Replace(strings.TrimSpace(doc.PublicationTitle), "\n", " ", -1)
 
 	if !isNomenNescio(doc.ISSN) {
