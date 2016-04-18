@@ -136,7 +136,10 @@ func (doc Document) Authors() (authors []finc.Author) {
 			if isNomenNescio(f) {
 				continue
 			}
-			authors = append(authors, finc.Author{Name: strings.TrimSpace(f)})
+			name := strings.TrimSpace(f)
+			if len(name) < 32766 {
+				authors = append(authors, finc.Author{Name: name})
+			}
 		}
 	}
 	return authors
