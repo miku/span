@@ -48,7 +48,7 @@ clean:
 	rm -rf ./packaging/deb/span/usr
 	rm -f assetutil/bindata.go
 
-deb: $(TARGETS)
+deb: all
 	mkdir -p packaging/deb/span/usr/sbin
 	cp $(TARGETS) packaging/deb/span/usr/sbin
 	cd packaging/deb && fakeroot dpkg-deb --build span .
