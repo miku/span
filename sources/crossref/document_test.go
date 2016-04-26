@@ -1,18 +1,9 @@
 package crossref
 
 import (
-	"log"
 	"testing"
 	"time"
 )
-
-func MustParse(layout, s string) time.Time {
-	t, err := time.Parse(layout, s)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return t
-}
 
 func TestDateFieldDate(t *testing.T) {
 	var tests = []struct {

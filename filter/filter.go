@@ -205,7 +205,6 @@ func (f *PackageFilter) UnmarshalJSON(p []byte) error {
 // create blacklists.
 type DOIFilter struct {
 	values []string
-	file   string
 }
 
 // Apply filters packages.

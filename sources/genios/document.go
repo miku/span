@@ -70,7 +70,6 @@ type Document struct {
 
 var (
 	rawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
-	collections     = assetutil.MustLoadStringMap("assets/genios/collections.json")
 	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// dbmap maps a database name to one or more "package names"

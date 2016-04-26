@@ -26,7 +26,6 @@ import (
 var (
 	errFormatRequired    = errors.New("input format required")
 	errFormatUnsupported = errors.New("input format not supported")
-	errCannotConvert     = errors.New("cannot convert type")
 )
 
 var logger *log.Logger = log.New(os.Stderr, "", log.LstdFlags)

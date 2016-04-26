@@ -24,7 +24,6 @@ package doaj
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -46,8 +45,6 @@ const (
 	Format = "ElectronicArticle"
 	Genre  = "article"
 )
-
-var errDateMissing = errors.New("date is missing")
 
 var (
 	LCCPatterns = assetutil.MustLoadRegexpMap("assets/finc/lcc.json")
