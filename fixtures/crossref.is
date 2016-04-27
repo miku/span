@@ -1,0 +1,46 @@
+{
+  "finc.format": "ElectronicArticle",
+  "finc.mega_collection": "Nature Publishing Group (CrossRef)",
+  "finc.record_id": "ai-49-aHR0cDovL2R4LmRvaS5vcmcvMTAuMTAzOC9qaWQuMjAwOS4zNTQ",
+  "finc.source_id": "49",
+  "ris.type": "EJOUR",
+  "rft.atitle": "Sun-Sensitizing Effects of PKCɛ Shine on Multiple Mouse Strains",
+  "rft.epage": "19",
+  "rft.genre": "article",
+  "rft.issn": [
+    "0022-202X",
+    "1523-1747"
+  ],
+  "rft.issue": "1",
+  "rft.jtitle": "J Investig Dermatol",
+  "rft.tpages": "2",
+  "rft.pages": "17-19",
+  "rft.pub": [
+    "Nature Publishing Group"
+  ],
+  "rft.date": "2010-01-01",
+  "x.date": "2010-01-01T00:00:00Z",
+  "rft.spage": "17",
+  "rft.volume": "130",
+  "authors": [
+    {
+      "rft.aulast": "Denning",
+      "rft.aufirst": "Mitchell F"
+    }
+  ],
+  "doi": "10.1038/jid.2009.354",
+  "languages": [
+    "eng"
+  ],
+  "url": [
+    "http://dx.doi.org/10.1038/jid.2009.354"
+  ],
+  "version": "0.9",
+  "x.subjects": [
+    "Molecular Biology",
+    "Dermatology",
+    "Biochemistry",
+    "Cell Biology"
+  ],
+  "x.type": "journal-article"
+}

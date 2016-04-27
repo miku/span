@@ -39,3 +39,5 @@ assetutil/bindata.go
 vagrant.key
 Notes.md
 /vendor
+
+fixtures/sid93is.ndj

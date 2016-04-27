@@ -51,12 +51,14 @@ func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGro
 
 			// TODO(miku): Unmarshal date correctly.
 			if err := json.Unmarshal([]byte(s), &is); err != nil {
+				log.Printf("cound not deserialize line: %s", s)
 				log.Fatal(err)
 			}
 
 			// Get export format.
 			schema := opts.exportSchemaFunc()
 			if err := schema.Convert(is); err != nil {
+				log.Printf("could not export: %v", is)
 				log.Fatal(err)
 			}
 
