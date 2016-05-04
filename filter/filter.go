@@ -284,13 +284,74 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	return false
 }
 
-// UnmarshalJSON unwraps a JSON into a HoldingsFilter. Can use holding file
-// from file or URL, if both are given, file is preferred.
+func (f *HoldingsFilter) download(link string) (string, error) {
+	file, err := ioutil.TempFile("", "span-")
+	if err != nil {
+		return "", err
+	}
+
+	log.Printf("fetching: %s", link)
+
+	resp, err := http.Get(link)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if _, err = io.Copy(file, resp.Body); err != nil {
+		return "", err
+	}
+	if err := file.Close(); err != nil {
+		return "", err
+	}
+
+	// if file is zipped, the content will be written to ztmp
+	ztmp, err := ioutil.TempFile("", "span-")
+	if err != nil {
+		return "", err
+	}
+	defer ztmp.Close()
+
+	// assume zip file, extract all members into a single file, ztmp
+	filename, err := func() (string, error) {
+		r, err := zip.OpenReader(file.Name())
+		if err != nil {
+			return "", err
+		}
+		defer r.Close()
+
+		for _, f := range r.File {
+			rc, err := f.Open()
+			if err != nil {
+				return "", err
+			}
+			if _, err = io.Copy(ztmp, rc); err != nil {
+				return "", err
+			}
+			rc.Close()
+		}
+		if err := ztmp.Close(); err != nil {
+			return "", err
+		}
+		return ztmp.Name(), nil
+	}()
+
+	if err == nil {
+		return filename, nil
+	}
+	// if zip errs, use the downloaded file directly
+	return file.Name(), nil
+}
+
+// UnmarshalJSON unwraps a JSON into a
+// HoldingsFilter. Can use holding file from file
+// or a list of URLs, if both are given, only the
+// file is used.
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
-			Filename string `json:"file"`
-			Link     string `json:"url"`
+			Filename string   `json:"file"`
+			Links    []string `json:"urls"`
 		} `json:"holdings"`
 	}
 
@@ -298,67 +359,32 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 
-	var filename string
+	// concatenated downloaded and possible extracted links
+	concatenated, err := ioutil.TempFile("", "span-")
+	defer os.Remove(concatenated.Name()) // clean up
 
-	// support direct links to holding files (zipped or unzipped) in configuration
-	if s.Holdings.Link != "" {
-		dltmp, err := ioutil.TempFile("", "span-")
+	for _, link := range s.Holdings.Links {
+		fn, err := f.download(link)
 		if err != nil {
 			return err
 		}
-		defer os.Remove(dltmp.Name()) // clean up
-
-		log.Printf("fetching: %s", s.Holdings.Link)
-		resp, err := http.Get(s.Holdings.Link)
+		f, err := os.Open(fn)
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
-
-		if _, err = io.Copy(dltmp, resp.Body); err != nil {
+		if _, err := io.Copy(concatenated, f); err != nil {
 			return err
 		}
-		if err := dltmp.Close(); err != nil {
+		if err := f.Close(); err != nil {
 			return err
-		}
-
-		// if we have a zip, the content will be written to tmp
-		tmp, err := ioutil.TempFile("", "span-")
-		if err != nil {
-			return err
-		}
-		defer os.Remove(tmp.Name()) // clean up
-
-		// assume zip file, extract all members into a single file
-		err = func() error {
-			r, err := zip.OpenReader(dltmp.Name())
-			if err != nil {
-				return err
-			}
-			defer r.Close()
-
-			for _, f := range r.File {
-				rc, err := f.Open()
-				if err != nil {
-					return err
-				}
-				if _, err = io.Copy(tmp, rc); err != nil {
-					return err
-				}
-				rc.Close()
-			}
-			if err := tmp.Close(); err != nil {
-				return err
-			}
-			filename = tmp.Name()
-			return nil
-		}()
-
-		// if zip errs, use the downloaded file directly
-		if err != nil {
-			filename = dltmp.Name()
 		}
 	}
+
+	if err := concatenated.Close(); err != nil {
+		return err
+	}
+
+	filename := concatenated.Name()
 
 	if s.Holdings.Filename != "" {
 		filename = s.Holdings.Filename
