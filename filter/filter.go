@@ -113,13 +113,33 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		ISSN struct {
 			Values []string `json:"list"`
 			File   string   `json:"file"`
-			Link   []string `json:"url"`
+			Link   string `json:"url"`
 		} `json:"issn"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
 	f.values = *container.NewStringSet()
+
+	if s.ISSN.Link != "" {
+		f, err := ioutil.TempFile("", "span-")
+		if err != nil {
+			return err
+		}
+		resp, err := http.Get(s.ISSN.Link)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if _, err := io.Copy(f, resp.Body); err != nil {
+			return err
+		}
+		if err := f.Close(); err != nil {
+			return err
+		}
+		s.ISSN.File = f.Name()
+	}
+
 	if s.ISSN.File != "" {
 		file, err := os.Open(s.ISSN.File)
 		if err != nil {
