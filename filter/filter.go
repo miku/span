@@ -113,7 +113,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		ISSN struct {
 			Values []string `json:"list"`
 			File   string   `json:"file"`
-			Link   string `json:"url"`
+			Link   string   `json:"url"`
 		} `json:"issn"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
@@ -126,6 +126,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		if err != nil {
 			return err
 		}
+		log.Printf("ISSNFilter: fetching: %s", s.ISSN.Link)
 		resp, err := http.Get(s.ISSN.Link)
 		if err != nil {
 			return err
@@ -311,7 +312,7 @@ func (f *HoldingsFilter) download(link string) (string, error) {
 		return "", err
 	}
 
-	log.Printf("fetching: %s", link)
+	log.Printf("HoldingsFilter: fetching: %s", link)
 
 	resp, err := http.Get(link)
 	if err != nil {
