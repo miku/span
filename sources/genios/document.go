@@ -228,9 +228,13 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
 
+	var prefixedPackageNames []string
+	for _, name := range packageNames {
+		prefixedPackageNames = append(prefixedPackageNames, fmt.Sprintf("Genios (%s)", name))
+	}
 	// Note DB name as well as package name (Wiwi, Sowi, Recht, etc.) as well
 	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
-	output.Packages = append([]string{doc.DB}, packageNames...)
+	output.Packages = append([]string{doc.DB}, prefixedPackageNames...)
 
 	if len(packageNames) > 0 {
 		output.MegaCollection = fmt.Sprintf("Genios (%s)", packageNames[0])
