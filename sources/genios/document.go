@@ -241,8 +241,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
 	output.Packages = append([]string{doc.DB}, prefixedPackageNames...)
 
-	if len(packageNames) > 0 {
-		output.MegaCollection = fmt.Sprintf("Genios (%s)", packageNames[0])
+	if len(prefixedPackageNames) > 0 {
+		output.MegaCollection = prefixedPackageNames[0]
 	} else {
 		log.Printf("genios: db is not associated with package: %s, using generic default", doc.DB)
 		output.MegaCollection = fmt.Sprintf("Genios")
