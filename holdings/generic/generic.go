@@ -55,6 +55,11 @@ func NewReader(r io.Reader) (holdings.File, error) {
 	var file holdings.File
 	var errors ErrorList
 
+	if len(b) == 0 {
+		log.Printf("warning: file with 0 entries")
+		return kbart.NewReader(bytes.NewReader(b)), nil
+	}
+
 	// probe kbart
 	file = kbart.NewReader(bytes.NewReader(b))
 	if entries, err := file.ReadEntries(); err != nil {
