@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sort"
 	"strings"
 	"time"
 
@@ -232,6 +233,10 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, name := range packageNames {
 		prefixedPackageNames = append(prefixedPackageNames, fmt.Sprintf("Genios (%s)", name))
 	}
+
+	// hack, to move Genios (LIT) further down
+	sort.Sort(sort.Reverse(sort.StringSlice(prefixedPackageNames)))
+
 	// Note DB name as well as package name (Wiwi, Sowi, Recht, etc.) as well
 	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
 	output.Packages = append([]string{doc.DB}, prefixedPackageNames...)
