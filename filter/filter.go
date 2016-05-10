@@ -113,6 +113,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		ISSN struct {
 			Values []string `json:"list"`
 			File   string   `json:"file"`
+			Link   []string `json:"url"`
 		} `json:"issn"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
