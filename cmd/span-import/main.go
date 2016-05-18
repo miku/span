@@ -37,7 +37,7 @@ var formats = map[string]span.Source{
 	"jstor":     jstor.Jstor{},
 	"doaj":      doaj.DOAJ{},
 	"genios":    genios.Genios{},
-	"thieme":    thieme.Thieme{},
+	"thieme":    thieme.Thieme{Format: "nlm"},
 }
 
 type options struct {

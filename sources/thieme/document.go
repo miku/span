@@ -46,15 +46,26 @@ func leftPad(s string, padStr string, overallLen int) string {
 	return retStr[(len(retStr) - overallLen):]
 }
 
-type Thieme struct{}
+type Thieme struct {
+	Format string
+}
 
 // Iterate emits Converter elements via XML decoding.
 func (s Thieme) Iterate(r io.Reader) (<-chan []span.Importer, error) {
-	return span.FromXML(r, "record", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
-		doc := new(Document)
-		err := d.DecodeElement(&doc, &se)
-		return doc, err
-	})
+	switch s.Format {
+	default:
+		return span.FromXML(r, "record", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
+			doc := new(Document)
+			err := d.DecodeElement(&doc, &se)
+			return doc, err
+		})
+	case "nlm":
+		return span.FromXML(r, "article", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
+			doc := new(Article)
+			err := d.DecodeElement(&doc, &se)
+			return doc, err
+		})
+	}
 }
 
 type Document struct {
@@ -174,6 +185,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Issue = journal.Issue
 
 	article := doc.Metadata.ArticleSet.Article
+
+	output.ArticleTitle = article.ArticleTitle
 
 	output.Abstract = article.Abstract
 	if output.Abstract == "" {
