@@ -45,5 +45,10 @@ type Article struct {
 func (article Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 	output.ArticleTitle = article.Front.ArticleMeta.TitleGroup.ArticleTitle
+	output.JournalTitle = article.Front.JournalMeta.JournalTitleGroup
+	output.ISSN = article.Front.JournalMeta.Issn
+	if article.Front.JournalMeta.Publisher != "" {
+		output.Publishers = []string{article.Front.JournalMeta.Publisher}
+	}
 	return output, nil
 }
