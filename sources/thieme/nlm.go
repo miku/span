@@ -108,6 +108,11 @@ func (article Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) 
 	if len(output.DOI) == 0 {
 		return output, fmt.Errorf("empty DOI")
 	}
+
+	output.MegaCollection = "Thieme"
+	output.Genre = "article"
+	output.Format = "ElectronicArticle"
+
 	output.URL = []string{fmt.Sprintf("http://doi.org/%s", output.DOI)}
 	output.Volume = article.Front.ArticleMeta.Volume
 	output.Issue = article.Front.ArticleMeta.Issue
@@ -122,6 +127,8 @@ func (article Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) 
 		return output, err
 	}
 	output.Date = t
+	output.RawDate = output.Date.Format("2006-01-02")
+
 	if article.Front.JournalMeta.Publisher.Name != "" {
 		output.Publishers = []string{article.Front.JournalMeta.Publisher.Name}
 	}
