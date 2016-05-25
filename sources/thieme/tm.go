@@ -123,17 +123,21 @@ type Document struct {
 	CopyrightInformation string `xml:"CopyrightInformation"`
 }
 
-func (doc Document) DOI() string {
+func (doc Document) DOI() (string, error) {
 	for _, id := range doc.ArticleIdList {
 		if id.ArticleId.IdType == "doi" {
-			return id.ArticleId.Id
+			return id.ArticleId.Id, nil
 		}
 	}
-	return ""
+	return "", fmt.Errorf("no DOI found")
 }
 
-func (doc Document) RecordID() string {
-	return fmt.Sprintf("ai-60-%s", base64.RawURLEncoding.EncodeToString([]byte(doc.DOI())))
+func (doc Document) RecordID() (string, error) {
+	doi, err := doc.DOI()
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("ai-60-%s", base64.RawURLEncoding.EncodeToString([]byte(doi))), nil
 }
 
 func (doc Document) Date() (time.Time, error) {
@@ -166,7 +170,11 @@ func (doc Document) Date() (time.Time, error) {
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	output.RecordID = doc.RecordID()
+	id, err := doc.RecordID()
+	if err != nil {
+		return output, err
+	}
+	output.RecordID = id
 	output.SourceID = SourceID
 	output.MegaCollection = Collection
 	output.Genre = Genre
