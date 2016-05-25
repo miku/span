@@ -22,6 +22,7 @@
 package thieme
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -54,7 +55,7 @@ type Thieme struct {
 func (s Thieme) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 	switch s.Format {
 	default:
-		return span.FromXML(r, "record", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
+		return span.FromXML(r, "Article", func(d *xml.Decoder, se xml.StartElement) (span.Importer, error) {
 			doc := new(Document)
 			err := d.DecodeElement(&doc, &se)
 			return doc, err
@@ -69,67 +70,74 @@ func (s Thieme) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 }
 
 type Document struct {
-	Identifier string `xml:"header>identifier"`
-	Metadata   struct {
-		ArticleSet struct {
-			Article struct {
-				Journal struct {
-					PublisherName string `xml:"PublisherName"`
-					JournalTitle  string `xml:"JournalTitle"`
-					ISSN          string `xml:"Issn"`
-					EISSN         string `xml:"E-Issn"`
-					Volume        string `xml:"Volume"`
-					Issue         string `xml:"Issue"`
-					PubDate       struct {
-						Year  string `xml:"Year"`
-						Month string `xml:"Month"`
-						Day   string `xml:"Day"`
-					} `xml:"PubDate"`
-				} `xml:"Journal"`
-				AuthorList struct {
-					Authors []struct {
-						FirstName string `xml:"FirstName"`
-						LastName  string `xml:"LastName"`
-					} `xml:"Author"`
-				} `xml:"AuthorList"`
-				ArticleIdList []struct {
-					ArticleId struct {
-						OpenAccess string `xml:"OpenAccess,attr"`
-						IdType     string `xml:"IdType,attr"`
-						Id         string `xml:",chardata"`
-					}
-				} `xml:"ArticleIdList"`
-				ArticleType        string   `xml:"ArticleType"`
-				ArticleTitle       string   `xml:"ArticleTitle"`
-				VernacularTitle    string   `xml:"VernacularTitle"`
-				FirstPage          string   `xml:"FirstPage"`
-				LastPage           string   `xml:"LastPage"`
-				VernacularLanguage string   `xml:"VernacularLanguage"`
-				Language           string   `xml:"Language"`
-				Subject            []string `xml:"subject"`
-				Links              []string `xml:"Links>Link"`
-				History            []struct {
-					PubDate struct {
-						Status string `xml:"PubStatus,attr"`
-						Year   string `xml:"Year"`
-						Month  string `xml:"Month"`
-						Day    string `xml:"Day"`
-					} `xml:"PubDate"`
-				} `xml:"History"`
-				Abstract           string `xml:"Abstract"`
-				VernacularAbstract string `xml:"VernacularAbstract"`
-				Format             struct {
-					HTML string `xml:"html,attr"`
-					PDF  string `xml:"pdf,attr"`
-				} `xml:"format"`
-				CopyrightInformation string `xml:"CopyrightInformation"`
-			} `xml:"Article"`
-		} `xml:"ArticleSet"`
-	} `xml:"metadata"`
+	xml.Name `xml:"Article"`
+	Journal  struct {
+		PublisherName string `xml:"PublisherName"`
+		JournalTitle  string `xml:"JournalTitle"`
+		ISSN          string `xml:"Issn"`
+		EISSN         string `xml:"E-Issn"`
+		Volume        string `xml:"Volume"`
+		Issue         string `xml:"Issue"`
+		PubDate       struct {
+			Year  string `xml:"Year"`
+			Month string `xml:"Month"`
+			Day   string `xml:"Day"`
+		} `xml:"PubDate"`
+	} `xml:"Journal"`
+	AuthorList struct {
+		Authors []struct {
+			FirstName string `xml:"FirstName"`
+			LastName  string `xml:"LastName"`
+		} `xml:"Author"`
+	} `xml:"AuthorList"`
+	ArticleIdList []struct {
+		ArticleId struct {
+			OpenAccess string `xml:"OpenAccess,attr"`
+			IdType     string `xml:"IdType,attr"`
+			Id         string `xml:",chardata"`
+		}
+	} `xml:"ArticleIdList"`
+	ArticleType        string   `xml:"ArticleType"`
+	ArticleTitle       string   `xml:"ArticleTitle"`
+	VernacularTitle    string   `xml:"VernacularTitle"`
+	FirstPage          string   `xml:"FirstPage"`
+	LastPage           string   `xml:"LastPage"`
+	VernacularLanguage string   `xml:"VernacularLanguage"`
+	Language           string   `xml:"Language"`
+	Subject            []string `xml:"subject"`
+	Links              []string `xml:"Links>Link"`
+	History            []struct {
+		PubDate struct {
+			Status string `xml:"PubStatus,attr"`
+			Year   string `xml:"Year"`
+			Month  string `xml:"Month"`
+			Day    string `xml:"Day"`
+		} `xml:"PubDate"`
+	} `xml:"History"`
+	Abstract           string `xml:"Abstract"`
+	VernacularAbstract string `xml:"VernacularAbstract"`
+	Format             struct {
+		HTML string `xml:"html,attr"`
+		PDF  string `xml:"pdf,attr"`
+	} `xml:"format"`
+	CopyrightInformation string `xml:"CopyrightInformation"`
+}
+
+func (doc Document) DOI() string {
+	for _, id := range doc.ArticleIdList {
+		if id.ArticleId.IdType == "doi" {
+			return id.ArticleId.Id
+		}
+	}
+	return ""
+}
+
+func (doc Document) RecordID() string {
+	return fmt.Sprintf("ai-60-%s", base64.RawURLEncoding.EncodeToString([]byte(doc.DOI())))
 }
 
 func (doc Document) Date() (time.Time, error) {
-	pd := doc.Metadata.ArticleSet.Article.Journal.PubDate
+	pd := doc.Journal.PubDate
 
 	if pd.Month == "0" {
 		pd.Month = "01"
@@ -158,7 +166,7 @@ func (doc Document) Date() (time.Time, error) {
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	output.RecordID = doc.Identifier
+	output.RecordID = doc.RecordID()
 	output.SourceID = SourceID
 	output.MegaCollection = Collection
 	output.Genre = Genre
@@ -169,7 +177,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.Date = date
 
-	journal := doc.Metadata.ArticleSet.Article.Journal
+	journal := doc.Journal
 	if journal.PublisherName != "" {
 		output.Publishers = append(output.Publishers, journal.PublisherName)
 	}
@@ -184,31 +192,35 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = journal.Volume
 	output.Issue = journal.Issue
 
-	article := doc.Metadata.ArticleSet.Article
+	output.ArticleTitle = doc.ArticleTitle
 
-	output.ArticleTitle = article.ArticleTitle
-
-	output.Abstract = article.Abstract
+	output.Abstract = doc.Abstract
 	if output.Abstract == "" {
-		output.Abstract = article.VernacularAbstract
+		output.Abstract = doc.VernacularAbstract
 	}
 
-	for _, link := range article.Links {
+	for _, link := range doc.Links {
 		output.URL = append(output.URL, link)
 	}
 
-	output.Subjects = article.Subject
+	var subjects []string
+	for _, s := range doc.Subject {
+		if len(strings.TrimSpace(s)) > 0 {
+			subjects = append(subjects, s)
+		}
+	}
+	output.Subjects = subjects
 
-	if article.Language != "" {
-		output.Languages = append(output.Languages, strings.ToLower(article.Language))
+	if doc.Language != "" {
+		output.Languages = append(output.Languages, strings.ToLower(doc.Language))
 	} else {
-		if article.VernacularLanguage != "" {
-			output.Languages = append(output.Languages, strings.ToLower(article.VernacularLanguage))
+		if doc.VernacularLanguage != "" {
+			output.Languages = append(output.Languages, strings.ToLower(doc.VernacularLanguage))
 		}
 	}
 
 	var authors []finc.Author
-	for _, author := range article.AuthorList.Authors {
+	for _, author := range doc.AuthorList.Authors {
 		authors = append(authors, finc.Author{FirstName: author.FirstName, LastName: author.LastName})
 	}
 	output.Authors = authors

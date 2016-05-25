@@ -32,13 +32,13 @@ var logger *log.Logger = log.New(os.Stderr, "", log.LstdFlags)
 
 // Available input formats and their source type.
 var formats = map[string]span.Source{
-	"crossref":  crossref.Crossref{},
-	"degruyter": degruyter.DeGruyter{},
-	"jstor":     jstor.Jstor{},
-	"doaj":      doaj.DOAJ{},
-	"genios":    genios.Genios{},
-	"thieme-tm":    thieme.Thieme{Format: "tm"},
-	"thieme-nlm":    thieme.Thieme{Format: "nlm"},
+	"crossref":   crossref.Crossref{},
+	"degruyter":  degruyter.DeGruyter{},
+	"jstor":      jstor.Jstor{},
+	"doaj":       doaj.DOAJ{},
+	"genios":     genios.Genios{},
+	"thieme-tm":  thieme.Thieme{Format: "tm"},
+	"thieme-nlm": thieme.Thieme{Format: "nlm"},
 }
 
 type options struct {
