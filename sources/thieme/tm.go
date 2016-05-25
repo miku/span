@@ -36,7 +36,7 @@ import (
 const (
 	SourceID   = "60"
 	Format     = "ElectronicArticle"
-	Collection = "Thieme"
+	Collection = "Thieme E-Journals"
 	Genre      = "article"
 )
 
