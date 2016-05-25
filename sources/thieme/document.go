@@ -87,7 +87,7 @@ type Document struct {
 					} `xml:"PubDate"`
 				} `xml:"Journal"`
 				AuthorList struct {
-					Author []struct {
+					Authors []struct {
 						FirstName string `xml:"FirstName"`
 						LastName  string `xml:"LastName"`
 					} `xml:"Author"`
@@ -206,6 +206,12 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 			output.Languages = append(output.Languages, strings.ToLower(article.VernacularLanguage))
 		}
 	}
+
+	var authors []finc.Author
+	for _, author := range article.AuthorList.Authors {
+		authors = append(authors, finc.Author{FirstName: author.FirstName, LastName: author.LastName})
+	}
+	output.Authors = authors
 
 	return output, nil
 }
