@@ -103,15 +103,15 @@ func (article Article) ParseTime() (time.Time, error) {
 func (article Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 	output.RecordID = article.RecordID()
-	output.SourceID = "60"
+	output.SourceID = SourceID
 	output.DOI = article.DOI()
 	if len(output.DOI) == 0 {
 		return output, fmt.Errorf("empty DOI")
 	}
 
-	output.MegaCollection = "Thieme"
-	output.Genre = "article"
-	output.Format = "ElectronicArticle"
+	output.MegaCollection = Collection
+	output.Genre = Genre
+	output.Format = Format
 
 	output.URL = []string{fmt.Sprintf("http://doi.org/%s", output.DOI)}
 	output.Volume = article.Front.ArticleMeta.Volume
