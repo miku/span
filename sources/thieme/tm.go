@@ -146,18 +146,17 @@ func (doc Document) Date() (time.Time, error) {
 	if pd.Month == "0" {
 		pd.Month = "01"
 	}
+
 	if pd.Day == "0" {
 		pd.Day = "01"
 	}
 
 	if pd.Year != "" && pd.Month != "" && pd.Day != "" {
-		s := fmt.Sprintf("%s-%s-%s", leftPad(pd.Year, "0", 4),
-			leftPad(pd.Month, "0", 2), leftPad(pd.Day, "0", 2))
+		s := fmt.Sprintf("%s-%s-%s", leftPad(pd.Year, "0", 4), leftPad(pd.Month, "0", 2), leftPad(pd.Day, "0", 2))
 		return time.Parse("2006-01-02", s)
 	}
 	if pd.Year != "" && pd.Month != "" {
-		s := fmt.Sprintf("%s-%s-01", leftPad(pd.Year, "0", 4),
-			leftPad(pd.Month, "0", 2))
+		s := fmt.Sprintf("%s-%s-01", leftPad(pd.Year, "0", 4), leftPad(pd.Month, "0", 2))
 		return time.Parse("2006-01-02", s)
 	}
 	if pd.Year != "" {
