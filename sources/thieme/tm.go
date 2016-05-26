@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/miku/span"
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/finc"
 )
 
@@ -46,6 +47,8 @@ func leftPad(s string, padStr string, overallLen int) string {
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
 }
+
+var LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
 
 type Thieme struct {
 	Format string
@@ -177,6 +180,13 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = SourceID
 	output.MegaCollection = Collection
 	output.Genre = Genre
+	output.Format = Format
+
+	doi, err := doc.DOI()
+	if err != nil {
+		return output, err
+	}
+	output.DOI = doi
 
 	date, err := doc.Date()
 	if err != nil {
@@ -200,6 +210,9 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Issue = journal.Issue
 
 	output.ArticleTitle = doc.ArticleTitle
+	if output.ArticleTitle == "" {
+		output.ArticleTitle = doc.VernacularTitle
+	}
 
 	output.Abstract = doc.Abstract
 	if output.Abstract == "" {
@@ -219,10 +232,10 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Subjects = subjects
 
 	if doc.Language != "" {
-		output.Languages = append(output.Languages, strings.ToLower(doc.Language))
+		output.Languages = append(output.Languages, LanguageMap.LookupDefault(strings.ToUpper(doc.Language), "und"))
 	} else {
 		if doc.VernacularLanguage != "" {
-			output.Languages = append(output.Languages, strings.ToLower(doc.VernacularLanguage))
+			output.Languages = append(output.Languages, LanguageMap.LookupDefault(strings.ToUpper(doc.VernacularLanguage), "und"))
 		}
 	}
 
