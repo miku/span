@@ -73,7 +73,6 @@ func worker(queue chan []span.Importer, out chan []byte, opts options, wg *sync.
 func main() {
 	inputFormat := flag.String("i", "", "input format")
 	listFormats := flag.Bool("list", false, "list formats")
-	members := flag.String("members", "", "path to LDJ file, one member per line")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	logfile := flag.String("log", "", "if given log to file")
 	showVersion := flag.Bool("v", false, "prints current program version")
@@ -116,13 +115,6 @@ func main() {
 
 	if _, ok := formats[*inputFormat]; !ok {
 		log.Fatal(errFormatUnsupported)
-	}
-
-	if *members != "" {
-		err := crossref.PopulateMemberNameCache(*members)
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 
 	if flag.Arg(0) == "" {

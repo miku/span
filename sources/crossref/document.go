@@ -223,28 +223,6 @@ func (doc *Document) ShortTitle() (s string) {
 	return
 }
 
-// MemberName resolves the primary name of the member.
-func (doc *Document) MemberName() (string, error) {
-	id, err := doc.parseMemberID()
-	if err != nil {
-		return "", err
-	}
-	return LookupMemberName(id)
-}
-
-// ParseMemberID extracts the numeric member id.
-func (doc *Document) parseMemberID() (id int, err error) {
-	fields := strings.Split(doc.Member, "/")
-	if len(fields) > 0 {
-		id, err = strconv.Atoi(fields[len(fields)-1])
-		if err != nil {
-			return id, fmt.Errorf("invalid member: %s", doc.Member)
-		}
-		return id, nil
-	}
-	return id, fmt.Errorf("invalid member: %s", doc.Member)
-}
-
 // ToIntermediateSchema converts a crossref document into IS.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
@@ -324,12 +302,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
-	name, err := doc.MemberName()
-	if err == nil {
-		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", name)
-	} else {
-		// TODO(miku): Use publisher as fallback, refs. #4833
+	if doc.Publisher == "" {
 		output.MegaCollection = fmt.Sprintf("X-U (CrossRef)")
+	} else {
+		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", doc.Publisher)
 	}
 
 	return output, nil
