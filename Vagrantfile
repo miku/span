@@ -27,6 +27,7 @@ $script = <<SCRIPT
 
 sudo rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 sudo yum -y update
+sudo yum -y upgrade
 sudo yum install -y jq xmlstarlet lftp vim tmux bash-completion tree golang git rpm-build gcc-c++
 
 mkdir -p /home/vagrant/src/github.com/miku && cd /home/vagrant/src/github.com/miku && git clone /vagrant/.git span
@@ -37,6 +38,6 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
-  config.vm.box = "puphpet/centos65-x64"
+  config.vm.box = "bento/centos-6.7"
   config.vm.provision "shell", inline: $script, privileged: false
 end
