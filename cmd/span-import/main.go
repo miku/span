@@ -17,6 +17,7 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/sources/crossref"
 	"github.com/miku/span/sources/doaj"
+	"github.com/miku/span/sources/elsevier"
 	"github.com/miku/span/sources/genios"
 	"github.com/miku/span/sources/jats/degruyter"
 	"github.com/miku/span/sources/jats/jstor"
@@ -32,13 +33,14 @@ var logger *log.Logger = log.New(os.Stderr, "", log.LstdFlags)
 
 // Available input formats and their source type.
 var formats = map[string]span.Source{
-	"crossref":   crossref.Crossref{},
-	"degruyter":  degruyter.DeGruyter{},
-	"jstor":      jstor.Jstor{},
-	"doaj":       doaj.DOAJ{},
-	"genios":     genios.Genios{},
-	"thieme-tm":  thieme.Thieme{Format: "tm"},
-	"thieme-nlm": thieme.Thieme{Format: "nlm"},
+	"crossref":     crossref.Crossref{},
+	"degruyter":    degruyter.DeGruyter{},
+	"jstor":        jstor.Jstor{},
+	"doaj":         doaj.DOAJ{},
+	"genios":       genios.Genios{},
+	"thieme-tm":    thieme.Thieme{Format: "tm"},
+	"thieme-nlm":   thieme.Thieme{Format: "nlm"},
+	"elsevier-tar": elsevier.Elsevier{},
 }
 
 type options struct {

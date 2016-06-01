@@ -1,10 +1,36 @@
 package elsevier
 
-import "encoding/xml"
+import (
+	"archive/tar"
+	"bytes"
+	"encoding/base64"
+	"encoding/xml"
+	"errors"
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
+	"github.com/kennygrant/sanitize"
+	"github.com/miku/span"
+	"github.com/miku/span/finc"
+)
+
+var (
+	ErrNoYearFound     = errors.New("no year found")
+	ErrTarFileRequired = errors.New("a tar file is required")
+)
+
+// Dataset describes journal issues and items, usually inside a dataset.xml.
 type Dataset struct {
-	XMLName          xml.Name `xml:"dataset"`
-	DatasetUniqueIDs struct {
+	xml.Name         `xml:"dataset"`
+	SchemaVersion    string `xml:"schema-version,attr"`
+	Xsi              string `xml:"xsi,attr"`
+	SchemaLocation   string `xml:"schemaLocation,attr"`
+	DatasetUniqueIds struct {
 		ProfileCode      string `xml:"profile-code"`
 		ProfileDatasetId string `xml:"profile-dataset-id"`
 		Timestamp        string `xml:"timestamp"`
@@ -12,20 +38,25 @@ type Dataset struct {
 	DatasetProperties struct {
 		DatasetAction     string `xml:"dataset-action"`
 		ProductionProcess string `xml:"production-process"`
-	}
+	} `xml:"dataset-properties"`
 	DatasetContent struct {
-		// Journal issues
 		JournalIssue []struct {
 			Version struct {
 				VersionNumber string `xml:"version-number"`
-				Stage         string `xml:"H300"`
+				Stage         string `xml:"stage"`
 			} `xml:"version"`
-			JournalIssueUniqueIDs struct {
-				PII string `xml:"pii"`
+			JournalIssueUniqueIds struct {
+				Pii    string `xml:"pii"`
+				Doi    string `xml:"doi"`
+				JidAid struct {
+					Jid  string `xml:"jid"`
+					Issn string `xml:"issn"`
+					Aid  string `xml:"aid"`
+				} `xml:"jid-aid"`
 			} `xml:"journal-issue-unique-ids"`
 			JournalIssueProperties struct {
-				JID               string `xml:"jid"`
-				ISSN              string `xml:"issn"`
+				Jid               string `xml:"jid"`
+				Issn              string `xml:"issn"`
 				VolumeIssueNumber struct {
 					VolFirst string `xml:"vol-first"`
 					Suppl    string `xml:"suppl"`
@@ -33,7 +64,7 @@ type Dataset struct {
 				CollectionTitle string `xml:"collection-title"`
 			} `xml:"journal-issue-properties"`
 			FilesInfo struct {
-				ML struct {
+				Ml []struct {
 					Pathname   string `xml:"pathname"`
 					Filesize   string `xml:"filesize"`
 					Purpose    string `xml:"purpose"`
@@ -41,154 +72,442 @@ type Dataset struct {
 				} `xml:"ml"`
 			} `xml:"files-info"`
 		} `xml:"journal-issue"`
-
-		// Journal items
 		JournalItem []struct {
-			Version struct {
+			CrossMark string `xml:"cross-mark,attr"`
+			Version   struct {
 				VersionNumber string `xml:"version-number"`
-				Stage         string `xml:"H300"`
+				Stage         string `xml:"stage"`
 			} `xml:"version"`
-			JournalItemUniqueIDs struct {
-				PII    string `xml:"pii"`
-				DOI    string `xml:"doi"`
-				JIDAid struct {
-					PII  string `xml:"jid"`
-					ISSN string `xml:"issn"`
-					AID  string `xml:"aid"`
+			JournalItemUniqueIds struct {
+				Pii    string `xml:"pii"`
+				Doi    string `xml:"doi"`
+				JidAid struct {
+					Jid  string `xml:"jid"`
+					Issn string `xml:"issn"`
+					Aid  string `xml:"aid"`
 				} `xml:"jid-aid"`
 			} `xml:"journal-item-unique-ids"`
 			JournalItemProperties struct {
-				PIT                   string `xml:"pit"`
+				Pit                   string `xml:"pit"`
 				ProductionType        string `xml:"production-type"`
 				OnlinePublicationDate string `xml:"online-publication-date"`
-				SponsoredAccess       struct {
-					Type string `xml:"type"`
-				} `xml:"sponsored-access"`
-				FundingBodyId string `xml:"funding-body-id"`
 			} `xml:"journal-item-properties"`
 			FilesInfo struct {
-				ML struct {
+				Ml []struct {
 					Pathname   string `xml:"pathname"`
 					Filesize   string `xml:"filesize"`
 					Purpose    string `xml:"purpose"`
 					DTDVersion string `xml:"dtd-version"`
-					Weight     string `xml:"weight"`
-					Assets     []struct {
-						Pathname string `xml:"pathname"`
-						Filesize string `xml:"filesize"`
-						Type     string `xml:"type"`
-					} `xml:"assets"`
 				} `xml:"ml"`
 			} `xml:"files-info"`
 		} `xml:"journal-item"`
 	} `xml:"dataset-content"`
 }
 
+// Pages is a helper, so we can calculate the total.
+type Pages struct {
+	FirstPage string `xml:"first-page"`
+	LastPage  string `xml:"last-page"`
+}
+
+// Total number of pages. Will not do any plausibility checks.
+func (p Pages) Total() string {
+	f, err := strconv.Atoi(p.FirstPage)
+	if err != nil {
+		return ""
+	}
+	t, err := strconv.Atoi(p.LastPage)
+	if err != nil {
+		return ""
+	}
+	return strconv.Itoa(t - f)
+}
+
+// SerialIssue contains information about an issue, usually inside issue.xml.
 type SerialIssue struct {
-	XMLName   xml.Name `xml:"serial-issue"`
+	xml.Name  `xml:"serial-issue"`
 	IssueInfo struct {
-		PII               string
-		JID               string
+		Pii               string `xml:"pii"`
+		Jid               string `xml:"jid"`
+		Issn              string `xml:"issn"`
 		VolumeIssueNumber struct {
 			VolFirst string `xml:"vol-first"`
 			IssFirst string `xml:"iss-first"`
-			IssLast  string `xml:"iss-last"`
 		} `xml:"volume-issue-number"`
 	} `xml:"issue-info"`
 	IssueData struct {
 		CoverDate struct {
-			StartDate string `xml:"start-date"`
-			EndDate   string `xml:"end-date"`
+			DateRange struct {
+				StartDate string `xml:"start-date"`
+			} `xml:"date-range"`
 		} `xml:"cover-date"`
-		Pages struct {
-			FirstPage string `xml:"first-page"`
-			LastPage  string `xml:"last-page"`
-		} `xml:"pages"`
-		CoverImage struct {
-			Figure struct {
-				Link struct {
-					Locator string `xml:"locator,attr"`
-				} `xml:"link"`
-			} `xml:"figure"`
-		} `xml:"cover-image"`
-		TitleEditorsGroup struct {
-			Title   string `xml:"title"`
-			Editors struct {
-				AuthorGroup []struct {
-					Author struct {
-						GivenName string `xml:"given-name"`
-						Surname   string `xml:"surname"`
-					} `xml:"author"`
-				} `xml:"author-group"`
-			} `xml:"editors"`
-		}
+		Pages      []Pages `xml:"pages"`
+		CoverImage string  `xml:"cover-image"`
 	} `xml:"issue-data"`
-
 	IssueBody struct {
-		IncludeItems []struct {
-			PII   string `xml:"pii"`
-			DOI   string `xml:"doi"`
-			Pages struct {
-				FirstPage string `xml:"first-page"`
-				LastPage  string `xml:"last-page"`
-			} `xml:"pages"`
+		IncludeItem []struct {
+			Pii   string `xml:"pii"`
+			Doi   string `xml:"doi"`
+			Pages string `xml:"pages"`
 		} `xml:"include-item"`
-		IssueSections []struct {
+		IssueSec []struct {
 			SectionTitle string `xml:"section-title"`
-			IncludeItem  struct {
-				PII   string `xml:"pii"`
-				DOI   string `xml:"doi"`
-				Pages struct {
-					FirstPage string `xml:"first-page"`
-					LastPage  string `xml:"last-page"`
-				} `xml:"pages"`
-			}
+			IncludeItem  []struct {
+				Pii   string `xml:"pii"`
+				Doi   string `xml:"doi"`
+				Pages Pages  `xml:"pages"`
+			} `xml:"include-item"`
 		} `xml:"issue-sec"`
 	} `xml:"issue-body"`
 }
 
-type SimpleArticle struct {
-	XMLName  xml.Name `xml:"simple-article"`
-	ItemInfo struct {
-		JID       string `xml:"jid"`
-		AID       string `xml:"aid"`
-		PII       string `xml:"ce:pii"`
-		DOI       string `xml:"ce:doi"`
+// Article describes a single article.
+type Article struct {
+	xml.Name   `xml:"article"`
+	Xlink      string `xml:"xlink,attr"`
+	Ce         string `xml:"ce,attr"`
+	Sb         string `xml:"sb,attr"`
+	Docsubtype string `xml:"docsubtype,attr"`
+	Version    string `xml:"version,attr"`
+	Lang       string `xml:"lang,attr"`
+	ItemInfo   struct {
+		Jid       string `xml:"jid"`
+		Aid       string `xml:"aid"`
+		Pii       string `xml:"pii"`
+		Doi       string `xml:"doi"`
 		Copyright struct {
 			Type string `xml:"type,attr"`
 			Year string `xml:"year,attr"`
-		} `xml:"ce:copyright"`
-	} `xml:"ce:item-info"`
-
-	SimpleHead struct {
-		DocHead struct {
-			TextFn string `xml:"ce:textfn"`
-		} `xml:"ce:dochead"`
-		Title       string `xml:"ce:title"`
-		AuthorGroup []struct {
-			Author struct {
-				ID                string `xml:"id,attr"`
-				GivenName         string `xml:"ce:given-name"`
-				Surname           string `xml:"ce:surname"`
-				ElectronicAddress struct {
-					Type  string `xml:"type,attr"`
-					Value string `xml:",chardata"`
-				} `xml:"ce:e-address"`
+		} `xml:"copyright"`
+	} `xml:"item-info"`
+	Head struct {
+		ArticleFootnote string `xml:"article-footnote"`
+		Dochead         struct {
+			Id     string `xml:"id,attr"`
+			Textfn string `xml:"textfn"`
+		} `xml:"dochead"`
+		Title       string `xml:"title"`
+		AuthorGroup struct {
+			Id     string `xml:"id,attr"`
+			Author []struct {
+				Id        string `xml:"id,attr"`
+				Orcid     string `xml:"orcid,attr"`
+				GivenName string `xml:"given-name"`
+				Surname   string `xml:"surname"`
+				Degrees   string `xml:"degrees"`
+				CrossRef  struct {
+					Refid string `xml:"refid,attr"`
+					Id    string `xml:"id,attr"`
+					Sup   string `xml:"sup"`
+				} `xml:"cross-ref"`
+				EAddress struct {
+					Type string `xml:"type,attr"`
+					Id   string `xml:"id,attr"`
+				} `xml:"e-address"`
+			} `xml:"author"`
+			Affiliation struct {
+				Id          string `xml:"id,attr"`
+				Textfn      string `xml:"textfn"`
 				Affiliation struct {
-					TextFn string `xml:"ce:textfn"`
-				} `xml:"ce:affilitaion"`
-				Crossref struct {
-					RefID string `xml:"refid,attr"`
-					Sup   struct {
-						Loc string `xml:"loc,attr"`
-					}
-				} `xml:"ce:cross-ref"`
-				Correspondence struct {
-					ID    string `xml:"id,attr"`
-					Label string `xml:"ce:label"`
-					Text  string `xml:"ce:text"`
-				} `xml:"ce:correspondence"`
-			} `xml:"ce:author"`
-		} `xml:"ce:author-group"`
-	} `xml:"ce:simple-head"`
+					Sa           string   `xml:"sa,attr"`
+					Organization []string `xml:"organization"`
+					AddressLine  string   `xml:"address-line"`
+					City         string   `xml:"city"`
+					State        string   `xml:"state"`
+					PostalCode   string   `xml:"postal-code"`
+					Country      string   `xml:"country"`
+				} `xml:"affiliation"`
+			} `xml:"affiliation"`
+			Correspondence struct {
+				Id    string `xml:"id,attr"`
+				Label string `xml:"label"`
+				Text  string `xml:"text"`
+			} `xml:"correspondence"`
+		} `xml:"author-group"`
+		DateReceived struct {
+			Day   string `xml:"day,attr"`
+			Month string `xml:"month,attr"`
+			Year  string `xml:"year,attr"`
+		} `xml:"date-received"`
+		DateRevised struct {
+			Day   string `xml:"day,attr"`
+			Month string `xml:"month,attr"`
+			Year  string `xml:"year,attr"`
+		} `xml:"date-revised"`
+		DateAccepted struct {
+			Day   string `xml:"day,attr"`
+			Month string `xml:"month,attr"`
+			Year  string `xml:"year,attr"`
+		} `xml:"date-accepted"`
+		Abstract []struct {
+			Text         string `xml:",innerxml"`
+			Lang         string `xml:"lang,attr"`
+			Id           string `xml:"id,attr"`
+			View         string `xml:"view,attr"`
+			Class        string `xml:"class,attr"`
+			SectionTitle string `xml:"section-title"`
+			AbstractSec  []struct {
+				Role         string `xml:"role,attr"`
+				Id           string `xml:"id,attr"`
+				View         string `xml:"view,attr"`
+				SectionTitle string `xml:"section-title"`
+				SimplePara   struct {
+					Id   string `xml:"id,attr"`
+					View string `xml:"view,attr"`
+					List struct {
+						Id       string `xml:"id,attr"`
+						ListItem []struct {
+							Id    string `xml:"id,attr"`
+							Label string `xml:"label"`
+							Para  struct {
+								Id   string `xml:"id,attr"`
+								View string `xml:"view,attr"`
+							} `xml:"para"`
+						} `xml:"list-item"`
+					} `xml:"list"`
+				} `xml:"simple-para"`
+			} `xml:"abstract-sec"`
+		} `xml:"abstract"`
+		Keywords struct {
+			Lang         string `xml:"lang,attr"`
+			Id           string `xml:"id,attr"`
+			View         string `xml:"view,attr"`
+			Class        string `xml:"class,attr"`
+			SectionTitle string `xml:"section-title"`
+			Keyword      []struct {
+				Id   string `xml:"id,attr"`
+				Text string `xml:"text"`
+			} `xml:"keyword"`
+		} `xml:"keywords"`
+	} `xml:"head"`
+}
+
+// Date returns the date of the article. Currently use the date-received attribute.
+func (article Article) Date() (time.Time, error) {
+	dr := article.Head.DateReceived
+	var year, month, day = dr.Year, dr.Month, dr.Day
+
+	year = strings.TrimLeft(year, "0")
+	month = strings.TrimLeft(month, "0")
+	day = strings.TrimLeft(day, "0")
+
+	if year == "" {
+		if article.ItemInfo.Copyright.Year != "" {
+			year = article.ItemInfo.Copyright.Year
+		} else {
+			// require at least a year
+			return time.Time{}, ErrNoYearFound
+		}
+	}
+	if month == "" {
+		month = "1"
+	}
+	if day == "" {
+		day = "1"
+	}
+	return time.Parse("2006-1-2", fmt.Sprintf("%s-%s-%s", year, month, day))
+}
+
+func (article Article) Authors() []finc.Author {
+	var authors []finc.Author
+	for _, author := range article.Head.AuthorGroup.Author {
+		authors = append(authors, finc.Author{
+			FirstName: author.GivenName,
+			LastName:  author.Surname,
+			Name:      fmt.Sprintf("%s %s", author.GivenName, author.Surname),
+		})
+	}
+	return authors
+}
+
+// Shipment is a tar export, looks like SAXC0000000000046A.tar. The tar is not
+// extracted but loaded into memory at once. Issues and articles are stored in a
+// map, each keyed on the PII.
+type Shipment struct {
+	// the full path to the file
+	origin string
+	// parsed dataset.xml from the tar file
+	dataset Dataset
+	// issues, keyed by the PII
+	issues map[string]SerialIssue
+	// articles, keyed by the PII
+	articles map[string]Article
+}
+
+// String describes the shipment briefly.
+func (s Shipment) String() string {
+	return fmt.Sprintf("<Shipment origin=%s, issues=%d, articles=%d>",
+		s.origin,
+		len(s.dataset.DatasetContent.JournalIssue),
+		len(s.dataset.DatasetContent.JournalItem))
+}
+
+// NewShipment creates a new bag of data from a given tarfile.
+func NewShipment(r io.Reader) (Shipment, error) {
+
+	var shipment = Shipment{
+		issues:   make(map[string]SerialIssue),
+		articles: make(map[string]Article),
+	}
+
+	if ff, ok := r.(*os.File); ok {
+		shipment.origin = ff.Name()
+	}
+
+	// cache the raw bytes here
+	var cache = make(map[string][]byte)
+
+	tr := tar.NewReader(r)
+	for {
+		header, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return shipment, err
+		}
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, tr); err != nil {
+			return shipment, err
+		}
+		cache[header.Name] = buf.Bytes()
+	}
+
+	for k, v := range cache {
+		dec := xml.NewDecoder(bytes.NewReader(v))
+		dec.Strict = false
+
+		switch {
+		case strings.HasSuffix(k, "main.xml"):
+			var article Article
+			if err := dec.Decode(&article); err != nil {
+				return shipment, err
+			}
+			shipment.articles[article.ItemInfo.Pii] = article
+		case strings.HasSuffix(k, "issue.xml"):
+			var si SerialIssue
+			if err := dec.Decode(&si); err != nil {
+				return shipment, err
+			}
+			shipment.issues[si.IssueInfo.Pii] = si
+		case strings.HasSuffix(k, "dataset.xml"):
+			var ds Dataset
+			if err := dec.Decode(&ds); err != nil {
+				return shipment, err
+			}
+			shipment.dataset = ds
+		}
+	}
+	return shipment, nil
+}
+
+// BatchConvert converts all items for a shipment into importable objects.
+func (s Shipment) BatchConvert() ([]span.Importer, error) {
+	var outputs []span.Importer
+
+	for _, ji := range s.dataset.DatasetContent.JournalIssue {
+		pii := ji.JournalIssueUniqueIds.Pii
+		si, ok := s.issues[pii]
+		if !ok {
+			log.Println(fmt.Sprintf("issue referenced %s, but not cached", pii))
+			continue
+		}
+		for _, sec := range si.IssueBody.IssueSec {
+			for _, ii := range sec.IncludeItem {
+				output := finc.NewIntermediateSchema()
+
+				article, ok := s.articles[ii.Pii]
+
+				if !ok {
+					log.Println(fmt.Sprintf("article referenced %s, but not cached", ii.Pii))
+					continue
+				}
+
+				output.Format = "ElectronicArticle"
+				output.MegaCollection = "Elsevier Journals"
+				output.SourceID = "85"
+				output.RecordID = fmt.Sprintf("ai-85-%s", base64.RawURLEncoding.EncodeToString([]byte(article.ItemInfo.Doi)))
+				output.Genre = "article"
+				output.Languages = []string{"eng"}
+				output.RefType = "EJOUR"
+				output.Volume = si.IssueInfo.VolumeIssueNumber.VolFirst
+				output.Issue = si.IssueInfo.VolumeIssueNumber.IssFirst
+				output.DOI = article.ItemInfo.Doi
+
+				output.ArticleTitle = article.Head.Title
+				output.JournalTitle = ji.JournalIssueProperties.CollectionTitle
+
+				output.StartPage = ii.Pages.FirstPage
+				output.EndPage = ii.Pages.LastPage
+				output.Pages = ii.Pages.Total()
+
+				output.Authors = article.Authors()
+
+				output.ISSN = []string{si.IssueInfo.Issn}
+				output.URL = []string{
+					fmt.Sprintf("http://doi.org/%s", article.ItemInfo.Doi),
+				}
+
+				date, err := article.Date()
+				if err != nil {
+					log.Printf("%+v: %s", article.Head, err)
+					continue
+				}
+
+				output.Date = date
+				output.RawDate = date.Format("2006-01-02")
+
+				var buf bytes.Buffer
+				for _, abs := range article.Head.Abstract {
+					buf.WriteString(sanitize.HTML(abs.Text))
+				}
+				output.Abstract = buf.String()
+
+				outputs = append(outputs, span.Importer(SchemaFunc(*output)))
+			}
+		}
+	}
+	return outputs, nil
+}
+
+// SchemaFunc make an already converted intermediate schema look like something,
+// that can be converted into one. Workaround to satisfy the interface, for the
+// moment.
+type SchemaFunc finc.IntermediateSchema
+
+// ToIntermediateSchema does a type conversion only.
+func (s SchemaFunc) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+	is := finc.IntermediateSchema(s)
+	return &is, nil
+}
+
+// Elsevier journals source.
+type Elsevier struct{}
+
+// Iterate expects a reader over a tar source. Items are converted in a batch,
+// then sent in once throw to the rest of the pipeline. This works as long as
+// the working sets fit into memory.
+func (e Elsevier) Iterate(r io.Reader) (<-chan []span.Importer, error) {
+	ch := make(chan []span.Importer)
+
+	shipment, err := NewShipment(r)
+	if err != nil {
+		return ch, err
+	}
+
+	outputs, err := shipment.BatchConvert()
+	if err != nil {
+		return ch, err
+	}
+
+	go func() {
+		docs := make([]span.Importer, len(outputs))
+		for i, output := range outputs {
+			docs[i] = output
+		}
+		ch <- docs
+		close(ch)
+	}()
+
+	return ch, nil
 }
