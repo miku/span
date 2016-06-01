@@ -19,6 +19,13 @@ import (
 	"github.com/miku/span/finc"
 )
 
+const (
+	SourceID = "85"
+	Format = "ElectronicArticle"
+	Collection = "Elsevier Journals"
+	Genre = "article"
+)
+
 var (
 	ErrNoYearFound     = errors.New("no year found")
 	ErrTarFileRequired = errors.New("a tar file is required")
@@ -346,6 +353,7 @@ func (s Shipment) String() string {
 func NewShipment(r io.Reader) (Shipment, error) {
 
 	var shipment = Shipment{
+		origin:   fmt.Sprintf("%T", r),
 		issues:   make(map[string]SerialIssue),
 		articles: make(map[string]Article),
 	}
@@ -354,10 +362,8 @@ func NewShipment(r io.Reader) (Shipment, error) {
 		shipment.origin = ff.Name()
 	}
 
-	// cache the raw bytes here
-	var cache = make(map[string][]byte)
-
 	tr := tar.NewReader(r)
+
 	for {
 		header, err := tr.Next()
 		if err == io.EOF {
@@ -366,31 +372,29 @@ func NewShipment(r io.Reader) (Shipment, error) {
 		if err != nil {
 			return shipment, err
 		}
+
 		var buf bytes.Buffer
 		if _, err := io.Copy(&buf, tr); err != nil {
 			return shipment, err
 		}
-		cache[header.Name] = buf.Bytes()
-	}
 
-	for k, v := range cache {
-		dec := xml.NewDecoder(bytes.NewReader(v))
+		dec := xml.NewDecoder(&buf)
 		dec.Strict = false
 
 		switch {
-		case strings.HasSuffix(k, "main.xml"):
+		case strings.HasSuffix(header.Name, "main.xml"):
 			var article Article
 			if err := dec.Decode(&article); err != nil {
 				return shipment, err
 			}
 			shipment.articles[article.ItemInfo.Pii] = article
-		case strings.HasSuffix(k, "issue.xml"):
+		case strings.HasSuffix(header.Name, "issue.xml"):
 			var si SerialIssue
 			if err := dec.Decode(&si); err != nil {
 				return shipment, err
 			}
 			shipment.issues[si.IssueInfo.Pii] = si
-		case strings.HasSuffix(k, "dataset.xml"):
+		case strings.HasSuffix(header.Name, "dataset.xml"):
 			var ds Dataset
 			if err := dec.Decode(&ds); err != nil {
 				return shipment, err
@@ -409,7 +413,7 @@ func (s Shipment) BatchConvert() ([]span.Importer, error) {
 		pii := ji.JournalIssueUniqueIds.Pii
 		si, ok := s.issues[pii]
 		if !ok {
-			log.Println(fmt.Sprintf("issue referenced %s, but not cached", pii))
+			log.Println(fmt.Sprintf("skipping, issue referenced %s, but not cached", pii))
 			continue
 		}
 		for _, sec := range si.IssueBody.IssueSec {
@@ -419,20 +423,22 @@ func (s Shipment) BatchConvert() ([]span.Importer, error) {
 				article, ok := s.articles[ii.Pii]
 
 				if !ok {
-					log.Println(fmt.Sprintf("article referenced %s, but not cached", ii.Pii))
+					log.Println(fmt.Sprintf("skipping, article referenced %s, but not cached", ii.Pii))
 					continue
 				}
 
-				output.Format = "ElectronicArticle"
-				output.MegaCollection = "Elsevier Journals"
-				output.SourceID = "85"
-				output.RecordID = fmt.Sprintf("ai-85-%s", base64.RawURLEncoding.EncodeToString([]byte(article.ItemInfo.Doi)))
-				output.Genre = "article"
-				output.Languages = []string{"eng"}
-				output.RefType = "EJOUR"
-				output.Volume = si.IssueInfo.VolumeIssueNumber.VolFirst
-				output.Issue = si.IssueInfo.VolumeIssueNumber.IssFirst
+				output.Authors = article.Authors()
 				output.DOI = article.ItemInfo.Doi
+				output.Format = Format
+				output.Genre = Genre
+				output.ISSN = []string{si.IssueInfo.Issn}
+				output.Issue = si.IssueInfo.VolumeIssueNumber.IssFirst
+				output.Languages = []string{"eng"}
+				output.MegaCollection = Collection
+				output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(article.ItemInfo.Doi)))
+				output.RefType = "EJOUR"
+				output.SourceID = SourceID
+				output.Volume = si.IssueInfo.VolumeIssueNumber.VolFirst
 
 				output.ArticleTitle = article.Head.Title
 				output.JournalTitle = ji.JournalIssueProperties.CollectionTitle
@@ -441,9 +447,6 @@ func (s Shipment) BatchConvert() ([]span.Importer, error) {
 				output.EndPage = ii.Pages.LastPage
 				output.Pages = ii.Pages.Total()
 
-				output.Authors = article.Authors()
-
-				output.ISSN = []string{si.IssueInfo.Issn}
 				output.URL = []string{
 					fmt.Sprintf("http://doi.org/%s", article.ItemInfo.Doi),
 				}
