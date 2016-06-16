@@ -106,8 +106,8 @@ func (s *Solr5Vufind3v11) Convert(is finc.IntermediateSchema) error {
 	s.Imprint = is.Imprint()
 	s.ISSN = is.ISSNList()
 	s.MegaCollections = append(s.MegaCollections, is.MegaCollection)
-	s.PublishDateSort = is.ParsedDate().Year()
-	s.PublishDate = []string{is.RawDate}
+	s.PublishDateSort = is.Date.Year()
+	s.PublishDate = []string{is.Date.Format("2006-01-02")}
 	s.Publishers = is.Publishers
 	s.RecordType = finc.AIRecordType
 	s.Series = append(s.Series, is.JournalTitle)
