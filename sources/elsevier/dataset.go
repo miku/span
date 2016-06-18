@@ -20,10 +20,10 @@ import (
 )
 
 const (
-	SourceID = "85"
-	Format = "ElectronicArticle"
+	SourceID   = "85"
+	Format     = "ElectronicArticle"
 	Collection = "Elsevier Journals"
-	Genre = "article"
+	Genre      = "article"
 )
 
 var (
