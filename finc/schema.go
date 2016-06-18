@@ -249,3 +249,8 @@ func (is *IntermediateSchema) SortableAuthor() string {
 	buf.WriteString(is.SortableTitle())
 	return buf.String()
 }
+
+type StrippedSchema struct {
+	DOI    string   `json:"doi"`
+	Labels []string `json:"x.labels"`
+}

@@ -8,7 +8,6 @@ package finc
 import (
 	"bytes"
 	"fmt"
-
 	fflib "github.com/pquerna/ffjson/fflib/v1"
 )
 
@@ -2323,7 +2322,7 @@ handle_EISBN:
 
 			for {
 
-				var v string
+				var tmp_uj__EISBN string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -2344,7 +2343,7 @@ handle_EISBN:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__EISBN type=string kind=string quoted=false*/
 
 				{
 
@@ -2360,12 +2359,12 @@ handle_EISBN:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__EISBN = string(string(outBuf))
 
 					}
 				}
 
-				uj.EISBN = append(uj.EISBN, v)
+				uj.EISBN = append(uj.EISBN, tmp_uj__EISBN)
 				wantVal = false
 			}
 		}
@@ -2396,7 +2395,7 @@ handle_EISSN:
 
 			for {
 
-				var v string
+				var tmp_uj__EISSN string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -2417,7 +2416,7 @@ handle_EISSN:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__EISSN type=string kind=string quoted=false*/
 
 				{
 
@@ -2433,12 +2432,12 @@ handle_EISSN:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__EISSN = string(string(outBuf))
 
 					}
 				}
 
-				uj.EISSN = append(uj.EISSN, v)
+				uj.EISSN = append(uj.EISSN, tmp_uj__EISSN)
 				wantVal = false
 			}
 		}
@@ -2521,7 +2520,7 @@ handle_ISBN:
 
 			for {
 
-				var v string
+				var tmp_uj__ISBN string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -2542,7 +2541,7 @@ handle_ISBN:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__ISBN type=string kind=string quoted=false*/
 
 				{
 
@@ -2558,12 +2557,12 @@ handle_ISBN:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__ISBN = string(string(outBuf))
 
 					}
 				}
 
-				uj.ISBN = append(uj.ISBN, v)
+				uj.ISBN = append(uj.ISBN, tmp_uj__ISBN)
 				wantVal = false
 			}
 		}
@@ -2594,7 +2593,7 @@ handle_ISSN:
 
 			for {
 
-				var v string
+				var tmp_uj__ISSN string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -2615,7 +2614,7 @@ handle_ISSN:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__ISSN type=string kind=string quoted=false*/
 
 				{
 
@@ -2631,12 +2630,12 @@ handle_ISSN:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__ISSN = string(string(outBuf))
 
 					}
 				}
 
-				uj.ISSN = append(uj.ISSN, v)
+				uj.ISSN = append(uj.ISSN, tmp_uj__ISSN)
 				wantVal = false
 			}
 		}
@@ -2797,7 +2796,7 @@ handle_Places:
 
 			for {
 
-				var v string
+				var tmp_uj__Places string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -2818,7 +2817,7 @@ handle_Places:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Places type=string kind=string quoted=false*/
 
 				{
 
@@ -2834,12 +2833,12 @@ handle_Places:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Places = string(string(outBuf))
 
 					}
 				}
 
-				uj.Places = append(uj.Places, v)
+				uj.Places = append(uj.Places, tmp_uj__Places)
 				wantVal = false
 			}
 		}
@@ -2870,7 +2869,7 @@ handle_Publishers:
 
 			for {
 
-				var v string
+				var tmp_uj__Publishers string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -2891,7 +2890,7 @@ handle_Publishers:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Publishers type=string kind=string quoted=false*/
 
 				{
 
@@ -2907,12 +2906,12 @@ handle_Publishers:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Publishers = string(string(outBuf))
 
 					}
 				}
 
-				uj.Publishers = append(uj.Publishers, v)
+				uj.Publishers = append(uj.Publishers, tmp_uj__Publishers)
 				wantVal = false
 			}
 		}
@@ -3177,7 +3176,7 @@ handle_Authors:
 
 			for {
 
-				var v Author
+				var tmp_uj__Authors Author
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3198,7 +3197,7 @@ handle_Authors:
 					wantVal = true
 				}
 
-				/* handler: v type=finc.Author kind=struct quoted=false*/
+				/* handler: tmp_uj__Authors type=finc.Author kind=struct quoted=false*/
 
 				{
 					if tok == fflib.FFTok_null {
@@ -3207,14 +3206,14 @@ handle_Authors:
 						goto mainparse
 					}
 
-					err = v.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+					err = tmp_uj__Authors.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
 					if err != nil {
 						return err
 					}
 					state = fflib.FFParse_after_value
 				}
 
-				uj.Authors = append(uj.Authors, v)
+				uj.Authors = append(uj.Authors, tmp_uj__Authors)
 				wantVal = false
 			}
 		}
@@ -3271,7 +3270,7 @@ handle_Languages:
 
 			for {
 
-				var v string
+				var tmp_uj__Languages string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3292,7 +3291,7 @@ handle_Languages:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Languages type=string kind=string quoted=false*/
 
 				{
 
@@ -3308,12 +3307,12 @@ handle_Languages:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Languages = string(string(outBuf))
 
 					}
 				}
 
-				uj.Languages = append(uj.Languages, v)
+				uj.Languages = append(uj.Languages, tmp_uj__Languages)
 				wantVal = false
 			}
 		}
@@ -3344,7 +3343,7 @@ handle_URL:
 
 			for {
 
-				var v string
+				var tmp_uj__URL string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3365,7 +3364,7 @@ handle_URL:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__URL type=string kind=string quoted=false*/
 
 				{
 
@@ -3381,12 +3380,12 @@ handle_URL:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__URL = string(string(outBuf))
 
 					}
 				}
 
-				uj.URL = append(uj.URL, v)
+				uj.URL = append(uj.URL, tmp_uj__URL)
 				wantVal = false
 			}
 		}
@@ -3495,7 +3494,7 @@ handle_Headings:
 
 			for {
 
-				var v string
+				var tmp_uj__Headings string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3516,7 +3515,7 @@ handle_Headings:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Headings type=string kind=string quoted=false*/
 
 				{
 
@@ -3532,12 +3531,12 @@ handle_Headings:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Headings = string(string(outBuf))
 
 					}
 				}
 
-				uj.Headings = append(uj.Headings, v)
+				uj.Headings = append(uj.Headings, tmp_uj__Headings)
 				wantVal = false
 			}
 		}
@@ -3568,7 +3567,7 @@ handle_Subjects:
 
 			for {
 
-				var v string
+				var tmp_uj__Subjects string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3589,7 +3588,7 @@ handle_Subjects:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Subjects type=string kind=string quoted=false*/
 
 				{
 
@@ -3605,12 +3604,12 @@ handle_Subjects:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Subjects = string(string(outBuf))
 
 					}
 				}
 
-				uj.Subjects = append(uj.Subjects, v)
+				uj.Subjects = append(uj.Subjects, tmp_uj__Subjects)
 				wantVal = false
 			}
 		}
@@ -3693,7 +3692,7 @@ handle_Packages:
 
 			for {
 
-				var v string
+				var tmp_uj__Packages string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3714,7 +3713,7 @@ handle_Packages:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Packages type=string kind=string quoted=false*/
 
 				{
 
@@ -3730,12 +3729,12 @@ handle_Packages:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Packages = string(string(outBuf))
 
 					}
 				}
 
-				uj.Packages = append(uj.Packages, v)
+				uj.Packages = append(uj.Packages, tmp_uj__Packages)
 				wantVal = false
 			}
 		}
@@ -3766,7 +3765,7 @@ handle_Labels:
 
 			for {
 
-				var v string
+				var tmp_uj__Labels string
 
 				tok = fs.Scan()
 				if tok == fflib.FFTok_error {
@@ -3787,7 +3786,7 @@ handle_Labels:
 					wantVal = true
 				}
 
-				/* handler: v type=string kind=string quoted=false*/
+				/* handler: tmp_uj__Labels type=string kind=string quoted=false*/
 
 				{
 
@@ -3803,12 +3802,307 @@ handle_Labels:
 
 						outBuf := fs.Output.Bytes()
 
-						v = string(string(outBuf))
+						tmp_uj__Labels = string(string(outBuf))
 
 					}
 				}
 
-				uj.Labels = append(uj.Labels, v)
+				uj.Labels = append(uj.Labels, tmp_uj__Labels)
+				wantVal = false
+			}
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+wantedvalue:
+	return fs.WrapErr(fmt.Errorf("wanted value token, but got token: %v", tok))
+wrongtokenerror:
+	return fs.WrapErr(fmt.Errorf("ffjson: wanted token: %v, but got token: %v output=%s", wantedTok, tok, fs.Output.String()))
+tokerror:
+	if fs.BigError != nil {
+		return fs.WrapErr(fs.BigError)
+	}
+	err = fs.Error.ToError()
+	if err != nil {
+		return fs.WrapErr(err)
+	}
+	panic("ffjson-generated: unreachable, please report bug.")
+done:
+	return nil
+}
+
+func (mj *StrippedSchema) MarshalJSON() ([]byte, error) {
+	var buf fflib.Buffer
+	if mj == nil {
+		buf.WriteString("null")
+		return buf.Bytes(), nil
+	}
+	err := mj.MarshalJSONBuf(&buf)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+func (mj *StrippedSchema) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
+	if mj == nil {
+		buf.WriteString("null")
+		return nil
+	}
+	var err error
+	var obj []byte
+	_ = obj
+	_ = err
+	buf.WriteString(`{"doi":`)
+	fflib.WriteJsonString(buf, string(mj.DOI))
+	buf.WriteString(`,"x.labels":`)
+	if mj.Labels != nil {
+		buf.WriteString(`[`)
+		for i, v := range mj.Labels {
+			if i != 0 {
+				buf.WriteString(`,`)
+			}
+			fflib.WriteJsonString(buf, string(v))
+		}
+		buf.WriteString(`]`)
+	} else {
+		buf.WriteString(`null`)
+	}
+	buf.WriteByte('}')
+	return nil
+}
+
+const (
+	ffj_t_StrippedSchemabase = iota
+	ffj_t_StrippedSchemano_such_key
+
+	ffj_t_StrippedSchema_DOI
+
+	ffj_t_StrippedSchema_Labels
+)
+
+var ffj_key_StrippedSchema_DOI = []byte("doi")
+
+var ffj_key_StrippedSchema_Labels = []byte("x.labels")
+
+func (uj *StrippedSchema) UnmarshalJSON(input []byte) error {
+	fs := fflib.NewFFLexer(input)
+	return uj.UnmarshalJSONFFLexer(fs, fflib.FFParse_map_start)
+}
+
+func (uj *StrippedSchema) UnmarshalJSONFFLexer(fs *fflib.FFLexer, state fflib.FFParseState) error {
+	var err error = nil
+	currentKey := ffj_t_StrippedSchemabase
+	_ = currentKey
+	tok := fflib.FFTok_init
+	wantedTok := fflib.FFTok_init
+
+mainparse:
+	for {
+		tok = fs.Scan()
+		//	println(fmt.Sprintf("debug: tok: %v  state: %v", tok, state))
+		if tok == fflib.FFTok_error {
+			goto tokerror
+		}
+
+		switch state {
+
+		case fflib.FFParse_map_start:
+			if tok != fflib.FFTok_left_bracket {
+				wantedTok = fflib.FFTok_left_bracket
+				goto wrongtokenerror
+			}
+			state = fflib.FFParse_want_key
+			continue
+
+		case fflib.FFParse_after_value:
+			if tok == fflib.FFTok_comma {
+				state = fflib.FFParse_want_key
+			} else if tok == fflib.FFTok_right_bracket {
+				goto done
+			} else {
+				wantedTok = fflib.FFTok_comma
+				goto wrongtokenerror
+			}
+
+		case fflib.FFParse_want_key:
+			// json {} ended. goto exit. woo.
+			if tok == fflib.FFTok_right_bracket {
+				goto done
+			}
+			if tok != fflib.FFTok_string {
+				wantedTok = fflib.FFTok_string
+				goto wrongtokenerror
+			}
+
+			kn := fs.Output.Bytes()
+			if len(kn) <= 0 {
+				// "" case. hrm.
+				currentKey = ffj_t_StrippedSchemano_such_key
+				state = fflib.FFParse_want_colon
+				goto mainparse
+			} else {
+				switch kn[0] {
+
+				case 'd':
+
+					if bytes.Equal(ffj_key_StrippedSchema_DOI, kn) {
+						currentKey = ffj_t_StrippedSchema_DOI
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 'x':
+
+					if bytes.Equal(ffj_key_StrippedSchema_Labels, kn) {
+						currentKey = ffj_t_StrippedSchema_Labels
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				}
+
+				if fflib.EqualFoldRight(ffj_key_StrippedSchema_Labels, kn) {
+					currentKey = ffj_t_StrippedSchema_Labels
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_StrippedSchema_DOI, kn) {
+					currentKey = ffj_t_StrippedSchema_DOI
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				currentKey = ffj_t_StrippedSchemano_such_key
+				state = fflib.FFParse_want_colon
+				goto mainparse
+			}
+
+		case fflib.FFParse_want_colon:
+			if tok != fflib.FFTok_colon {
+				wantedTok = fflib.FFTok_colon
+				goto wrongtokenerror
+			}
+			state = fflib.FFParse_want_value
+			continue
+		case fflib.FFParse_want_value:
+
+			if tok == fflib.FFTok_left_brace || tok == fflib.FFTok_left_bracket || tok == fflib.FFTok_integer || tok == fflib.FFTok_double || tok == fflib.FFTok_string || tok == fflib.FFTok_bool || tok == fflib.FFTok_null {
+				switch currentKey {
+
+				case ffj_t_StrippedSchema_DOI:
+					goto handle_DOI
+
+				case ffj_t_StrippedSchema_Labels:
+					goto handle_Labels
+
+				case ffj_t_StrippedSchemano_such_key:
+					err = fs.SkipField(tok)
+					if err != nil {
+						return fs.WrapErr(err)
+					}
+					state = fflib.FFParse_after_value
+					goto mainparse
+				}
+			} else {
+				goto wantedvalue
+			}
+		}
+	}
+
+handle_DOI:
+
+	/* handler: uj.DOI type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.DOI = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Labels:
+
+	/* handler: uj.Labels type=[]string kind=slice quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_left_brace && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for ", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+			uj.Labels = nil
+		} else {
+
+			uj.Labels = make([]string, 0)
+
+			wantVal := true
+
+			for {
+
+				var tmp_uj__Labels string
+
+				tok = fs.Scan()
+				if tok == fflib.FFTok_error {
+					goto tokerror
+				}
+				if tok == fflib.FFTok_right_brace {
+					break
+				}
+
+				if tok == fflib.FFTok_comma {
+					if wantVal == true {
+						// TODO(pquerna): this isn't an ideal error message, this handles
+						// things like [,,,] as an array value.
+						return fs.WrapErr(fmt.Errorf("wanted value token, but got token: %v", tok))
+					}
+					continue
+				} else {
+					wantVal = true
+				}
+
+				/* handler: tmp_uj__Labels type=string kind=string quoted=false*/
+
+				{
+
+					{
+						if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+							return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+						}
+					}
+
+					if tok == fflib.FFTok_null {
+
+					} else {
+
+						outBuf := fs.Output.Bytes()
+
+						tmp_uj__Labels = string(string(outBuf))
+
+					}
+				}
+
+				uj.Labels = append(uj.Labels, tmp_uj__Labels)
 				wantVal = false
 			}
 		}
