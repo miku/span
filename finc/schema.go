@@ -251,6 +251,7 @@ func (is *IntermediateSchema) SortableAuthor() string {
 }
 
 type StrippedSchema struct {
-	DOI    string   `json:"doi"`
-	Labels []string `json:"x.labels"`
+	DOI      string   `json:"doi"`
+	Labels   []string `json:"x.labels"`
+	SourceID string   `json:"finc.source_id"`
 }

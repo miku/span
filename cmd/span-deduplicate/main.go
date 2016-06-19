@@ -26,7 +26,7 @@ func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
 				log.Fatal(err)
 			}
 			if is.DOI != "" {
-				out <- fmt.Sprintf("%s\t%s", is.DOI, strings.Join(is.Labels, " "))
+				out <- fmt.Sprintf("%s\t%s\t%s", is.SourceID, is.DOI, strings.Join(is.Labels, "|"))
 			}
 		}
 	}
@@ -100,7 +100,7 @@ func main() {
 
 		if i == 20000 {
 			counter += i
-			if counter % 1000000 == 0 {
+			if counter%1000000 == 0 {
 				log.Printf("@%d", counter)
 			}
 			payload := make([][]byte, len(batch))
