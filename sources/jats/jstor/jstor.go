@@ -52,6 +52,7 @@ var (
 		regexp.MustCompile(`(?i)(front|back)\s*matter`),
 		regexp.MustCompile(`(?i)table\s*of\s*content[s]?`),
 	}
+	DOIPattern = regexp.MustCompile(`10\.[0-9]+\/\S+`)
 )
 
 // Jstor source.
@@ -76,13 +77,7 @@ func (s Jstor) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 func (article *Article) Identifiers() (jats.Identifiers, error) {
 	locator := article.Front.Article.SelfURI.Value
 
-	// guess DOI from jstor stable URL
-	var candidate, doi string
-	candidate = strings.Replace(locator, "http://www.jstor.org/stable/", "", -1)
-	if strings.Contains(candidate, "/") {
-		doi = candidate
-	}
-
+	doi := DOIPattern.FindString(locator)
 	recordID := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
 	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
 }
