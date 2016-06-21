@@ -202,6 +202,8 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return is, span.Skip{Reason: err.Error()}
 	}
 	is.Date = date
+	is.RawDate = date.Format("2006-01-02")
+
 	is.Authors = p.Authors()
 
 	is.URL = []string{}
