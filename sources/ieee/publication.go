@@ -5,12 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
+)
+
+const (
+	SourceID   = "89"
+	Format     = "ElectronicArticle"
+	Collection = "IEEE"
+	Genre      = "article"
 )
 
 var ErrNoDate = errors.New("no date found")
@@ -62,6 +68,7 @@ type Publication struct {
 				Amsid       string `xml:"amsid"`
 				Issuestatus string `xml:"issuestatus"`
 			} `xml:"issue"`
+			Volumenum string `xml:"volumenum"`
 		} `xml:"volumeinfo"`
 		Article struct {
 			Title       string `xml:"title"`
@@ -73,6 +80,7 @@ type Publication struct {
 				Articlestatus          string `xml:"articlestatus"`
 				Articleopenaccess      string `xml:"articleopenaccess"`
 				Articleshowflag        string `xml:"articleshowflag"`
+				Issuenum               string `xml:"issuenum"`
 				Articleplagiarizedflag string `xml:"articleplagiarizedflag"`
 				Articlenodoiflag       string `xml:"articlenodoiflag"`
 				Articlecoverimageflag  string `xml:"articlecoverimageflag"`
@@ -112,8 +120,10 @@ type Publication struct {
 				Numreferences string `xml:"numreferences"`
 				Amsid         string `xml:"amsid"`
 				Keywordset    struct {
-					Keywordtype string   `xml:"keywordtype,attr"`
-					Keyword     []string `xml:"keyword"`
+					Keywordtype string `xml:"keywordtype,attr"`
+					Keyword     []struct {
+						Term string `xml:"keywordterm"`
+					} `xml:"keyword"`
 				} `xml:"keywordset"`
 			} `xml:"articleinfo"`
 		} `xml:"article"`
@@ -149,7 +159,6 @@ func (p Publication) Date() (time.Time, error) {
 			if v > 0 && v < 13 {
 				m = date.Month
 			} else {
-				log.Printf("synthetic month: %v -> Jan", v)
 				m = "Jan"
 			}
 		}
@@ -159,7 +168,6 @@ func (p Publication) Date() (time.Time, error) {
 			if v > 0 && v < 32 {
 				m = date.Day
 			} else {
-				log.Println("synthetic day")
 				m = "1"
 			}
 		}
@@ -167,16 +175,54 @@ func (p Publication) Date() (time.Time, error) {
 	return time.Parse("2006-Jan-02", fmt.Sprintf("%s-%s-%02s", y, m, d))
 }
 
+func (p Publication) Authors() []finc.Author {
+	var authors []finc.Author
+	for _, author := range p.Volume.Article.Articleinfo.Authorgroup.Author {
+		authors = append(authors, finc.Author{FirstName: author.Firstname, LastName: author.Surname})
+	}
+	return authors
+}
+
 // ToIntermediateSchema does a type conversion only.
 func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is := finc.NewIntermediateSchema()
-	is.ArticleTitle = p.Title
+	is.JournalTitle = p.Title
+	is.ArticleTitle = p.Volume.Article.Title
+
+	if p.Publicationinfo.Issn == "" {
+		return is, span.Skip{Reason: "no ISSN"}
+	}
+
 	is.ISSN = []string{p.Publicationinfo.Issn}
+
 	is.Abstract = p.Volume.Article.Articleinfo.Abstract
+
 	date, err := p.Date()
 	if err != nil {
-		return is, err
+		return is, span.Skip{Reason: err.Error()}
 	}
 	is.Date = date
+	is.Authors = p.Authors()
+
+	is.URL = []string{}
+
+	if p.Volume.Article.Articleinfo.Amsid != "" {
+		is.URL = append(is.URL, fmt.Sprintf("http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=%s", p.Volume.Article.Articleinfo.Amsid))
+	}
+	if p.Volume.Article.Articleinfo.Articledoi != "" {
+		is.DOI = p.Volume.Article.Articleinfo.Articledoi
+		is.URL = append(is.URL, fmt.Sprintf("http://doi.org/%s", is.DOI))
+	}
+
+	is.Volume = p.Volume.Volumeinfo.Volumenum
+	is.Issue = p.Volume.Article.Articleinfo.Issuenum
+	is.Pages = p.Volume.Article.Articleinfo.Numpages
+	is.Publishers = []string{"IEEE"}
+
+	is.Subjects = []string{}
+	for _, kw := range p.Volume.Article.Articleinfo.Keywordset.Keyword {
+		is.Subjects = append(is.Subjects, kw.Term)
+	}
+
 	return is, nil
 }
