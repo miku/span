@@ -2,11 +2,18 @@ package ieee
 
 import (
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"io"
+	"log"
+	"strconv"
+	"time"
 
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
 )
+
+var ErrNoDate = errors.New("no date found")
 
 type Publication struct {
 	xml.Name        `xml:"publication"`
@@ -90,6 +97,7 @@ type Publication struct {
 					Datetype string `xml:"datetype,attr"`
 					Year     string `xml:"year"`
 					Month    string `xml:"month"`
+					Day      string `xml:"day"`
 				} `xml:"date"`
 				Numpages string `xml:"numpages"`
 				Size     string `xml:"size"`
@@ -123,9 +131,52 @@ func (s IEEE) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 	})
 }
 
+func (p Publication) Date() (time.Time, error) {
+	date := p.Volume.Article.Articleinfo.Date
+	y, m, d := "1970", "Jan", "1"
+	if date.Year == "" {
+		return time.Time{}, ErrNoDate
+	} else {
+		if _, err := strconv.Atoi(date.Year); err != nil {
+			return time.Time{}, err
+		}
+		y = date.Year
+	}
+	if date.Month != "" {
+		if v, err := strconv.Atoi(date.Month); err != nil {
+			m = date.Month
+		} else {
+			if v > 0 && v < 13 {
+				m = date.Month
+			} else {
+				log.Printf("synthetic month: %v -> Jan", v)
+				m = "Jan"
+			}
+		}
+	}
+	if date.Day != "" {
+		if v, err := strconv.Atoi(date.Day); err != nil {
+			if v > 0 && v < 32 {
+				m = date.Day
+			} else {
+				log.Println("synthetic day")
+				m = "1"
+			}
+		}
+	}
+	return time.Parse("2006-Jan-02", fmt.Sprintf("%s-%s-%02s", y, m, d))
+}
+
 // ToIntermediateSchema does a type conversion only.
 func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is := finc.NewIntermediateSchema()
 	is.ArticleTitle = p.Title
+	is.ISSN = []string{p.Publicationinfo.Issn}
+	is.Abstract = p.Volume.Article.Articleinfo.Abstract
+	date, err := p.Date()
+	if err != nil {
+		return is, err
+	}
+	is.Date = date
 	return is, nil
 }
