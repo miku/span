@@ -19,6 +19,7 @@ import (
 	"github.com/miku/span/sources/doaj"
 	"github.com/miku/span/sources/elsevier"
 	"github.com/miku/span/sources/genios"
+	"github.com/miku/span/sources/ieee"
 	"github.com/miku/span/sources/jats/degruyter"
 	"github.com/miku/span/sources/jats/jstor"
 	"github.com/miku/span/sources/thieme"
@@ -41,6 +42,7 @@ var formats = map[string]span.Source{
 	"thieme-tm":    thieme.Thieme{Format: "tm"},
 	"thieme-nlm":   thieme.Thieme{Format: "nlm"},
 	"elsevier-tar": elsevier.Elsevier{},
+	"ieee":         ieee.IEEE{},
 }
 
 type options struct {
