@@ -19,7 +19,10 @@ const (
 	Genre      = "article"
 )
 
-var ErrNoDate = errors.New("no date found")
+var (
+	ErrNoDate       = errors.New("no date found")
+	ErrNoIdentifier = errors.New("missing identifier")
+)
 
 type Publication struct {
 	xml.Name        `xml:"publication"`
@@ -208,8 +211,15 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.URL = []string{}
 
+	is.SourceID = SourceID
+	is.MegaCollection = Collection
+	is.Format = Format
+
 	if p.Volume.Article.Articleinfo.Amsid != "" {
 		is.URL = append(is.URL, fmt.Sprintf("http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=%s", p.Volume.Article.Articleinfo.Amsid))
+		is.RecordID = fmt.Sprintf("ai-89-%s", p.Volume.Article.Articleinfo.Amsid)
+	} else {
+		return is, ErrNoIdentifier
 	}
 	if p.Volume.Article.Articleinfo.Articledoi != "" {
 		is.DOI = p.Volume.Article.Articleinfo.Articledoi
