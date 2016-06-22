@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/miku/span"
@@ -44,7 +45,10 @@ type Publication struct {
 			Isbntype  string `xml:"isbntype,attr"`
 			Mediatype string `xml:"mediatype,attr"`
 		} `xml:"isbn"`
-		Issn                string `xml:"issn"`
+		Issn []struct {
+			Mediatype string `xml:"mediatype,attr"`
+			Value     string `xml:",chardata"`
+		} `xml:"issn"`
 		Pubtopicalbrowseset string `xml:"pubtopicalbrowseset"`
 		Copyrightgroup      string `xml:"copyrightgroup"`
 		Publisher           string `xml:"publisher"`
@@ -144,6 +148,24 @@ func (s IEEE) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 	})
 }
 
+func (p Publication) PaperISSN() (issns []string) {
+	for _, issn := range p.Publicationinfo.Issn {
+		if strings.ToLower(issn.Mediatype) == "paper" {
+			issns = append(issns, issn.Value)
+		}
+	}
+	return
+}
+
+func (p Publication) OnlineISSN() (issns []string) {
+	for _, issn := range p.Publicationinfo.Issn {
+		if strings.ToLower(issn.Mediatype) == "online" {
+			issns = append(issns, issn.Value)
+		}
+	}
+	return
+}
+
 func (p Publication) Date() (time.Time, error) {
 	date := p.Volume.Article.Articleinfo.Date
 	y, m, d := "1970", "Jan", "1"
@@ -192,11 +214,13 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is.JournalTitle = p.Title
 	is.ArticleTitle = p.Volume.Article.Title
 
-	if p.Publicationinfo.Issn == "" {
+	is.ISSN = p.PaperISSN()
+	is.EISSN = p.OnlineISSN()
+
+	if len(is.ISSN) == 0 && len(is.EISSN) == 0 {
+		// TODO(miku): sort out the various types
 		return is, span.Skip{Reason: "no ISSN"}
 	}
-
-	is.ISSN = []string{p.Publicationinfo.Issn}
 
 	is.Abstract = p.Volume.Article.Articleinfo.Abstract
 
