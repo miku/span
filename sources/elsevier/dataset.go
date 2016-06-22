@@ -287,6 +287,34 @@ type Article struct {
 			} `xml:"keyword"`
 		} `xml:"keywords"`
 	} `xml:"head"`
+	// in case of a "simple-article", carry this field as well
+	SimpleHead struct {
+		Title       string `xml:"title"`
+		AuthorGroup struct {
+			Id     string `xml:"id,attr"`
+			Author []struct {
+				Id        string `xml:"id,attr"`
+				GivenName string `xml:"given-name"`
+				Surname   string `xml:"surname"`
+				EAddress  struct {
+					Id   string `xml:"id,attr"`
+					Type string `xml:"type,attr"`
+				} `xml:"e-address"`
+			} `xml:"author"`
+			Affiliation struct {
+				Id          string `xml:"id,attr"`
+				Textfn      string `xml:"textfn"`
+				Affiliation struct {
+					Sa           string   `xml:"sa,attr"`
+					Organization []string `xml:"organization"`
+					AddressLine  string   `xml:"address-line"`
+					City         string   `xml:"city"`
+					PostalCode   string   `xml:"postal-code"`
+					Country      string   `xml:"country"`
+				} `xml:"affiliation"`
+			} `xml:"affiliation"`
+		} `xml:"author-group"`
+	} `xml:"simple-head"`
 }
 
 // Date returns the date of the article. Currently use the date-received attribute.
@@ -315,6 +343,13 @@ func (article Article) Date() (time.Time, error) {
 	return time.Parse("2006-1-2", fmt.Sprintf("%s-%s-%s", year, month, day))
 }
 
+func (article Article) Title() string {
+	if article.Head.Title != "" {
+		return article.Head.Title
+	}
+	return article.SimpleHead.Title
+}
+
 func (article Article) Authors() []finc.Author {
 	var authors []finc.Author
 	for _, author := range article.Head.AuthorGroup.Author {
@@ -323,6 +358,16 @@ func (article Article) Authors() []finc.Author {
 			LastName:  author.Surname,
 			Name:      fmt.Sprintf("%s %s", author.GivenName, author.Surname),
 		})
+	}
+	if len(authors) == 0 {
+		// assume it is a simple article and try to get authors from there
+		for _, author := range article.SimpleHead.AuthorGroup.Author {
+			authors = append(authors, finc.Author{
+				FirstName: author.GivenName,
+				LastName:  author.Surname,
+				Name:      fmt.Sprintf("%s %s", author.GivenName, author.Surname),
+			})
+		}
 	}
 	return authors
 }
@@ -440,7 +485,7 @@ func (s Shipment) BatchConvert() ([]span.Importer, error) {
 				output.SourceID = SourceID
 				output.Volume = si.IssueInfo.VolumeIssueNumber.VolFirst
 
-				output.ArticleTitle = article.Head.Title
+				output.ArticleTitle = article.Title()
 				output.JournalTitle = ji.JournalIssueProperties.CollectionTitle
 
 				output.StartPage = ii.Pages.FirstPage
