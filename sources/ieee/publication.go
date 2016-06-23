@@ -1,6 +1,7 @@
 package ieee
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -241,7 +242,7 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	if p.Volume.Article.Articleinfo.Amsid != "" {
 		is.URL = append(is.URL, fmt.Sprintf("http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=%s", p.Volume.Article.Articleinfo.Amsid))
-		is.RecordID = fmt.Sprintf("ai-89-%s", p.Volume.Article.Articleinfo.Amsid)
+		is.RecordID = fmt.Sprintf("ai-89-%s", base64.RawURLEncoding.EncodeToString([]byte(p.Volume.Article.Articleinfo.Amsid)))
 	} else {
 		return is, ErrNoIdentifier
 	}
