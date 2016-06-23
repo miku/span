@@ -48,22 +48,11 @@ var (
 
 // AuthorReplacer is a special cleaner for author names.
 var AuthorReplacer = strings.NewReplacer(
-	"- -", "",
 	"anonym", "",
 	"Anonymous", "",
-	"EB", "",
 	"keine Angabe", "",
-	"mg", "",
-	"MM", "",
-	"mm", "",
 	"No authorship indicated", "",
 	"Not Available, Not Available", "",
-	"O.V.", "",
-	"ps", "",
-	"rb", "",
-	"et al", "",
-	"index", "",
-	"Index", "",
 	"Author Index", "",
 	"AUTHOR Index", "",
 	"AUTHOR INDEX", "")
