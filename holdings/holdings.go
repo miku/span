@@ -49,8 +49,11 @@ type File interface {
 	ReadEntries() (Entries, error)
 }
 
-// Entries holds a list of license entries keyed by ISSN. Not an interface since
-// it should not be more complicated than this.
+// Entries holds a list of license entries keyed by ISSN. The ISSN should be
+// written as 1234-567X, according to the standard (https://en.wikipedia.org/wik
+// i/International_Standard_Serial_Number#Code_format). The format of the ISSN
+// is an eight digit code, divided by a hyphen into two four-digit numbers.
+// Not an interface since it should not be more complicated than this.
 type Entries map[string][]License
 
 // Licenses make Entries fulfill the holdings interface.

@@ -3,6 +3,7 @@ package kbart
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"regexp"
@@ -155,6 +156,15 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 
 		pi := strings.TrimSpace(cols.PrintIdentifier)
 		oi := strings.TrimSpace(cols.OnlineIdentifier)
+
+		// force ISSN format
+		if len(pi) == 8 {
+			pi = fmt.Sprintf("%s-%s", pi[:4], pi[4:])
+		}
+
+		if len(oi) == 8 {
+			oi = fmt.Sprintf("%s-%s", pi[:4], pi[4:])
+		}
 
 		if pi == "" && oi == "" {
 			if !r.SkipMissingIdentifiers {
