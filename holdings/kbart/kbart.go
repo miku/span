@@ -163,7 +163,7 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 		}
 
 		if len(oi) == 8 {
-			oi = fmt.Sprintf("%s-%s", pi[:4], pi[4:])
+			oi = fmt.Sprintf("%s-%s", oi[:4], oi[4:])
 		}
 
 		if pi == "" && oi == "" {
