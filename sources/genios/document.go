@@ -94,6 +94,12 @@ func (doc Document) Headings() []string {
 	fields := strings.FieldsFunc(doc.Descriptors, func(r rune) bool {
 		return r == ';' || r == '/'
 	})
+	// refs. #8009
+	if len(fields) == 1 {
+		fields = strings.FieldsFunc(doc.Descriptors, func(r rune) bool {
+			return r == ','
+		})
+	}
 	for _, f := range fields {
 		headings = append(headings, strings.TrimSpace(f))
 	}
