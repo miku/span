@@ -51,6 +51,8 @@
 // }
 //
 // TODO(miku): add a small cache to reuse holding file filters, used in multiple places.
+//
+// Faster evaluation? http://theory.stanford.edu/~sergei/papers/sigmod10-index.pdf
 
 package filter
 
