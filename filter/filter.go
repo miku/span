@@ -1,21 +1,52 @@
-// Package tree collect the next version of filters using trees. Eventually
-// the old filters will be sorted out and this will move back into span/filter
-// package namespace.
+// Flexible ISIL attachments with expression trees[1], serialized as JSON. The
+// top-level key is the label, that is to be given to a record. Here this label
+// is an ISIL. Each ISIL specifies a tree of filters. Intermediate nodes can be
+// "or" and "and" filters, leaf nodes contain custom filter, that are matched
+// against records.
 //
-// Flexible ISIL attachments with expression trees (serialized as JSON).
+// A filter implements filter.Filter with a single method: Apply. Each filter
+// must also implement UnmarshalJSON, so we can load it from a file. Each filter
+// can define arbitrary number of options, e.g. a HoldingsFilter can be loaded
+// from a single file or a list of urls.
 //
-// {
-//   "DE-Brt1": {
-//     "holdings": {
-//       "file": "/tmp/amsl/AMSLHoldingsFile/date-2016-02-17-isil-DE-Brt1.tsv"
-//     }
-//   },
-//   "DE-Zi4": {
-//     "or": [
-//         {"collection": ["A", "B"]},
-//         {"holdings": {"file": "/tmp/amsl/AMSLHoldingsFile/date-2016-02-17-isil-DE-Zi4.tsv"}}
-//     ]
-//   }
+// [1] https://en.wikipedia.org/wiki/Binary_expression_tree#Boolean_expressions
+//
+// Example JSON serialization:
+//
+// "DE-14": {
+//   "or": [
+//     {
+//       "and": [
+//         {
+//           "source": [
+//             "55"
+//           ]
+//         },
+//         {
+//           "holdings": {
+//             "urls": [
+//               "http://www.jstor.org/kbart/collections/asii",
+//               "http://www.jstor.org/kbart/collections/as"
+//             ]
+//           }
+//         }
+//       ]
+//     },
+//     {
+//       "and": [
+//         {
+//           "source": [
+//             "49"
+//           ]
+//         },
+//         {
+//           "holdings": {
+//             "urls": [
+//               "https://example.com/docs/KBART_DE14",
+//               "https://example.com/docs/KBART_FREEJOURNALS"
+//             ]
+//           }
+//         },
 //   ...
 // }
 //
@@ -46,7 +77,8 @@ type Filter interface {
 	Apply(finc.IntermediateSchema) bool
 }
 
-// FilterFunc makes a function satisfy an interface.
+// FilterFunc makes a function satisfy an
+// interface.
 type FilterFunc func(finc.IntermediateSchema) bool
 
 // Apply just calls the function.
@@ -60,7 +92,8 @@ type AnyFilter struct{}
 // Apply will just return true.
 func (f *AnyFilter) Apply(finc.IntermediateSchema) bool { return true }
 
-// UnmarshalJSON turns a config fragment into a ISSN filter.
+// UnmarshalJSON turns a config fragment into a
+// ISSN filter.
 func (f *AnyFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Any struct{} `json:"any"`
@@ -98,6 +131,8 @@ type ISSNFilter struct {
 	values container.StringSet
 }
 
+// Apply applies ISSN filter on intermediate
+// schema, no distinction between ISSN and EISSN.
 func (f *ISSNFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		if f.values.Contains(issn) {
@@ -282,14 +317,14 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 }
 
 // HoldingsFilter filters a record against a holding file. The holding file
-// might be in KBART, Ovid or Google format. TODO(miku): move moving wall
-// logic under `.Covers`.
+// might be in KBART, Ovid or Google format. TODO(miku): move moving wall logic
+// under `.Covers`.
 type HoldingsFilter struct {
 	entries holdings.Entries
 }
 
-// Apply tests validity against holding file.
-// TODO(miku): holdings file indentifiers can be ISSNs, ISBNs or DOIs
+// Apply tests validity against holding file. TODO(miku): holdings file
+// indentifiers can be ISSNs, ISBNs or DOIs
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	signature := holdings.Signature{
 		Date:   is.Date.Format("2006-01-02"),
@@ -306,6 +341,9 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	return false
 }
 
+// download takes a link and returns the path to a temporary file with the
+// content on success or an error, will automatically unzip all members into a
+// single file.
 func (f *HoldingsFilter) download(link string) (string, error) {
 	file, err := ioutil.TempFile("", "span-")
 	if err != nil {
@@ -365,10 +403,8 @@ func (f *HoldingsFilter) download(link string) (string, error) {
 	return file.Name(), nil
 }
 
-// UnmarshalJSON unwraps a JSON into a
-// HoldingsFilter. Can use holding file from file
-// or a list of URLs, if both are given, only the
-// file is used.
+// UnmarshalJSON unwraps a JSON into a HoldingsFilter. Can use holding file from
+// file or a list of URLs, if both are given, only the file is used.
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
@@ -413,7 +449,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	}
 
 	if filename == "" {
-		return fmt.Errorf("holdings filter: either filename or url must be given")
+		return fmt.Errorf("holdings filter: either file or url must be given")
 	}
 
 	file, err := generic.New(filename)
@@ -527,8 +563,8 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 	}
 }
 
-// firstKey returns the top level key of an object, given as a raw JSON
-// message. It peeks into the fragment. An empty document will cause an error.
+// firstKey returns the top level key of an object, given as a raw JSON message.
+// It peeks into the fragment. An empty document will cause an error.
 func firstKey(raw json.RawMessage) (string, error) {
 	var peeker = make(map[string]interface{})
 	if err := json.Unmarshal(raw, &peeker); err != nil {
@@ -625,8 +661,8 @@ type FilterTree struct {
 	root Filter
 }
 
-// UnmarshalJSON will decide which filter is the top level one, by peeking
-// into the file.
+// UnmarshalJSON will decide which filter is the top level one, by peeking into
+// the file.
 func (f *FilterTree) UnmarshalJSON(p []byte) error {
 	name, err := firstKey(p)
 	if err != nil {
@@ -645,14 +681,15 @@ func (f *FilterTree) Apply(is finc.IntermediateSchema) bool {
 	return f.root.Apply(is)
 }
 
-// Tagger is takes a list of tags (ISILs) and annotates and intermediate
-// schema accroding to a number of filter, defined per label. The tagger can
-// be loaded directly from JSON.
+// Tagger is takes a list of tags (ISILs) and annotates and intermediate schema
+// accroding to a number of filter, defined per label. The tagger can be loaded
+// directly from JSON.
 type Tagger struct {
 	filtermap map[string]FilterTree
 }
 
-// Tag takes an intermediate schema and returns a labeled version of that schema.
+// Tag takes an intermediate schema and returns a labeled version of that
+// schema.
 func (t *Tagger) Tag(is finc.IntermediateSchema) finc.IntermediateSchema {
 	var tags []string
 	for tag, filter := range t.filtermap {
@@ -664,6 +701,7 @@ func (t *Tagger) Tag(is finc.IntermediateSchema) finc.IntermediateSchema {
 	return is
 }
 
+// UnmarshalJSON unmarshals a complete filter config from serialized JSON.
 func (t *Tagger) UnmarshalJSON(p []byte) error {
 	var fm = make(map[string]FilterTree)
 	if err := json.Unmarshal(p, &fm); err != nil {
