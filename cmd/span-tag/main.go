@@ -21,8 +21,10 @@ import (
 	"github.com/miku/span/finc"
 )
 
+// tagger is the deserialized configuration.
 var tagger filter.Tagger
 
+// workers run tagging of a queue.
 func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for batch := range queue {
@@ -43,6 +45,7 @@ func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
 	}
 }
 
+// writer writes to stdout.
 func writer(sc chan string, done chan bool) {
 	w := bufio.NewWriter(os.Stdout)
 	for s := range sc {
