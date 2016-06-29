@@ -10,12 +10,12 @@ import (
 )
 
 // Attach attaches the ISILs to a record. Noop.
-func (s *Solr5Vufind3v11) Attach(_ []string) {}
+func (s *Solr5Vufind3v12) Attach(_ []string) {}
 
 // WIP: Solr5Vufind3v12 is the basic solr 5 schema as of 2016-04-14. It is based on
 // VuFind 3. Same as Solr5Vufind3v12, but with fullrecord field, refs. #8031.
 
-type Solr5Vufind3v11 struct {
+type Solr5Vufind3v12 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
 	Authors              []string `json:"author,omitempty"`
@@ -69,7 +69,7 @@ type Solr5Vufind3v11 struct {
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr5Vufind3v11) Convert(is finc.IntermediateSchema) error {
+func (s *Solr5Vufind3v12) Convert(is finc.IntermediateSchema) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID
