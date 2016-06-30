@@ -24,7 +24,7 @@ func (bb *ByteBatch) Add(b []byte) {
 
 // Reset clear this slice.
 func (bb *ByteBatch) Reset() {
-	bb.b = bb.b[:0]
+	bb.b = nil
 }
 
 // Size returns the current size of the batch.
