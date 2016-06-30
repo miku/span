@@ -2,7 +2,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,66 +9,23 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"sync"
 
 	"github.com/miku/span"
+	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/finc"
 )
 
-// worker iterates over string batches
-func worker(queue chan []string, out chan []byte, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for batch := range queue {
-		for _, s := range batch {
-			is := finc.IntermediateSchema{}
-
-			if err := json.Unmarshal([]byte(s), &is); err != nil {
-				log.Printf("cound not deserialize line: %s", s)
-				log.Fatal(err)
-			}
-
-			// Redact
-			is.Fulltext = ""
-
-			b, err := json.Marshal(is)
-			if err != nil {
-				log.Fatal(err)
-			}
-			out <- b
-		}
-	}
-}
-
 func main() {
-
 	showVersion := flag.Bool("v", false, "prints current program version")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
 	flag.Parse()
 
-	runtime.GOMAXPROCS(*numWorkers)
-
 	if *showVersion {
 		fmt.Println(span.AppVersion)
 		os.Exit(0)
 	}
-
-	queue := make(chan []string)
-	out := make(chan []byte)
-	done := make(chan bool)
-
-	go span.ByteSink(os.Stdout, out, done)
-
-	var wg sync.WaitGroup
-
-	for i := 0; i < *numWorkers; i++ {
-		wg.Add(1)
-		go worker(queue, out, &wg)
-	}
-
-	var batch []string
-	var i int
 
 	var readers []io.Reader
 
@@ -87,33 +43,29 @@ func main() {
 	}
 
 	for _, r := range readers {
-		br := bufio.NewReader(r)
-		for {
-			line, err := br.ReadString('\n')
-			if err == io.EOF {
-				break
+		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
+			is := finc.IntermediateSchema{}
+
+			if err := json.Unmarshal(b, &is); err != nil {
+				log.Printf("failed to unmarshal: %s", string(b))
+				return b, err
 			}
+
+			// Redact full text.
+			is.Fulltext = ""
+
+			bb, err := json.Marshal(is)
 			if err != nil {
-				log.Fatal(err)
+				return bb, err
 			}
-			batch = append(batch, line)
-			if i%*size == 0 {
-				b := make([]string, len(batch))
-				copy(b, batch)
-				queue <- b
-				batch = batch[:0]
-			}
-			i++
+			return bb, nil
+		})
+
+		p.NumWorkers = *numWorkers
+		p.BatchSize = *size
+
+		if err := p.Run(); err != nil {
+			log.Fatal(err)
 		}
 	}
-
-	b := make([]string, len(batch))
-	copy(b, batch)
-	queue <- b
-
-	close(queue)
-	wg.Wait()
-	close(out)
-	<-done
-
 }
