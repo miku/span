@@ -6,7 +6,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -14,52 +13,18 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"sync"
 
 	"github.com/miku/span"
+	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/finc"
 )
 
-// tagger is the deserialized configuration.
-var tagger filter.Tagger
-
-// workers run tagging of a queue.
-func worker(queue chan [][]byte, out chan string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for batch := range queue {
-		for _, b := range batch {
-			var is finc.IntermediateSchema
-			if err := json.Unmarshal(b, &is); err != nil {
-				log.Fatal(err)
-			}
-
-			tagged := tagger.Tag(is)
-
-			b, err := json.Marshal(tagged)
-			if err != nil {
-				log.Fatal(err)
-			}
-			out <- string(b)
-		}
-	}
-}
-
-// writer writes to stdout.
-func writer(sc chan string, done chan bool) {
-	w := bufio.NewWriter(os.Stdout)
-	for s := range sc {
-		if _, err := io.WriteString(w, s+"\n"); err != nil {
-			log.Fatal(err)
-		}
-	}
-	w.Flush()
-	done <- true
-}
-
 func main() {
 	config := flag.String("c", "", "JSON config file for filters")
 	version := flag.Bool("v", false, "show version")
+	size := flag.Int("b", 20000, "batch size")
+	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 
 	flag.Parse()
 
@@ -72,73 +37,52 @@ func main() {
 		log.Fatal("config file required")
 	}
 
-	// reader for intermediate schema, stdin or file.
-	var r *bufio.Reader
+	var r io.Reader
 
 	if flag.NArg() == 0 {
-		r = bufio.NewReader(os.Stdin)
+		r = os.Stdin
 	} else {
 		file, err := os.Open(flag.Arg(0))
 		if err != nil {
 			log.Fatal(err)
 		}
-		r = bufio.NewReader(file)
+		r = file
 	}
 
-	file, err := os.Open(*config)
+	configfile, err := os.Open(*config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dec := json.NewDecoder(file)
+	dec := json.NewDecoder(configfile)
 
+	// tagger is the deserialized configuration.
+	var tagger filter.Tagger
 	if err := dec.Decode(&tagger); err != nil {
 		log.Fatal(err)
 	}
 
-	queue := make(chan [][]byte)
-	out := make(chan string)
-	done := make(chan bool)
-
-	go writer(out, done)
-
-	var wg sync.WaitGroup
-
-	for i := 0; i < runtime.NumCPU(); i++ {
-		wg.Add(1)
-		go worker(queue, out, &wg)
-	}
-
-	var batch [][]byte
-	var i int
-
-	for {
-		line, err := r.ReadBytes('\n')
-		if err == io.EOF {
-			break
+	// business logic
+	processor := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
+		var is finc.IntermediateSchema
+		if err := json.Unmarshal(b, &is); err != nil {
+			return b, err
 		}
+
+		tagged := tagger.Tag(is)
+
+		bb, err := json.Marshal(tagged)
 		if err != nil {
-			log.Fatal(err)
+			return bb, err
 		}
+		bb = append(bb, '\n')
+		return bb, nil
+	})
 
-		if i == 20000 {
-			payload := make([][]byte, len(batch))
-			copy(payload, batch)
-			queue <- payload
-			batch = batch[:0]
-			i = 0
-		}
+	processor.NumWorkers = *numWorkers
+	processor.BatchSize = *size
 
-		batch = append(batch, line)
-		i++
+	if err := processor.Run(); err != nil {
+		log.Fatal(err)
 	}
-
-	payload := make([][]byte, len(batch))
-	copy(payload, batch)
-	queue <- payload
-
-	close(queue)
-	wg.Wait()
-	close(out)
-	<-done
 }
