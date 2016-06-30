@@ -25,6 +25,12 @@ Also:
 * [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
 * [Google holdings](http://scholar.google.com/intl/en/scholar/libraries.html)
 
+TODO
+----
+
+* Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
+* Generic batcher, e.g. something along https://gist.github.com/miku/acc8e9a22d817727eb605e2865c056a9
+
 Licence
 -------
 
