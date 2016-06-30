@@ -7,12 +7,12 @@ import (
 	"sync"
 )
 
-// BytesBatch is a batch of a byte slices.
+// ByteBatch is a batch of byte slices.
 type ByteBatch struct {
 	b [][]byte
 }
 
-// NewByteBatch creates a new BytesBatch with a given capacity.
+// NewByteBatch creates a new ByteBatch with a given capacity.
 func NewByteBatch(cap int) *ByteBatch {
 	return &ByteBatch{b: make([][]byte, 0, cap)}
 }
@@ -22,12 +22,12 @@ func (bb *ByteBatch) Add(b []byte) {
 	bb.b = append(bb.b, b)
 }
 
-// Reset clear this slice.
+// Reset empties this batch.
 func (bb *ByteBatch) Reset() {
 	bb.b = nil
 }
 
-// Size returns the current size of the batch.
+// Size returns the number of elements in the batch.
 func (bb *ByteBatch) Size() int {
 	return len(bb.b)
 }
@@ -41,12 +41,11 @@ func (bb *ByteBatch) Slice() [][]byte {
 	return b
 }
 
-// ByteFunc is a func, that transforms a byte slice to another byte slice, and a
-// possible error.
+// ByteFunc is a function, that transforms a byte slice into another byte slice (plus error).
 type ByteFunc func([]byte) ([]byte, error)
 
-// LineProcessor read bytes from a reader, feed them into a ByteFunc and
-// writes the result to a writer. The unit of work is one line.
+// LineProcessor reads bytes from a reader, feeds them into a ByteFunc and
+// writes the result to a writer. The default unit of work is one line.
 type LineProcessor struct {
 	BatchSize     int
 	LineSeparator byte
@@ -57,12 +56,12 @@ type LineProcessor struct {
 }
 
 // NewLineProcessor creates a new LineProcessor. Default batch size is 10000,
-// default line separator is `\n`.
+// default line separator is `\n`, default number of workers equals the cpu count.
 func NewLineProcessor(r io.Reader, w io.Writer, f ByteFunc) *LineProcessor {
 	return &LineProcessor{r: r, w: w, f: f, BatchSize: 10000, LineSeparator: '\n', NumWorkers: runtime.NumCPU()}
 }
 
-// Run starts workers for executing the given func over the data.
+// Run starts executing workers, crunching trough the input.
 func (p LineProcessor) Run() error {
 
 	// wErr signals a worker or writer error. If an error occurs, the items in
@@ -71,7 +70,7 @@ func (p LineProcessor) Run() error {
 	// about synchronisation.
 	var wErr error
 
-	// worker takes work from a queue, executes f and sends the result to out.
+	// worker takes []byte batches from a channel queue, executes f and sends the result to the out channel.
 	worker := func(queue chan [][]byte, out chan []byte, f ByteFunc, wg *sync.WaitGroup) {
 		defer wg.Done()
 		for batch := range queue {
@@ -123,7 +122,7 @@ func (p LineProcessor) Run() error {
 		}
 		batch.Add(b)
 		if batch.Size() == p.BatchSize {
-			// to avoid checking on every loop, we only check the for worker or write error here
+			// to avoid checking on each loop, we only check for worker or write errors here
 			if wErr != nil {
 				break
 			}
