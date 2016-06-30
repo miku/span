@@ -2,7 +2,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,17 +12,12 @@ import (
 	"runtime/pprof"
 	"sort"
 	"strings"
-	"sync"
 
 	"github.com/miku/span"
+	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/finc/exporter"
 )
-
-// Options for worker.
-type options struct {
-	exportSchemaFunc func() finc.ExportSchema
-}
 
 // Exporters holds available export formats
 var Exporters = map[string]func() finc.ExportSchema{
@@ -42,41 +36,7 @@ var Exporters = map[string]func() finc.ExportSchema{
 	"solr5vu3v12":  func() finc.ExportSchema { return new(exporter.Solr5Vufind3v12) },
 }
 
-// worker iterates over string batches
-func worker(queue chan []string, out chan []byte, opts options, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for batch := range queue {
-		for _, s := range batch {
-			var err error
-			is := finc.IntermediateSchema{}
-
-			// TODO(miku): Unmarshal date correctly.
-			if err := json.Unmarshal([]byte(s), &is); err != nil {
-				log.Printf("cound not deserialize line: %s", s)
-				log.Fatal(err)
-			}
-
-			// Get export format.
-			schema := opts.exportSchemaFunc()
-			if err := schema.Convert(is); err != nil {
-				log.Printf("could not export: %v", is)
-				log.Fatal(err)
-			}
-
-			// TODO(miku): maybe move marshalling into Exporter, if we have
-			// anything else than JSON - function could be somethings like
-			// func Marshal() ([]byte, error)
-			b, err := json.Marshal(schema)
-			if err != nil {
-				log.Fatal(err)
-			}
-			out <- b
-		}
-	}
-}
-
 func main() {
-
 	showVersion := flag.Bool("v", false, "prints current program version")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
@@ -85,8 +45,6 @@ func main() {
 	listFormats := flag.Bool("list", false, "list output formats")
 
 	flag.Parse()
-
-	runtime.GOMAXPROCS(*numWorkers)
 
 	if *showVersion {
 		fmt.Println(span.AppVersion)
@@ -114,25 +72,8 @@ func main() {
 
 	exportSchemaFunc, ok := Exporters[*format]
 	if !ok {
-		log.Fatal("unknown export schema")
+		log.Fatalf("unknown export schema: %s", *format)
 	}
-	opts := options{exportSchemaFunc: exportSchemaFunc}
-
-	queue := make(chan []string)
-	out := make(chan []byte)
-	done := make(chan bool)
-
-	go span.ByteSink(os.Stdout, out, done)
-
-	var wg sync.WaitGroup
-
-	for i := 0; i < *numWorkers; i++ {
-		wg.Add(1)
-		go worker(queue, out, opts, &wg)
-	}
-
-	var batch []string
-	var i int
 
 	var readers []io.Reader
 
@@ -150,32 +91,39 @@ func main() {
 	}
 
 	for _, r := range readers {
-		br := bufio.NewReader(r)
-		for {
-			line, err := br.ReadString('\n')
-			if err == io.EOF {
-				break
+		// business logic
+		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
+			is := finc.IntermediateSchema{}
+
+			// TODO(miku): Unmarshal date correctly.
+			if err := json.Unmarshal(b, &is); err != nil {
+				log.Printf("failed to unmarshal: %s", string(b))
+				return b, err
 			}
+
+			// Get export format.
+			schema := exportSchemaFunc()
+			if err := schema.Convert(is); err != nil {
+				log.Printf("failed to convert: %v", is)
+				return b, err
+			}
+
+			// TODO(miku): maybe move marshalling into Exporter, if we have
+			// anything else than JSON - function could be somethings like
+			// func Marshal() ([]byte, error)
+			bb, err := json.Marshal(schema)
 			if err != nil {
-				log.Fatal(err)
+				return b, err
 			}
-			batch = append(batch, line)
-			if i%*size == 0 {
-				b := make([]string, len(batch))
-				copy(b, batch)
-				queue <- b
-				batch = batch[:0]
-			}
-			i++
+			bb = append(bb, '\n')
+			return bb, nil
+		})
+
+		p.NumWorkers = *numWorkers
+		p.BatchSize = *size
+
+		if err := p.Run(); err != nil {
+			log.Fatal(err)
 		}
 	}
-
-	b := make([]string, len(batch))
-	copy(b, batch)
-	queue <- b
-
-	close(queue)
-	wg.Wait()
-	close(out)
-	<-done
 }
