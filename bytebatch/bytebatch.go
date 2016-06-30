@@ -105,7 +105,7 @@ func (p LineProcessor) Run() error {
 
 	go writer(p.w, out, done)
 
-	for i := 0; i < runtime.NumCPU(); i++ {
+	for i := 0; i < p.NumWorkers; i++ {
 		wg.Add(1)
 		go worker(queue, out, p.f, &wg)
 	}
