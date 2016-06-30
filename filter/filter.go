@@ -1,5 +1,5 @@
 // Flexible ISIL attachments with expression trees[1], serialized as JSON. The
-// top-level key is the label, that is to be given to a record. Here this label
+// top-level key is the label, that is to be given to a record. Here, this label
 // is an ISIL. Each ISIL specifies a tree of filters. Intermediate nodes can be
 // "or" and "and" filters, leaf nodes contain custom filter, that are matched
 // against records.
@@ -11,44 +11,56 @@
 //
 // [1] https://en.wikipedia.org/wiki/Binary_expression_tree#Boolean_expressions
 //
-// Example JSON serialization:
+// The simplest filter is one, that says yes to all records:
 //
-// "DE-14": {
-//   "or": [
-//     {
-//       "and": [
+//     "DE-X": { "any": {} }
+//
+// On the command line:
+//
+//     $ span-tag -c <(echo '{"DE-X": {"any": {}}}') in.ldj > out.ldj
+//
+// Another, more complex example:
+//
+//     "DE-14": {
+//       "or": [
 //         {
-//           "source": [
-//             "55"
+//           "and": [
+//             {
+//               "source": [
+//                 "55"
+//               ]
+//             },
+//             {
+//               "holdings": {
+//                 "urls": [
+//                   "http://www.jstor.org/kbart/collections/asii",
+//                   "http://www.jstor.org/kbart/collections/as"
+//                 ]
+//               }
+//             }
 //           ]
 //         },
 //         {
-//           "holdings": {
-//             "urls": [
-//               "http://www.jstor.org/kbart/collections/asii",
-//               "http://www.jstor.org/kbart/collections/as"
-//             ]
-//           }
-//         }
-//       ]
-//     },
-//     {
-//       "and": [
-//         {
-//           "source": [
-//             "49"
-//           ]
-//         },
-//         {
-//           "holdings": {
-//             "urls": [
-//               "https://example.com/docs/KBART_DE14",
-//               "https://example.com/docs/KBART_FREEJOURNALS"
-//             ]
-//           }
-//         },
-//   ...
-// }
+//           "and": [
+//             {
+//               "source": [
+//                 "49"
+//               ]
+//             },
+//             {
+//               "holdings": {
+//                 "urls": [
+//                   "https://example.com/docs/KBART_DE14",
+//                   "https://example.com/docs/KBART_FREEJOURNALS"
+//                 ]
+//               }
+//             },
+//       ...
+//     }
+//
+// Additional filters must be registered in `unmarshalFilter`.
+//
+// ----
 //
 // TODO(miku): add a small cache to reuse holding file filters, used in multiple places.
 //

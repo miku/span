@@ -1,4 +1,4 @@
-// span-solr will be the next span-export.
+// span-export creates various destination formats, mostly for SOLR.
 package main
 
 import (

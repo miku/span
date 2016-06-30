@@ -123,7 +123,7 @@ func (p LineProcessor) Run() error {
 		}
 		batch.Add(b)
 		if batch.Size() == p.BatchSize {
-			// to avoid checking on every loop, we only check the halt flag here
+			// to avoid checking on every loop, we only check the for worker or write error here
 			if wErr != nil {
 				break
 			}
