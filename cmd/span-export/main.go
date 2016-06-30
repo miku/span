@@ -41,7 +41,7 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	format := flag.String("o", "solr4vu13v9", "output format")
+	format := flag.String("o", "solr5vu3v11", "output format")
 	listFormats := flag.Bool("list", false, "list output formats")
 
 	flag.Parse()
