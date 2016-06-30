@@ -58,6 +58,7 @@ func main() {
 			if err != nil {
 				return bb, err
 			}
+			bb = append(bb, '\n')
 			return bb, nil
 		})
 
