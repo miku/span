@@ -50,23 +50,26 @@ type ByteFunc func([]byte) ([]byte, error)
 type LineProcessor struct {
 	BatchSize     int
 	LineSeparator byte
+	NumWorkers    int
 	r             io.Reader
 	w             io.Writer
 	f             ByteFunc
 }
 
-// NewLineProcessor creates a new LineProcessor.
+// NewLineProcessor creates a new LineProcessor. Default batch size is 10000,
+// default line separator is `\n`.
 func NewLineProcessor(r io.Reader, w io.Writer, f ByteFunc) *LineProcessor {
-	return &LineProcessor{r: r, w: w, f: f, BatchSize: 10000, LineSeparator: '\n'}
+	return &LineProcessor{r: r, w: w, f: f, BatchSize: 10000, LineSeparator: '\n', NumWorkers: runtime.NumCPU()}
 }
 
 // Run starts workers for executing the given func over the data.
 func (p LineProcessor) Run() error {
 
-	// wErr signals a worker error
+	// wErr signals a worker or writer error. If an error occurs, the items in
+	// the queue are still process, just no items are added to the queue. There
+	// is only one way to toggle this, from false to true, so we don't care
+	// about synchronisation.
 	var wErr error
-	// halt will be set to true by a failing worker
-	var halt bool
 
 	// worker takes work from a queue, executes f and sends the result to out.
 	worker := func(queue chan [][]byte, out chan []byte, f ByteFunc, wg *sync.WaitGroup) {
@@ -75,7 +78,6 @@ func (p LineProcessor) Run() error {
 			for _, b := range batch {
 				r, err := f(b)
 				if err != nil {
-					halt = true
 					wErr = err
 				}
 				out <- r
@@ -122,7 +124,7 @@ func (p LineProcessor) Run() error {
 		batch.Add(b)
 		if batch.Size() == p.BatchSize {
 			// to avoid checking on every loop, we only check the halt flag here
-			if halt {
+			if wErr != nil {
 				break
 			}
 			queue <- batch.Slice()
