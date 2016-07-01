@@ -31,7 +31,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cloudfoundry/gosigar"
 	"github.com/miku/span/finc"
 )
 
@@ -73,18 +72,7 @@ type XMLDecoderFunc func(*xml.Decoder, xml.StartElement) (Importer, error)
 // FromXML is like FromXMLSize, with a default batch size of 2000 XML
 // documents.
 func FromXML(r io.Reader, name string, decoderFunc XMLDecoderFunc) (chan []Importer, error) {
-	mem := sigar.Mem{}
-	if err := mem.Get(); err != nil {
-		return FromXMLSize(r, name, decoderFunc, 500)
-	}
-	switch {
-	default:
-		return FromXMLSize(r, name, decoderFunc, 2000)
-	case mem.Free < 1048576:
-		return FromXMLSize(r, name, decoderFunc, 500)
-	case mem.Free < 2097152:
-		return FromXMLSize(r, name, decoderFunc, 1000)
-	}
+	return FromXMLSize(r, name, decoderFunc, 1000)
 }
 
 // FromXMLSize returns a channel of importable document slices given a reader
@@ -137,18 +125,7 @@ type ImporterFunc func(b []byte) (Importer, error)
 // FromLines returns a channel of slices of importable objects with a default
 // batch size of 20000 docs.
 func FromLines(r io.Reader, f ImporterFunc) (chan []Importer, error) {
-	mem := sigar.Mem{}
-	if err := mem.Get(); err != nil {
-		return FromLinesSize(r, f, 2000)
-	}
-	switch {
-	default:
-		return FromLinesSize(r, f, 20000)
-	case mem.Free < 1048576:
-		return FromLinesSize(r, f, 2000)
-	case mem.Free < 2097152:
-		return FromLinesSize(r, f, 5000)
-	}
+	return FromLinesSize(r, f, 20000)
 }
 
 // FromLinesSize returns a channel of slices of importable values, given a
