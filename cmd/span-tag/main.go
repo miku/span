@@ -1,8 +1,8 @@
-// span-tag takes an intermediate schema file and a configuration trees of
+// span-tag takes an intermediate schema file and a configuration tree of
 // filters for various tags and runs all filters on every record of the input
 // to produce a stream of tagged records.
 //
-// $ span-tag -c <(echo '{"DE-15": {"any": {}}}') input.ldj > output.ldj
+// $ span-tag -c <(echo '{"DE-15": {"any": {}}}') input.ldj [input.ldj, ...] > output.ldj
 package main
 
 import (
@@ -37,18 +37,22 @@ func main() {
 		log.Fatal("config file required")
 	}
 
-	var r io.Reader
+	var readers []io.Reader
 
 	if flag.NArg() == 0 {
-		r = os.Stdin
+		readers = append(readers, os.Stdin)
 	} else {
-		file, err := os.Open(flag.Arg(0))
-		if err != nil {
-			log.Fatal(err)
+		for _, filename := range flag.Args() {
+			file, err := os.Open(filename)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer file.Close()
+			readers = append(readers, file)
 		}
-		r = file
 	}
 
+	// read and parse config file
 	configfile, err := os.Open(*config)
 	if err != nil {
 		log.Fatal(err)
@@ -56,33 +60,34 @@ func main() {
 
 	dec := json.NewDecoder(configfile)
 
-	// tagger is the deserialized configuration.
 	var tagger filter.Tagger
 	if err := dec.Decode(&tagger); err != nil {
 		log.Fatal(err)
 	}
 
-	// business logic
-	processor := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
-		var is finc.IntermediateSchema
-		if err := json.Unmarshal(b, &is); err != nil {
-			return b, err
+	for _, r := range readers {
+		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
+			// business logic
+			var is finc.IntermediateSchema
+			if err := json.Unmarshal(b, &is); err != nil {
+				return b, err
+			}
+
+			tagged := tagger.Tag(is)
+
+			bb, err := json.Marshal(tagged)
+			if err != nil {
+				return bb, err
+			}
+			bb = append(bb, '\n')
+			return bb, nil
+		})
+
+		p.NumWorkers = *numWorkers
+		p.BatchSize = *size
+
+		if err := p.Run(); err != nil {
+			log.Fatal(err)
 		}
-
-		tagged := tagger.Tag(is)
-
-		bb, err := json.Marshal(tagged)
-		if err != nil {
-			return bb, err
-		}
-		bb = append(bb, '\n')
-		return bb, nil
-	})
-
-	processor.NumWorkers = *numWorkers
-	processor.BatchSize = *size
-
-	if err := processor.Run(); err != nil {
-		log.Fatal(err)
 	}
 }
