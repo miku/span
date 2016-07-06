@@ -4,10 +4,10 @@
 // "or" and "and" filters, leaf nodes contain custom filter, that are matched
 // against records.
 //
-// A filter implements filter.Filter with a single method: Apply. Each filter
-// must also implement UnmarshalJSON, so we can load it from a file. Each filter
-// can define arbitrary number of options, e.g. a HoldingsFilter can be loaded
-// from a single file or a list of urls.
+// A filter implements filter.Filter with a two methods: Apply and optionally
+// UnmarshalJSON, so we can load the configuration from a file. Each filter can
+// define arbitrary options, e.g. a HoldingsFilter can be loaded from a single
+// file or a list of urls.
 //
 // [1] https://en.wikipedia.org/wiki/Binary_expression_tree#Boolean_expressions
 //
@@ -91,32 +91,13 @@ type Filter interface {
 	Apply(finc.IntermediateSchema) bool
 }
 
-// FilterFunc makes a function satisfy an
-// interface.
-type FilterFunc func(finc.IntermediateSchema) bool
-
-// Apply just calls the function.
-func (f FilterFunc) Apply(is finc.IntermediateSchema) bool {
-	return f(is)
-}
-
 // AnyFilter validates any record.
-type AnyFilter struct{}
+type AnyFilter struct {
+	Any struct{} `json:"any"`
+}
 
 // Apply will just return true.
 func (f *AnyFilter) Apply(finc.IntermediateSchema) bool { return true }
-
-// UnmarshalJSON turns a config fragment into a
-// ISSN filter.
-func (f *AnyFilter) UnmarshalJSON(p []byte) error {
-	var s struct {
-		Any struct{} `json:"any"`
-	}
-	if err := json.Unmarshal(p, &s); err != nil {
-		return err
-	}
-	return nil
-}
 
 // CollectionFilter validates all records matching one of the given collections.
 type CollectionFilter struct {
@@ -218,12 +199,12 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// CollectionFilter allows all records of one of the given collections.
+// SourceFilter allows all records with the given source id or ids.
 type SourceFilter struct {
 	values []string
 }
 
-// Apply filters source ids.
+// Apply filter.
 func (f *SourceFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, v := range f.values {
 		if v == is.SourceID {
@@ -236,12 +217,12 @@ func (f *SourceFilter) Apply(is finc.IntermediateSchema) bool {
 // UnmarshalJSON turns a config fragment into a filter.
 func (f *SourceFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
-		Collections []string `json:"source"`
+		Sources []string `json:"source"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = s.Collections
+	f.values = s.Sources
 	return nil
 }
 
@@ -301,7 +282,9 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 	}
 	var values []string
 	if s.DOI.File != "" {
+
 		log.Println(s.DOI.File)
+
 		file, err := os.Open(s.DOI.File)
 		if err != nil {
 			return err
@@ -331,14 +314,13 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 }
 
 // HoldingsFilter filters a record against a holding file. The holding file
-// might be in KBART, Ovid or Google format. TODO(miku): move moving wall logic
-// under `.Covers`.
+// might be in KBART, Ovid or Google format.
 type HoldingsFilter struct {
 	entries holdings.Entries
 }
 
 // Apply tests validity against holding file. TODO(miku): holdings file
-// indentifiers can be ISSNs, ISBNs or DOIs
+// indentifiers can be ISSNs, ISBNs or DOIs.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	signature := holdings.Signature{
 		Date:   is.Date.Format("2006-01-02"),
@@ -357,7 +339,7 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 
 // download takes a link and returns the path to a temporary file with the
 // content on success or an error, will automatically unzip all members into a
-// single file.
+// single file. TODO(miku): move such things into a linkutils.go or similar.
 func (f *HoldingsFilter) download(link string) (string, error) {
 	file, err := ioutil.TempFile("", "span-")
 	if err != nil {
@@ -419,6 +401,7 @@ func (f *HoldingsFilter) download(link string) (string, error) {
 
 // UnmarshalJSON unwraps a JSON into a HoldingsFilter. Can use holding file from
 // file or a list of URLs, if both are given, only the file is used.
+// TODO(miku): Allow multiple files as well.
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
@@ -463,7 +446,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	}
 
 	if filename == "" {
-		return fmt.Errorf("holdings filter: either file or url must be given")
+		return fmt.Errorf("holdings filter: either file or urls must be given")
 	}
 
 	file, err := generic.New(filename)
@@ -506,7 +489,7 @@ func (f *OrFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// unmarshalFilter takes a name of a filter and a raw JSON message and
+// unmarshalFilter takes the name of a filter and a raw JSON message and
 // unmarshals the appropriate filter. All filters must be registered here.
 // Unknown filters cause an error.
 func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
@@ -578,7 +561,8 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 }
 
 // firstKey returns the top level key of an object, given as a raw JSON message.
-// It peeks into the fragment. An empty document will cause an error.
+// It peeks into the fragment. An empty document will cause an error, as
+// multiple top level keys.
 func firstKey(raw json.RawMessage) (string, error) {
 	var peeker = make(map[string]interface{})
 	if err := json.Unmarshal(raw, &peeker); err != nil {
@@ -590,6 +574,9 @@ func firstKey(raw json.RawMessage) (string, error) {
 	}
 	if len(keys) == 0 {
 		return "", fmt.Errorf("no key found")
+	}
+	if len(keys) > 1 {
+		return "", fmt.Errorf("cannot decide which top-level key to use: %s", keys)
 	}
 	return keys[0], nil
 }
@@ -627,7 +614,7 @@ func (f *AndFilter) Apply(is finc.IntermediateSchema) bool {
 	return true
 }
 
-// UnmarshalJSON turns a config fragment into a or filter.
+// UnmarshalJSON turns a config fragment into an or filter.
 func (f *AndFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Filters []json.RawMessage `json:"and"`
@@ -640,17 +627,17 @@ func (f *AndFilter) UnmarshalJSON(p []byte) error {
 	return err
 }
 
-// NotFilter inverts a filter.
+// NotFilter inverts another filter.
 type NotFilter struct {
 	filter Filter
 }
 
-// NotFilter inverts a filter.
+// NotFilter inverts.
 func (f *NotFilter) Apply(is finc.IntermediateSchema) bool {
 	return !f.filter.Apply(is)
 }
 
-// UnmarshalJSON turns a config fragment into a or filter.
+// UnmarshalJSON turns a config fragment into a not filter.
 func (f *NotFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Filter json.RawMessage `json:"not"`
@@ -659,6 +646,8 @@ func (f *NotFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
+	// TODO(miku): not should only work with a single filter, what is the
+	// meaning of "not": [..., ..., ...] ...
 	filters, err := unmarshalFilterList([]json.RawMessage{s.Filter})
 	if err != nil {
 		return err
