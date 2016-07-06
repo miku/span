@@ -92,9 +92,9 @@ func (e Entry) TimeRestricted(t time.Time) error {
 }
 
 // Covers returns true if the given signature lies inside the interval defined
-// by the entry and the moving wall is not hit. If there is not comparable
-// date, the volume and issue comparisons do not make much sense. However, if
-// there is a date, we are ok with just one of volume or issue defined.
+// by the entry and the moving wall is not hit. If there the dates are not comparable
+// the volume and issue comparisons do not make much sense. However, if
+// there is a date, we are ok with a missing volume or a missing issue.
 func (e Entry) Covers(s Signature) error {
 	if err := e.compareDate(s); err != nil {
 		return err
