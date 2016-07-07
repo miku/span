@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miku/span/container"
 	"github.com/miku/span/holdings"
 )
 
@@ -21,8 +22,11 @@ var (
 	ErrMissingIdentifiers = errors.New("missing identifiers")
 )
 
-// delayPattern fixes allowed embargo strings.
-var delayPattern = regexp.MustCompile(`([P|R])([0-9]+)([Y|M|D])`)
+var (
+	// delayPattern fixes allowed embargo strings.
+	delayPattern = regexp.MustCompile(`([P|R])([0-9]+)([Y|M|D])`)
+	issnPattern  = regexp.MustCompile(`[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9X]`)
+)
 
 // embargo is a string representing a delay, e.g. P1Y, R10M.
 type embargo string
@@ -50,8 +54,9 @@ type columns struct {
 	InterlibraryTransmission string
 	InterlibraryComment      string
 	Publisher                string
-	Anchor                   string
-	ZDBID                    string
+	// Anchor might contain ISSNs, too
+	Anchor string
+	ZDBID  string
 }
 
 // Convert string like P12M, P1M, R10Y into a time.Duration.
@@ -157,7 +162,7 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 		pi := strings.TrimSpace(cols.PrintIdentifier)
 		oi := strings.TrimSpace(cols.OnlineIdentifier)
 
-		// force ISSN format
+		// Slight ISSN restoration (e.g. http://www.jstor.org/kbart/collections/as).
 		if len(pi) == 8 {
 			pi = fmt.Sprintf("%s-%s", pi[:4], pi[4:])
 		}
@@ -166,16 +171,28 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 			oi = fmt.Sprintf("%s-%s", oi[:4], oi[4:])
 		}
 
-		if pi == "" && oi == "" {
+		// Collect all identifiers.
+		identifiers := container.NewStringSet()
+		if pi != "" {
+			identifiers.Add(pi)
+		}
+		if oi != "" {
+			identifiers.Add(oi)
+		}
+
+		// Extract ISSN from anchor field.
+		for _, issn := range issnPattern.FindAllString(cols.Anchor, -1) {
+			identifiers.Add(issn)
+		}
+
+		if identifiers.Size() == 0 {
 			if !r.SkipMissingIdentifiers {
 				return entries, ErrMissingIdentifiers
 			}
 		}
-		if pi != "" {
-			entries[pi] = append(entries[pi], holdings.License(entry))
-		}
-		if oi != "" {
-			entries[oi] = append(entries[oi], holdings.License(entry))
+
+		for _, id := range identifiers.Values() {
+			entries[id] = append(entries[pi], holdings.License(entry))
 		}
 	}
 
