@@ -192,7 +192,7 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 		}
 
 		for _, id := range identifiers.Values() {
-			entries[id] = append(entries[pi], holdings.License(entry))
+			entries[id] = append(entries[id], holdings.License(entry))
 		}
 	}
 
