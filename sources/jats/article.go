@@ -488,7 +488,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Authors = article.Authors()
 	output.Fulltext = article.Body.Section.Value
 	output.Genre = "article"
-	output.RefType = "JOUR"
+	output.RefType = "EJOUR"
 	output.Headings = article.Headings()
 	output.ISSN = article.ISSN()
 	output.Issue = article.Front.Article.Issue.Value

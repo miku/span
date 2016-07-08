@@ -128,6 +128,7 @@ func (article Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) 
 	}
 	output.Date = t
 	output.RawDate = output.Date.Format("2006-01-02")
+	output.RefType = DefaultRefType
 
 	if article.Front.JournalMeta.Publisher.Name != "" {
 		output.Publishers = []string{article.Front.JournalMeta.Publisher.Name}

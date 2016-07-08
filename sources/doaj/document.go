@@ -44,6 +44,8 @@ const (
 	// Format for all records
 	Format = "ElectronicArticle"
 	Genre  = "article"
+	// Default ris.type
+	DefaultRefType = "EJOUR"
 )
 
 var (
@@ -251,5 +253,6 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.Languages = languages.Values()
 
+	output.RefType = DefaultRefType
 	return output, nil
 }

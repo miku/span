@@ -24,6 +24,8 @@ const (
 	Format     = "ElectronicArticle"
 	Collection = "Elsevier Journals"
 	Genre      = "article"
+	// Default ris.type
+	DefaultRefType = "EJOUR"
 )
 
 var (
@@ -481,7 +483,7 @@ func (s Shipment) BatchConvert() ([]span.Importer, error) {
 				output.Languages = []string{"eng"}
 				output.MegaCollection = Collection
 				output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(article.ItemInfo.Doi)))
-				output.RefType = "EJOUR"
+				output.RefType = DefaultRefType
 				output.SourceID = SourceID
 				output.Volume = si.IssueInfo.VolumeIssueNumber.VolFirst
 

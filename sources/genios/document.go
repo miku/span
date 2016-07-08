@@ -44,6 +44,8 @@ const (
 	// Collection is the base name of the collection.
 	Collection = "Genios"
 	Genre      = "article"
+	// Default ris.type
+	DefaultRefType = "EJOUR"
 	// If no abstract is found accept this number of chars from doc.Text as Abstract.
 	textAsAbstractCutoff = 2000
 )
@@ -270,6 +272,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	// keep the date indicator, so we can create an update order
 	output.Indicator = doc.XIssue
+	output.RefType = DefaultRefType
 
 	return output, nil
 }

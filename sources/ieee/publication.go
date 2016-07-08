@@ -15,10 +15,11 @@ import (
 )
 
 const (
-	SourceID   = "89"
-	Format     = "ElectronicArticle"
-	Collection = "IEEE"
-	Genre      = "article"
+	SourceID       = "89"
+	Format         = "ElectronicArticle"
+	Collection     = "IEEE"
+	Genre          = "article"
+	DefaultRefType = "EJOUR"
 )
 
 var (
@@ -260,6 +261,8 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, kw := range p.Volume.Article.Articleinfo.Keywordset.Keyword {
 		is.Subjects = append(is.Subjects, kw.Term)
 	}
+
+	is.RefType = DefaultRefType
 
 	return is, nil
 }

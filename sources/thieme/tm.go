@@ -35,10 +35,11 @@ import (
 )
 
 const (
-	SourceID   = "60"
-	Format     = "ElectronicArticle"
-	Collection = "Thieme E-Journals"
-	Genre      = "article"
+	SourceID       = "60"
+	Format         = "ElectronicArticle"
+	Collection     = "Thieme E-Journals"
+	Genre          = "article"
+	DefaultRefType = "EJOUR"
 )
 
 func leftPad(s string, padStr string, overallLen int) string {
@@ -244,6 +245,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		authors = append(authors, finc.Author{FirstName: author.FirstName, LastName: author.LastName})
 	}
 	output.Authors = authors
+	output.RefType = DefaultRefType
 
 	return output, nil
 }
