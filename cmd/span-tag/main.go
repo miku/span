@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"runtime/pprof"
 
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
@@ -25,6 +26,7 @@ func main() {
 	version := flag.Bool("v", false, "show version")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 
 	flag.Parse()
 
@@ -35,6 +37,15 @@ func main() {
 
 	if *config == "" {
 		log.Fatal("config file required")
+	}
+
+	if *cpuprofile != "" {
+		file, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(file)
+		defer pprof.StopCPUProfile()
 	}
 
 	var readers []io.Reader
