@@ -29,7 +29,7 @@ var (
 	ErrKeyTooLong              = fmt.Errorf("record id exceeds key limit of %s", span.KeyLengthLimit)
 	ErrPublicationDateTooEarly = errors.New("publication date too early")
 	ErrRepeatedSubtitle        = errors.New("repeated subtitle")
-	ErrCurrencyInTitle         = errors.New("currenty in title")
+	ErrCurrencyInTitle         = errors.New("currency in title")
 	ErrExcessivePunctuation    = errors.New("excessive punctuation")
 	ErrNoPublisher             = errors.New("no publisher")
 	ErrShortAuthorName         = errors.New("very short author name")
