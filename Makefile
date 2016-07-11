@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-TARGETS = span-import span-export span-tag span-redact
+TARGETS = span-import span-export span-tag span-redact span-check
 
 # find go-bindata executable on vm
 export PATH := /home/vagrant/bin:$(PATH)
