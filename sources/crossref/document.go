@@ -210,10 +210,6 @@ func (doc *Document) CombinedTitle() string {
 	return ""
 }
 
-// FullTitle returns everything title.
-func (doc *Document) FullTitle() string {
-	return span.UnescapeTrim(strings.Join(append(doc.Title, doc.Subtitle...), " "))
-}
 
 // ShortTitle returns the first main title only.
 func (doc *Document) ShortTitle() (s string) {
