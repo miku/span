@@ -51,6 +51,8 @@ clean:
 deb: all
 	mkdir -p packaging/deb/span/usr/sbin
 	cp $(TARGETS) packaging/deb/span/usr/sbin
+	mkdir -p packaging/deb/span/usr/local/share/man/man1
+	cp docs/span.1 packaging/deb/span/usr/local/share/man/man1
 	cd packaging/deb && fakeroot dpkg-deb --build span .
 	mv packaging/deb/span_*.deb .
 
