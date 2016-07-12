@@ -36,7 +36,7 @@ cover:
 generate:
 	go generate
 
-all: assets deps $(TARGETS)
+all: assets deps $(TARGETS) docs/span.1
 
 $(TARGETS): %: cmd/%/main.go
 	go build -o $@ $<
