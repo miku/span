@@ -170,4 +170,4 @@ Martin Czygan <martin.czygan@uni-leipzig.de>
 SEE ALSO
 --------
 
-[FINC](https://finc.info), [AMSL](http://amsl.technology/), jq(1), xmlstarlet(5)
+[FINC](https://finc.info), [AMSL](http://amsl.technology/), jq(1), xmlstarlet(1)
