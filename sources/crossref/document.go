@@ -126,7 +126,8 @@ type PageInfo struct {
 // PageCount returns the number of pages, or zero if this cannot be determined.
 func (pi *PageInfo) PageCount() int {
 	if pi.StartPage != 0 && pi.EndPage != 0 {
-		count := pi.EndPage - pi.StartPage
+		// an article, that starts at page 19 and ends at page 19 has one page
+		count := pi.EndPage - pi.StartPage + 1
 		if count > 0 {
 			return count
 		}
