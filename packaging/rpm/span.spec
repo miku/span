@@ -27,6 +27,9 @@ install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
 
+mkdir -p $RPM_BUILD_ROOT/usr/local/share/man
+install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
+
 %post
 
 %clean
@@ -42,6 +45,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-import
 /usr/local/sbin/span-redact
 /usr/local/sbin/span-tag
+/usr/local/share/man/man1/span.1
 
 %changelog
 

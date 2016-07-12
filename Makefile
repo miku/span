@@ -41,7 +41,7 @@ all: assets deps $(TARGETS)
 $(TARGETS): %: cmd/%/main.go
 	go build -o $@ $<
 
-clean:
+clean: clean-docs
 	rm -f $(TARGETS)
 	rm -f span_*deb
 	rm -f span-*rpm
@@ -58,11 +58,18 @@ rpm: all
 	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
 	cp ./packaging/rpm/span.spec $(HOME)/rpmbuild/SPECS
 	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
+	cp docs/span.1 $(HOME)/rpmbuild/BUILD
 	./packaging/rpm/buildrpm.sh span
 	cp $(HOME)/rpmbuild/RPMS/x86_64/span*.rpm .
 
 cloc:
 	cloc --max-file-size 1 --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
+
+docs/span.1: docs/span.md
+	md2man-roff docs/span.md > docs/span.1
+
+clean-docs:
+	rm -f docs/span.1
 
 # ==== vm-based packaging ====
 #
