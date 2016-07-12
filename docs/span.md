@@ -74,10 +74,11 @@ Apply licensing information from a configuration file to an intermediate schema 
 
   `span-tag -c <(echo '{"DE-15": {"any": {}}})' intermediate.file`
 
-There a couple of content filters available: any, doi, issn, package, holdings,
-collection, source. These content filters can be combined with: or, and and not.
-The top level keys are the labels, that will be added to `x.labels` into the
-document, if the filter evaluates to true.
+There are a couple of content filters available: `any`, `doi`, `issn`,
+`package`, `holdings`, `collection`, `source`. These content filters can be
+combined with: `or`, `and` and `not`. The top level keys are the labels, that
+will be injected as `x.labels` into the document, if the filter evaluates to
+true.
 
 More complex example for a configuration file:
 
