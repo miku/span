@@ -44,6 +44,7 @@ var (
 	FormatDel189 = assetutil.MustLoadStringMap("assets/finc/formats/del189.json")
 	FormatDeZi4  = assetutil.MustLoadStringMap("assets/finc/formats/dezi4.json")
 	FormatDeZwi2 = assetutil.MustLoadStringMap("assets/finc/formats/dezwi2.json")
+	FormatNrw    = assetutil.MustLoadStringMap("assets/finc/formats/nrw.json")
 )
 
 // AuthorReplacer is a special cleaner for author names.

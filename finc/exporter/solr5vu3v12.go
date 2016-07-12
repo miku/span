@@ -66,6 +66,7 @@ type Solr5Vufind3v12 struct {
 	FormatDel189 []string `json:"format_del189,omitempty"`
 	FormatDeZi4  []string `json:"format_dezi4,omitempty"`
 	FormatDeZwi2 []string `json:"format_dezwi2,omitempty"`
+	FormatNrw    []string `json:"format_nrw,omitempty"`
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
@@ -147,6 +148,7 @@ func (s *Solr5Vufind3v12) Convert(is finc.IntermediateSchema) error {
 	s.FormatDel189 = []string{FormatDel189.LookupDefault(is.Format, "")}
 	s.FormatDeZi4 = []string{FormatDeZi4.LookupDefault(is.Format, "")}
 	s.FormatDeZwi2 = []string{FormatDeZwi2.LookupDefault(is.Format, "")}
+	s.FormatNrw = []string{FormatNrw.LookupDefault(is.Format, "")}
 
 	s.ContainerVolume = is.Volume
 	s.ContainerIssue = is.Issue

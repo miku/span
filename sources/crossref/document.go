@@ -210,7 +210,6 @@ func (doc *Document) CombinedTitle() string {
 	return ""
 }
 
-
 // ShortTitle returns the first main title only.
 func (doc *Document) ShortTitle() (s string) {
 	if len(doc.Title) > 0 {
