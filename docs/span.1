@@ -1,0 +1,156 @@
+.TH SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
+.SH NAME
+.PP
+span\-import, span\-tag, span\-check, span\-export \- intermediate schema tools
+.SH SYNOPSIS
+.PP
+\fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] \fIfile\fP
+.PP
+\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\-file\fP] \fIfile\fP
+.PP
+\fB\fCspan\-check\fR [\fB\fC\-verbose\fR] \fIfile\fP
+.PP
+\fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] \fIfile\fP
+.SH DESCRIPTION
+.PP
+The \fB\fCspan\fR support metadata processing by supplying commands for data conversion
+to and and from intermediate schema, license tagging and quality assurance.
+.SH OPTIONS
+.TP
+\fB\fC\-i\fR \fIformat\fP
+Input format. \fB\fCspan\-import\fR only.
+.TP
+\fB\fC\-o\fR \fIformat\fP
+Output format. \fB\fCspan\-export\fR only.
+.TP
+\fB\fC\-c\fR \fIconfig\-file\fP
+Path to configuration file. \fB\fCspan\-tag\fR only. See EXAMPLE for a CONFIGURATION FILE.
+.TP
+\fB\fC\-list\fR
+List support formats. \fB\fCspan\-import\fR, \fB\fCspan\-export\fR only.
+.TP
+\fB\fC\-verbose\fR
+More output. \fB\fCspan\-import\fR, \fB\fCspan\-check\fR only.
+.TP
+\fB\fC\-b\fR \fIN\fP
+Batch size (default N=20000). \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR only.
+.TP
+\fB\fC\-w\fR \fIN\fP
+Number of workers (defaults to CPU count). \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR only.
+.TP
+\fB\fC\-cpuprofile\fR \fIpprof\-file\fP
+Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR only.
+.TP
+\fB\fC\-log\fR \fIlog\-file\fP
+If given log to file. \fB\fCspan\-import\fR only.
+.TP
+\fB\fC\-v\fR
+Show version.
+.TP
+\fB\fC\-h\fR
+Show usage.
+.SH EXAMPLES
+.PP
+List supported format for conversion to intermediate schema:
+.IP
+\fB\fCspan\-import \-list\fR
+.PP
+Convert DOAJ dump into intermediate schema:
+.IP
+\fB\fCspan\-import \-i doaj dump.ldj\fR
+.PP
+Apply licensing information from a configuration file to an intermediate schema file.
+.IP
+\fB\fCspan\-tag \-c <(echo '{"DE\-15": {"any": {}}})' intermediate.file\fR
+.PP
+There a couple of content filters available: any, doi, issn, package, holdings,
+collection, source. These content filters can be combined with: or, and and not.
+The top level keys are the labels, that will be added to \fB\fCx.labels\fR into the
+document, if the filter evaluates to true.
+.PP
+More complex example for a configuration file:
+.PP
+.RS
+.nf
+{
+  "DE\-14": {
+    "or": [
+      {
+        "and": [
+          {
+            "source": [
+              "55"
+            ]
+          },
+          {
+            "holdings": {
+              "urls": [
+                "http://www.jstor.org/kbart/collections/asii",
+                "http://www.jstor.org/kbart/collections/as"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "and": [
+          {
+            "source": [
+              "49"
+            ]
+          },
+          {
+            "holdings": {
+              "urls": [
+                "https://example.com/KBART_DE14",
+                "https://example.com/KBART_FREEJOURNALS"
+              ]
+            }
+          },
+          {
+            "collection": [
+              "Turkish Family Physicans Association (CrossRef)",
+              "Helminthological Society (CrossRef)",
+              "International Association of Physical Chemists (IAPC) (CrossRef)",
+              "The Society for Antibacterial and Antifungal Agents, Japan (CrossRef)",
+              "Fundacao CECIERJ (CrossRef)"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+.fi
+.RE
+.IP
+\fB\fCspan\-tag \-c config.json intermediate.file\fR
+.PP
+Export in a SOLR schema:
+.IP
+\fB\fCspan\-export \-o solr5vu3v11 intermediate.file\fR
+.SH FILES
+.PP
+Assets (mostly string to string mappings) are compiled into the executable. To
+change these mappings, edit the suitable file under
+\[la]https://github.com/miku/span/tree/master/assets\[ra], commit and recompile.
+.SH ENVIRONMENT
+.TP
+\fB\fCGOMAXPROCS\fR
+The GOMAXPROCS variable limits the number of operating system threads that can
+execute user\-level Go code simultaneously.
+.SH DIAGNOSTICS
+.PP
+Any input error, e.g. faulty JSON, any write error, etc., will lead to an
+immediate stop of the program.
+.SH BUGS
+.PP
+Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.
+.SH AUTHOR
+.PP
+Martin Czygan \[la]martin.czygan@uni-leipzig.de\[ra]
+.SH SEE ALSO
+.PP
+FINC \[la]https://finc.info\[ra], AMSL \[la]http://amsl.technology/\[ra], 
+.BR jq (1), 
+.BR xmlstarlet (5)
