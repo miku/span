@@ -36,12 +36,12 @@ cover:
 generate:
 	go generate
 
-all: assets deps $(TARGETS) docs/span.1
+all: assets deps $(TARGETS)
 
 $(TARGETS): %: cmd/%/main.go
 	go build -o $@ $<
 
-clean: clean-docs
+clean:
 	rm -f $(TARGETS)
 	rm -f span_*deb
 	rm -f span-*rpm
