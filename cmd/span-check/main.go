@@ -61,7 +61,9 @@ func main() {
 
 	go statsCounter(errc, done)
 
-	nothing := make([]byte, 0)
+	out := make(chan []byte)
+
+	go span.ByteSink(os.Stdout, out, done)
 
 	for _, r := range readers {
 		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
@@ -83,12 +85,12 @@ func main() {
 						if err != nil {
 							log.Fatal(err)
 						}
-						fmt.Println(string(b))
+						out <- b
 					}
 				}
 			}
 
-			return nothing, nil
+			return nil, nil
 
 		})
 
@@ -101,6 +103,9 @@ func main() {
 	}
 
 	close(errc)
+
+	// wait for both queue and writer
+	<-done
 	<-done
 
 	b, err := json.Marshal(map[string]interface{}{"stats": stats})
