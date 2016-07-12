@@ -29,7 +29,6 @@ TODO
 ----
 
 * Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
-* Generic batcher, e.g. something along https://gist.github.com/miku/acc8e9a22d817727eb605e2865c056a9
 
 Licence
 -------
