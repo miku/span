@@ -103,7 +103,7 @@ func main() {
 	}
 
 	close(errc)
-
+	close(out)
 	// wait for both queue and writer
 	<-done
 	<-done
