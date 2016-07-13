@@ -155,12 +155,13 @@ func (doc Document) Authors() (authors []finc.Author) {
 	return authors
 }
 
+// ISSNList returns a list of ISSN.
 func (doc Document) ISSNList() []string {
-	var issns []string
+	issns := container.NewStringSet()
 	for _, s := range issnPattern.FindAllString(doc.ISSN, -1) {
-		issns = append(issns, s)
+		issns.Add(s)
 	}
-	return issns
+	return issns.Values()
 }
 
 // RecordID uses SourceAndID as starting point.
