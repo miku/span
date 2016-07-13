@@ -78,7 +78,7 @@ var (
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// dbmap maps a database name to one or more "package names"
 	dbmap       = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
-	issnPattern = regexp.MustCompile(`[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9X]`)
+	issnPattern = regexp.MustCompile(`[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9X]`)
 )
 
 type Genios struct{}
