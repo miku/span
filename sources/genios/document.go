@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -76,7 +77,8 @@ var (
 	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// dbmap maps a database name to one or more "package names"
-	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
+	dbmap       = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
+	issnPattern = regexp.MustCompile(`[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9X]`)
 )
 
 type Genios struct{}
@@ -153,6 +155,14 @@ func (doc Document) Authors() (authors []finc.Author) {
 	return authors
 }
 
+func (doc Document) ISSNList() []string {
+	var issns []string
+	for _, s := range issnPattern.FindAllString(doc.ISSN, -1) {
+		issns = append(issns, s)
+	}
+	return issns
+}
+
 // RecordID uses SourceAndID as starting point.
 func (doc Document) RecordID() string {
 	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.SourceAndID())))
@@ -218,9 +228,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.JournalTitle = strings.Replace(strings.TrimSpace(doc.PublicationTitle), "\n", " ", -1)
 
-	if !isNomenNescio(doc.ISSN) {
-		output.ISSN = append(output.ISSN, strings.TrimSpace(doc.ISSN))
-	}
+	output.ISSN = doc.ISSNList()
 
 	if !isNomenNescio(doc.Issue) {
 		output.Issue = strings.TrimSpace(doc.Issue)
