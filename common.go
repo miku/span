@@ -44,7 +44,7 @@ const (
 	KeyLengthLimit = 250
 )
 
-var ISSNPattern = regexp.MustCompile(`^[0-9]{4,4}-[0-9]{3,3}[0-9X]$`)
+var ISSNPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9X]`)
 
 // Skip marks records to skip.
 type Skip struct {
