@@ -193,13 +193,19 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			}
 			// TODO(miku): need to regex out ISSN, line might contain noise
 			line = strings.ToUpper(line)
-			if !span.ISSNPattern.MatchString(line) {
-				log.Printf("warning: entry is not an ISSN: %s", line)
+
+			// sniff ISSNs
+			issns := container.NewStringSet()
+			for _, s := range span.ISSNPattern.FindAllString(line, -1) {
+				issns.Add(s)
 			}
-			if len(line) > 9 {
-				log.Printf("warning: entry too long: %s", line)
+
+			if issns.Size() == 0 {
+				log.Printf("warning: no ISSNs found on line: %s", line)
 			}
-			f.values.Add(line)
+			for _, issn := range issns.Values() {
+				f.values.Add(issn)
+			}
 		}
 	}
 	for _, v := range s.ISSN.Values {
