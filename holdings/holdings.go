@@ -122,6 +122,10 @@ func (e Entry) Covers(s Signature) error {
 	return e.TimeRestricted(t)
 }
 
+func (e Entry) String() string {
+	return fmt.Sprintf("<Entry Begin=%s, End=%s, Embargo=%s, EmbargoDisallowEarlier=%v>", e.Begin, e.End, e.Embargo, e.EmbargoDisallowEarlier)
+}
+
 // compareYear returns an error, if both values are defined and disagree, or
 // if too few values are defined to do a sane comparison.
 func (e Entry) compareDate(s Signature) error {
@@ -232,6 +236,10 @@ func (s Signature) VolumeInt() int {
 // IssueInt returns the issue as int in a best effort manner.
 func (s Signature) IssueInt() int {
 	return findInt(s.Issue)
+}
+
+func (s Signature) String() string {
+	return fmt.Sprintf("<Signature Date=%v, Volume=%s, Issue=%s>", s.Date, s.Volume, s.Issue)
 }
 
 // findInt return the first int that is found in s or 0 if there is no number.
