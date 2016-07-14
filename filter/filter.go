@@ -191,6 +191,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			if line == "" {
 				continue
 			}
+			// TODO(miku): need to regex out ISSN, line might contain noise
 			line = strings.ToUpper(line)
 			if !span.ISSNPattern.MatchString(line) {
 				log.Printf("warning: entry is not an ISSN: %s", line)
