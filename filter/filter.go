@@ -325,6 +325,7 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 // might be in KBART, Ovid or Google format.
 type HoldingsFilter struct {
 	entries holdings.Entries
+	Verbose bool
 }
 
 // Apply tests validity against holding file. TODO(miku): holdings file
@@ -339,6 +340,19 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 		for _, license := range f.entries.Licenses(issn) {
 			if err := license.Covers(signature); err == nil {
 				return true
+			} else {
+				if f.Verbose {
+					b, merr := json.Marshal(map[string]interface{}{
+						"document": is,
+						"err":      err.Error(),
+						"issn":     issn,
+						"license":  license})
+					if merr == nil {
+						log.Printf(os.Stderr, string(b))
+					} else {
+						log.Printf("cannot even serialize document: %s", merr)
+					}
+				}
 			}
 		}
 	}
@@ -415,12 +429,15 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		Holdings struct {
 			Filename string   `json:"file"`
 			Links    []string `json:"urls"`
+			Verbose  bool     `json:"verbose"`
 		} `json:"holdings"`
 	}
 
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
+
+	f.Verbose = s.Holdings.Verbose
 
 	// concatenated downloaded and possible extracted links
 	concatenated, err := ioutil.TempFile("", "span-")
