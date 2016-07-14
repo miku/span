@@ -158,6 +158,106 @@ DIAGNOSTICS
 Any input error, e.g. faulty JSON, any write error, etc., will lead to an
 immediate stop of the program.
 
+To debug a holdings filter, set `verbose` to `true` to see rejected records and rejection reason:
+
+    {
+      "DE-14": {
+        "holdings": {
+          "verbose": true,
+          "urls": [
+            "http://www.jstor.org/kbart/collections/asii",
+            "http://www.jstor.org/kbart/collections/as"
+          ]
+        }
+      }
+    }
+
+Example debugging output:
+
+    2016/07/14 14:29:45 {
+        "document": {
+            ...
+            "finc.record_id": "ai-55-aHR0cDovL3d3dy5qc3Rvci5vcmcvc3RhYmxlLzEwLjE0MzIxL3JoZXRwdWJsYWZmYS4xOC4xLjAxNjE",
+            ...
+            "rft.atitle": "Review: Depression: A Public Feeling",
+            ...
+            "rft.issn": [
+                "1094-8392",
+                "1534-5238"
+            ],
+            "rft.date": "2015-04-01",
+            "doi": "10.14321/rhetpublaffa.18.1.0161",
+            ...
+        },
+        "err": "after coverage interval",
+        "issn": "1534-5238",
+        "license": {
+            "Begin": {
+                "Date": "1998-04-01",
+                "Volume": "1",
+                "Issue": "1"
+            },
+            "End": {
+                "Date": "2012-12-01",
+                "Volume": "15",
+                "Issue": "4"
+            },
+            "Embargo": -126144000000000000,
+            "EmbargoDisallowEarlier": false
+        }
+    }
+
+
+To debug a holdings filter, set `verbose` to `true` to see rejected records and rejection reason:
+
+    {
+      "DE-14": {
+        "holdings": {
+          "verbose": true,
+          "urls": [
+            "http://www.jstor.org/kbart/collections/asii",
+            "http://www.jstor.org/kbart/collections/as"
+          ]
+        }
+      }
+    }
+
+Example debugging output:
+
+    2016/07/14 14:29:45 {
+        "document": {
+            ...
+            "finc.record_id": "ai-55-aHR0cDovL3d3dy5qc3Rvci5vcmcvc3RhYmxlLzEwLjE0MzIxL3JoZXRwdWJsYWZmYS4xOC4xLjAxNjE",
+            ...
+            "rft.atitle": "Review: Depression: A Public Feeling",
+            ...
+            "rft.issn": [
+                "1094-8392",
+                "1534-5238"
+            ],
+            "rft.date": "2015-04-01",
+            "doi": "10.14321/rhetpublaffa.18.1.0161",
+            ...
+        },
+        "err": "after coverage interval",
+        "issn": "1534-5238",
+        "license": {
+            "Begin": {
+                "Date": "1998-04-01",
+                "Volume": "1",
+                "Issue": "1"
+            },
+            "End": {
+                "Date": "2012-12-01",
+                "Volume": "15",
+                "Issue": "4"
+            },
+            "Embargo": -126144000000000000,
+            "EmbargoDisallowEarlier": false
+        }
+    }
+
+
 BUGS
 ----
 
