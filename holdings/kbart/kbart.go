@@ -89,7 +89,7 @@ func (e embargo) AsDuration() (time.Duration, error) {
 	case "M":
 		return time.Duration(-i) * 24 * time.Hour * 30, nil
 	case "Y":
-		return time.Duration(-i) * 24 * time.Hour * 30 * 365, nil
+		return time.Duration(-i) * 24 * time.Hour * 365, nil
 	default:
 		return d, ErrInvalidEmbargo
 	}
