@@ -20,8 +20,10 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-The `span` support metadata processing by supplying commands for data conversion
-to and and from intermediate schema, license tagging and quality assurance.
+The `span` tools support metadata processing by supplying commands for data conversion
+to and from intermediate schema, license tagging and quality assurance.
+
+The intermediate schema is a normalization vehicle. Spec: https://github.com/ubleipzig/intermediateschema
 
 OPTIONS
 -------
@@ -156,7 +158,7 @@ DIAGNOSTICS
 -----------
 
 Any input error, e.g. faulty JSON, any write error, etc., will lead to an
-immediate stop of the program.
+immediate halt.
 
 To debug a holdings filter, set `verbose` to `true` to see rejected records and rejection reason:
 
@@ -172,57 +174,7 @@ To debug a holdings filter, set `verbose` to `true` to see rejected records and 
       }
     }
 
-Example debugging output:
-
-    2016/07/14 14:29:45 {
-        "document": {
-            ...
-            "finc.record_id": "ai-55-aHR0cDovL3d3dy5qc3Rvci5vcmcvc3RhYmxlLzEwLjE0MzIxL3JoZXRwdWJsYWZmYS4xOC4xLjAxNjE",
-            ...
-            "rft.atitle": "Review: Depression: A Public Feeling",
-            ...
-            "rft.issn": [
-                "1094-8392",
-                "1534-5238"
-            ],
-            "rft.date": "2015-04-01",
-            "doi": "10.14321/rhetpublaffa.18.1.0161",
-            ...
-        },
-        "err": "after coverage interval",
-        "issn": "1534-5238",
-        "license": {
-            "Begin": {
-                "Date": "1998-04-01",
-                "Volume": "1",
-                "Issue": "1"
-            },
-            "End": {
-                "Date": "2012-12-01",
-                "Volume": "15",
-                "Issue": "4"
-            },
-            "Embargo": -126144000000000000,
-            "EmbargoDisallowEarlier": false
-        }
-    }
-
-
-To debug a holdings filter, set `verbose` to `true` to see rejected records and rejection reason:
-
-    {
-      "DE-14": {
-        "holdings": {
-          "verbose": true,
-          "urls": [
-            "http://www.jstor.org/kbart/collections/asii",
-            "http://www.jstor.org/kbart/collections/as"
-          ]
-        }
-      }
-    }
-
-Example debugging output:
+Example debugging output, record rejected because it's outside licence coverage:
 
     2016/07/14 14:29:45 {
         "document": {
@@ -271,4 +223,4 @@ Martin Czygan <martin.czygan@uni-leipzig.de>
 SEE ALSO
 --------
 
-[FINC](https://finc.info), [AMSL](http://amsl.technology/), jq(1), xmlstarlet(1)
+[FINC](https://finc.info), [AMSL](http://amsl.technology/), [intermediate schema](https://github.com/ubleipzig/intermediateschema), jq(1), xmlstarlet(1)
