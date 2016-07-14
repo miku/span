@@ -48,6 +48,19 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	// read and parse config file
+	configfile, err := os.Open(*config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dec := json.NewDecoder(configfile)
+
+	var tagger filter.Tagger
+	if err := dec.Decode(&tagger); err != nil {
+		log.Fatal(err)
+	}
+
 	var readers []io.Reader
 
 	if flag.NArg() == 0 {
@@ -61,19 +74,6 @@ func main() {
 			defer file.Close()
 			readers = append(readers, file)
 		}
-	}
-
-	// read and parse config file
-	configfile, err := os.Open(*config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dec := json.NewDecoder(configfile)
-
-	var tagger filter.Tagger
-	if err := dec.Decode(&tagger); err != nil {
-		log.Fatal(err)
 	}
 
 	for _, r := range readers {
