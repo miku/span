@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -77,8 +76,7 @@ var (
 	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// dbmap maps a database name to one or more "package names"
-	dbmap       = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
-	issnPattern = regexp.MustCompile(`[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9X]`)
+	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
 )
 
 type Genios struct{}
@@ -158,7 +156,7 @@ func (doc Document) Authors() (authors []finc.Author) {
 // ISSNList returns a list of ISSN.
 func (doc Document) ISSNList() []string {
 	issns := container.NewStringSet()
-	for _, s := range issnPattern.FindAllString(doc.ISSN, -1) {
+	for _, s := range span.ISSNPattern.FindAllString(doc.ISSN, -1) {
 		issns.Add(s)
 	}
 	return issns.Values()

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/holdings"
 )
@@ -25,7 +26,6 @@ var (
 var (
 	// delayPattern fixes allowed embargo strings.
 	delayPattern = regexp.MustCompile(`([P|R])([0-9]+)([Y|M|D])`)
-	issnPattern  = regexp.MustCompile(`[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9X]`)
 )
 
 // embargo is a string representing a delay, e.g. P1Y, R10M.
@@ -181,7 +181,7 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 		}
 
 		// Extract ISSN from anchor field.
-		for _, issn := range issnPattern.FindAllString(cols.Anchor, -1) {
+		for _, issn := range span.ISSNPattern.FindAllString(cols.Anchor, -1) {
 			identifiers.Add(issn)
 		}
 

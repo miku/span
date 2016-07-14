@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -42,6 +43,8 @@ const (
 	// this limit might become obsolete.
 	KeyLengthLimit = 250
 )
+
+var ISSNPattern = regexp.MustCompile(`^[0-9]{4,4}-[0-9]{3,3}[0-9X]$`)
 
 // Skip marks records to skip.
 type Skip struct {

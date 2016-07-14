@@ -46,8 +46,6 @@ var (
 	currencyPattern = regexp.MustCompile(`[€$¥][+-]?[0-9]{1,3}(?:[0-9]*(?:[.,][0-9]{2})?|(?:,[0-9]{3})*(?:\.[0-9]{2})?|(?:\.[0-9]{3})*(?:,[0-9]{2})?)`)
 	// suspiciousPatterns, used by NoExcessivePunctuation
 	suspiciousPatterns = []string{"?????", "!!!!!", "....."}
-	// issnPattern looks for a canonical ISSN
-	issnPattern = regexp.MustCompile(`^[0-9]{4,4}-[0-9]{3,3}[0-9X]$`)
 	// htmlEntityPattern looks for leftover entities: http://rubular.com/r/flzmBzpShX
 	htmlEntityPattern = regexp.MustCompile(`&(?:[a-z\d]+|#\d+|#x[a-f\d]+);`)
 )
@@ -252,7 +250,7 @@ func TestHasURL(is finc.IntermediateSchema) error {
 // TestCanonicalISSN checks for the canonical ISSN format 1234-567X.
 func TestCanonicalISSN(is finc.IntermediateSchema) error {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		if !issnPattern.MatchString(issn) {
+		if !span.ISSNPattern.MatchString(issn) {
 			return Issue{Err: ErrNonCanonicalISSN, Record: is}
 		}
 	}
