@@ -196,7 +196,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 				log.Printf("warning: entry is not an ISSN: %s", line)
 			}
 			if len(line) > 9 {
-				log.Printf("warning: entry too long: %s")
+				log.Printf("warning: entry too long: %s", line)
 			}
 			f.values.Add(line)
 		}
