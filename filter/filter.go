@@ -80,6 +80,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
@@ -191,6 +192,12 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 				continue
 			}
 			line = strings.ToUpper(line)
+			if !span.ISSNPattern.MatchString(line) {
+				log.Printf("warning: entry is not an ISSN: %s", line)
+			}
+			if len(line) > 9 {
+				log.Printf("warning: entry too long: %s")
+			}
 			f.values.Add(line)
 		}
 	}
