@@ -342,13 +342,13 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 				return true
 			} else {
 				if f.Verbose {
-					b, merr := json.Marshal(map[string]interface{}{
+					b, merr := json.MarshalIndent(map[string]interface{}{
 						"document": is,
 						"err":      err.Error(),
 						"issn":     issn,
-						"license":  license})
+						"license":  license}, "", "    ")
 					if merr == nil {
-						log.Printf(os.Stderr, string(b))
+						log.Printf(string(b))
 					} else {
 						log.Printf("cannot even serialize document: %s", merr)
 					}
