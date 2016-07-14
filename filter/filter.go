@@ -190,6 +190,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			if line == "" {
 				continue
 			}
+			line = strings.ToUpper(line)
 			f.values.Add(line)
 		}
 	}
