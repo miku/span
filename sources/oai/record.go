@@ -62,11 +62,12 @@ func (r *Record) Date() (time.Time, error) {
 	if len(r.Metadata.Dc.Date) == 0 {
 		return time.Time{}, fmt.Errorf("record has no date")
 	}
+	date := datePattern.FindString(r.Metadata.Dc.Date[0])
 	switch {
 	case len(r.Metadata.Dc.Date[0]) == 4:
 		return time.Parse("2006", r.Metadata.Dc.Date[0])
-	case datePattern.FindString(r.Metadata.Dc.Date[0]) != "":
-		return time.Parse("2006-01-02", r.Metadata.Dc.Date[0])
+	case date != "":
+		return time.Parse("2006-01-02", date)
 	default:
 		return time.Time{}, fmt.Errorf("unknown date format: %s", r.Metadata.Dc.Date[0])
 	}
