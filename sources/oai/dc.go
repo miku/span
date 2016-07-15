@@ -12,8 +12,12 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// datePattern matches date portions syntactically
-var datePattern = regexp.MustCompile(`[12][0-9][0-9][0-9]-[01][0-9]-[0123][0-9]`)
+var (
+	// datePattern matches date portions syntactically
+	datePattern = regexp.MustCompile(`[12][0-9][0-9][0-9]-[01][0-9]-[0123][0-9]`)
+	// http://stackoverflow.com/questions/27910/finding-a-doi-in-a-document-or-page
+	doiPattern = regexp.MustCompile(`10[.][0-9]{4,}.+`)
+)
 
 type Record struct {
 	XMLName xml.Name `xml:"Record"`
@@ -95,6 +99,15 @@ func (r *Record) Authors() []finc.Author {
 	return authors
 }
 
+func (r *Record) DOI() string {
+	for _, id := range r.Metadata.Dc.Identifier {
+		if doi := doiPattern.FindString(id); doi != "" {
+			return doi
+		}
+	}
+	return ""
+}
+
 func (r *Record) Links() []string {
 	var links []string
 	for _, id := range r.Metadata.Dc.Identifier {
@@ -125,6 +138,7 @@ func (r *Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Subjects = r.Metadata.Dc.Subject
 	// TODO(miku): normalize
 	output.Languages = r.Metadata.Dc.Language
+	output.DOI = r.DOI()
 
 	return output, nil
 }
