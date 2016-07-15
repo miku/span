@@ -123,6 +123,8 @@ func (r *Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Authors = r.Authors()
 	output.URL = r.Links()
 	output.Subjects = r.Metadata.Dc.Subject
+	// TODO(miku): normalize
+	output.Languages = r.Metadata.Dc.Language
 
 	return output, nil
 }
