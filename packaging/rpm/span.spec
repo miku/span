@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.118
+Version:    0.1.119
 Release:    0
 License:    GPL
 BuildArch:  x86_64
