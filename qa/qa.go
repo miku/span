@@ -21,25 +21,28 @@ var (
 	// LatestDate represents the latest publication date we accept. Five years into the future.
 	LatestDate = time.Now().AddDate(5, 0, 0)
 
-	ErrInvalidEndPage          = errors.New("broken end page")
-	ErrInvalidStartPage        = errors.New("broken start page")
-	ErrEndPageBeforeStartPage  = errors.New("end page before start page")
-	ErrSuspiciousPageCount     = errors.New("suspicious page count")
-	ErrInvalidURL              = errors.New("invalid URL")
-	ErrKeyTooLong              = fmt.Errorf("record id exceeds key limit of %s", span.KeyLengthLimit)
-	ErrPublicationDateTooEarly = errors.New("publication date too early")
-	ErrRepeatedSubtitle        = errors.New("repeated subtitle")
-	ErrCurrencyInTitle         = errors.New("currency in title")
-	ErrExcessivePunctuation    = errors.New("excessive punctuation")
-	ErrNoPublisher             = errors.New("no publisher")
-	ErrShortAuthorName         = errors.New("very short author name")
-	ErrEtAlAuthorName          = errors.New("et al in author name")
-	ErrNAInAuthorName          = errors.New("NA in author name")
-	ErrWhitespaceAuthor        = errors.New("whitespace author")
-	ErrHTMLEntityInAuthorName  = errors.New("html entity in author name")
-	ErrRepeatedSlashInDOI      = errors.New("repeated slash in DOI")
-	ErrNoURL                   = errors.New("record has no URL")
-	ErrNonCanonicalISSN        = errors.New("non-canonical ISSN")
+	ErrInvalidEndPage              = errors.New("broken end page")
+	ErrInvalidStartPage            = errors.New("broken start page")
+	ErrEndPageBeforeStartPage      = errors.New("end page before start page")
+	ErrSuspiciousPageCount         = errors.New("suspicious page count")
+	ErrInvalidURL                  = errors.New("invalid URL")
+	ErrKeyTooLong                  = fmt.Errorf("record id exceeds key limit of %s", span.KeyLengthLimit)
+	ErrPublicationDateTooEarly     = errors.New("publication date too early")
+	ErrRepeatedSubtitle            = errors.New("repeated subtitle")
+	ErrCurrencyInTitle             = errors.New("currency in title")
+	ErrExcessivePunctuation        = errors.New("excessive punctuation")
+	ErrNoPublisher                 = errors.New("no publisher")
+	ErrShortAuthorName             = errors.New("very short author name")
+	ErrEtAlAuthorName              = errors.New("et al in author name")
+	ErrNAInAuthorName              = errors.New("NA in author name")
+	ErrWhitespaceAuthor            = errors.New("whitespace author")
+	ErrHTMLEntityInAuthorName      = errors.New("html entity in author name")
+	ErrRepeatedSlashInDOI          = errors.New("repeated slash in DOI")
+	ErrNoURL                       = errors.New("record has no URL")
+	ErrNonCanonicalISSN            = errors.New("non-canonical ISSN")
+	ErrAtSignInAuthorName          = errors.New("@ in author name")
+	ErrHTTPInAuthorName            = errors.New("http: in author name")
+	ErrBlacklistedWordInAuthorName = errors.New("blacklisted word in author name")
 
 	// currencyPattern is a rather narrow pattern:
 	// http://rubular.com/r/WjcnjhckZq, used by NoCurrencyInTitle
@@ -48,6 +51,15 @@ var (
 	suspiciousPatterns = []string{"?????", "!!!!!", "....."}
 	// htmlEntityPattern looks for leftover entities: http://rubular.com/r/flzmBzpShX
 	htmlEntityPattern = regexp.MustCompile(`&(?:[a-z\d]+|#\d+|#x[a-f\d]+);`)
+	// words that likely indicate some error
+	blacklistedWordsAuthorNames = []string{
+		"verfasser",
+		"herausgeber",
+		"copyright",
+		"www.",
+		"@",
+		"http:",
+	}
 )
 
 var TestSuite = []Tester{
@@ -226,6 +238,11 @@ func TestFeasibleAuthor(is finc.IntermediateSchema) error {
 		}
 		if htmlEntityPattern.MatchString(s) {
 			return Issue{Err: ErrHTMLEntityInAuthorName, Record: is}
+		}
+		for _, w := range blacklistedWordsAuthorNames {
+			if strings.Contains(strings.ToLower(s), w) {
+				return Issue{Err: ErrBlacklistedWordInAuthorName, Record: is}
+			}
 		}
 	}
 	return nil
