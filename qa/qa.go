@@ -43,6 +43,7 @@ var (
 	ErrAtSignInAuthorName          = errors.New("@ in author name")
 	ErrHTTPInAuthorName            = errors.New("http: in author name")
 	ErrBlacklistedWordInAuthorName = errors.New("blacklisted word in author name")
+	ErrLongAuthorName              = errors.New("long author name")
 
 	// currencyPattern is a rather narrow pattern:
 	// http://rubular.com/r/WjcnjhckZq, used by NoCurrencyInTitle
@@ -243,6 +244,9 @@ func TestFeasibleAuthor(is finc.IntermediateSchema) error {
 			if strings.Contains(strings.ToLower(s), w) {
 				return Issue{Err: ErrBlacklistedWordInAuthorName, Record: is}
 			}
+		}
+		if len(s) > 50 {
+			return Issue{Err: ErrLongAuthorName, Record: is}
 		}
 	}
 	return nil
