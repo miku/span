@@ -201,12 +201,12 @@ func (d *DateField) Date() (t time.Time, err error) {
 func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
 		if len(doc.Subtitle) > 0 {
-			return span.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, "/"), strings.Join(doc.Subtitle, "/")))
+			return span.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, " "), strings.Join(doc.Subtitle, " ")))
 		}
-		return span.UnescapeTrim(strings.Join(doc.Title, "/"))
+		return span.UnescapeTrim(strings.Join(doc.Title, " "))
 	}
 	if len(doc.Subtitle) > 0 {
-		return span.UnescapeTrim(strings.Join(doc.Subtitle, "/"))
+		return span.UnescapeTrim(strings.Join(doc.Subtitle, " "))
 	}
 	return ""
 }
