@@ -140,5 +140,7 @@ func (r *Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Languages = r.Metadata.Dc.Language
 	output.DOI = r.DOI()
 
+	output.Series = strings.Join(r.Metadata.Dc.Source, ", ")
+
 	return output, nil
 }
