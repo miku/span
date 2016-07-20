@@ -9,13 +9,9 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// Attach attaches the ISILs to a record. Noop.
-func (s *Solr5Vufind3v12) Attach(_ []string) {}
-
-// WIP: Solr5Vufind3v12 is the basic solr 5 schema as of 2016-04-14. It is based on
+// WIP: Solr5Vufind3 is the basic solr 5 schema as of 2016-04-14. It is based on
 // VuFind 3. Same as Solr5Vufind3v12, but with fullrecord field, refs. #8031.
-
-type Solr5Vufind3v12 struct {
+type Solr5Vufind3 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
 	Authors              []string `json:"author,omitempty"`
@@ -70,7 +66,7 @@ type Solr5Vufind3v12 struct {
 }
 
 // Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr5Vufind3v12) Convert(is finc.IntermediateSchema) error {
+func (s *Solr5Vufind3) Convert(is finc.IntermediateSchema, withFullrecord bool) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID
@@ -157,11 +153,13 @@ func (s *Solr5Vufind3v12) Convert(is finc.IntermediateSchema) error {
 
 	s.Institutions = is.Labels
 
-	// refs. #8031
-	b, err := json.Marshal(is)
-	if err != nil {
-		return err
+	if withFullrecord {
+		// refs. #8031
+		b, err := json.Marshal(is)
+		if err != nil {
+			return err
+		}
+		s.Fullrecord = string(b)
 	}
-	s.Fullrecord = string(b)
 	return nil
 }

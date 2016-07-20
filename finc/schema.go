@@ -46,10 +46,7 @@ var (
 type ExportSchema interface {
 	// Convert takes an intermediate schema record to export. Returns an
 	// error, if conversion failed.
-	Convert(IntermediateSchema) error
-	// Attach takes a list of strings (here: ISILs) and attaches them to the
-	// current record.
-	Attach([]string)
+	Convert(is IntermediateSchema, withFullrecord bool) error
 }
 
 // Author representes an author, "inspired" by OpenURL.
