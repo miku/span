@@ -26,7 +26,7 @@ var (
 	ErrEndPageBeforeStartPage      = errors.New("end page before start page")
 	ErrSuspiciousPageCount         = errors.New("suspicious page count")
 	ErrInvalidURL                  = errors.New("invalid URL")
-	ErrKeyTooLong                  = fmt.Errorf("record id exceeds key limit of %s", span.KeyLengthLimit)
+	ErrKeyTooLong                  = fmt.Errorf("record id exceeds key limit of %d", span.KeyLengthLimit)
 	ErrPublicationDateTooEarly     = errors.New("publication date too early")
 	ErrRepeatedSubtitle            = errors.New("repeated subtitle")
 	ErrCurrencyInTitle             = errors.New("currency in title")
@@ -97,7 +97,7 @@ type Issue struct {
 }
 
 func (i Issue) Error() string {
-	return fmt.Sprintf("%s: %+v", i.Error, i.Record)
+	return fmt.Sprintf("%s: %+v", i.Err, i.Record)
 }
 
 func (i Issue) MarshalJSON() ([]byte, error) {
