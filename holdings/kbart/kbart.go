@@ -254,6 +254,10 @@ func (r *Reader) Read() (columns, holdings.Entry, error) {
 		Embargo:          embargo(record[12]),
 	}
 
+	if len(record) > 21 {
+		cols.Anchor = record[21]
+	}
+
 	emb, err := cols.Embargo.AsDuration()
 	if err != nil {
 		return cols, entry, err
