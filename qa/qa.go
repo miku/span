@@ -44,6 +44,7 @@ var (
 	ErrHTTPInAuthorName            = errors.New("http: in author name")
 	ErrBlacklistedWordInAuthorName = errors.New("blacklisted word in author name")
 	ErrLongAuthorName              = errors.New("long author name")
+	ErrPageZero                    = errors.New("page is zero")
 
 	// currencyPattern is a rather narrow pattern:
 	// http://rubular.com/r/WjcnjhckZq, used by NoCurrencyInTitle
@@ -156,6 +157,9 @@ func TestPageCount(is finc.IntermediateSchema) error {
 				}
 				if e-s > maxPageCount {
 					return Issue{Err: ErrSuspiciousPageCount, Record: is}
+				}
+				if e == 0 || s == 0 {
+					return Issue{Err: ErrPageZero, Record: is}
 				}
 			} else {
 				return Issue{Err: ErrInvalidEndPage, Record: is}
