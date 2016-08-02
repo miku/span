@@ -123,7 +123,8 @@ func (e Entry) Covers(s Signature) error {
 }
 
 func (e Entry) String() string {
-	return fmt.Sprintf("<Entry Begin=%s, End=%s, Embargo=%s, EmbargoDisallowEarlier=%v>", e.Begin, e.End, e.Embargo, e.EmbargoDisallowEarlier)
+	return fmt.Sprintf("<Entry Begin=%s, End=%s, Embargo=%s, EmbargoDisallowEarlier=%v>",
+		e.Begin, e.End, e.Embargo.String(), e.EmbargoDisallowEarlier)
 }
 
 // compareYear returns an error, if both values are defined and disagree, or
