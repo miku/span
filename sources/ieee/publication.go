@@ -41,7 +41,7 @@ type Publication struct {
 		Pubstatus             string   `xml:"pubstatus"`
 		Publicationopenaccess string   `xml:"publicationopenaccess"`
 		StandardId            string   `xml:"standard_id"`
-		Packagememberset      []string `xml:"packagememberset>packagemember"`
+		Packagemembers        []string `xml:"packagememberset>packagemember"`
 		Isbn                  []struct {
 			Isbntype  string `xml:"isbntype,attr"`
 			Mediatype string `xml:"mediatype,attr"`
@@ -62,21 +62,23 @@ type Publication struct {
 				Holder string `xml:"holder"`
 			}
 		}
-		PublisherName string `xml:"publisher>publishername"`
-		Holdstatus    string `xml:"holdstatus"`
-		Confgroup     struct {
-			Confdate []struct {
-				ConfTitle    string `xml:"conftitle"`
+		PublisherNames []string `xml:"publisher>publishername"`
+		Holdstatus     string   `xml:"holdstatus"`
+		Confgroup      struct {
+			ConfTitle string `xml:"conftitle"`
+			Confdate  []struct {
 				Confdatetype string `xml:"confdatetype,attr"`
 				Year         string `xml:"year"`
 				Month        string `xml:"month"`
 				Day          string `xml:"day"`
 			} `xml:"confdate"`
-			Conflocation  string `xml:"conflocation"`
-			Confcountry   string `xml:"confcountry"`
-			DoiPermission string `xml:"doi_permission"`
+			Conflocation   string `xml:"conflocation"`
+			Confcountry    string `xml:"confcountry"`
+			ConferenceType string `xml:"conference_type"`
+			DoiPermission  string `xml:"doi_permission"`
 		} `xml:"confgroup"`
 		Amsid string `xml:"amsid"`
+		Coden string `xml:"coden"`
 	} `xml:"publicationinfo"`
 	Volume struct {
 		Volumeinfo struct {
@@ -84,8 +86,9 @@ type Publication struct {
 			Idamsid   string `xml:"idamsid"`
 			Notegroup string `xml:"notegroup"`
 			Issue     struct {
-				Amsid       string `xml:"amsid"`
-				Issuestatus string `xml:"issuestatus"`
+				Amsid         string `xml:"amsid"`
+				Amscreatedate string `xml:"amscreatedate"`
+				Issuestatus   string `xml:"issuestatus"`
 			} `xml:"issue"`
 			Volumenum string `xml:"volumenum"`
 		} `xml:"volumeinfo"`
@@ -120,7 +123,7 @@ type Publication struct {
 						Firstname   string `xml:"firstname"`
 					} `xml:"author"`
 				} `xml:"authorgroup"`
-				Date struct {
+				Date []struct {
 					Datetype string `xml:"datetype,attr"`
 					Year     string `xml:"year"`
 					Month    string `xml:"month"`
@@ -138,6 +141,7 @@ type Publication struct {
 				} `xml:"artpagenums"`
 				Numreferences string `xml:"numreferences"`
 				Amsid         string `xml:"amsid"`
+				Csarticleid   string `xml:"csarticleid"`
 				Keywordset    struct {
 					Keywordtype string `xml:"keywordtype,attr"`
 					Keyword     []struct {
@@ -179,7 +183,10 @@ func (p Publication) OnlineISSN() (issns []string) {
 }
 
 func (p Publication) Date() (time.Time, error) {
-	date := p.Volume.Article.Articleinfo.Date
+	if len(p.Volume.Article.Articleinfo.Date) == 0 {
+		return time.Time{}, ErrNoDate
+	}
+	date := p.Volume.Article.Articleinfo.Date[0]
 	y, m, d := "1970", "Jan", "1"
 	if date.Year == "" {
 		return time.Time{}, ErrNoDate
