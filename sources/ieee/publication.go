@@ -28,35 +28,45 @@ var (
 )
 
 type Publication struct {
-	xml.Name        `xml:"publication"`
-	Title           string `xml:"title"`
-	Normtitle       string `xml:"normtitle"`
-	Publicationinfo struct {
-		Idamsid               string `xml:"idamsid"`
-		Publicationtype       string `xml:"publicationtype"`
-		Publicationsubtype    string `xml:"publicationsubtype"`
-		Ieeeabbrev            string `xml:"ieeeabbrev"`
-		Acronym               string `xml:"acronym"`
-		Pubstatus             string `xml:"pubstatus"`
-		Publicationopenaccess string `xml:"publicationopenaccess"`
-		StandardId            string `xml:"standard_id"`
-		Packagememberset      struct {
-			Packagemember []string `xml:"packagemember"`
-		} `xml:"packagememberset"`
-		Isbn struct {
+	xml.Name          `xml:"publication"`
+	Title             string `xml:"title"`
+	TitleAbbreviation string `xml:"titleabbrev"`
+	Normtitle         string `xml:"normtitle"`
+	Publicationinfo   struct {
+		Idamsid               string   `xml:"idamsid"`
+		Publicationtype       string   `xml:"publicationtype"`
+		Publicationsubtype    string   `xml:"publicationsubtype"`
+		Ieeeabbrev            string   `xml:"ieeeabbrev"`
+		Acronym               string   `xml:"acronym"`
+		Pubstatus             string   `xml:"pubstatus"`
+		Publicationopenaccess string   `xml:"publicationopenaccess"`
+		StandardId            string   `xml:"standard_id"`
+		Packagememberset      []string `xml:"packagememberset>packagemember"`
+		Isbn                  []struct {
 			Isbntype  string `xml:"isbntype,attr"`
 			Mediatype string `xml:"mediatype,attr"`
 		} `xml:"isbn"`
+		BmsProductNumber struct {
+			MediaType string `xml:"mediatype,attr"`
+			Value     string `xml:",chardata"`
+		}
+		TCN  string `xml:"tcn"`
 		Issn []struct {
 			Mediatype string `xml:"mediatype,attr"`
 			Value     string `xml:",chardata"`
 		} `xml:"issn"`
-		Pubtopicalbrowseset string `xml:"pubtopicalbrowseset"`
-		Copyrightgroup      string `xml:"copyrightgroup"`
-		Publisher           string `xml:"publisher"`
-		Holdstatus          string `xml:"holdstatus"`
-		Confgroup           struct {
+		Pubtopicalbrowse []string `xml:"pubtopicalbrowseset>pubtopicalbrowse"`
+		Copyrightgroup   struct {
+			Copyright []struct {
+				Year   string `xml:"year"`
+				Holder string `xml:"holder"`
+			}
+		}
+		PublisherName string `xml:"publisher>publishername"`
+		Holdstatus    string `xml:"holdstatus"`
+		Confgroup     struct {
 			Confdate []struct {
+				ConfTitle    string `xml:"conftitle"`
 				Confdatetype string `xml:"confdatetype,attr"`
 				Year         string `xml:"year"`
 				Month        string `xml:"month"`
