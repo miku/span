@@ -62,10 +62,10 @@ var (
 	// ArticleTitleBlocker will trigger skips, if article title matches exactly.
 	ArticleTitleBlocker = []string{"Titelei", "Front Matter", "Advertisement", "Advertisement:"}
 
-	// ArticleTitleBlockerPatterns trigger skips, if pattern matches.
-	ArticleTitleBlockerPatterns = []*regexp.Regexp{
+	// ArticleTitleCleanerPatterns removes matching parts.
+	ArticleTitleCleanerPatterns = []*regexp.Regexp{
 		// refs. #5827
-		regexp.MustCompile(`[?!]{6,}`),
+		regexp.MustCompile(`[?]{6,}`),
 	}
 
 	// Future, if a publication date lies beyond it, it gets skipped.
@@ -267,10 +267,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
-	for _, p := range ArticleTitleBlockerPatterns {
-		if p.MatchString(output.ArticleTitle) {
-			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_PATTERN_IN_TITLE %s", output.RecordID)}
-		}
+	for _, p := range ArticleTitleCleanerPatterns {
+		output.ArticleTitle = p.ReplaceAllString(output.ArticleTitle, "")
 	}
 
 	output.DOI = doc.DOI
