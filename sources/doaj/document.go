@@ -25,6 +25,7 @@ package doaj
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"strconv"
 	"strings"
@@ -148,7 +149,7 @@ func (s DOAJ) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 
 func (doc Document) Authors() (authors []finc.Author) {
 	for _, author := range doc.BibJson.Author {
-		authors = append(authors, finc.Author{Name: author.Name})
+		authors = append(authors, finc.Author{Name: html.UnescapeString(author.Name)})
 	}
 	return authors
 }
