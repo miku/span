@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -60,6 +61,12 @@ var (
 
 	// ArticleTitleBlocker will trigger skips, if article title matches exactly.
 	ArticleTitleBlocker = []string{"Titelei", "Front Matter", "Advertisement", "Advertisement:"}
+
+	// ArticleTitleBlockerPatterns trigger skips, if pattern matches.
+	ArticleTitleBlockerPatterns = []*regexp.Regexp{
+		// refs. #5827
+		regexp.MustCompile(`[?!]{6,}`),
+	}
 
 	// Future, if a publication date lies beyond it, it gets skipped.
 	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
@@ -257,6 +264,12 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, title := range ArticleTitleBlocker {
 		if output.ArticleTitle == title {
 			return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.RecordID)}
+		}
+	}
+
+	for _, p := range ArticleTitleBlockerPatterns {
+		if p.MatchString(output.ArticleTitle) {
+			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_PATTERN_IN_TITLE %s", output.RecordID)}
 		}
 	}
 
