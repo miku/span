@@ -97,6 +97,12 @@ func (s *Solr5Vufind3) Convert(is finc.IntermediateSchema, withFullrecord bool) 
 	sanitized := sanitize.HTML(is.ArticleTitle)
 	s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
 
+	// is we do not have a title yet be rft.btitle is non-empty, use that
+	if s.Title == "" && is.BookTitle != "" {
+		sanitized := sanitize.HTML(is.BookTitle)
+		s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
+	}
+
 	for _, lang := range is.Languages {
 		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
 	}
