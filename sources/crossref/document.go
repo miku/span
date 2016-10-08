@@ -271,6 +271,11 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.ArticleTitle = p.ReplaceAllString(output.ArticleTitle, "")
 	}
 
+	// refs. #8428
+	if len(output.ArticleTitle) > 32000 {
+		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.RecordID)}
+	}
+
 	output.DOI = doc.DOI
 	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
 	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
