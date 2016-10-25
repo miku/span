@@ -49,6 +49,13 @@ type ExportSchema interface {
 	Convert(is IntermediateSchema, withFullrecord bool) error
 }
 
+type Exporter interface {
+	// Export turns an intermediate schema into bytes. Lower level
+	// representation than ExportSchema.Convert. Allows JSON, XML, Marc,
+	// Formeta and other formats.
+	Export(is IntermediateSchema, withFullrecord bool) ([]byte, error)
+}
+
 // Author representes an author, "inspired" by OpenURL.
 type Author struct {
 	ID           string `json:"x.id,omitempty"`

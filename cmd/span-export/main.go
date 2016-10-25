@@ -20,8 +20,8 @@ import (
 )
 
 // Exporters holds available export formats
-var Exporters = map[string]func() finc.ExportSchema{
-	"solr5vu3": func() finc.ExportSchema { return new(exporter.Solr5Vufind3) },
+var Exporters = map[string]func() finc.Exporter{
+	"solr5vu3": func() finc.Exporter { return new(exporter.Solr5Vufind3) },
 }
 
 func main() {
@@ -97,20 +97,13 @@ func main() {
 
 			// Get export format.
 			schema := exportSchemaFunc()
-			if err := schema.Convert(is, *withFullrecord); err != nil {
+			if b, err := schema.Export(is, *withFullrecord); err != nil {
 				log.Printf("failed to convert: %v", is)
 				return b, err
 			}
 
-			// TODO(miku): maybe move marshalling into Exporter, if we have
-			// anything else than JSON - function could be somethings like
-			// func Marshal() ([]byte, error)
-			bb, err := json.Marshal(schema)
-			if err != nil {
-				return b, err
-			}
-			bb = append(bb, '\n')
-			return bb, nil
+			b = append(b, '\n')
+			return b, nil
 		})
 
 		p.NumWorkers = *numWorkers

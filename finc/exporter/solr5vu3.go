@@ -65,6 +65,13 @@ type Solr5Vufind3 struct {
 	FormatNrw    []string `json:"format_nrw,omitempty"`
 }
 
+func (s *Solr5Vufind3) Export(is finc.IntermediateSchema, withFullrecord bool) ([]byte, error) {
+	if err := s.Convert(is, withFullrecord); err != nil {
+		return []byte{}, err
+	}
+	return json.Marshal(s)
+}
+
 // Export method from intermediate schema to solr 4/13 schema.
 func (s *Solr5Vufind3) Convert(is finc.IntermediateSchema, withFullrecord bool) error {
 	s.Allfields = is.Allfields()
