@@ -97,13 +97,15 @@ func main() {
 
 			// Get export format.
 			schema := exportSchemaFunc()
-			if b, err := schema.Export(is, *withFullrecord); err != nil {
+
+			bb, err := schema.Export(is, *withFullrecord)
+			if err != nil {
 				log.Printf("failed to convert: %v", is)
-				return b, err
+				return bb, err
 			}
 
-			b = append(b, '\n')
-			return b, nil
+			bb = append(bb, '\n')
+			return bb, nil
 		})
 
 		p.NumWorkers = *numWorkers
