@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/miku/structs"
+	"github.com/fatih/structs"
 )
 
 var ErrValueNotAllowed = errors.New("value not allowed")
