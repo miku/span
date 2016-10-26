@@ -62,6 +62,9 @@ func marshal(w io.Writer, k string, v interface{}) error {
 		if k == "" {
 			return ErrValueNotAllowed
 		}
+		if _, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escapeSingleQuote(s))); err != nil {
+			return err
+		}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 
