@@ -2,6 +2,7 @@ package formeta
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"reflect"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/miku/structs"
 )
+
+var ErrValueNotAllowed = errors.New("value not allowed")
 
 func escapeSingleQuote(s string) string {
 	return strings.Replace(s, "'", `\'`, -1)
@@ -54,6 +57,9 @@ func marshal(w io.Writer, k string, v interface{}) error {
 	case reflect.String:
 		_, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escapeSingleQuote(v.(string))))
 		if err != nil {
+		if k == "" {
+			return ErrValueNotAllowed
+		}
 			return err
 		}
 	default:
