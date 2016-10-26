@@ -18,6 +18,7 @@ Formats
 * GENIOS Profile XML
 * Elsevier Transport
 * Thieme TM Style
+* [Formeta](https://github.com/culturegraph)
 
 Also:
 
