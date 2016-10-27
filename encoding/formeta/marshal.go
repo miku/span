@@ -15,12 +15,8 @@ import (
 var (
 	ErrValueNotAllowed = errors.New("value not allowed")
 
-	escapeReplacer = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
+	escaper = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
 )
-
-func escapeValue(s string) string {
-	return escapeReplacer.Replace(s)
-}
 
 func marshal(w io.Writer, k string, v interface{}) error {
 	switch reflect.TypeOf(v).Kind() {
@@ -66,7 +62,7 @@ func marshal(w io.Writer, k string, v interface{}) error {
 			// no toplevel key and a string
 			return ErrValueNotAllowed
 		}
-		if _, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escapeValue(s))); err != nil {
+		if _, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escaper.Replace(s))); err != nil {
 			return err
 		}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
