@@ -12,17 +12,18 @@ import (
 	"github.com/fatih/structs"
 )
 
-var ErrValueNotAllowed = errors.New("value not allowed")
+var (
+	ErrValueNotAllowed = errors.New("value not allowed")
 
-var escapeReplacer = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
+	escapeReplacer = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
+)
 
 func escapeValue(s string) string {
 	return escapeReplacer.Replace(s)
 }
 
 func marshal(w io.Writer, k string, v interface{}) error {
-	kind := reflect.TypeOf(v).Kind()
-	switch kind {
+	switch reflect.TypeOf(v).Kind() {
 	case reflect.Struct:
 		// we want time.Time formatted, not the struct
 		switch t := v.(type) {
@@ -62,14 +63,17 @@ func marshal(w io.Writer, k string, v interface{}) error {
 			return nil
 		}
 		if k == "" {
+			// no toplevel key and a string
 			return ErrValueNotAllowed
 		}
 		if _, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escapeValue(s))); err != nil {
 			return err
 		}
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if _, err := io.WriteString(w, fmt.Sprintf("%s: %d, ", k, v)); err != nil {
+			return err
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		if _, err := io.WriteString(w, fmt.Sprintf("%s: %d, ", k, v)); err != nil {
 			return err
 		}
@@ -91,5 +95,5 @@ func Marshal(v interface{}) ([]byte, error) {
 	if err := marshal(buf, "", v); err != nil {
 		return []byte{}, err
 	}
-	return buf.Bytes(), nil
+	return bytes.TrimSpace(buf.Bytes()), nil
 }

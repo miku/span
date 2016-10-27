@@ -10,22 +10,22 @@ func TestEncoding(t *testing.T) {
 	}{
 		{in: "", out: "", err: nil},
 		{in: "x", out: "", err: ErrValueNotAllowed},
-		{in: struct{ A string }{A: "B"}, out: ` { A: 'B',  } `, err: nil},
-		{in: struct{ A string }{A: "B 'A"}, out: ` { A: 'B \'A',  } `, err: nil},
+		{in: struct{ A string }{A: "B"}, out: `{ A: 'B',  }`, err: nil},
+		{in: struct{ A string }{A: "B 'A"}, out: `{ A: 'B \'A',  }`, err: nil},
 		{
 			in: struct{ A string }{A: `B
-A`}, out: ` { A: 'B\nA',  } `, err: nil,
+A`}, out: `{ A: 'B\nA',  }`, err: nil,
 		},
 		{
-			in: struct{ A string }{A: `B\ A`}, out: ` { A: 'B\\ A',  } `, err: nil,
+			in: struct{ A string }{A: `B\ A`}, out: `{ A: 'B\\ A',  }`, err: nil,
 		},
 		{
 			in: struct{ A string }{A: `B\
-'A \`}, out: ` { A: 'B\\\n\'A \\',  } `, err: nil,
+'A \`}, out: `{ A: 'B\\\n\'A \\',  }`, err: nil,
 		},
-		{in: struct{ A []string }{A: []string{"B", "C"}}, out: ` { A: 'B', A: 'C',  } `, err: nil},
-		{in: struct{ A int }{A: 1}, out: ` { A: 1,  } `, err: nil},
-		{in: struct{ A int64 }{A: 1}, out: ` { A: 1,  } `, err: nil},
+		{in: struct{ A []string }{A: []string{"B", "C"}}, out: `{ A: 'B', A: 'C',  }`, err: nil},
+		{in: struct{ A int }{A: 1}, out: `{ A: 1,  }`, err: nil},
+		{in: struct{ A int64 }{A: 1}, out: `{ A: 1,  }`, err: nil},
 	}
 
 	for _, c := range cases {
