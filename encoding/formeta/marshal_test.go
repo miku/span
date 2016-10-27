@@ -1,6 +1,9 @@
 package formeta
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestEncoding(t *testing.T) {
 	var cases = []struct {
@@ -36,5 +39,46 @@ A`}, out: `{ A: 'B\nA',  }`, err: nil,
 		if string(b) != c.out {
 			t.Errorf("Marshal got %v, want %v", string(b), c.out)
 		}
+	}
+}
+
+type TestPosition struct {
+	Longitude float64
+	Latitude  float64
+}
+
+type TestPeak struct {
+	Name     string
+	Location TestPosition
+	Ascent   time.Time
+	Variants []string
+	Camps    []TestPosition
+}
+
+func TestNested(t *testing.T) {
+	p := TestPeak{
+		Name: "пик Сталина",
+		Location: TestPosition{
+			38.916667, 72.016667,
+		},
+		Variants: []string{
+			"Ismoil Somoni Peak",
+			"Қуллаи Исмоили Сомонӣ",
+		},
+		Camps: []TestPosition{
+			{38.916667, 72.016667},
+			{38.916667, 72.016667},
+			{38.916667, 72.016667},
+		},
+	}
+
+	want := `{ Name: 'пик Сталина', Location { Longitude: 38.916667, Latitude: 72.016667,  } Ascent: '0001-01-01T00:00:00Z', Variants: 'Ismoil Somoni Peak', Variants: 'Қуллаи Исмоили Сомонӣ', Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  }  }`
+
+	b, err := Marshal(p)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if string(b) != want {
+		t.Errorf("Marshal got %v, want %v", string(b), want)
 	}
 }
