@@ -14,10 +14,10 @@ import (
 
 var ErrValueNotAllowed = errors.New("value not allowed")
 
+var escapeReplacer = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
+
 func escapeValue(s string) string {
-	s = strings.Replace(s, `\`, `\\`, -1)
-	s = strings.Replace(s, "\n", `\n`, -1)
-	return strings.Replace(s, "'", `\'`, -1)
+	return escapeReplacer.Replace(s)
 }
 
 func marshal(w io.Writer, k string, v interface{}) error {
