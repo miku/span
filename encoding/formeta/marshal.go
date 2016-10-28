@@ -1,3 +1,4 @@
+// Package formeta implements marshaling for formeta (metafacture internal format).
 package formeta
 
 import (
@@ -18,6 +19,8 @@ var (
 	escaper = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
 )
 
+// marshal encodes a value as formeta. Top level object should be a struct.
+// JSON tags are reused as keys, if defined.
 func marshal(w io.Writer, k string, v interface{}) error {
 	switch reflect.TypeOf(v).Kind() {
 	case reflect.Struct:
@@ -38,7 +41,17 @@ func marshal(w io.Writer, k string, v interface{}) error {
 			if !f.IsExported() {
 				continue
 			}
-			if err := marshal(w, f.Name(), f.Value()); err != nil {
+
+			var key string
+			var tagv = strings.Split(f.Tag("json"), ",")
+
+			if len(tagv) > 0 && tagv[0] != "" {
+				key = tagv[0]
+			} else {
+				key = f.Name()
+			}
+
+			if err := marshal(w, key, f.Value()); err != nil {
 				return err
 			}
 		}

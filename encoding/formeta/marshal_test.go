@@ -48,7 +48,7 @@ type TestPosition struct {
 }
 
 type TestPeak struct {
-	Name     string
+	Name     string `json:"name"`
 	Location TestPosition
 	Ascent   time.Time
 	Variants []string
@@ -72,7 +72,7 @@ func TestNested(t *testing.T) {
 		},
 	}
 
-	want := `{ Name: 'пик Сталина', Location { Longitude: 38.916667, Latitude: 72.016667,  } Ascent: '0001-01-01T00:00:00Z', Variants: 'Ismoil Somoni Peak', Variants: 'Қуллаи Исмоили Сомонӣ', Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  }  }`
+	want := `{ name: 'пик Сталина', Location { Longitude: 38.916667, Latitude: 72.016667,  } Ascent: '0001-01-01T00:00:00Z', Variants: 'Ismoil Somoni Peak', Variants: 'Қуллаи Исмоили Сомонӣ', Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  }  }`
 
 	b, err := Marshal(p)
 	if err != nil {
