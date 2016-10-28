@@ -156,6 +156,10 @@ type IntermediateSchema struct {
 	Packages []string `json:"x.packages,omitempty"`
 	// Labels can carry a list of marks for a given records, e.g. ISILs
 	Labels []string `json:"x.labels,omitempty"`
+
+	// OpenAccess, refs. #8986, prototype
+	OpenAccess bool     `json:"x.oa,omitempty"`
+	License    []string `json:"x.license"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {
