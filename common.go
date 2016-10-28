@@ -90,6 +90,7 @@ func FromXMLSize(r io.Reader, name string, decoderFunc XMLDecoderFunc, size int)
 
 	go func() {
 		decoder := xml.NewDecoder(bufio.NewReader(r))
+		decoder.Strict = false
 		for {
 			t, _ := decoder.Token()
 			if t == nil {
