@@ -16,7 +16,7 @@ import (
 var (
 	ErrValueNotAllowed = errors.New("value not allowed")
 
-	escaper = strings.NewReplacer(`\`, `\\`, "\n", `\n`, "'", `\'`)
+	escaper = strings.NewReplacer(`\`, `\\`, "\r\n", `\n`, "\n", `\n`, "'", `\'`)
 )
 
 // marshal encodes a value as formeta. Top level object should be a struct.
