@@ -3,6 +3,7 @@ package exporter
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
@@ -93,7 +94,13 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 	s.Subtitle = is.ArticleSubtitle
 	s.TitleSort = is.SortableTitle()
 	s.Topics = is.Subjects
-	s.URL = is.URL
+
+	// refs. #8709
+	if is.DOI != "" {
+		s.URL = []string{fmt.Sprintf("http://doi.org/%s", is.DOI)}
+	} else {
+		s.URL = is.URL
+	}
 
 	classes := container.NewStringSet()
 	for _, s := range is.Subjects {
