@@ -39,16 +39,6 @@ var (
 	NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
 )
 
-// ExportSchema encapsulate an export flavour. This will most likely be a
-// struct with fields and methods relevant to the exported format. For the
-// moment we assume, the output is JSON. If formats other than JSON are
-// requested, move the marshalling into this interface.
-type ExportSchema interface {
-	// Convert takes an intermediate schema record to export. Returns an
-	// error, if conversion failed.
-	Convert(is IntermediateSchema, withFullrecord bool) error
-}
-
 type Exporter interface {
 	// Export turns an intermediate schema into bytes. Lower level
 	// representation than ExportSchema.Convert. Allows JSON, XML, Marc,

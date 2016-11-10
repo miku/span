@@ -65,15 +65,17 @@ type Solr5Vufind3 struct {
 	FormatNrw    []string `json:"format_nrw,omitempty"`
 }
 
+// Export fulfuls finc.Exporter interface, so we can plug this into cmd/span-export. Takes
+// an intermediate schema and returns serialized JSON.
 func (s *Solr5Vufind3) Export(is finc.IntermediateSchema, withFullrecord bool) ([]byte, error) {
-	if err := s.Convert(is, withFullrecord); err != nil {
+	if err := s.convert(is, withFullrecord); err != nil {
 		return []byte{}, err
 	}
 	return json.Marshal(s)
 }
 
-// Export method from intermediate schema to solr 4/13 schema.
-func (s *Solr5Vufind3) Convert(is finc.IntermediateSchema, withFullrecord bool) error {
+// convert converts intermediate schema to the Solr5Vufind3. The struct fields are populated.
+func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
 	s.Fullrecord = "blob:" + is.RecordID
