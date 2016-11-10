@@ -153,7 +153,7 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 
 	s.AccessFacet = AIAccessFacet
 
-	// site specific formats
+	// site specific formats, TODO: fix this soon
 	s.FormatDe105 = []string{FormatDe105.LookupDefault(is.Format, "")}
 	s.FormatDe14 = []string{FormatDe14.LookupDefault(is.Format, "")}
 	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
