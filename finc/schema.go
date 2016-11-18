@@ -169,6 +169,19 @@ func (is *IntermediateSchema) ISSNList() []string {
 	return issns
 }
 
+// ISBNList returns a deduplicated list of all ISBN and EISBN.
+func (is *IntermediateSchema) ISBNList() []string {
+	set := make(map[string]struct{})
+	for _, isbn := range append(is.ISBN, is.EISBN...) {
+		set[isbn] = struct{}{}
+	}
+	var isbns []string
+	for k := range set {
+		isbns = append(isbns, k)
+	}
+	return isbns
+}
+
 // ParsedDate turns tries to turn a raw date string into a date.
 // TODO(miku): sources need to enforce a format, maybe enforce it here, too?
 func (is *IntermediateSchema) ParsedDate() time.Time {
@@ -182,9 +195,31 @@ func (is *IntermediateSchema) Allfields() string {
 	for _, author := range is.Authors {
 		authors = append(authors, author.String())
 	}
-	fields := [][]string{authors,
-		is.Subjects, is.ISSN, is.EISSN, is.Publishers, is.Places, is.URL,
-		{is.ArticleTitle, is.ArticleSubtitle, is.JournalTitle, is.Fulltext, is.Abstract}}
+
+	fields := [][]string{
+		// multivalued
+		authors,
+		is.EISBN,
+		is.EISSN,
+		is.ISBN,
+		is.ISSN,
+		is.Places,
+		is.Publishers,
+		is.Subjects,
+		is.URL,
+		{
+			// single-valued
+			is.Abstract,
+			is.ArticleSubtitle,
+			is.ArticleTitle,
+			is.BookTitle,
+			is.Edition,
+			is.Fulltext,
+			is.JournalTitle,
+			is.Series,
+			is.ShortTitle,
+		}}
+
 	var buf bytes.Buffer
 	for _, f := range fields {
 		for _, value := range f {
@@ -235,7 +270,12 @@ func (is *IntermediateSchema) Imprint() (s string) {
 
 // SortableAuthor is loosely based on solrmarcs builtin getSortableTitle
 func (is *IntermediateSchema) SortableTitle() string {
-	return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.ArticleTitle, ""))
+	switch {
+	case is.BookTitle != "":
+		return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.BookTitle, ""))
+	default:
+		return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.ArticleTitle, ""))
+	}
 }
 
 // SortableAuthor is loosely based on solrmarcs builtin getSortableAuthor

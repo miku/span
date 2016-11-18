@@ -18,6 +18,7 @@ type Solr5Vufind3 struct {
 	Authors              []string `json:"author,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
+	Edition              string   `json:"edition,omitempty"`
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
@@ -27,6 +28,7 @@ type Solr5Vufind3 struct {
 	Institutions         []string `json:"institution,omitempty"`
 	Imprint              string   `json:"imprint,omitempty"`
 	ISSN                 []string `json:"issn,omitempty"`
+	ISBN                 []string `json:"isbn,omitempty"`
 	Languages            []string `json:"language,omitempty"`
 	MegaCollections      []string `json:"mega_collection,omitempty"`
 	PublishDateSort      int      `json:"publishDateSort,omitempty"`
@@ -84,12 +86,21 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 	s.ID = is.RecordID
 	s.Imprint = is.Imprint()
 	s.ISSN = is.ISSNList()
+	s.ISBN = is.ISBNList()
+	s.Edition = is.Edition
 	s.MegaCollections = append(s.MegaCollections, is.MegaCollection)
 	s.PublishDateSort = is.Date.Year()
 	s.PublishDate = []string{is.Date.Format("2006-01-02")}
 	s.Publishers = is.Publishers
 	s.RecordType = finc.AIRecordType
-	s.Series = append(s.Series, is.JournalTitle)
+
+	if is.JournalTitle != "" {
+		s.Series = append(s.Series, is.JournalTitle)
+	}
+	if is.Series != "" {
+		s.Series = append(s.Series, is.Series)
+	}
+
 	s.SourceID = is.SourceID
 	s.Subtitle = is.ArticleSubtitle
 	s.TitleSort = is.SortableTitle()
@@ -110,7 +121,14 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 	}
 	s.FincClassFacet = classes.Values()
 
-	sanitized := sanitize.HTML(is.ArticleTitle)
+	var sanitized string
+	switch {
+	case is.BookTitle != "":
+		sanitized = sanitize.HTML(is.BookTitle)
+	default:
+		sanitized = sanitize.HTML(is.ArticleTitle)
+	}
+
 	s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
 
 	// is we do not have a title yet be rft.btitle is non-empty, use that
