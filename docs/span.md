@@ -20,10 +20,11 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-The `span` tools support metadata processing by supplying commands for data conversion
-to and from intermediate schema, license tagging and quality assurance.
+The `span` tools convert to and from an intermediate schema and support
+license tagging and quality assurance.
 
-The intermediate schema is a normalization vehicle. Spec: https://github.com/ubleipzig/intermediateschema
+The intermediate schema is a normalization vehicle, spec:
+https://github.com/ubleipzig/intermediateschema
 
 OPTIONS
 -------
@@ -78,9 +79,9 @@ Apply licensing information from a configuration file to an intermediate schema 
 
 There are a couple of content filters available: `any`, `doi`, `issn`,
 `package`, `holdings`, `collection`, `source`. These content filters can be
-combined with: `or`, `and` and `not`. The top level keys are the labels, that
-will be injected as `x.labels` into the document, if the filter evaluates to
-true.
+combined with: `or`, `and` and `not`. The configuration can be seen as an
+expression forest. The top level keys are the labels, that will be injected as
+`x.labels` into the document, if the filter below the key evaluates to true.
 
 More complex example for a configuration file:
 
@@ -157,8 +158,7 @@ ENVIRONMENT
 DIAGNOSTICS
 -----------
 
-Any input error, e.g. faulty JSON, any write error, etc., will lead to an
-immediate halt.
+Any error (like faulty JSON, IO errors, ...) will lead to an immediate halt.
 
 To debug a holdings filter, set `verbose` to `true` to see rejected records and rejection reason:
 

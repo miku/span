@@ -13,10 +13,11 @@ span\-import, span\-tag, span\-check, span\-export \- intermediate schema tools
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] \fIfile\fP
 .SH DESCRIPTION
 .PP
-The \fB\fCspan\fR tools support metadata processing by supplying commands for data conversion
-to and from intermediate schema, license tagging and quality assurance.
+The \fB\fCspan\fR tools convert to and from an intermediate schema and support
+license tagging and quality assurance.
 .PP
-The intermediate schema is a normalization vehicle. Spec: \[la]https://github.com/ubleipzig/intermediateschema\[ra]
+The intermediate schema is a normalization vehicle, spec:
+\[la]https://github.com/ubleipzig/intermediateschema\[ra]
 .SH OPTIONS
 .TP
 \fB\fC\-i\fR \fIformat\fP
@@ -67,9 +68,9 @@ Apply licensing information from a configuration file to an intermediate schema 
 .PP
 There are a couple of content filters available: \fB\fCany\fR, \fB\fCdoi\fR, \fB\fCissn\fR,
 \fB\fCpackage\fR, \fB\fCholdings\fR, \fB\fCcollection\fR, \fB\fCsource\fR\&. These content filters can be
-combined with: \fB\fCor\fR, \fB\fCand\fR and \fB\fCnot\fR\&. The top level keys are the labels, that
-will be injected as \fB\fCx.labels\fR into the document, if the filter evaluates to
-true.
+combined with: \fB\fCor\fR, \fB\fCand\fR and \fB\fCnot\fR\&. The configuration can be seen as an
+expression forest. The top level keys are the labels, that will be injected as
+\fB\fCx.labels\fR into the document, if the filter below the key evaluates to true.
 .PP
 More complex example for a configuration file:
 .PP
@@ -144,8 +145,7 @@ The GOMAXPROCS variable limits the number of operating system threads that can
 execute user\-level Go code simultaneously.
 .SH DIAGNOSTICS
 .PP
-Any input error, e.g. faulty JSON, any write error, etc., will lead to an
-immediate halt.
+Any error (like faulty JSON, IO errors, ...) will lead to an immediate halt.
 .PP
 To debug a holdings filter, set \fB\fCverbose\fR to \fB\fCtrue\fR to see rejected records and rejection reason:
 .PP
