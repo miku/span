@@ -344,23 +344,26 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 		Volume: is.Volume,
 		Issue:  is.Issue,
 	}
+
+	var err error
+
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		for _, license := range f.entries.Licenses(issn) {
-			if err := license.Covers(signature); err == nil {
+			if err = license.Covers(signature); err == nil {
 				return true
+			}
+			if !f.Verbose {
+				continue
+			}
+			b, merr := json.MarshalIndent(map[string]interface{}{
+				"document": is,
+				"err":      err.Error(),
+				"issn":     issn,
+				"license":  license}, "", "    ")
+			if merr == nil {
+				log.Printf(string(b))
 			} else {
-				if f.Verbose {
-					b, merr := json.MarshalIndent(map[string]interface{}{
-						"document": is,
-						"err":      err.Error(),
-						"issn":     issn,
-						"license":  license}, "", "    ")
-					if merr == nil {
-						log.Printf(string(b))
-					} else {
-						log.Printf("cannot even serialize document: %s", merr)
-					}
-				}
+				log.Printf("cannot even serialize document: %s", merr)
 			}
 		}
 	}
