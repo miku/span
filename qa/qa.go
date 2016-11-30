@@ -45,6 +45,7 @@ var (
 	ErrBlacklistedWordInAuthorName = errors.New("blacklisted word in author name")
 	ErrLongAuthorName              = errors.New("long author name")
 	ErrPageZero                    = errors.New("page is zero")
+	ErrTitleTooLong                = errors.New("title too long")
 
 	// currencyPattern is a rather narrow pattern:
 	// http://rubular.com/r/WjcnjhckZq, used by NoCurrencyInTitle
@@ -77,6 +78,7 @@ var TestSuite = []Tester{
 	TesterFunc(TestRepeatedSlashInDOI),
 	TesterFunc(TestHasURL),
 	TesterFunc(TestCanonicalISSN),
+	TesterFunc(TestTitleTooLong),
 }
 
 // Tester is a intermediate record checker.
@@ -278,6 +280,14 @@ func TestCanonicalISSN(is finc.IntermediateSchema) error {
 		if !span.ISSNPattern.MatchString(issn) {
 			return Issue{Err: ErrNonCanonicalISSN, Record: is}
 		}
+	}
+	return nil
+}
+
+// TestTitleTooLong returns an err if the title exceeds a limit, refs. #9230.
+func TestTitleTooLong(is finc.IntermediateSchema) error {
+	if len(is.ArticleTitle) > 400 {
+		return Issue{Err: ErrTitleTooLong, Record: is}
 	}
 	return nil
 }
