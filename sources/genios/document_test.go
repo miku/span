@@ -67,7 +67,6 @@ Alle xxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxx.<BR/>www.xxxxxxxx.de
 				RawAuthors:       []string{"n.n."},
 				Language:         "n.n.",
 				Abstract:         "n.n.",
-				XGroup:           "",
 				Descriptors:      "n.n.",
 				Text:             "\nLorem ipsum dolor sit amet, consectetur adipisicing elit. Iusto sit esse tempore repellendus nemo, expedita vitae praesentium, voluptatibus. Illum error distinctio incidunt, magnam autem quisquam cum odio omnis culpa ipsum.\n",
 			},
