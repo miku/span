@@ -67,8 +67,6 @@ type Document struct {
 	Abstract         string   `xml:"Abstract"`
 	Descriptors      string   `xml:"Descriptors>Descriptor"`
 	Text             string   `xml:"Text"`
-	XGroup           string   `xml:"x-group"`
-	XIssue           string   `xml:"x-issue"`
 }
 
 var (
@@ -277,8 +275,6 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = SourceID
 	output.Subjects = doc.Headings()
 
-	// keep the date indicator, so we can create an update order
-	output.Indicator = doc.XIssue
 	output.RefType = DefaultRefType
 
 	return output, nil
