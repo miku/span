@@ -1,11 +1,11 @@
 {
-    "eBook": "Book, E-Book",
+    "eBook": "Article, E-Article",
     "ElectronicArticle": "Article, E-Article",
-    "ElectronicBookPart": "Book, E-Book",
-    "ElectronicJournal": "Journal, E-Journal",
-    "ElectronicProceeding": "Proceeding",
-    "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
-    "ElectronicSerial": "Journal, E-Journal",
-    "ElectronicThesis": "Thesis",
-    "Unknown": "Unknown Format"
+    "ElectronicBookPart": "Article, E-Article",
+    "ElectronicJournal": "Article, E-Article",
+    "ElectronicProceeding": "Article, E-Article",
+    "ElectronicResourceRemoteAccess": "Article, E-Article",
+    "ElectronicSerial": "Article, E-Article",
+    "ElectronicThesis": "Article, E-Article",
+    "Unknown": "Article, E-Article" 
 }
