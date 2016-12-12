@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -236,11 +237,6 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is.ISSN = p.PaperISSN()
 	is.EISSN = p.OnlineISSN()
 
-	if len(is.ISSN) == 0 && len(is.EISSN) == 0 {
-		// TODO(miku): sort out the various types
-		return is, span.Skip{Reason: "no ISSN"}
-	}
-
 	is.Abstract = p.Volume.Article.Articleinfo.Abstract
 
 	date, err := p.Date()
@@ -280,6 +276,10 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	is.RefType = DefaultRefType
+
+	if len(is.ISSN) == 0 && len(is.EISSN) == 0 {
+		log.Printf("warning: no ISSN: %s", is.ArticleTitle)
+	}
 
 	return is, nil
 }
