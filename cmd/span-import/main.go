@@ -7,6 +7,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"runtime"
@@ -123,10 +124,6 @@ func main() {
 		log.Fatal(errFormatUnsupported)
 	}
 
-	if flag.Arg(0) == "" {
-		log.Fatal("input file required")
-	}
-
 	queue := make(chan []span.Importer)
 	out := make(chan []byte)
 	done := make(chan bool)
@@ -152,10 +149,16 @@ func main() {
 		defer bw.Flush()
 	}
 
-	filename := flag.Arg(0)
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
+	var file io.Reader = os.Stdin
+
+	if flag.NArg() > 0 {
+		filename := flag.Arg(0)
+		f, err := os.Open(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		file = f
 	}
 
 	source, _ := formats[*inputFormat]
