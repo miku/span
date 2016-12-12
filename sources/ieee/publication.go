@@ -277,6 +277,9 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.RefType = DefaultRefType
 
+	// test addition fields
+	is.Packages = []string{p.Publicationinfo.Publicationtype, p.Publicationinfo.Publicationsubtype}
+
 	if len(is.ISSN) == 0 && len(is.EISSN) == 0 {
 		log.Printf("warning: no ISSN: %s", is.ArticleTitle)
 	}
