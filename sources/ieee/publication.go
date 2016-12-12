@@ -46,6 +46,7 @@ type Publication struct {
 		Isbn                  []struct {
 			Isbntype  string `xml:"isbntype,attr"`
 			Mediatype string `xml:"mediatype,attr"`
+			Value     string `xml:",chardata"`
 		} `xml:"isbn"`
 		BmsProductNumber struct {
 			MediaType string `xml:"mediatype,attr"`
@@ -183,6 +184,13 @@ func (p Publication) OnlineISSN() (issns []string) {
 	return
 }
 
+func (p Publication) ISBNList() (isbns []string) {
+	for _, isbn := range p.Publicationinfo.Isbn {
+		isbns = append(isbns, isbn.Value)
+	}
+	return
+}
+
 func (p Publication) Date() (time.Time, error) {
 	if len(p.Volume.Article.Articleinfo.Date) == 0 {
 		return time.Time{}, ErrNoDate
@@ -198,6 +206,9 @@ func (p Publication) Date() (time.Time, error) {
 		y = date.Year
 	}
 	if date.Month != "" {
+		if len(date.Month) > 3 {
+			date.Month = date.Month[:3]
+		}
 		if v, err := strconv.Atoi(date.Month); err != nil {
 			m = date.Month
 		} else {
@@ -217,7 +228,20 @@ func (p Publication) Date() (time.Time, error) {
 			}
 		}
 	}
-	return time.Parse("2006-Jan-02", fmt.Sprintf("%s-%s-%02s", y, m, d))
+
+	// try various patterns
+	patterns := []string{
+		"2006-Jan-02",
+		"2006-01-02",
+		"2006-1-02",
+	}
+
+	for _, p := range patterns {
+		if t, err := time.Parse(p, fmt.Sprintf("%s-%s-%02s", y, m, d)); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf(fmt.Sprintf("%s", p.Volume.Article.Articleinfo.Date))
 }
 
 func (p Publication) Authors() []finc.Author {
@@ -228,19 +252,37 @@ func (p Publication) Authors() []finc.Author {
 	return authors
 }
 
+func (p Publication) PageCount() string {
+	start, err := strconv.Atoi(p.Volume.Article.Articleinfo.Artpagenums.Startpage)
+	if err != nil {
+		return ""
+	}
+	end, err := strconv.Atoi(p.Volume.Article.Articleinfo.Artpagenums.Endpage)
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%d", end-start+1)
+}
+
 // ToIntermediateSchema does a type conversion only.
 func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is := finc.NewIntermediateSchema()
 	is.JournalTitle = p.Title
 	is.ArticleTitle = p.Volume.Article.Title
 
+	if strings.HasPrefix(is.ArticleTitle, "[") {
+		return is, span.Skip{Reason: fmt.Sprintf("extra content: %s", is.ArticleTitle)}
+	}
+
 	is.ISSN = p.PaperISSN()
 	is.EISSN = p.OnlineISSN()
+	is.ISBN = p.ISBNList()
 
 	is.Abstract = p.Volume.Article.Articleinfo.Abstract
 
 	date, err := p.Date()
 	if err != nil {
+		log.Printf("date problem: %s: %s", err, is.ArticleTitle)
 		return is, span.Skip{Reason: err.Error()}
 	}
 	is.Date = date
@@ -258,6 +300,7 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		is.URL = append(is.URL, fmt.Sprintf("http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=%s", p.Volume.Article.Articleinfo.Amsid))
 		is.RecordID = fmt.Sprintf("ai-89-%s", base64.RawURLEncoding.EncodeToString([]byte(p.Volume.Article.Articleinfo.Amsid)))
 	} else {
+		log.Printf("warning: no identifier: %s", is.ArticleTitle)
 		return is, ErrNoIdentifier
 	}
 	if p.Volume.Article.Articleinfo.Articledoi != "" {
@@ -267,18 +310,32 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.Volume = p.Volume.Volumeinfo.Volumenum
 	is.Issue = p.Volume.Article.Articleinfo.Issuenum
-	is.Pages = p.Volume.Article.Articleinfo.Numpages
+
+	is.StartPage = p.Volume.Article.Articleinfo.Artpagenums.Startpage
+	is.EndPage = p.Volume.Article.Articleinfo.Artpagenums.Endpage
+	is.Pages = fmt.Sprintf("%s-%s", is.StartPage, is.EndPage)
+	is.PageCount = p.PageCount()
+
 	is.Publishers = []string{"IEEE"}
 
 	is.Subjects = []string{}
 	for _, kw := range p.Volume.Article.Articleinfo.Keywordset.Keyword {
-		is.Subjects = append(is.Subjects, kw.Term)
+		term := strings.TrimSpace(kw.Term)
+		if term == "" {
+			continue
+		}
+		is.Subjects = append(is.Subjects, term)
 	}
 
 	is.RefType = DefaultRefType
 
 	// test addition fields
-	is.Packages = []string{p.Publicationinfo.Publicationtype, p.Publicationinfo.Publicationsubtype}
+	is.Packages = []string{
+		p.Publicationinfo.Publicationtype,
+		p.Publicationinfo.Publicationsubtype,
+	}
+
+	is.Packages = append(is.Packages, p.Publicationinfo.Packagemembers...)
 
 	if len(is.ISSN) == 0 && len(is.EISSN) == 0 {
 		log.Printf("warning: no ISSN: %s", is.ArticleTitle)

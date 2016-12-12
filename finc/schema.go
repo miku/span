@@ -102,7 +102,7 @@ type IntermediateSchema struct {
 	BookTitle    string   `json:"rft.btitle,omitempty"`
 	Chronology   string   `json:"rft.chron,omitempty"`
 	Edition      string   `json:"rft.edition,omitempty"`
-	EISBN        []string `json:"rft.isbn,omitempty"`
+	EISBN        []string `json:"rft.eisbn,omitempty"`
 	EISSN        []string `json:"rft.eissn,omitempty"`
 	EndPage      string   `json:"rft.epage,omitempty"`
 	Genre        string   `json:"rft.genre,omitempty"`
