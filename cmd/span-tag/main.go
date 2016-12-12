@@ -48,17 +48,22 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// read and parse config file
-	configfile, err := os.Open(*config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dec := json.NewDecoder(configfile)
-
+	// the configuration tree
 	var tagger filter.Tagger
-	if err := dec.Decode(&tagger); err != nil {
-		log.Fatal(err)
+
+	// test, if we are given JSON directly
+	err := json.Unmarshal([]byte(*config), &tagger)
+	if err != nil {
+		// read and parse config file
+		f, err := os.Open(*config)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+
+		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	var readers []io.Reader

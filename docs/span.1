@@ -6,7 +6,7 @@ span\-import, span\-tag, span\-check, span\-export \- intermediate schema tools
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] \fIfile\fP
 .PP
-\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\-file\fP] \fIfile\fP
+\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP] \fIfile\fP
 .PP
 \fB\fCspan\-check\fR [\fB\fC\-verbose\fR] \fIfile\fP
 .PP
@@ -26,8 +26,9 @@ Input format. \fB\fCspan\-import\fR only.
 \fB\fC\-o\fR \fIformat\fP
 Output format. \fB\fCspan\-export\fR only.
 .TP
-\fB\fC\-c\fR \fIconfig\-file\fP
-Path to configuration file. \fB\fCspan\-tag\fR only. See EXAMPLE for a CONFIGURATION FILE.
+\fB\fC\-c\fR \fIconfig\-string\fP or \fIconfig\-file\fP
+Configuration string or path to configuration file. \fB\fCspan\-tag\fR only. See
+EXAMPLE for a CONFIGURATION FILE.
 .TP
 \fB\fC\-list\fR
 List support formats. \fB\fCspan\-import\fR, \fB\fCspan\-export\fR only.
@@ -61,6 +62,10 @@ List supported format for conversion to intermediate schema:
 Convert DOAJ dump into intermediate schema:
 .IP
 \fB\fCspan\-import \-i doaj dump.ldj\fR
+.PP
+Apply licensing information from a string with streaming input.
+.IP
+\fB\fCcat intermediate.file | span\-tag \-c '{"DE\-15": {"any": {}}}'\fR
 .PP
 Apply licensing information from a configuration file to an intermediate schema file.
 .IP

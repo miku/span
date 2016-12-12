@@ -11,7 +11,7 @@ SYNOPSIS
 
 `span-import` [`-i` *input-format*] *file*
 
-`span-tag` [`-c` *config-file*] *file*
+`span-tag` [`-c` *config*] *file*
 
 `span-check` [`-verbose`] *file*
 
@@ -35,8 +35,9 @@ OPTIONS
 `-o` *format*
   Output format. `span-export` only.
 
-`-c` *config-file*
-  Path to configuration file. `span-tag` only. See EXAMPLE for a CONFIGURATION FILE.
+`-c` *config-string* or *config-file*
+  Configuration string or path to configuration file. `span-tag` only. See
+  EXAMPLE for a CONFIGURATION FILE.
 
 `-list`
   List support formats. `span-import`, `span-export` only.
@@ -72,6 +73,10 @@ List supported format for conversion to intermediate schema:
 Convert DOAJ dump into intermediate schema:
 
   `span-import -i doaj dump.ldj`
+
+Apply licensing information from a string with streaming input.
+
+  `cat intermediate.file | span-tag -c '{"DE-15": {"any": {}}}'`
 
 Apply licensing information from a configuration file to an intermediate schema file.
 
