@@ -149,7 +149,7 @@ type IntermediateSchema struct {
 
 	// OpenAccess, refs. #8986, prototype
 	OpenAccess bool     `json:"x.oa,omitempty"`
-	License    []string `json:"x.license"`
+	License    []string `json:"x.license,omitempty"`
 }
 
 func NewIntermediateSchema() *IntermediateSchema {
