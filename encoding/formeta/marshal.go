@@ -98,7 +98,36 @@ func marshal(w io.Writer, k string, v interface{}) error {
 	return nil
 }
 
-// Marshal serializes a value as metafacture formeta. Partial implementation.
+// Marshal serializes a value as metafacture formeta. Mostly complete, might missing some edge cases.
+// Example formeta snippets:
+//
+//     person-1 {
+//         Name: Grimm,
+//         Vorname: Wilhelm,
+//         Vorname: Carl
+//     }
+//     person-2 {
+//         Name: Grimm,
+//         Vorname: Jacob,
+//     }
+//     person-3 {
+//         surname: 'Jung',
+//         forename: 'Carl', forename: 'Gustav',
+//         affiliation {
+//             institution: 'Basel University',
+//             country: 'Switzerland',
+//         },
+//     }
+//     978-3-525-20764-2 {
+//         title: Kinder- und Hausmärchen,
+//         authoredById: person-1,
+//         authoredById: person-2,
+//         readById: person-3,
+//         publicationYear: 1986,
+//         publisher: Vandenhoeck und Ruprecht\: Göttingen,
+//         isbn: 978-3-525-20764-2
+//     }
+//
 func Marshal(v interface{}) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	if err := marshal(buf, "", v); err != nil {
