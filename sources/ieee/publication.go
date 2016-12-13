@@ -18,7 +18,7 @@ import (
 const (
 	SourceID       = "89"
 	Format         = "ElectronicArticle"
-	Collection     = "IEEE"
+	Collection     = "IEEE Xplore Library"
 	Genre          = "article"
 	DefaultRefType = "EJOUR"
 )
