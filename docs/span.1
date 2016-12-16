@@ -135,9 +135,17 @@ More complex example for a configuration file:
 .IP
 \fB\fCspan\-tag \-c config.json intermediate.file\fR
 .PP
-Export in a SOLR schema:
+List available export formats:
 .IP
-\fB\fCspan\-export \-o solr5vu3v11 intermediate.file\fR
+\fB\fCspan\-export \-list\fR
+.PP
+Export to a SOLR schema:
+.IP
+\fB\fCspan\-export \-o solr5vu3 intermediate.file\fR
+.PP
+Export to Metafacture formeta:
+.IP
+\fB\fCspan\-export \-o formeta intermediate.file\fR
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To
@@ -216,6 +224,6 @@ Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.
 Martin Czygan \[la]martin.czygan@uni-leipzig.de\[ra]
 .SH SEE ALSO
 .PP
-FINC \[la]https://finc.info\[ra], AMSL \[la]http://amsl.technology/\[ra], intermediate schema \[la]https://github.com/ubleipzig/intermediateschema\[ra], 
+FINC \[la]https://finc.info\[ra], AMSL \[la]http://amsl.technology/\[ra], intermediate schema \[la]https://github.com/ubleipzig/intermediateschema\[ra], metafacture \[la]https://github.com/culturegraph\[ra], 
 .BR jq (1), 
 .BR xmlstarlet (1)
