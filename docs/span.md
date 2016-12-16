@@ -142,9 +142,17 @@ More complex example for a configuration file:
 
   `span-tag -c config.json intermediate.file`
 
-Export in a SOLR schema:
+List available export formats:
 
-  `span-export -o solr5vu3v11 intermediate.file`
+  `span-export -list`
+
+Export to a SOLR schema:
+
+  `span-export -o solr5vu3 intermediate.file`
+
+Export to Metafacture formeta:
+
+  `span-export -o formeta intermediate.file`
 
 FILES
 -----
@@ -228,4 +236,4 @@ Martin Czygan <martin.czygan@uni-leipzig.de>
 SEE ALSO
 --------
 
-[FINC](https://finc.info), [AMSL](http://amsl.technology/), [intermediate schema](https://github.com/ubleipzig/intermediateschema), jq(1), xmlstarlet(1)
+[FINC](https://finc.info), [AMSL](http://amsl.technology/), [intermediate schema](https://github.com/ubleipzig/intermediateschema), [metafacture](https://github.com/culturegraph), jq(1), xmlstarlet(1)
