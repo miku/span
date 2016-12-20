@@ -538,6 +538,9 @@
   "FOGR": [
     "Technik"
   ],
+  "PRIN": [
+    "Technik"
+  ],
   "AWCH": [
     "Wirtschaftswissenschaften",
     "Fachzeitschriften"
@@ -1074,6 +1077,11 @@
     "Recht"
   ],
   "ZFP": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften",
+    "Psychologie"
+  ],
+  "GJHR": [
     "Wirtschaftswissenschaften",
     "Fachzeitschriften",
     "Psychologie"
