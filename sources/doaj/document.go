@@ -78,15 +78,31 @@ type Index struct {
 	ISSN           []string `json:"issn"`
 	Language       []string `json:"language"`
 	License        []string `json:"license"`
-	Publishers     []string `json:"publisher"`
+
+	// Record retrieved via Dump (https://gist.github.com/miku/8e6dc3a5d4e22222b16e2083086ca830)
+	// "publisher": "[u'National Veterinary Research Institute in Pulawy', u'De Gruyter Open']",
+	// > looks like __repr__ :)
+	//
+	// Not retrievable via API:
+	// 404: https://doaj.org/api/v1/articles/02ce7f2befb44ca6852d9e5d59b430a1
+	//
+	// Random positive API example:
+	// 200: https://doaj.org/api/v1/articles/00005468e7c44f729fdcd318971b7e4a
+	//
+	// Field was not used, anyhow.
+	// TODO(miku): remove later.
+	// Publishers     []string `json:"publisher"`
+
 	SchemaCode     []string `json:"schema_code"`
 	SchemaSubjects []string `json:"schema_subjects"`
 	Subjects       []string `json:"subject"`
 }
 
 type License struct {
-	Title string `json:"title"`
-	Type  string `json:"type"`
+	Title      string `json:"title"`
+	Type       string `json:"type"`
+	OpenAccess bool   `json:"open_access"`
+	URL        string `json:"url"`
 }
 
 type Journal struct {
