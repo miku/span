@@ -234,7 +234,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	// refs. #8709
 	if output.DOI != "" {
-		output.URL = append(output.URL, "http://doi.org/%s"+output.DOI)
+		output.URL = append(output.URL, "http://doi.org/"+output.DOI)
 	}
 
 	// refs. #8709
