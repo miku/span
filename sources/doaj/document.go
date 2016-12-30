@@ -232,8 +232,16 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = SourceID
 	output.Volume = doc.BibJson.Journal.Volume
 
-	for _, link := range doc.BibJson.Link {
-		output.URL = append(output.URL, link.URL)
+	// refs. #8709
+	if output.DOI != "" {
+		output.URL = append(output.URL, "http://doi.org/%s", output.DOI)
+	}
+
+	// refs. #8709
+	if len(output.URL) == 0 {
+		for _, link := range doc.BibJson.Link {
+			output.URL = append(output.URL, link.URL)
+		}
 	}
 
 	// refs. #6634
