@@ -25,13 +25,12 @@ var (
 func marshal(w io.Writer, k string, v interface{}) error {
 	switch reflect.TypeOf(v).Kind() {
 	case reflect.Struct:
-		// we want time.Time formatted, not the struct
-		switch t := v.(type) {
-		case time.Time:
-			if _, err := io.WriteString(w, fmt.Sprintf("%s: '%s', ", k, t.Format(time.RFC3339))); err != nil {
-				return err
-			}
-			return nil
+		// If v is a time.Time, it will be recognized as struct as well, but we
+		// really want the time formatted.
+		if t, ok := v.(time.Time); ok {
+			s := fmt.Sprintf("%s: '%s', ", k, t.Format(time.RFC3339))
+			_, err := io.WriteString(w, s)
+			return err
 		}
 
 		if _, err := io.WriteString(w, k+" { "); err != nil {
