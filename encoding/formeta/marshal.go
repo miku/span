@@ -14,13 +14,14 @@ import (
 )
 
 var (
+	// ErrValueNotAllowed signal formeta semantic mismatch.
 	ErrValueNotAllowed = errors.New("value not allowed")
 
 	escaper = strings.NewReplacer(`\`, `\\`, "\r\n", `\n`, "\n", `\n`, "'", `\'`)
 )
 
-// marshal encodes a value as formeta. Top level object should be a struct.
-// JSON tags are reused as keys, if defined.
+// marshal encodes a value as formeta and writes it to the given writer.
+// Toplevel object must be a struct. JSON tags are reused as keys, if defined.
 func marshal(w io.Writer, k string, v interface{}) error {
 	switch reflect.TypeOf(v).Kind() {
 	case reflect.Struct:
@@ -72,7 +73,7 @@ func marshal(w io.Writer, k string, v interface{}) error {
 			return nil
 		}
 		if k == "" {
-			// no toplevel key and a string
+			// No toplevel key present and value is a string.
 			return ErrValueNotAllowed
 		}
 		if _, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escaper.Replace(s))); err != nil {
