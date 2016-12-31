@@ -62,7 +62,8 @@
 //
 // ----
 //
-// TODO(miku): add a small cache to reuse holding file filters, used in multiple places.
+// TODO(miku): Add a small cache to reuse holding file filters, used in multiple places.
+// TODO(miku): Simplify some too long Unmarshaler, create filterutil if necessary.
 //
 // Faster evaluation? http://theory.stanford.edu/~sergei/papers/sigmod10-index.pdf
 
