@@ -17,7 +17,7 @@
 //
 // On the command line:
 //
-//     $ span-tag -c <(echo '{"DE-X": {"any": {}}}') in.ldj > out.ldj
+//     $ span-tag -c '{"DE-X": {"any": {}}}' in.ldj > out.ldj
 //
 // Another, more complex example:
 //
