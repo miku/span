@@ -3,12 +3,13 @@
     "ElectronicArticle": "Article, E-Article",
     "ElectronicBookPart": "Book, E-Book",
     "ElectronicJournal": "Journal, E-Journal",
+    "ElectronicMusicalScore": "Musical Score",
     "ElectronicProceeding": "Proceeding",
     "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
     "ElectronicSerial": "Journal, E-Journal",
     "ElectronicThesis": "Thesis",
-    "Unknown": "Unknown Format",
-    "Monograph": "Book, E-Book",
     "Image": "Image",
+    "Monograph": "Book, E-Book",
+    "Unknown": "Unknown Format",
     "Volume": "Book, E-Book"
 }
