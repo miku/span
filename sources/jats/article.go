@@ -431,7 +431,7 @@ func (article *Article) Date() (t time.Time) {
 	default:
 		var index int
 		for i, pd := range article.Front.Article.PubDates {
-			if pd.Type == "epub" {
+			if pd.Type == "ppub" {
 				index = i
 			}
 		}
