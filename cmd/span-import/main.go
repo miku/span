@@ -15,6 +15,8 @@ import (
 	"sort"
 	"sync"
 
+	msgpack "gopkg.in/vmihailenco/msgpack.v2"
+
 	"github.com/miku/span"
 	"github.com/miku/span/sources/crossref"
 	"github.com/miku/span/sources/doaj"
@@ -25,6 +27,13 @@ import (
 	"github.com/miku/span/sources/jats/jstor"
 	"github.com/miku/span/sources/oai"
 	"github.com/miku/span/sources/thieme"
+)
+
+type format int
+
+const (
+	formatJSON = iota
+	formatMsgPack
 )
 
 var (
@@ -49,6 +58,7 @@ var formats = map[string]span.Source{
 }
 
 type options struct {
+	format  format
 	verbose bool
 }
 
@@ -68,9 +78,15 @@ func worker(queue chan []span.Importer, out chan []byte, opts options, wg *sync.
 					log.Fatalf("doc.ToIntermediateSchema: %v, %v", err, output)
 				}
 			}
-			b, err := json.Marshal(output)
+			var b []byte
+			switch opts.format {
+			case formatMsgPack:
+				b, err = msgpack.Marshal(output)
+			default:
+				b, err = json.Marshal(output)
+			}
 			if err != nil {
-				log.Fatalf("json.Marshal: %v, %v", err, output)
+				log.Fatalf("marshal failed: %v, %v", err, output)
 			}
 			out <- b
 		}
@@ -85,6 +101,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 	verbose := flag.Bool("verbose", false, "more output")
+	serialization := flag.String("s", "json", "serialization format (json, msgpack)")
 
 	flag.Parse()
 
@@ -132,6 +149,13 @@ func main() {
 
 	var wg sync.WaitGroup
 	opts := options{verbose: *verbose}
+
+	switch *serialization {
+	case "msgp":
+		opts.format = formatMsgPack
+	default:
+		opts.format = formatJSON
+	}
 
 	for i := 0; i < *numWorkers; i++ {
 		wg.Add(1)
