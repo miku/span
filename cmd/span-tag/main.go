@@ -2,7 +2,7 @@
 // filters for various tags and runs all filters on every record of the input
 // to produce a stream of tagged records.
 //
-// $ span-tag -c <(echo '{"DE-15": {"any": {}}}') input.ldj [input.ldj, ...] > output.ldj
+// $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
 package main
 
 import (
