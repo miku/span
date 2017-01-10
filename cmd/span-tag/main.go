@@ -1,4 +1,4 @@
-// span-tag takes an intermediate schema file and a configuration tree of
+// span-tag takes an intermediate schema file and a configuration forest of
 // filters for various tags and runs all filters on every record of the input
 // to produce a stream of tagged records.
 //
