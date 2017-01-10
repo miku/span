@@ -32,7 +32,7 @@ var (
 	errFormatUnsupported = errors.New("input format not supported")
 )
 
-var logger *log.Logger = log.New(os.Stderr, "", log.LstdFlags)
+var logger = log.New(os.Stderr, "", log.LstdFlags)
 
 // Available input formats and their source type.
 var formats = map[string]span.Source{
