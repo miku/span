@@ -1,7 +1,7 @@
 default fileName = in;
 
 fileName|
-open-file|
+open-gzip|
 as-lines|
 decode-formeta|
 encode-json(prettyprinting="true")|
