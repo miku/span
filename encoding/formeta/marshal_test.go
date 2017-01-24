@@ -1,8 +1,11 @@
 package formeta
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
+
+	"github.com/miku/span/finc"
 )
 
 func TestEncoding(t *testing.T) {
@@ -80,5 +83,33 @@ func TestNested(t *testing.T) {
 	}
 	if string(b) != want {
 		t.Errorf("Marshal got %v, want %v", string(b), want)
+	}
+}
+
+func TestDanglingCR(t *testing.T) {
+	var cases = []struct {
+		in  string
+		out string
+		err error
+	}{
+		{
+			in:  `{"finc.format":"ElectronicArticle","finc.mega_collection":"Japanese Society for Horticultural Science (CrossRef)","finc.record_id":"ai-49-aHR0cDovL2R4LmRvaS5vcmcvMTAuMjUwMy9ocmouMy4zMjk","finc.source_id":"49","ris.type":"EJOUR","rft.atitle":"多様な生息地から採取したギョウジャニンニク系統の萌芽期の早晩性およびRAPD分析による分類\r Variations on Sprouting Time and Classification by RAPD Analysis of Allium victorialis L. Clones Collected from Diverse Habitats","rft.epage":"332","rft.genre":"article","rft.issn":["1347-2658","1880-3571"],"rft.issue":"4","rft.jtitle":"Horticultural Research (Japan)","rft.tpages":"4","rft.pages":"329-332","rft.pub":["Japanese Society for Horticultural Science"],"rft.date":"2004-01-01","x.date":"2004-01-01T00:00:00Z","rft.spage":"329","rft.volume":"3","authors":[{"rft.aulast":"Inatomi","rft.aufirst":"Yoshihiro"},{"rft.aulast":"Murata","rft.aufirst":"Naho"},{"rft.aulast":"Nakano","rft.aufirst":"Hideki"},{"rft.aulast":"Tamura","rft.aufirst":"Haruto"},{"rft.aulast":"Suzuki","rft.aufirst":"Takashi"},{"rft.aulast":"Oosawa","rft.aufirst":"Katsuji"}],"doi":"10.2503/hrj.3.329","languages":["eng"],"url":["http://dx.doi.org/10.2503/hrj.3.329"],"version":"0.9","x.type":"journal-article"}`,
+			out: `{ finc.format: 'ElectronicArticle', finc.mega_collection: 'Japanese Society for Horticultural Science (CrossRef)', finc.record_id: 'ai-49-aHR0cDovL2R4LmRvaS5vcmcvMTAuMjUwMy9ocmouMy4zMjk', finc.source_id: '49', ris.type: 'EJOUR', rft.atitle: '多様な生息地から採取したギョウジャニンニク系統の萌芽期の早晩性およびRAPD分析による分類  Variations on Sprouting Time and Classification by RAPD Analysis of Allium victorialis L. Clones Collected from Diverse Habitats', rft.epage: '332', rft.genre: 'article', rft.issn: '1347-2658', rft.issn: '1880-3571', rft.issue: '4', rft.jtitle: 'Horticultural Research (Japan)', rft.tpages: '4', rft.pages: '329-332', rft.pub: 'Japanese Society for Horticultural Science', rft.date: '2004-01-01', x.date: '2004-01-01T00:00:00Z', rft.spage: '329', rft.volume: '3', authors { rft.aulast: 'Inatomi', rft.aufirst: 'Yoshihiro',  } authors { rft.aulast: 'Murata', rft.aufirst: 'Naho',  } authors { rft.aulast: 'Nakano', rft.aufirst: 'Hideki',  } authors { rft.aulast: 'Tamura', rft.aufirst: 'Haruto',  } authors { rft.aulast: 'Suzuki', rft.aufirst: 'Takashi',  } authors { rft.aulast: 'Oosawa', rft.aufirst: 'Katsuji',  } doi: '10.2503/hrj.3.329', languages: 'eng', url: 'http://dx.doi.org/10.2503/hrj.3.329', version: '0.9', x.type: 'journal-article', x.oa: 'false',  }`,
+			err: nil,
+		},
+	}
+
+	for _, c := range cases {
+		var v finc.IntermediateSchema
+		if err := json.Unmarshal([]byte(c.in), &v); err != nil {
+			t.Errorf(err.Error())
+		}
+		b, err := Marshal(v)
+		if err != c.err {
+			t.Errorf("got error %v, want %v", err, c.err)
+		}
+		if string(b) != c.out {
+			t.Errorf("got %v, want %v", string(b), c.out)
+		}
 	}
 }

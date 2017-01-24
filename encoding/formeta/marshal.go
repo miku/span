@@ -17,7 +17,7 @@ var (
 	// ErrValueNotAllowed signal formeta semantic mismatch.
 	ErrValueNotAllowed = errors.New("value not allowed")
 
-	escaper = strings.NewReplacer(`\`, `\\`, "\r\n", `\n`, "\n", `\n`, "'", `\'`)
+	escaper = strings.NewReplacer(`\`, `\\`, "\r\n", `\n`, "\n", `\n`, "'", `\'`, "\r", " ")
 )
 
 // marshal encodes a value as formeta and writes it to the given writer.
