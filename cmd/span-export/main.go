@@ -13,6 +13,8 @@ import (
 	"sort"
 	"strings"
 
+	"bytes"
+
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/finc"
@@ -88,6 +90,9 @@ func main() {
 	for _, r := range readers {
 		// business logic
 		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
+			if len(bytes.TrimSpace(b)) == 0 {
+				return nil, nil
+			}
 			is := finc.IntermediateSchema{}
 
 			// TODO(miku): Unmarshal date correctly.
