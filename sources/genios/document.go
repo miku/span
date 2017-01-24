@@ -50,6 +50,9 @@ const (
 	DefaultRefType = "EJOUR"
 	// If no abstract is found accept this number of chars from doc.Text as Abstract.
 	textAsAbstractCutoff = 2000
+	// maxAuthorLength example: document/BOND__b0604160052
+	maxAuthorLength = 200
+	maxTitleLength  = 4096
 )
 
 // Document represents a Genios document.
@@ -147,7 +150,7 @@ func (doc Document) Authors() (authors []finc.Author) {
 				continue
 			}
 			name := strings.TrimSpace(f)
-			if len(name) < 32766 {
+			if len(name) < maxAuthorLength {
 				authors = append(authors, finc.Author{Name: name})
 			}
 		}
@@ -224,7 +227,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
-	if len(output.ArticleTitle) > 16384 {
+	if len(output.ArticleTitle) > maxTitleLength {
 		return output, span.Skip{Reason: fmt.Sprintf("article title too long: %d", len(output.ArticleTitle))}
 	}
 	output.JournalTitle = strings.Replace(strings.TrimSpace(doc.PublicationTitle), "\n", " ", -1)
