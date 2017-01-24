@@ -38,18 +38,21 @@ import (
 )
 
 const (
+	// SourceID for internal bookkeeping.
 	SourceID = "48"
-
+	// Format is mapped per site later.
 	Format = "ElectronicArticle"
 	// Collection is the base name of the collection.
 	Collection = "Genios"
-	Genre      = "article"
-	// Default ris.type
+	// Genre default.
+	Genre = "article"
+	// DefaultRefType is the default ris.type.
 	DefaultRefType = "EJOUR"
 	// If no abstract is found accept this number of chars from doc.Text as Abstract.
 	textAsAbstractCutoff = 2000
 )
 
+// Document represents a Genios document.
 type Document struct {
 	ID               string   `xml:"ID,attr"`
 	DB               string   `xml:"DB,attr"`
@@ -77,6 +80,7 @@ var (
 	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
 )
 
+// Genios data source.
 type Genios struct{}
 
 // Iterate emits Converter elements via XML decoding.
