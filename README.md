@@ -13,12 +13,13 @@ Formats
 * [CrossRef API](http://api.crossref.org/), works and members
 * JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html), with various flavours for JSTOR and others
 * [DOAJ](http://doaj.org/) exports
-* FINC [Intermediate Format](https://github.com/miku/span/blob/master/schema/README.md)
-* Various FINC [SOLR Schema](https://github.com/miku/span/blob/ca8583aaa9b6d5e42b758f25ade8ed3e85532841/finc/solr.go#L4)
+* FINC [Intermediate Format](https://github.com/ubleipzig/intermediateschema)
+* Various FINC [SOLR Schema](https://github.com/finc/index/blob/master/schema.xml)
 * GENIOS Profile XML
 * Elsevier Transport
 * Thieme TM Style
 * [Formeta](https://github.com/culturegraph)
+* IEEE IDAMS Exchange V2.0.0
 
 Also:
 
