@@ -1,6 +1,9 @@
 {
+    "Article": "Article, E-Article",
+    "Book": "Book, E-Book",
     "eBook": "Book, E-Book",
     "ElectronicArticle": "Article, E-Article",
+    "ElectronicBook": "Book, E-Book",
     "ElectronicBookPart": "Book, E-Book",
     "ElectronicJournal": "Journal, E-Journal",
     "ElectronicMusicalScore": "Musical Score",
@@ -10,6 +13,7 @@
     "ElectronicThesis": "Thesis",
     "Image": "Image",
     "Monograph": "Book, E-Book",
+    "Thesis": "Thesis",
     "Unknown": "Unknown Format",
     "Volume": "Book, E-Book"
 }
