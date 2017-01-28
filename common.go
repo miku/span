@@ -48,6 +48,7 @@ const (
 	KeyLengthLimit = 250
 )
 
+// ISSNPattern is a regular expression matching standard ISSN.
 var ISSNPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9X]`)
 
 // Skip marks records to skip.
@@ -234,7 +235,7 @@ func UnescapeTrim(s string) string {
 	return strings.TrimSpace(html.UnescapeString(s))
 }
 
-// ByteSink is a fan in writer for a byte channel.
+// ByteSink is a fan in writer for a []byte channel.
 // A newline is appended after each object.
 func ByteSink(w io.Writer, out chan []byte, done chan bool) {
 	f := bufio.NewWriter(w)
