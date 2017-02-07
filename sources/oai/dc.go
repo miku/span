@@ -123,13 +123,6 @@ func (r *Record) Links() []string {
 func (r *Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	date, err := r.Date()
-	if err != nil {
-		return output, nil
-	}
-
-	output.Date = date
-	output.RawDate = output.Date.Format("2006-01-02")
 	output.Abstract = strings.TrimSpace(r.Description())
 	output.ArticleTitle = r.Title()
 	output.Publishers = r.Metadata.Dc.Publisher
@@ -141,6 +134,14 @@ func (r *Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.DOI = r.DOI()
 
 	output.Series = strings.Join(r.Metadata.Dc.Source, ", ")
+
+	date, err := r.Date()
+	if err != nil {
+		return output, nil
+	}
+
+	output.Date = date
+	output.RawDate = output.Date.Format("2006-01-02")
 
 	return output, nil
 }
