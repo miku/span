@@ -27,7 +27,7 @@ func (e *ErrorList) Add(err error) {
 	e.errors = append(e.errors, err)
 }
 
-func (e ErrorList) Error() string {
+func (e *ErrorList) Error() string {
 	var errs []string
 	for _, err := range e.errors {
 		errs = append(errs, err.Error())
@@ -53,25 +53,28 @@ func NewReader(r io.Reader) (holdings.File, error) {
 	}
 
 	var file holdings.File
-	var errors ErrorList
+	var errors = new(ErrorList)
 
 	if len(b) == 0 {
 		log.Printf("warning: file with 0 entries")
 		return kbart.NewReader(bytes.NewReader(b)), nil
 	}
 
-	// probe kbart
+	// Probe KBART.
 	file = kbart.NewReader(bytes.NewReader(b))
-	if entries, err := file.ReadEntries(); err != nil {
-		errors.Add(fmt.Errorf("kbart: %s", err))
+	entries, err := file.ReadEntries()
+	if err != nil {
+		return kbart.NewReader(bytes.NewReader([]byte{})), nil
+	}
+	if len(entries) > 0 {
+		log.Printf("holdings: kbart detected (%d)", len(entries))
+		return kbart.NewReader(bytes.NewReader(b)), nil
 	} else {
-		if len(entries) > 0 {
-			log.Printf("holdings: kbart detected (%d)", len(entries))
-			return kbart.NewReader(bytes.NewReader(b)), nil
-		}
+		// TODO: this will catch all other formats, so no more format guessing
+		return kbart.NewReader(bytes.NewReader([]byte{})), nil
 	}
 
-	// probe ovid
+	// Probe OVID.
 	file = ovid.NewReader(bytes.NewReader(b))
 	if entries, err := file.ReadEntries(); err != nil {
 		errors.Add(fmt.Errorf("ovid: %s", err))
@@ -82,7 +85,7 @@ func NewReader(r io.Reader) (holdings.File, error) {
 		}
 	}
 
-	// probe google
+	// Probe Google.
 	file = google.NewReader(bytes.NewReader(b))
 	if entries, err := file.ReadEntries(); err != nil {
 		errors.Add(fmt.Errorf("google: %s", err))

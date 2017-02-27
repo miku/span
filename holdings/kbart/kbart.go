@@ -136,6 +136,7 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 		}
 
 		switch err {
+		case nil: // pass
 		case ErrMissingIdentifiers:
 			if r.SkipMissingIdentifiers {
 				log.Println("skipping line with missing identifiers")
@@ -157,6 +158,8 @@ func (r *Reader) ReadEntries() (holdings.Entries, error) {
 			} else {
 				return entries, err
 			}
+		default:
+			return entries, err
 		}
 
 		pi := strings.TrimSpace(cols.PrintIdentifier)
