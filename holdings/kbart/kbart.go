@@ -124,7 +124,7 @@ func NewReader(r io.Reader) *Reader {
 	}
 }
 
-// ReadAll loads entries from a reader.
+// ReadEntries returns a list of entries.
 func (r *Reader) ReadEntries() (holdings.Entries, error) {
 	entries := make(holdings.Entries)
 
