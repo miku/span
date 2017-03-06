@@ -213,6 +213,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	for _, v := range s.ISSN.Values {
 		f.values.Add(v)
 	}
+	log.Printf("loaded %d ISSN from list", f.values.Size())
 	return nil
 }
 
