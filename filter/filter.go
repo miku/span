@@ -70,9 +70,7 @@
 package filter
 
 import (
-	"archive/zip"
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -88,108 +86,6 @@ import (
 	"github.com/miku/span/holdings"
 	"github.com/miku/span/holdings/generic"
 )
-
-// LinkReader turns a URL into an io.Reader. If URL content is in ZIP format, the
-// content of all files inside the ZIP file are concatenated.
-// TODO(miku): Split up.
-type LinkReader struct {
-	Link    string
-	started bool
-	buf     bytes.Buffer
-}
-
-// fill internal buffer.
-func (r *LinkReader) fill() error {
-	filename, err := r.fetch()
-	if err != nil {
-		return err
-	}
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	if _, err := io.Copy(&r.buf, file); err != nil {
-		return err
-	}
-	return nil
-}
-
-// fetch returns downloaded and optionally extracted filename.
-// TODO(miku): does not need LinkReader that much.
-func (r *LinkReader) fetch() (string, error) {
-	file, err := ioutil.TempFile("", "span-")
-	if err != nil {
-		return "", err
-	}
-
-	log.Printf("fetching: %s", r.Link)
-
-	// TODO(miku): Use more resilient client.
-	resp, err := http.Get(r.Link)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	// Store content temporarily.
-	if _, err = io.Copy(file, resp.Body); err != nil {
-		return "", err
-	}
-	if err := file.Close(); err != nil {
-		return "", err
-	}
-
-	// If file is zipped, the content will be written into ztmp.
-	ztmp, err := ioutil.TempFile("", "span-")
-	if err != nil {
-		return "", err
-	}
-	defer ztmp.Close()
-
-	// Assume zip file, extract all members into a single file, ztmp. Return name of
-	// temporary file containing all zipfile contents.
-	filename, err := func() (string, error) {
-		rr, err := zip.OpenReader(file.Name())
-		if err != nil {
-			return "", err
-		}
-		defer rr.Close()
-
-		for _, f := range rr.File {
-			rc, err := f.Open()
-			if err != nil {
-				return "", err
-			}
-			if _, err = io.Copy(ztmp, rc); err != nil {
-				return "", err
-			}
-			rc.Close()
-		}
-		if err := ztmp.Close(); err != nil {
-			return "", err
-		}
-		return ztmp.Name(), nil
-	}()
-
-	// It actually was a zipfile.
-	if err == nil {
-		return filename, nil
-	}
-
-	// If zip fails, use the downloaded file directly.
-	return file.Name(), nil
-}
-
-func (r *LinkReader) Read(p []byte) (int, error) {
-	if !r.started {
-		if err := r.fill(); err != nil {
-			return 0, err
-		}
-		r.started = true
-	}
-	return r.buf.Read(p)
-}
 
 // Filter returns go or no for a given record.
 type Filter interface {
@@ -498,7 +394,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	defer os.Remove(concatenated.Name()) // clean up
 
 	for _, link := range s.Holdings.Links {
-		if _, err := io.Copy(concatenated, &LinkReader{Link: link}); err != nil {
+		if _, err := io.Copy(concatenated, &span.ZipOrPlainLinkReader{Link: link}); err != nil {
 			return err
 		}
 	}
