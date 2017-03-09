@@ -79,24 +79,20 @@ type ZipContentReader struct {
 func (r *ZipContentReader) fill() (err error) {
 	r.once.Do(func() {
 		var rc *zip.ReadCloser
-		rc, err = zip.OpenReader(r.Filename)
-		if err != nil {
+		if rc, err = zip.OpenReader(r.Filename); err != nil {
 			return
 		}
 		defer rc.Close()
 
 		for _, f := range rc.File {
 			var frc io.ReadCloser
-			frc, err = f.Open()
-			if err != nil {
+			if frc, err = f.Open(); err != nil {
 				return
 			}
 			if _, err = io.Copy(&r.buf, frc); err != nil {
 				return
 			}
-			if err = frc.Close(); err != nil {
-				return
-			}
+			err = frc.Close()
 		}
 	})
 	return
