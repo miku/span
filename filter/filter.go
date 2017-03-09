@@ -157,6 +157,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		if err != nil {
 			return err
 		}
+		defer slink.Remove()
 		s.ISSN.File = filename
 	}
 
