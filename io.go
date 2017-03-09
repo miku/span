@@ -175,6 +175,24 @@ func (r *ZipOrPlainLinkReader) Read(p []byte) (int, error) {
 	return r.buf.Read(p)
 }
 
+// ZipOrPlainLinkMultiReader reads uncompressed or zipped content from multiple URLs.
+type ZipOrPlainLinkMultiReader struct {
+	Links []string
+	r     io.Reader
+}
+
+// Read reads content from all links.
+func (r *ZipOrPlainLinkMultiReader) Read(p []byte) (int, error) {
+	if r.r == nil {
+		var readers []io.Reader
+		for _, link := range r.Links {
+			readers = append(readers, &ZipOrPlainLinkReader{Link: link})
+		}
+		r.r = io.MultiReader(readers...)
+	}
+	return r.r.Read(p)
+}
+
 // ReadLines returns a list of trimmed lines in a file. Empty lines are skipped.
 func ReadLines(filename string) (lines []string, err error) {
 	file, err := os.Open(filename)
