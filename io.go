@@ -20,8 +20,8 @@ type LinkReader struct {
 	once sync.Once
 }
 
-// fetch fills copies the content of the URL into the internal buffer.
-func (r *LinkReader) fetch() (err error) {
+// fill copies the content of the URL into the internal buffer.
+func (r *LinkReader) fill() (err error) {
 	r.once.Do(func() {
 		var resp *http.Response
 		resp, err = http.Get(r.Link)
@@ -35,7 +35,7 @@ func (r *LinkReader) fetch() (err error) {
 }
 
 func (r *LinkReader) Read(p []byte) (int, error) {
-	if err := r.fetch(); err != nil {
+	if err := r.fill(); err != nil {
 		return 0, err
 	}
 	return r.buf.Read(p)
