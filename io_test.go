@@ -49,12 +49,21 @@ func TestSavedLink(t *testing.T) {
 
 func TestFileReader(t *testing.T) {
 	var buf bytes.Buffer
-	n, err := io.Copy(&buf, &FileReader{Filename: "io.go"})
+	testfile := "io.go"
+	n, err := io.Copy(&buf, &FileReader{Filename: testfile})
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	if n != 3483 {
-		t.Errorf("FileReader: got %v, want 3483", n)
+	f, err := os.File(testfile)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	fi, err := f.Stat()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if n != fi.Size() {
+		t.Errorf("FileReader: got %v, want %v", n, fi.Size())
 	}
 }
 
