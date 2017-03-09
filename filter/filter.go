@@ -370,6 +370,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		return fmt.Errorf("holdings filter: either file or urls must be given")
 	}
 
+	// TODO(miku): holdings should work with readers, so we could skip exposing temporary files.
 	file, err := generic.New(filename)
 	if err != nil {
 		return err
