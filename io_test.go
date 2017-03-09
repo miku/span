@@ -54,7 +54,7 @@ func TestFileReader(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	f, err := os.File(testfile)
+	f, err := os.Open(testfile)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
