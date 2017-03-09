@@ -47,7 +47,7 @@ type SavedLink struct {
 	f    *os.File
 }
 
-// Save link to a temporary file.
+// Save link to a temporary file, return the filename.
 func (s *SavedLink) Save() (filename string, err error) {
 	r := &LinkReader{Link: s.Link}
 	s.f, err = ioutil.TempFile("", "span-")
@@ -75,6 +75,7 @@ type ZipContentReader struct {
 	once     sync.Once
 }
 
+// fill populates the internal buffer with the content of all archive members.
 func (r *ZipContentReader) fill() (err error) {
 	r.once.Do(func() {
 		var rc *zip.ReadCloser
@@ -101,6 +102,7 @@ func (r *ZipContentReader) fill() (err error) {
 	return
 }
 
+// Read returns the content of all archive members.
 func (r *ZipContentReader) Read(p []byte) (int, error) {
 	if err := r.fill(); err != nil {
 		return 0, err
@@ -108,7 +110,8 @@ func (r *ZipContentReader) Read(p []byte) (int, error) {
 	return r.buf.Read(p)
 }
 
-// FileReader creates a ReadCloser from a filename.
+// FileReader creates a ReadCloser from a filename. If postpones error handling up
+// until the first read.
 type FileReader struct {
 	Filename string
 	f        *os.File
@@ -168,6 +171,7 @@ func (r *ZipOrPlainLinkReader) fill() (err error) {
 	return err
 }
 
+// Read implements the reader interface.
 func (r *ZipOrPlainLinkReader) Read(p []byte) (int, error) {
 	if err := r.fill(); err != nil {
 		return 0, err
