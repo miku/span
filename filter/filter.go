@@ -70,7 +70,6 @@
 package filter
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -162,34 +161,18 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	}
 
 	if s.ISSN.File != "" {
-		file, err := os.Open(s.ISSN.File)
+		lines, err := span.ReadLines(s.ISSN.File)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		reader := bufio.NewReader(file)
-		for {
-			line, err := reader.ReadString('\n')
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return err
-			}
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-
-			// valid ISSN can contain x, normalize to uppercase
+		for _, line := range lines {
+			// Valid ISSN can contain x, normalize to uppercase.
 			line = strings.ToUpper(line)
-
-			// sniff ISSNs
+			// Sniff ISSNs.
 			issns := container.NewStringSet()
 			for _, s := range span.ISSNPattern.FindAllString(line, -1) {
 				issns.Add(s)
 			}
-
 			if issns.Size() == 0 {
 				log.Printf("warning: no ISSNs found on line: %s", line)
 			}
@@ -198,10 +181,11 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			}
 		}
 	}
+	// Add any ISSN given as string in configuration.
 	for _, v := range s.ISSN.Values {
 		f.values.Add(v)
 	}
-	log.Printf("loaded %d ISSN from list", f.values.Size())
+	log.Printf("found %d ISSN in %s", f.values.Size(), s.ISSN.File)
 	return nil
 }
 
@@ -286,36 +270,20 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	var values []string
+
 	if s.DOI.File != "" {
-
-		log.Println(s.DOI.File)
-
-		file, err := os.Open(s.DOI.File)
+		lines, err := span.ReadLines(s.DOI.File)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		reader := bufio.NewReader(file)
-		for {
-			line, err := reader.ReadString('\n')
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return err
-			}
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-			values = append(values, line)
+		for _, line := range lines {
+			f.values = append(f.values, line)
 		}
 	}
+
 	for _, v := range s.DOI.Values {
-		values = append(values, v)
+		f.values = append(f.values, v)
 	}
-	f.values = values
 	return nil
 }
 
