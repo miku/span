@@ -2,12 +2,14 @@ package span
 
 import (
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -171,4 +173,29 @@ func (r *ZipOrPlainLinkReader) Read(p []byte) (int, error) {
 		return 0, err
 	}
 	return r.buf.Read(p)
+}
+
+// ReadLines returns a list of trimmed lines in a file. Empty lines are skipped.
+func ReadLines(filename string) (lines []string, err error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	reader := bufio.NewReader(file)
+	for {
+		line, err := reader.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		lines = append(lines, line)
+	}
+	return
 }
