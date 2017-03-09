@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/base64"
 	"io"
+	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -76,5 +78,29 @@ func TestZipContentReader(t *testing.T) {
 	want, got := "a\nb\n", buf.String()
 	if want != got {
 		t.Errorf("ZipContentReader: got %v, want %v", got, want)
+	}
+}
+
+func TestSavedReaders(t *testing.T) {
+	sr := SavedReaders{Readers: []io.Reader{
+		strings.NewReader("Hello"),
+		strings.NewReader("World"),
+	}}
+	fn, err := sr.Save()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	b, err := ioutil.ReadFile(fn)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	if string(b) != "HelloWorld" {
+		t.Errorf("SavedReaders: got %v, want HelloWorld", string(b))
+	}
+	if err := sr.Remove(); err != nil {
+		t.Errorf(err.Error())
+	}
+	if _, err := os.Stat(fn); err == nil {
+		t.Errorf("SavedReaders: file exists, but should be deleted: %v", fn)
 	}
 }

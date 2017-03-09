@@ -193,6 +193,34 @@ func (r *ZipOrPlainLinkMultiReader) Read(p []byte) (int, error) {
 	return r.r.Read(p)
 }
 
+// SavedReaders takes a list of readers and persists their content in temporary file.
+type SavedReaders struct {
+	Readers []io.Reader
+	f       *os.File
+}
+
+// Save saves all readers to a temporary file and returns the filename.
+func (r *SavedReaders) Save() (filename string, err error) {
+	r.f, err = ioutil.TempFile("", "span-")
+	if err != nil {
+		return
+	}
+	if _, err = io.Copy(r.f, io.MultiReader(r.Readers...)); err != nil {
+		return
+	}
+	if err = r.f.Close(); err != nil {
+		return
+	}
+	filename = r.f.Name()
+	return
+}
+
+// Remove remove any left over temporary file.
+func (r *SavedReaders) Remove() error {
+	_ = os.Remove(r.f.Name())
+	return nil
+}
+
 // ReadLines returns a list of trimmed lines in a file. Empty lines are skipped.
 func ReadLines(filename string) (lines []string, err error) {
 	file, err := os.Open(filename)
