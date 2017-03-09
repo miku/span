@@ -73,9 +73,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/miku/span"
@@ -346,21 +344,17 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 
 	f.Verbose = s.Holdings.Verbose
 
-	// concatenated downloaded and possible extracted links
-	concatenated, err := ioutil.TempFile("", "span-")
-	defer os.Remove(concatenated.Name()) // clean up
+	sr := span.SavedReaders{Readers: []io.Reader{
+		&span.ZipOrPlainLinkMultiReader{
+			Links: s.Holdings.Links,
+		},
+	}}
 
-	for _, link := range s.Holdings.Links {
-		if _, err := io.Copy(concatenated, &span.ZipOrPlainLinkReader{Link: link}); err != nil {
-			return err
-		}
-	}
-
-	if err := concatenated.Close(); err != nil {
+	filename, err := sr.Save()
+	if err != nil {
 		return err
 	}
-
-	filename := concatenated.Name()
+	defer sr.Remove()
 
 	if s.Holdings.Filename != "" {
 		filename = s.Holdings.Filename
