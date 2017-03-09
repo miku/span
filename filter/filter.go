@@ -76,7 +76,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
@@ -153,23 +152,12 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	f.values = *container.NewStringSet()
 
 	if s.ISSN.Link != "" {
-		f, err := ioutil.TempFile("", "span-")
+		slink := span.SavedLink{Link: s.ISSN.Link}
+		filename, err := slink.Save()
 		if err != nil {
 			return err
 		}
-		log.Printf("ISSNFilter: fetching: %s", s.ISSN.Link)
-		resp, err := http.Get(s.ISSN.Link)
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-		if _, err := io.Copy(f, resp.Body); err != nil {
-			return err
-		}
-		if err := f.Close(); err != nil {
-			return err
-		}
-		s.ISSN.File = f.Name()
+		s.ISSN.File = filename
 	}
 
 	if s.ISSN.File != "" {
