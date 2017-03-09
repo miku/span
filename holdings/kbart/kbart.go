@@ -54,9 +54,8 @@ type columns struct {
 	InterlibraryTransmission string
 	InterlibraryComment      string
 	Publisher                string
-	// Anchor might contain ISSNs, too
-	Anchor string
-	ZDBID  string
+	Anchor                   string // Anchor might contain ISSNs, too.
+	ZDBID                    string // http://www.zeitschriftendatenbank.de/suche/zdb-katalog.html
 }
 
 // Convert string like P12M, P1M, R10Y into a time.Duration.
