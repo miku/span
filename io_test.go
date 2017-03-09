@@ -44,7 +44,7 @@ func TestSavedLink(t *testing.T) {
 	if err := slink.Remove(); err != nil {
 		t.Errorf(err.Error())
 	}
-	if _, err := os.Stat("/path/to/whatever"); err == nil {
+	if _, err := os.Stat(fn); err == nil {
 		t.Errorf("SavedLink: file exists, but should be deleted: %v", fn)
 	}
 }
