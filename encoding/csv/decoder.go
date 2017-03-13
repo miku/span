@@ -39,7 +39,7 @@ import (
 	stdcsv "encoding/csv"
 	"reflect"
 
-	"github.com/miku/structs"
+	"github.com/fatih/structs"
 )
 
 // A Decoder reads and decodes CSV rows from an input stream.
