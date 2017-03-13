@@ -7,14 +7,6 @@
 // (e.g. if the record has "AGZ" in a certain field, like x.package).
 package licensing
 
-import (
-	stdcsv "encoding/csv"
-	"io"
-
-	"github.com/miku/span"
-	"github.com/miku/span/encoding/csv"
-)
-
 // Embargo is a string, that expresses a moving wall. A moving wall is a set
 // period of time (usually three to five years) between a journal issue's
 // publication date and its availability as archival content on [Publisher]. The
@@ -23,35 +15,18 @@ import (
 type Embargo string
 
 // Entry contains fields about a licensed or available journal, book, article or
-// other resource.
+// other resource. First 14 columns are quite stardardized. Further columns may
+// contain custom information:
 //
-// User-defined fields:
+// EZB style: own_anchor, package:collection, il_relevance, il_nationwide,
+// il_electronic_transmission, il_comment, all_issns, zdb_id
 //
-// EZB style:
+// OCLC style: location, title_notes, staff_notes, vendor_id,
+// oclc_collection_name, oclc_collection_id, oclc_entry_id, oclc_linkscheme,
+// oclc_number, ACTION
 //
-// * own_anchor
-// * package:collection
-// * il_relevance
-// * il_nationwide
-// * il_electronic_transmission
-// * il_comment
-// * all_issns
-// * zdb_id
-//
-// ebooks style:
-//
-// * location
-// * title_notes
-// * staff_notes
-// * vendor_id
-// * oclc_collection_name
-// * oclc_collection_id
-// * oclc_entry_id
-// * oclc_linkscheme
-// * oclc_number
-// * ACTION
-//
-// http://www.uksg.org/kbart/s5/guidelines/data_field_labels
+// See also: http://www.uksg.org/kbart/s5/guidelines/data_field_labels,
+// http://www.uksg.org/kbart/s5/guidelines/data_fields
 type Entry struct {
 	PublicationTitle                   string `csv:"publication_title"`          // "Südost-Forschungen (2014-)", "Theory of Computation"
 	PrintIdentifier                    string `csv:"print_identifier"`           // "2029-8692", "9783662479841"
@@ -87,36 +62,4 @@ type Entry struct {
 	OCLCLinkScheme                     string `csv:"oclc_link_scheme"`           // "wiley.book"
 	OCLCNumber                         string `csv:"oclc_number"`                // "122938128"
 	Action                             string `csv:"ACTION"`                     // "raw"
-}
-
-// Holdings contains a list of entries about licenced or available content.
-type Holdings struct {
-	Entries []Entry
-}
-
-// ReadFrom create holdings struct from a reader. Expects a tab separated CSV with
-// a single header line.
-func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
-	var wc span.WriteCounter
-	rdr := io.TeeReader(r, &wc)
-
-	c := stdcsv.NewReader(rdr)
-	c.Comma = '\t'
-	c.FieldsPerRecord = -1
-	c.LazyQuotes = true
-
-	dec := csv.NewDecoder(c)
-	for {
-		var entry Entry
-		err := dec.Decode(&entry)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return 0, err
-		}
-		h.Entries = append(h.Entries, entry)
-	}
-
-	return int64(wc.Count()), nil
 }
