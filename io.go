@@ -113,13 +113,18 @@ type FileReader struct {
 	f        *os.File
 }
 
+func (r *FileReader) openFile() (err error) {
+	if r.f != nil {
+		return nil
+	}
+	r.f, err = os.Open(r.Filename)
+	return err
+}
+
 // Read reads from the file.
 func (r *FileReader) Read(p []byte) (n int, err error) {
-	if r.f == nil {
-		r.f, err = os.Open(r.Filename)
-		if err != nil {
-			return
-		}
+	if err = r.openFile(); err != nil {
+		return
 	}
 	n, err = r.f.Read(p)
 	if err == io.EOF {
@@ -130,11 +135,12 @@ func (r *FileReader) Read(p []byte) (n int, err error) {
 }
 
 // Close closes the file.
-func (r *FileReader) Close() error {
+func (r *FileReader) Close() (err error) {
 	if r.f != nil {
-		return r.f.Close()
+		err = r.f.Close()
+		r.f = nil
 	}
-	return nil
+	return
 }
 
 // ZipOrPlainLinkReader is a reader that transparently handles zipped and uncompressed
