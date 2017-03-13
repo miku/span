@@ -7,6 +7,13 @@
 // (e.g. if the record has "AGZ" in a certain field, like x.package).
 package licensing
 
+import (
+	"sort"
+
+	"github.com/miku/span"
+	"github.com/miku/span/container"
+)
+
 // Embargo is a string, that expresses a moving wall. A moving wall is a set
 // period of time (usually three to five years) between a journal issue's
 // publication date and its availability as archival content on [Publisher]. The
@@ -62,4 +69,21 @@ type Entry struct {
 	OCLCLinkScheme                     string `csv:"oclc_link_scheme"`           // "wiley.book"
 	OCLCNumber                         string `csv:"oclc_number"`                // "122938128"
 	Action                             string `csv:"ACTION"`                     // "raw"
+}
+
+// ISSNList returns a list of all ISSN from various fields.
+func (e *Entry) ISSNList() []string {
+	issns := container.NewStringSet()
+	if span.ISSNPattern.MatchString(e.PrintIdentifier) {
+		issns.Add(e.PrintIdentifier)
+	}
+	if span.ISSNPattern.MatchString(e.OnlineIdentifier) {
+		issns.Add(e.OnlineIdentifier)
+	}
+	for _, issn := range span.ISSNPattern.FindAllString(e.OwnAnchor, -1) {
+		issns.Add(issn)
+	}
+	v := issns.Values()
+	sort.Strings(v)
+	return v
 }

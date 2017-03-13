@@ -6,11 +6,12 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/encoding/csv"
+	"github.com/miku/span/licensing"
 )
 
 // Holdings contains a list of entries about licenced or available content.
 type Holdings struct {
-	Entries []Entry
+	Entries []licensing.Entry
 }
 
 // ReadFrom create holdings struct from a reader. Expects a tab separated CSV with
@@ -24,7 +25,7 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 
 	dec := csv.NewDecoder(c)
 	for {
-		var entry Entry
+		var entry licensing.Entry
 		err := dec.Decode(&entry)
 		if err == io.EOF {
 			break
