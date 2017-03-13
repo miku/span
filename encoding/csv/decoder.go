@@ -19,8 +19,13 @@ func NewDecoder(c *stdcsv.Reader) *Decoder {
 	return &Decoder{r: c}
 }
 
+// readHeader attempts to read the first row and store the column names. If the
+// header has been already set by hand, the values won't be overwritten.
 func (dec *Decoder) readHeader() error {
 	if dec.started {
+		return nil
+	}
+	if len(dec.Header) > 0 {
 		return nil
 	}
 	record, err := dec.r.Read()
