@@ -55,20 +55,17 @@ func NewDecoder(c *stdcsv.Reader) *Decoder {
 }
 
 // readHeader attempts to read the first row and store the column names. If the
-// header has been already set by hand, the values won't be overwritten.
-func (dec *Decoder) readHeader() error {
+// header has been already set manually, the values won't be overwritten.
+func (dec *Decoder) readHeader() (err error) {
 	if dec.started {
 		return nil
 	}
 	if len(dec.Header) > 0 {
 		return nil
 	}
-	record, err := dec.r.Read()
-	if err != nil {
-		return err
-	}
-	dec.Header, dec.started = record, true
-	return nil
+	dec.Header, err = dec.r.Read()
+	dec.started = true
+	return
 }
 
 // Decode a single entry, use csv struct tags.
