@@ -45,7 +45,8 @@ func (h *Holdings) ByISSN(issn string) (entries []licensing.Entry) {
 	if h.cache == nil {
 		h.cache = make(map[string][]licensing.Entry)
 	}
-	if _, ok := h.cache[issn]; !ok {
+	var ok bool
+	if entries, ok = h.cache[issn]; !ok {
 		for _, e := range h.Entries {
 			for _, id := range e.ISSNList() {
 				if id == issn {
@@ -55,5 +56,5 @@ func (h *Holdings) ByISSN(issn string) (entries []licensing.Entry) {
 		}
 		h.cache[issn] = entries
 	}
-	return h.cache[issn]
+	return
 }
