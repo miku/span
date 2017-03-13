@@ -180,7 +180,6 @@ func (r *ZipOrPlainLinkReader) Read(p []byte) (int, error) {
 	return r.buf.Read(p)
 }
 
-// SavedReaders takes a list of readers and persists their content in temporary file.
 // SavedReaders takes a list of readers and persists their content in a temporary file.
 type SavedReaders struct {
 	Readers []io.Reader
