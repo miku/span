@@ -44,8 +44,8 @@ import (
 
 // A Decoder reads and decodes CSV rows from an input stream.
 type Decoder struct {
-	r       *stdcsv.Reader // The underlying reader.
 	Header  []string       // Column names.
+	r       *stdcsv.Reader // The underlying CSV reader.
 	started bool           // Whether reading has started.
 }
 
@@ -60,11 +60,11 @@ func (dec *Decoder) readHeader() (err error) {
 	if dec.started {
 		return nil
 	}
+	dec.started = true
 	if len(dec.Header) > 0 {
 		return nil
 	}
 	dec.Header, err = dec.r.Read()
-	dec.started = true
 	return
 }
 
