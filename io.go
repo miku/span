@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
 // LinkReader implements io.Reader for a URL.
@@ -244,4 +245,20 @@ func ReadLines(filename string) (lines []string, err error) {
 		lines = append(lines, line)
 	}
 	return
+}
+
+// WriteCounter counts the number of bytes written through it.
+type WriteCounter struct {
+	w     io.Writer
+	count uint64
+}
+
+func (w *WriteCounter) Write(p []byte) (int, error) {
+	atomic.AddUint64(&w.count, uint64(len(p)))
+	return len(p), nil
+}
+
+// Count returns the number of bytes written.
+func (w *WriteCounter) Count() uint64 {
+	return atomic.LoadUint64(&w.count)
 }
