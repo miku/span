@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -59,7 +58,6 @@ func (s *SavedLink) Save() (filename string, err error) {
 	if _, err := io.Copy(s.f, r); err != nil {
 		return "", err
 	}
-	log.Printf("SavedLink: stored %s at %s", s.Link, s.f.Name())
 	return s.f.Name(), nil
 }
 
