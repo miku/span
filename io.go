@@ -128,8 +128,7 @@ func (r *FileReader) Read(p []byte) (n int, err error) {
 	}
 	n, err = r.f.Read(p)
 	if err == io.EOF {
-		defer r.f.Close()
-		r.f = nil
+		defer r.Close()
 	}
 	return
 }
