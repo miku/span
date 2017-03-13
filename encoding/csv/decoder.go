@@ -82,20 +82,20 @@ func (dec *Decoder) Decode(v interface{}) error {
 	}
 	s := structs.New(v)
 	for _, f := range s.Fields() {
-		name := f.Tag("csv")
-		if name == "" || name == "-" {
+		tag := f.Tag("csv")
+		if tag == "" || tag == "-" {
 			continue
 		}
-		for i, h := range dec.Header {
-			if name != h {
+		for i, header := range dec.Header {
+			if tag != header {
 				continue
 			}
-			if i < len(record) {
-				if err := f.Set(record[i]); err != nil {
-					return err
-				}
+			if i >= len(record) {
+				break // Record has too few columns.
 			}
-			break
+			if err := f.Set(record[i]); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
