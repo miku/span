@@ -344,11 +344,12 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 
 	f.Verbose = s.Holdings.Verbose
 
-	sr := span.SavedReaders{Readers: []io.Reader{
-		&span.ZipOrPlainLinkMultiReader{
-			Links: s.Holdings.Links,
-		},
-	}}
+	var readers []io.Reader
+	for _, link := range s.Holdings.Links {
+		readers = append(readers, &span.ZipOrPlainLinkReader{Link: link})
+	}
+
+	sr := span.SavedReaders{Readers: readers}
 
 	filename, err := sr.Save()
 	if err != nil {
