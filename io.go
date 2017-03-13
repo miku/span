@@ -66,7 +66,9 @@ func (s *SavedLink) Remove() {
 	_ = os.Remove(s.f.Name())
 }
 
-// ZipContentReader returns all files in zip concatenated.
+// ZipContentReader returns the concatenated content of all files in a zip archive
+// given by its filename. All content is temporarily stored in memory, so this
+// type should only be used with smaller archives.
 type ZipContentReader struct {
 	Filename string
 	buf      bytes.Buffer
@@ -136,7 +138,7 @@ func (r *FileReader) Close() error {
 }
 
 // ZipOrPlainLinkReader is a reader that transparently handles zipped and uncompressed
-// content. If the content is zipped, all archive entries are extracted.
+// content, given a URL as string.
 type ZipOrPlainLinkReader struct {
 	Link string
 	buf  bytes.Buffer
@@ -249,6 +251,7 @@ type WriteCounter struct {
 	count uint64
 }
 
+// Write increments the total byte count.
 func (w *WriteCounter) Write(p []byte) (int, error) {
 	atomic.AddUint64(&w.count, uint64(len(p)))
 	return len(p), nil
