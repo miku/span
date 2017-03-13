@@ -25,6 +25,9 @@ func TestByISSN(t *testing.T) {
 	}
 	t.Logf("loading took: %s", time.Since(started))
 	entries := holdings.ByISSN("2079-8245")
+	if len(entries) != 1 {
+		t.Errorf("ByISSN: got %v, want 1", len(entries))
+	}
 	t.Logf("%d found: %s", len(entries), entries[0].PublicationTitle)
 
 }
