@@ -156,15 +156,14 @@ func (r *ZipOrPlainLinkReader) fill() (err error) {
 	r.once.Do(func() {
 		var filename string
 		link := SavedLink{Link: r.Link}
-		filename, err = link.Save()
-		if err != nil {
+		if filename, err = link.Save(); err != nil {
 			return
 		}
 		defer link.Remove()
 
 		zipReader := &ZipContentReader{Filename: filename}
-		// If there is no error with zip, assume it was a zip and return.
 		if _, err = io.Copy(&r.buf, zipReader); err == nil {
+			// If there is no error with zip, assume it was a zip and return.
 			return
 		}
 		// Error with zip? Return plain content.
