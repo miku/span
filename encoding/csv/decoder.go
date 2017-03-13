@@ -86,6 +86,9 @@ func (dec *Decoder) Decode(v interface{}) error {
 	s := structs.New(v)
 	for _, f := range s.Fields() {
 		name := f.Tag("csv")
+		if name == "" || name == "-" {
+			continue
+		}
 		for i, h := range dec.Header {
 			if name != h {
 				continue
