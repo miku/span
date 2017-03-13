@@ -78,21 +78,21 @@ type ZipContentReader struct {
 // fill populates the internal buffer with the content of all archive members.
 func (r *ZipContentReader) fill() (err error) {
 	r.once.Do(func() {
-		var rc *zip.ReadCloser
-		if rc, err = zip.OpenReader(r.Filename); err != nil {
+		var zrc *zip.ReadCloser
+		if zrc, err = zip.OpenReader(r.Filename); err != nil {
 			return
 		}
-		defer rc.Close()
+		defer zrc.Close()
 
-		for _, f := range rc.File {
-			var frc io.ReadCloser
-			if frc, err = f.Open(); err != nil {
+		for _, f := range zrc.File {
+			var rc io.ReadCloser
+			if rc, err = f.Open(); err != nil {
 				return
 			}
-			if _, err = io.Copy(&r.buf, frc); err != nil {
+			if _, err = io.Copy(&r.buf, rc); err != nil {
 				return
 			}
-			err = frc.Close()
+			err = rc.Close()
 		}
 	})
 	return
