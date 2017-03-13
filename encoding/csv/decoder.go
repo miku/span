@@ -1,3 +1,38 @@
+// Package csv implements a decoder, that supports CSV decoding. The decoding is guided by struct
+// tags, similar to the use of struct tags in JSON or XML decoding.
+//
+// Given an CSV file with a header row like this:
+//
+//     id        name
+//     007       Seven
+//
+// We can decode the CSV into an Item with a few lines:
+//
+//     import stdcsv "encoding/csv"
+//
+//     ...
+//
+//     type Item struct {
+//         ID   string `csv:"id"`
+//         Name string `csv:"name"`
+//     }
+//
+//     ...
+//
+//     func main() {
+//         dec := csv.NewDecoder(stdcsv.NewReader(os.Stdin))
+//         var item Item
+//         if err := dec.Decode(&item); err != nil {
+//             log.Fatal(err)
+//         }
+//         fmt.Println(item.ID, item.Name) // 007 Seven
+//     }
+//
+// Since the decoder takes a csv.Reader as argument, you can customize any CSV
+// related property like comma or number of fields on that reader.
+//
+// Missing fields are ignored. Only string fields are supported.
+//
 package csv
 
 import (
