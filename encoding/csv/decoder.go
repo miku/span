@@ -55,8 +55,10 @@ func (dec *Decoder) Decode(v interface{}) error {
 			if name != h {
 				continue
 			}
-			if err := f.Set(record[i]); err != nil {
-				return err
+			if i < len(record) {
+				if err := f.Set(record[i]); err != nil {
+					return err
+				}
 			}
 			break
 		}
