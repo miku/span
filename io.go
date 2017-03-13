@@ -62,9 +62,8 @@ func (s *SavedLink) Save() (filename string, err error) {
 }
 
 // Remove remove any left over temporary file.
-func (s *SavedLink) Remove() error {
+func (s *SavedLink) Remove() {
 	_ = os.Remove(s.f.Name())
-	return nil
 }
 
 // ZipContentReader returns all files in zip concatenated.
@@ -215,9 +214,8 @@ func (r *SavedReaders) Save() (filename string, err error) {
 }
 
 // Remove remove any left over temporary file.
-func (r *SavedReaders) Remove() error {
+func (r *SavedReaders) Remove() {
 	_ = os.Remove(r.f.Name())
-	return nil
 }
 
 // ReadLines returns a list of trimmed lines in a file. Empty lines are skipped.

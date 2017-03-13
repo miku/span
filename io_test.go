@@ -41,9 +41,7 @@ func TestSavedLink(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	t.Logf("saved link to %v", fn)
-	if err := slink.Remove(); err != nil {
-		t.Errorf(err.Error())
-	}
+	slink.Remove()
 	if _, err := os.Stat(fn); err == nil {
 		t.Errorf("SavedLink: file exists, but should be deleted: %v", fn)
 	}
@@ -97,9 +95,7 @@ func TestSavedReaders(t *testing.T) {
 	if string(b) != "HelloWorld" {
 		t.Errorf("SavedReaders: got %v, want HelloWorld", string(b))
 	}
-	if err := sr.Remove(); err != nil {
-		t.Errorf(err.Error())
-	}
+	sr.Remove()
 	if _, err := os.Stat(fn); err == nil {
 		t.Errorf("SavedReaders: file exists, but should be deleted: %v", fn)
 	}
