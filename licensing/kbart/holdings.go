@@ -13,7 +13,7 @@ import (
 // exposes a couple helper methods.
 type Holdings struct {
 	Entries []licensing.Entry
-	cache   map[string][]licensing.Entry
+	cache   map[string][]licensing.Entry // Cache lookups by ISSN.
 }
 
 // ReadFrom create holdings struct from a reader. Expects a tab separated CSV with
@@ -40,7 +40,7 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 	return int64(wc.Count()), nil
 }
 
-// ByISSN returns all licensing entries for given issns.
+// ByISSN returns all licensing entries for given ISSN.
 func (h *Holdings) ByISSN(issn string) (entries []licensing.Entry) {
 	if h.cache == nil {
 		h.cache = make(map[string][]licensing.Entry)
