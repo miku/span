@@ -52,11 +52,11 @@ func (s *SavedLink) Save() (filename string, err error) {
 	r := &LinkReader{Link: s.Link}
 	s.f, err = ioutil.TempFile("", "span-")
 	if err != nil {
-		return "", err
+		return
 	}
 	defer s.f.Close()
-	if _, err := io.Copy(s.f, r); err != nil {
-		return "", err
+	if _, err = io.Copy(s.f, r); err != nil {
+		return
 	}
 	return s.f.Name(), nil
 }
