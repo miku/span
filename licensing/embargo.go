@@ -12,11 +12,11 @@ var (
 	// ErrInvalidEmbargo when embargo cannot be interpreted.
 	ErrInvalidEmbargo = errors.New("invalid embargo")
 
-	// Day has 24 hours.
+	// Day is fixed number of hours.
 	Day = 24 * time.Hour
-	// Month is fixed at 730 hours.
+	// Month is fixed number of hours.
 	Month = 730 * time.Hour
-	// Year is fixed at 730 hours.
+	// Year is fixed number of hours.
 	Year = 8760 * time.Hour
 
 	// embargoPattern fixes allowed embargo strings (type, length, units).
