@@ -31,24 +31,22 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 		}
 		h.Entries = append(h.Entries, entry)
 	}
+	h.buildLookupCache()
 	return int64(wc.Count()), nil
+}
+
+// buildLookupCache for ISSN lookups.
+func (h *Holdings) buildLookupCache() {
+	h.cache = make(map[string][]licensing.Entry)
+	for _, e := range h.Entries {
+		for _, issn := range e.ISSNList() {
+			h.cache[issn] = append(h.cache[issn], e)
+		}
+	}
 }
 
 // ByISSN returns all licensing entries for given ISSN.
 func (h *Holdings) ByISSN(issn string) (entries []licensing.Entry) {
-	if h.cache == nil {
-		h.cache = make(map[string][]licensing.Entry)
-	}
-	var ok bool
-	if entries, ok = h.cache[issn]; !ok {
-		for _, e := range h.Entries {
-			for _, id := range e.ISSNList() {
-				if id == issn {
-					entries = append(entries, e)
-				}
-			}
-		}
-		h.cache[issn] = entries
-	}
+	entries, _ = h.cache[issn]
 	return
 }
