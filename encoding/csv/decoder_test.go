@@ -24,6 +24,12 @@ type TestSimple struct {
 	ID    string `csv:"print_identifier"`
 }
 
+type TestRepetition struct {
+	Title       string `csv:"publication_title"`
+	Publication string `csv:"publication_title"`
+	ID          string `csv:"print_identifier"`
+}
+
 type TestEntry struct {
 	PublicationTitle                   string `csv:"publication_title"`
 	PrintIdentifier                    string `csv:"print_identifier"`
@@ -73,6 +79,23 @@ func TestDecode(t *testing.T) {
 	}
 
 	expected := TestSimple{Title: "Hello", ID: "123"}
+	if !reflect.DeepEqual(example, expected) {
+		t.Errorf("Decode: got %#v, want %#v", example, expected)
+	}
+}
+
+func TestDecodeRepetitions(t *testing.T) {
+	r := csv.NewReader(strings.NewReader(testOne))
+	r.Comma = '\t'
+
+	dec := NewDecoder(r)
+
+	var example TestRepetition
+	if err := dec.Decode(&example); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	expected := TestRepetition{Title: "Hello", Publication: "Hello", ID: "123"}
 	if !reflect.DeepEqual(example, expected) {
 		t.Errorf("Decode: got %#v, want %#v", example, expected)
 	}
