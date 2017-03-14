@@ -43,3 +43,106 @@ func TestISSNList(t *testing.T) {
 		}
 	}
 }
+
+func TestCoversDate(t *testing.T) {
+	var cases = []struct {
+		entry Entry
+		value string
+		ok    bool
+		err   error
+	}{
+		{
+			entry: Entry{
+				FirstIssueDate: "1992-06-23",
+				LastIssueDate:  "1998-04-10",
+			},
+			value: "1997",
+			ok:    true,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "",
+				LastIssueDate:  "1998-04-10",
+			},
+			value: "1997",
+			ok:    true,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "",
+				LastIssueDate:  "1998-04-10",
+			},
+			value: "1998-04",
+			ok:    true,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "",
+				LastIssueDate:  "",
+			},
+			value: "1998-04",
+			ok:    true,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "2000",
+				LastIssueDate:  "",
+			},
+			value: "1999-12-31",
+			ok:    false,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "2000",
+				LastIssueDate:  "",
+			},
+			value: "",
+			ok:    false,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "",
+				LastIssueDate:  "",
+			},
+			value: "",
+			ok:    false,
+			err:   nil,
+		},
+		{
+			entry: Entry{
+				FirstIssueDate: "1992-02-10",
+				LastIssueDate:  "1992-09-10",
+			},
+			value: "1992",
+			ok:    false,
+			err:   nil,
+		},
+	}
+
+	for _, c := range cases {
+		ok, err := c.entry.CoversDate(c.value)
+		if err != c.err {
+			t.Errorf("CoversDate: got %v, want %v", err, c.err)
+		}
+		if ok != c.ok {
+			t.Errorf("CoversDate: got %v, want %v", ok, c.ok)
+		}
+	}
+}
+
+func BenchmarkCoversDate(b *testing.B) {
+	entry := Entry{
+		FirstIssueDate: "1992-06-23",
+		LastIssueDate:  "1998-04-10",
+	}
+	v := "1992"
+	for i := 0; i < b.N; i++ {
+		entry.CoversDate(v)
+	}
+}

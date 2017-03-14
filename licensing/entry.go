@@ -9,10 +9,35 @@ package licensing
 
 import (
 	"sort"
+	"time"
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 )
+
+// datePatterns are candidate patterns for parsing dates.
+var datePatterns = []string{
+	"2006",
+	"2006-",
+	"2006-1",
+	"2006-01",
+	"2006-1-2",
+	"2006-1-02",
+	"2006-01-2",
+	"2006-01-02",
+	"2006-Jan",
+	"2006-January",
+	"2006-Jan-2",
+	"2006-Jan-02",
+	"2006-January-2",
+	"2006-January-02",
+	"2006-x",
+	"2006-xx",
+	"2006-x-x",
+	"2006-x-xx",
+	"2006-xx-x",
+	"2006-xx-xx",
+}
 
 // Entry contains fields about a licensed or available journal, book, article or
 // other resource. First 14 columns are quite stardardized. Further columns may
@@ -79,4 +104,55 @@ func (e *Entry) ISSNList() []string {
 	v := issns.Values()
 	sort.Strings(v)
 	return v
+}
+
+// Begin parses left boundary of license interval.
+func (e *Entry) Begin() (t time.Time, err error) {
+	if e.FirstIssueDate == "" {
+		return time.Parse("2006-01-02", "0001-01-01")
+	}
+	for _, layout := range datePatterns {
+		t, err := time.Parse(layout, e.FirstIssueDate)
+		if err == nil {
+			return t, nil
+		}
+	}
+	return
+}
+
+// End parses right boundary of license interval.
+func (e *Entry) End() (t time.Time, err error) {
+	if e.LastIssueDate == "" {
+		return time.Parse("2006-01-02", "2999-01-01")
+	}
+	for _, layout := range datePatterns {
+		t, err := time.Parse(layout, e.LastIssueDate)
+		if err == nil {
+			return t, nil
+		}
+	}
+	return
+}
+
+// CoversDate return true, if the given date (as string), lies between this entries issue dates.
+func (e *Entry) CoversDate(s string) (bool, error) {
+	for _, layout := range datePatterns {
+
+		t, err := time.Parse(layout, s)
+		if err != nil {
+			continue
+		}
+		begin, err := e.Begin()
+		if err != nil {
+			continue
+		}
+		end, err := e.End()
+		if err != nil {
+			continue
+		}
+		if begin.Before(t) && end.After(t) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
