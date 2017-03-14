@@ -14,13 +14,6 @@ import (
 	"github.com/miku/span/container"
 )
 
-// Embargo is a string, that expresses a moving wall. A moving wall is a set
-// period of time (usually three to five years) between a journal issue's
-// publication date and its availability as archival content on [Publisher]. The
-// moving wall for each journal is set by the publisher to define the portion of
-// its publication history constituting its archive.
-type Embargo string
-
 // Entry contains fields about a licensed or available journal, book, article or
 // other resource. First 14 columns are quite stardardized. Further columns may
 // contain custom information:
