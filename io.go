@@ -231,6 +231,38 @@ func ReadLines(filename string) (lines []string, err error) {
 	return
 }
 
+// SkipReader skips empty lines and lines with comments.
+type SkipReader struct {
+	r               *bufio.Reader
+	CommentPrefixes []string
+}
+
+// NewSkipReader creates a new SkipReader.
+func NewSkipReader(r *bufio.Reader) *SkipReader {
+	return &SkipReader{r: r}
+}
+
+// ReadString will return only non-empty lines and lines not starting with a comment prefix.
+func (r SkipReader) ReadString(delim byte) (s string, err error) {
+	for {
+		s, err = r.r.ReadString(delim)
+		if err == io.EOF {
+			return
+		}
+		s = strings.TrimSpace(s)
+		if s == "" {
+			continue
+		}
+		for _, p := range r.CommentPrefixes {
+			if strings.HasPrefix(s, p) {
+				continue
+			}
+		}
+		break
+	}
+	return
+}
+
 // WriteCounter counts the number of bytes written through it.
 type WriteCounter struct {
 	w     io.Writer
