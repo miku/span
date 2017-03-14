@@ -12,6 +12,13 @@ var (
 	// ErrInvalidEmbargo when embargo cannot be interpreted.
 	ErrInvalidEmbargo = errors.New("invalid embargo")
 
+	// Day has 24 hours.
+	Day = 24 * time.Hour
+	// Month is fixed at 730 hours.
+	Month = 730 * time.Hour
+	// Year is fixed at 730 hours.
+	Year = 8760 * time.Hour
+
 	// embargoPattern fixes allowed embargo strings (type, length, units).
 	embargoPattern = regexp.MustCompile(`([P|R])([0-9]+)([Y|M|D])`)
 )
@@ -79,7 +86,9 @@ var (
 // calendar years of content are available, except for the most current 30 days.
 type Embargo string
 
-// Duration converts embargo like P12M, P1M, R10Y into a time.Duration.
+// Duration converts embargo like P12M, P1M, R10Y into a time.Duration. This
+// duration will non-negative. Time differences will have small shifts due to a
+// month and a year being a fixed number of hours.
 func (embargo Embargo) Duration() (dur time.Duration, err error) {
 	e := strings.TrimSpace(string(embargo))
 	if len(e) == 0 {
@@ -100,12 +109,43 @@ func (embargo Embargo) Duration() (dur time.Duration, err error) {
 
 	switch parts[3] {
 	case "D":
-		return time.Duration(-i) * 24 * time.Hour, nil
+		return time.Duration(i) * Day, nil
 	case "M":
-		return time.Duration(-i) * 24 * time.Hour * 30, nil
+		return time.Duration(i) * Month, nil
 	case "Y":
-		return time.Duration(-i) * 24 * time.Hour * 365, nil
+		return time.Duration(i) * Year, nil
 	default:
 		return dur, ErrInvalidEmbargo
 	}
+}
+
+// AccessBeginsAtWall returns true, if access begins at the moving wall.
+func (embargo Embargo) AccessBeginsAtWall() bool {
+	return strings.HasPrefix(strings.TrimSpace(string(embargo)), "R")
+}
+
+// AccessEndsAtWall returns true, if access end at the moving wall.
+func (embargo Embargo) AccessEndsAtWall() bool {
+	return strings.HasPrefix(strings.TrimSpace(string(embargo)), "P")
+}
+
+// Compatible returns true, if the given date is validated by the embargo relative to the current time.
+func (embargo Embargo) Compatible(t time.Time) (bool, error) {
+	return embargo.CompatibleTo(t, time.Now())
+}
+
+// CompatibleTo returns true, if the given date in validated by this embargo relative to another date.
+func (embargo Embargo) CompatibleTo(t time.Time, relative time.Time) (ok bool, err error) {
+	var dur time.Duration
+	if dur, err = embargo.Duration(); err != nil {
+		return false, err
+	}
+	wall := relative.Add(-dur)
+	if embargo.AccessBeginsAtWall() && t.After(wall) {
+		return true, nil
+	}
+	if embargo.AccessEndsAtWall() && t.Before(wall) {
+		return true, nil
+	}
+	return false, nil
 }
