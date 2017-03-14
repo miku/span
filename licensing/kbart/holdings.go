@@ -1,11 +1,10 @@
 package kbart
 
 import (
-	stdcsv "encoding/csv"
 	"io"
 
 	"github.com/miku/span"
-	"github.com/miku/span/encoding/csv"
+	"github.com/miku/span/encoding/tsv"
 	"github.com/miku/span/licensing"
 )
 
@@ -20,12 +19,7 @@ type Holdings struct {
 // a single header line.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 	var wc span.WriteCounter
-	c := stdcsv.NewReader(io.TeeReader(r, &wc))
-	c.Comma = '\t'
-	c.FieldsPerRecord = -1
-	c.LazyQuotes = true
-
-	dec := csv.NewDecoder(c)
+	dec := tsv.NewDecoder(io.TeeReader(r, &wc))
 	for {
 		var entry licensing.Entry
 		err := dec.Decode(&entry)
