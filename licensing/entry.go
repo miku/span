@@ -8,6 +8,8 @@
 package licensing
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/miku/span"
@@ -88,16 +90,31 @@ type Entry struct {
 	Action                             string `csv:"ACTION"`                     // "raw"
 }
 
+// NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
+func NormalizeSerialNumber(s string) string {
+	s = strings.TrimSpace(s)
+	s = strings.ToUpper(s)
+	if len(s) == 8 {
+		return fmt.Sprintf("%s-%s", s[:4], s[4:])
+	}
+	return s
+}
+
+// FindSerialNumbers returns ISSN in standard form in a given string.
+func FindSerialNumbers(s string) []string {
+	return span.ISSNPattern.FindAllString(s, -1)
+}
+
 // ISSNList returns a list of all ISSN from various fields.
 func (e *Entry) ISSNList() []string {
 	issns := container.NewStringSet()
-	if span.ISSNPattern.MatchString(e.PrintIdentifier) {
-		issns.Add(e.PrintIdentifier)
+	for _, issn := range []string{e.PrintIdentifier, e.OnlineIdentifier} {
+		s := NormalizeSerialNumber(issn)
+		if span.ISSNPattern.MatchString(s) {
+			issns.Add(s)
+		}
 	}
-	if span.ISSNPattern.MatchString(e.OnlineIdentifier) {
-		issns.Add(e.OnlineIdentifier)
-	}
-	for _, issn := range span.ISSNPattern.FindAllString(e.OwnAnchor, -1) {
+	for _, issn := range FindSerialNumbers(e.OwnAnchor) {
 		issns.Add(issn)
 	}
 	return issns.SortedValues()
