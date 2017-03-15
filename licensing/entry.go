@@ -8,7 +8,6 @@
 package licensing
 
 import (
-	"sort"
 	"time"
 
 	"github.com/miku/span"
@@ -101,9 +100,7 @@ func (e *Entry) ISSNList() []string {
 	for _, issn := range span.ISSNPattern.FindAllString(e.OwnAnchor, -1) {
 		issns.Add(issn)
 	}
-	v := issns.Values()
-	sort.Strings(v)
-	return v
+	return issns.SortedValues()
 }
 
 // Begin parses left boundary of license interval.
