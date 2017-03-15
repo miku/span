@@ -1,3 +1,14 @@
+// Package kbart implements support for KBART (Knowledge Bases And Related Tools
+// working group, http://www.uksg.org/kbart/) holding files
+// (http://www.uksg.org/kbart/s5/guidelines/data_format).
+//
+// > This is a generic format that minimizes the effort involved in receiving and
+// loading the data, and reduces the likelihood of errors being introduced during
+// exchange. Tab-delimited formats are preferable to comma-separated formats, as
+// commas appear regularly within the distributed data and, though they can be
+// "commented out", doing so leaves a greater opportunity for error than the use
+// of a tab-delimited format. Tab-delimited formats can be easily exported from
+// all commonly used spreadsheet programs.
 package kbart
 
 import (
@@ -8,8 +19,9 @@ import (
 	"github.com/miku/span/licensing"
 )
 
-// Holdings contains a list of entries about licenced or available content. It
-// exposes a couple helper methods.
+// Holdings contains a list of entries about licenced or available content. In
+// addition to access to all entries, this type exposes a couple of helper
+// methods.
 type Holdings struct {
 	Entries []licensing.Entry
 	cache   map[string][]licensing.Entry // Cache lookups by ISSN.
