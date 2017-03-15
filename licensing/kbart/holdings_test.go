@@ -2,6 +2,7 @@ package kbart
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"regexp"
 	"strings"
@@ -11,11 +12,14 @@ import (
 	"github.com/miku/span/licensing"
 )
 
-var fixture = "../../fixtures/kbart.txt"
+var (
+	fixture           = "../../fixtures/kbart.txt"
+	errFixtureMissing = errors.New("missing fixture")
+)
 
 func loadHoldings() (*Holdings, error) {
 	if _, err := os.Stat(fixture); os.IsNotExist(err) {
-		return nil, err
+		return nil, errFixtureMissing
 	}
 	file, err := os.Open(fixture)
 	if err != nil {
@@ -32,6 +36,9 @@ func loadHoldings() (*Holdings, error) {
 func TestByISSN(t *testing.T) {
 	holdings, err := loadHoldings()
 	if err != nil {
+		if err == errFixtureMissing {
+			t.Skip(err.Error())
+		}
 		t.Fatalf(err.Error())
 	}
 	entries := holdings.ByISSN("2079-8245")
@@ -45,6 +52,9 @@ func TestByISSN(t *testing.T) {
 func BenchmarkByISSN(b *testing.B) {
 	holdings, err := loadHoldings()
 	if err != nil {
+		if err == errFixtureMissing {
+			b.Skip(err.Error())
+		}
 		b.Fatalf(err.Error())
 	}
 	b.ResetTimer()
@@ -56,6 +66,9 @@ func BenchmarkByISSN(b *testing.B) {
 func TestFilter(t *testing.T) {
 	holdings, err := loadHoldings()
 	if err != nil {
+		if err == errFixtureMissing {
+			t.Skip(err.Error())
+		}
 		t.Fatalf(err.Error())
 	}
 
@@ -85,6 +98,9 @@ func TestFilter(t *testing.T) {
 func BenchmarkFilterByISSN(b *testing.B) {
 	holdings, err := loadHoldings()
 	if err != nil {
+		if err == errFixtureMissing {
+			b.Skip(err.Error())
+		}
 		b.Fatalf(err.Error())
 	}
 	b.ResetTimer()
