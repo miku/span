@@ -14,63 +14,36 @@ import (
 
 var (
 	fixture           = "../../fixtures/kbart.txt"
+	holdings          *Holdings
 	errFixtureMissing = errors.New("missing fixture")
 )
 
-func loadHoldings() (*Holdings, error) {
-	if _, err := os.Stat(fixture); os.IsNotExist(err) {
-		return nil, errFixtureMissing
-	}
-	file, err := os.Open(fixture)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	holdings := new(Holdings)
-	if _, err := holdings.ReadFrom(bufio.NewReader(file)); err != nil {
-		return nil, err
-	}
-	return holdings, nil
+// skipper is shared by tests and benchmarks.
+type skipper interface {
+	Skipf(format string, args ...interface{})
 }
 
-func TestByISSN(t *testing.T) {
-	holdings, err := loadHoldings()
-	if err != nil {
-		if err == errFixtureMissing {
-			t.Skip(err.Error())
+func loadHoldings(s skipper) *Holdings {
+	if holdings == nil {
+		if _, err := os.Stat(fixture); os.IsNotExist(err) {
+			s.Skipf("fixture: %v", err)
 		}
-		t.Fatalf(err.Error())
-	}
-	entries := holdings.ByISSN("2079-8245")
-	if len(entries) != 1 {
-		t.Errorf("ByISSN: got %v, want 1", len(entries))
-	}
-	t.Logf("%d found: %s", len(entries), entries[0].PublicationTitle)
-
-}
-
-func BenchmarkByISSN(b *testing.B) {
-	holdings, err := loadHoldings()
-	if err != nil {
-		if err == errFixtureMissing {
-			b.Skip(err.Error())
+		file, err := os.Open(fixture)
+		if err != nil {
+			s.Skipf("fixture: %v", err)
 		}
-		b.Fatalf(err.Error())
+		defer file.Close()
+
+		holdings = new(Holdings)
+		if _, err := holdings.ReadFrom(bufio.NewReader(file)); err != nil {
+			s.Skipf("fixture: %v", err)
+		}
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		holdings.ByISSN("2079-8245")
-	}
+	return holdings
 }
 
 func TestFilter(t *testing.T) {
-	holdings, err := loadHoldings()
-	if err != nil {
-		if err == errFixtureMissing {
-			t.Skip(err.Error())
-		}
-		t.Fatalf(err.Error())
-	}
+	holdings := loadHoldings(t)
 
 	// Test filter.
 	entries := holdings.Filter(func(e licensing.Entry) bool {
@@ -95,21 +68,57 @@ func TestFilter(t *testing.T) {
 	}
 }
 
-func BenchmarkFilterByISSN(b *testing.B) {
-	holdings, err := loadHoldings()
-	if err != nil {
-		if err == errFixtureMissing {
-			b.Skip(err.Error())
-		}
-		b.Fatalf(err.Error())
-	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		holdings.Filter(func(e licensing.Entry) bool {
-			if e.PrintIdentifier == "2079-8245" || e.OnlineIdentifier == "2079-8245" {
-				return true
-			}
-			return false
-		})
+func TestSerialNumberMap(t *testing.T) {
+	holdings := loadHoldings(t)
+	m := holdings.SerialNumberMap()
+	if len(m) != 79293 {
+		t.Errorf("SerialNumberMap: got %v, want %v", len(m), 79293)
 	}
 }
+
+func BenchmarkSerialNumberMap(b *testing.B) {
+	holdings := loadHoldings(b)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		holdings.SerialNumberMap()
+	}
+}
+
+func BenchmarkLookupViaSerialNumberMap(b *testing.B) {
+	holdings := loadHoldings(b)
+	m := holdings.SerialNumberMap()
+	b.ResetTimer()
+
+	issn := "2079-8245"
+
+	for i := 0; i < b.N; i++ {
+		_ = m[issn]
+	}
+}
+
+func BenchmarkLookupViaFilter(b *testing.B) {
+	holdings := loadHoldings(b)
+	b.ResetTimer()
+
+	issn := "2079-8245"
+	f := func(e licensing.Entry) bool {
+		if e.PrintIdentifier == issn || e.OnlineIdentifier == issn {
+			return true
+		}
+		return false
+	}
+
+	for i := 0; i < b.N; i++ {
+		holdings.Filter(f)
+	}
+}
+
+// === RUN   TestFilter
+// --- PASS: TestFilter (4.29s)
+// === RUN   TestSerialNumberMap
+// --- PASS: TestSerialNumberMap (0.45s)
+// BenchmarkSerialNumberMap-4            	       2	 514861084 ns/op
+// BenchmarkLookupViaSerialNumberMap-4   	100000000	        21.5 ns/op
+// BenchmarkLookupViaFilter-4            	     100	  13340319 ns/op
+// PASS
+// ok  	github.com/miku/span/licensing/kbart	12.653s
