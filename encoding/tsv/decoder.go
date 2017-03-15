@@ -1,3 +1,7 @@
+// Package tsv implements a decoder for tab separated data. CSV looks like a
+// simple format, but its surprisingly hard to create valid CSV files. Sometimes
+// simply splitting a string circumvents all the problems that come with quoting
+// styles, field counts and so on.
 package tsv
 
 import (
@@ -15,7 +19,7 @@ import (
 // A Decoder reads and decodes TSV rows from an input stream.
 type Decoder struct {
 	Header []string         // Column names.
-	r      *span.SkipReader // The underlying buffered reader.
+	r      *span.SkipReader // The underlying reader.
 	once   sync.Once
 }
 
