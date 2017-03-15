@@ -81,3 +81,19 @@ func TestFilter(t *testing.T) {
 		t.Errorf("Filter: got %v, want %v", len(names.Values()), 534)
 	}
 }
+
+func BenchmarkFilterByISSN(b *testing.B) {
+	holdings, err := loadHoldings()
+	if err != nil {
+		b.Fatalf(err.Error())
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		holdings.Filter(func(e licensing.Entry) bool {
+			if e.PrintIdentifier == "2079-8245" || e.OnlineIdentifier == "2079-8245" {
+				return true
+			}
+			return false
+		})
+	}
+}
