@@ -132,3 +132,22 @@ func TestDecodeKbart(t *testing.T) {
 		t.Errorf("Decode: got %#v, want %#v", example, expected)
 	}
 }
+
+func BenchmarkDecodeKbart(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		dec := NewDecoder(strings.NewReader(testTwo))
+		var example TestEntry
+		dec.Decode(&example)
+	}
+}
+
+// $ go test -v github.com/miku/span/encoding/tsv -bench=.
+// === RUN   TestDecode
+// --- PASS: TestDecode (0.00s)
+// === RUN   TestDecodeRepetitions
+// --- PASS: TestDecodeRepetitions (0.00s)
+// === RUN   TestDecodeKbart
+// --- PASS: TestDecodeKbart (0.00s)
+// BenchmarkDecodeKbart-4   	   50000	     33831 ns/op
+// PASS
+// ok  	github.com/miku/span/encoding/tsv	1.990s
