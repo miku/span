@@ -27,6 +27,9 @@ type Holdings struct {
 	cache   map[string][]licensing.Entry // Cache lookups by ISSN.
 }
 
+// FilterFunc is a function that can match an Entry.
+type FilterFunc func(licensing.Entry) bool
+
 // ReadFrom create holdings struct from a reader. Expects a tab separated CSV with
 // a single header line.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
@@ -55,6 +58,16 @@ func (h *Holdings) buildLookupCache() {
 			h.cache[issn] = append(h.cache[issn], e)
 		}
 	}
+}
+
+// Filter finds entries with certain characteristics.
+func (h *Holdings) Filter(f FilterFunc) (result []licensing.Entry) {
+	for _, e := range h.Entries {
+		if f(e) {
+			result = append(result, e)
+		}
+	}
+	return
 }
 
 // ByISSN returns all licensing entries for given ISSN.
