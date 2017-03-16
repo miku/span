@@ -134,3 +134,29 @@ func BenchmarkContainsDate(b *testing.B) {
 		entry.containsDate(v)
 	}
 }
+
+func TestContainsVolume(t *testing.T) {
+	var cases = []struct {
+		entry  Entry
+		volume string
+		err    error
+	}{
+		{Entry{}, "", nil},
+		{Entry{}, "10", nil},
+		{Entry{FirstVolume: "1"}, "10", nil},
+		{Entry{FirstVolume: "Vol. 1"}, "10", nil},
+		{Entry{FirstVolume: "Vol. 10"}, "10", nil},
+		{Entry{FirstVolume: "Vol. X"}, "10", nil},
+		{Entry{LastVolume: "10"}, "10", nil},
+		{Entry{LastVolume: "10th volume"}, "10", nil},
+		{Entry{LastVolume: "11th volume"}, "10", nil},
+		{Entry{LastVolume: "9"}, "10", ErrAfterLastVolume},
+		{Entry{FirstVolume: "9", LastVolume: "11"}, "10", nil},
+	}
+	for _, c := range cases {
+		err := c.entry.containsVolume(c.volume)
+		if err != c.err {
+			t.Errorf("containsVolume(%v, %v): got %v, want %v", c.entry, c.volume, err, c.err)
+		}
+	}
+}

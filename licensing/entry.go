@@ -249,10 +249,10 @@ func (e *Entry) containsDate(s string) (err error) {
 // containsIssue return nil, if the given volume (string) is contained in this entries volume range.
 func (e *Entry) containsVolume(s string) error {
 	v := findInt(s)
-	if v < findInt(e.FirstVolume) {
+	if e.FirstVolume != "" && v < findInt(e.FirstVolume) {
 		return ErrBeforeFirstVolume
 	}
-	if v > findInt(e.LastVolume) {
+	if e.LastVolume != "" && v > findInt(e.LastVolume) {
 		return ErrAfterLastVolume
 	}
 	return nil
@@ -260,6 +260,9 @@ func (e *Entry) containsVolume(s string) error {
 
 // containsIssue return nil, if the given issue (string) is contained in this entries issue range.
 func (e *Entry) containsIssue(s string) error {
+	if e.FirstIssue == "" && e.LastIssue == "" {
+		return nil
+	}
 	v := findInt(s)
 	if v < findInt(e.FirstIssue) {
 		return ErrBeforeFirstIssue
@@ -311,11 +314,14 @@ func getGranularity(layout string) DateGranularity {
 
 // findInt return the first int that is found in s or 0 if there is no number.
 func findInt(s string) int {
-	// we expect to see a number most of the time
+	if s == "" {
+		return 0
+	}
+	// We expect to see a number most of the time.
 	if i, err := strconv.Atoi(s); err == nil {
 		return int(i)
 	}
-	// otherwise try to parse out a number
+	// Otherwise try to parse out a number.
 	m := intPattern.FindString(s)
 	if m == "" {
 		return 0
