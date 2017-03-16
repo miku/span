@@ -62,7 +62,6 @@ func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 		for k := range entrymap {
 			result[issn] = append(result[issn], k)
 		}
-
 	}
 	return result
 }
