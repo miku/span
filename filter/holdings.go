@@ -75,8 +75,6 @@ func (f *HoldingsFilter) count() (count int) {
 }
 
 // UnmarshalJSON deserializes this filter.
-// Ad-hoc test:
-// $ go run cmd/span-tag/main.go -c fixtures/updatedholdings.json <(echo '{"rft.issn": ["0006-2499"], "rft.date": "1996", "rft.volume": "30"}') | jq .
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
@@ -105,15 +103,12 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// Apply returns true, if there is a valid holding for a given record.
+// Apply returns true, if there is a valid holding for a given record. This will
+// take multiple attibutes like date, volume, issue and embargo into account.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		for _, key := range f.origins {
-			item, ok := cache[key]
-			if !ok {
-				log.Printf("holdings: warning: item %s not cached", key)
-				return false
-			}
+			item := cache[key] // The key is guaruanteed to be in cache.
 			for _, entry := range item.serialNumberMap[issn] {
 				err := entry.Covers(is.RawDate, is.Volume, is.Issue)
 				if err == nil {
