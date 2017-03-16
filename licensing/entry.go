@@ -8,6 +8,7 @@
 package licensing
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -135,53 +136,63 @@ func (e *Entry) ISSNList() []string {
 	return issns.SortedValues()
 }
 
-// Begin parses left boundary of license interval.
-func (e *Entry) Begin() (t time.Time, err error) {
-	if e.FirstIssueDate == "" {
-		return time.Parse("2006-01-02", "0001-01-01")
-	}
-	for _, layout := range datePatterns {
-		t, err := time.Parse(layout, e.FirstIssueDate)
-		if err == nil {
-			return t, nil
+// Begin parses left boundary of license interval, returns a date far in the past
+// if it is not defined.
+func (e *Entry) begin() time.Time {
+	if e.parsed.FirstIssueDate.IsZero() {
+		e.parsed.FirstIssueDate = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
+		for _, layout := range datePatterns {
+			if t, err := time.Parse(layout, e.FirstIssueDate); err == nil {
+				e.parsed.FirstIssueDate = t
+				break
+			}
 		}
 	}
-	return
+	return e.parsed.FirstIssueDate
 }
 
-// End parses right boundary of license interval.
-func (e *Entry) End() (t time.Time, err error) {
-	if e.LastIssueDate == "" {
-		return time.Parse("2006-01-02", "2999-01-01")
-	}
-	for _, layout := range datePatterns {
-		t, err := time.Parse(layout, e.LastIssueDate)
-		if err == nil {
-			return t, nil
+// End parses right boundary of license interval, returns a date far in the future
+// if it is not defined.
+func (e *Entry) end() time.Time {
+	if e.parsed.LastIssueDate.IsZero() {
+		e.parsed.LastIssueDate = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
+		for _, layout := range datePatterns {
+			if t, err := time.Parse(layout, e.LastIssueDate); err == nil {
+				e.parsed.LastIssueDate = t
+				break
+			}
 		}
 	}
-	return
+	return e.parsed.LastIssueDate
 }
 
-// CoversDate return true, if the given date (as string), lies between this entries issue dates.
-func (e *Entry) CoversDate(s string) (bool, error) {
-	for _, layout := range datePatterns {
-
-		t, err := time.Parse(layout, s)
-		if err != nil {
-			continue
-		}
-		begin, err := e.Begin()
-		if err != nil {
-			continue
-		}
-		end, err := e.End()
-		if err != nil {
-			continue
-		}
-		if begin.Before(t) && end.After(t) {
-			return true, nil
-		}
+// containsDate return nil, if the given date (as string), lies between this entries issue dates.
+func (e *Entry) containsDate(s string) (err error) {
+	if s == "" {
+		return nil
 	}
-	return false, nil
+	var t time.Time
+	for _, layout := range datePatterns {
+		if t, err = time.Parse(layout, s); err != nil {
+			continue
+		}
+		if t.Before(e.begin()) {
+			return ErrBeforeFirstIssueDate
+		}
+		if t.After(e.end()) {
+			return ErrAfterLastIssueDate
+		}
+		return nil
+	}
+	return ErrInvalidDate
+}
+
+func (e *Entry) containsVolume(s string) error {
+	return nil
+}
+
+// Covers is a generic method to determine, whether a given date, volume or issue
+// is covered by this entry.
+func (e *Entry) Covers(date, volume, issue string) error {
+	return nil
 }
