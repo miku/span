@@ -10,6 +10,8 @@ package licensing
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -29,32 +31,45 @@ const (
 var (
 	ErrBeforeFirstIssueDate = errors.New("before first issue")
 	ErrAfterLastIssueDate   = errors.New("after last issue")
+	ErrBeforeFirstVolume    = errors.New("before first volume")
+	ErrAfterLastVolume      = errors.New("after last volume")
+	ErrBeforeFirstIssue     = errors.New("before first issue")
+	ErrAfterLastIssue       = errors.New("after last issue")
 	ErrInvalidDate          = errors.New("invalid date")
+
+	intPattern = regexp.MustCompile("[0-9]+")
 )
 
+// dateFormat groups layout and granularity.
+type dateFormat struct {
+	layout      string
+	granularity DateGranularity
+}
+
 // datePatterns are candidate patterns for parsing dates.
-var datePatterns = []string{
-	"2006",
-	"2006-01-02",
-	"2006-",
-	"2006-01-2",
-	"2006-01",
-	"2006-1-02",
-	"2006-1-2",
-	"2006-1",
-	"2006-Jan-02",
-	"2006-Jan-2",
-	"2006-Jan",
-	"2006-January-02",
-	"2006-January-2",
-	"2006-January",
-	"2006-x-x",
-	"2006-x-xx",
-	"2006-x",
-	"2006-xx-x",
-	"2006-xx-xx",
-	"2006-xx",
-	"20060102",
+var datePatterns = []dateFormat{
+	{"2006", GRANULARITY_YEAR},
+	{"2006-01-02", GRANULARITY_DAY},
+	{"2006-", GRANULARITY_YEAR},
+	{"2006-01-2", GRANULARITY_DAY},
+	{"2006-01", GRANULARITY_MONTH},
+	{"2006-1-02", GRANULARITY_DAY},
+	{"2006-1-2", GRANULARITY_DAY},
+	{"2006-1", GRANULARITY_MONTH},
+	{"2006-Jan-02", GRANULARITY_DAY},
+	{"2006-Jan-2", GRANULARITY_DAY},
+	{"2006-Jan", GRANULARITY_MONTH},
+	{"2006-January-02", GRANULARITY_DAY},
+	{"2006-January-2", GRANULARITY_DAY},
+	{"2006-January", GRANULARITY_MONTH},
+	{"2006-x-x", GRANULARITY_YEAR},
+	{"2006-x-xx", GRANULARITY_YEAR},
+	{"2006-x", GRANULARITY_YEAR},
+	{"2006-xx-x", GRANULARITY_YEAR},
+	{"2006-xx-xx", GRANULARITY_YEAR},
+	{"2006-xx", GRANULARITY_YEAR},
+	{"20060102", GRANULARITY_DAY},
+	{"200601", GRANULARITY_MONTH},
 }
 
 // Entry contains fields about a licensed or available journal, book, article or
@@ -109,26 +124,7 @@ type Entry struct {
 	parsed struct {
 		FirstIssueDate time.Time
 		LastIssueDate  time.Time
-		FirstVolume    int
-		LastVolume     int
-		FirstIssue     int
-		LastIssue      int
 	}
-}
-
-// NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
-func NormalizeSerialNumber(s string) string {
-	s = strings.TrimSpace(s)
-	s = strings.ToUpper(s)
-	if len(s) == 8 {
-		return fmt.Sprintf("%s-%s", s[:4], s[4:])
-	}
-	return s
-}
-
-// FindSerialNumbers returns ISSN in standard form in a given string.
-func FindSerialNumbers(s string) []string {
-	return span.ISSNPattern.FindAllString(s, -1)
 }
 
 // ISSNList returns a list of all ISSN from various fields.
@@ -151,8 +147,8 @@ func (e *Entry) ISSNList() []string {
 func (e *Entry) begin() time.Time {
 	if e.parsed.FirstIssueDate.IsZero() {
 		e.parsed.FirstIssueDate = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
-		for _, layout := range datePatterns {
-			if t, err := time.Parse(layout, e.FirstIssueDate); err == nil {
+		for _, dfmt := range datePatterns {
+			if t, err := time.Parse(dfmt.layout, e.FirstIssueDate); err == nil {
 				e.parsed.FirstIssueDate = t
 				break
 			}
@@ -179,8 +175,8 @@ func (e *Entry) beginGranularity(g DateGranularity) time.Time {
 func (e *Entry) end() time.Time {
 	if e.parsed.LastIssueDate.IsZero() {
 		e.parsed.LastIssueDate = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
-		for _, layout := range datePatterns {
-			if t, err := time.Parse(layout, e.LastIssueDate); err == nil {
+		for _, dfmt := range datePatterns {
+			if t, err := time.Parse(dfmt.layout, e.LastIssueDate); err == nil {
 				e.parsed.LastIssueDate = t
 				break
 			}
@@ -202,54 +198,18 @@ func (e *Entry) endGranularity(g DateGranularity) time.Time {
 	}
 }
 
-// getGranularity returns the granularity for given layout.
-func getGranularity(layout string) DateGranularity {
-	switch layout {
-	case "2006":
-		return GRANULARITY_YEAR
-	case "2006-01-02":
-		return GRANULARITY_DAY
-	case "2006-":
-		return GRANULARITY_YEAR
-	case "2006-01-2":
-		return GRANULARITY_DAY
-	case "2006-01":
-		return GRANULARITY_MONTH
-	case "2006-1-02":
-		return GRANULARITY_DAY
-	case "2006-1-2":
-		return GRANULARITY_DAY
-	case "2006-1":
-		return GRANULARITY_MONTH
-	case "2006-Jan-02":
-		return GRANULARITY_DAY
-	case "2006-Jan-2":
-		return GRANULARITY_DAY
-	case "2006-Jan":
-		return GRANULARITY_MONTH
-	case "2006-January-02":
-		return GRANULARITY_DAY
-	case "2006-January-2":
-		return GRANULARITY_DAY
-	case "2006-January":
-		return GRANULARITY_MONTH
-	case "2006-x-x":
-		return GRANULARITY_YEAR
-	case "2006-x-xx":
-		return GRANULARITY_YEAR
-	case "2006-x":
-		return GRANULARITY_YEAR
-	case "2006-xx-x":
-		return GRANULARITY_YEAR
-	case "2006-xx-xx":
-		return GRANULARITY_YEAR
-	case "2006-xx":
-		return GRANULARITY_YEAR
-	case "20060102":
-		return GRANULARITY_DAY
-	default:
-		return GRANULARITY_DAY
+// containsDateTime returns nil, if the given time lies between this entries dates.
+func (e *Entry) containsDateTime(t time.Time, g DateGranularity) error {
+	if t.IsZero() {
+		return nil
 	}
+	if t.Before(e.beginGranularity(g)) {
+		return ErrBeforeFirstIssueDate
+	}
+	if t.After(e.endGranularity(g)) {
+		return ErrAfterLastIssueDate
+	}
+	return nil
 }
 
 // containsDate return nil, if the given date (as string), lies between this entries issue dates.
@@ -257,33 +217,109 @@ func (e *Entry) containsDate(s string) (err error) {
 	if s == "" {
 		return nil
 	}
-	for _, layout := range datePatterns {
-		t, err := time.Parse(layout, s)
-		if err != nil {
-			continue
-		}
-		gg := getGranularity(layout)
-		if t.Before(e.beginGranularity(gg)) {
-			return ErrBeforeFirstIssueDate
-		}
-		if t.After(e.endGranularity(gg)) {
-			return ErrAfterLastIssueDate
-		}
-		return nil
+	t, g, err := parseWithGranularity(s)
+	if err != nil {
+		return err
 	}
-	return ErrInvalidDate
+	return e.containsDateTime(t, g)
 }
 
+// containsIssue return nil, if the given volume (string) is contained in this entries volume range.
 func (e *Entry) containsVolume(s string) error {
+	v := findInt(s)
+	if v < findInt(e.FirstVolume) {
+		return ErrBeforeFirstVolume
+	}
+	if v > findInt(e.LastVolume) {
+		return ErrAfterLastVolume
+	}
+	return nil
+}
+
+// containsIssue return nil, if the given issue (string) is contained in this entries issue range.
+func (e *Entry) containsIssue(s string) error {
+	v := findInt(s)
+	if v < findInt(e.FirstIssue) {
+		return ErrBeforeFirstIssue
+	}
+	if v > findInt(e.LastIssue) {
+		return ErrAfterLastIssue
+	}
 	return nil
 }
 
 // Covers is a generic method to determine, whether a given date, volume or issue
 // is covered by this entry.
 func (e *Entry) Covers(date, volume, issue string) error {
-	// within date
-	// valid wall
-	// within volumes
-	// within issues
+	t, g, err := parseWithGranularity(date)
+	if err != nil {
+		return err
+	}
+	if err := e.containsDateTime(t, g); err != nil {
+		return err
+	}
+	if err := Embargo(e.Embargo).Compatible(t); err != nil {
+		return err
+	}
+	if err := e.containsVolume(volume); err != nil {
+		return err
+	}
+	if err := e.containsIssue(issue); err != nil {
+		return err
+	}
 	return nil
+}
+
+// NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
+func NormalizeSerialNumber(s string) string {
+	s = strings.TrimSpace(s)
+	s = strings.ToUpper(s)
+	if len(s) == 8 {
+		return fmt.Sprintf("%s-%s", s[:4], s[4:])
+	}
+	return s
+}
+
+// FindSerialNumbers returns ISSN in standard form in a given string.
+func FindSerialNumbers(s string) []string {
+	return span.ISSNPattern.FindAllString(s, -1)
+}
+
+// parseWithGranularity tries to parse a string into a time. If successful, also
+// return the granularity.
+func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) {
+	for _, dfmt := range datePatterns {
+		t, err = time.Parse(dfmt.layout, s)
+		if err != nil {
+			continue
+		}
+		g = getGranularity(dfmt.layout)
+		return
+	}
+	return t, g, ErrInvalidDate
+}
+
+// getGranularity returns the granularity for given layout.
+func getGranularity(layout string) DateGranularity {
+	for _, dfmt := range datePatterns {
+		if dfmt.layout == layout {
+			return dfmt.granularity
+		}
+	}
+	return GRANULARITY_DAY
+}
+
+// findInt return the first int that is found in s or 0 if there is no number.
+func findInt(s string) int {
+	// we expect to see a number most of the time
+	if i, err := strconv.Atoi(s); err == nil {
+		return int(i)
+	}
+	// otherwise try to parse out a number
+	m := intPattern.FindString(s)
+	if m == "" {
+		return 0
+	}
+	i, _ := strconv.ParseInt(m, 10, 32)
+	return int(i)
 }

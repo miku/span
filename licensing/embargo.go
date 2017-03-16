@@ -21,6 +21,9 @@ var (
 
 	// embargoPattern fixes allowed embargo strings (type, length, units).
 	embargoPattern = regexp.MustCompile(`([P|R])([0-9]+)([Y|M|D])`)
+
+	ErrBeforeMovingWall = errors.New("before moving wall")
+	ErrAfterMovingWall  = errors.New("after moving wall")
 )
 
 // Embargo holds moving wall information.
@@ -130,22 +133,22 @@ func (embargo Embargo) AccessEndsAtWall() bool {
 }
 
 // Compatible returns true, if the given date is validated by the embargo relative to the current time.
-func (embargo Embargo) Compatible(t time.Time) (bool, error) {
+func (embargo Embargo) Compatible(t time.Time) error {
 	return embargo.CompatibleTo(t, time.Now())
 }
 
 // CompatibleTo returns true, if the given date in validated by this embargo relative to another date.
-func (embargo Embargo) CompatibleTo(t time.Time, relative time.Time) (ok bool, err error) {
-	var dur time.Duration
-	if dur, err = embargo.Duration(); err != nil {
-		return false, err
+func (embargo Embargo) CompatibleTo(t time.Time, relative time.Time) error {
+	dur, err := embargo.Duration()
+	if err != nil {
+		return err
 	}
 	wall := relative.Add(-dur)
-	if embargo.AccessBeginsAtWall() && t.After(wall) {
-		return true, nil
+	if embargo.AccessBeginsAtWall() && t.Before(wall) {
+		return ErrBeforeMovingWall
 	}
-	if embargo.AccessEndsAtWall() && t.Before(wall) {
-		return true, nil
+	if embargo.AccessEndsAtWall() && t.After(wall) {
+		return ErrAfterMovingWall
 	}
-	return false, nil
+	return nil
 }

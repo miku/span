@@ -56,52 +56,43 @@ func TestEmbargoCompatible(t *testing.T) {
 			embargo: Embargo("P1D"), // Access ends one day earlier.
 			t:       mustParseTime("2006-01-02", "2000-01-01"),
 			rel:     mustParseTime("2006-01-02", "2000-01-01"),
-			ok:      false,
-			err:     nil,
+			err:     ErrAfterMovingWall,
 		},
 		{
 			embargo: Embargo("P1D"), // Access ends one day earlier.
 			t:       mustParseTime("2006-01-02", "2000-01-01"),
 			rel:     mustParseTime("2006-01-02", "2000-01-02"),
-			ok:      false,
 			err:     nil,
 		},
 		{
 			embargo: Embargo("P1D"), // Access ends one day earlier.
 			t:       mustParseTime("2006-01-02", "2000-01-01"),
 			rel:     mustParseTime("2006-01-02", "2000-01-03"),
-			ok:      true,
 			err:     nil,
 		},
 		{
 			embargo: Embargo("P1D"), // Access ends one day earlier.
 			t:       mustParseTime("2006-01-02", "2000-01-01"),
 			rel:     mustParseTime("2006-01-02", "2001-01-01"),
-			ok:      true,
 			err:     nil,
 		},
 		{
 			embargo: Embargo("P12M"), // Access ends 12 months from relative date.
 			t:       mustParseTime("2006-01-02", "2000-01-01"),
 			rel:     mustParseTime("2006-01-02", "2001-01-01"),
-			ok:      true,
 			err:     nil,
 		},
 		{
 			embargo: Embargo("R1Y"),                            // Access begin one year from relative date.
 			t:       mustParseTime("2006-01-02", "2000-01-03"), // Glitch due to fixed number of hours.
 			rel:     mustParseTime("2006-01-02", "2001-01-01"),
-			ok:      true,
 			err:     nil,
 		},
 	}
 	for _, c := range cases {
-		ok, err := c.embargo.CompatibleTo(c.t, c.rel)
+		err := c.embargo.CompatibleTo(c.t, c.rel)
 		if err != c.err {
 			t.Errorf("CompatibleTo(%v, %v, %v): got %v, want %v", c.embargo, c.t, c.rel, err, c.err)
-		}
-		if ok != c.ok {
-			t.Errorf("CompatibleTo(%v, %v, %v): got %v, want %v", c.embargo, c.t, c.rel, ok, c.ok)
 		}
 	}
 }
