@@ -112,7 +112,7 @@ func TestContainsDate(t *testing.T) {
 				LastIssueDate:  "1992-09-10",
 			},
 			value: "1992",
-			err:   ErrBeforeFirstIssueDate,
+			err:   nil,
 		},
 	}
 

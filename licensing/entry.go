@@ -17,6 +17,15 @@ import (
 	"github.com/miku/span/container"
 )
 
+// DateGranularity indicates how complete a date is.
+type DateGranularity byte
+
+const (
+	GRANULARITY_YEAR DateGranularity = iota
+	GRANULARITY_MONTH
+	GRANULARITY_DAY
+)
+
 var (
 	ErrBeforeFirstIssueDate = errors.New("before first issue")
 	ErrAfterLastIssueDate   = errors.New("after last issue")
@@ -28,23 +37,24 @@ var datePatterns = []string{
 	"2006",
 	"2006-01-02",
 	"2006-",
-	"2006-1",
-	"2006-01",
-	"2006-1-2",
-	"2006-1-02",
 	"2006-01-2",
-	"2006-Jan",
-	"2006-January",
-	"2006-Jan-2",
+	"2006-01",
+	"2006-1-02",
+	"2006-1-2",
+	"2006-1",
 	"2006-Jan-02",
-	"2006-January-2",
+	"2006-Jan-2",
+	"2006-Jan",
 	"2006-January-02",
-	"2006-x",
-	"2006-xx",
+	"2006-January-2",
+	"2006-January",
 	"2006-x-x",
 	"2006-x-xx",
+	"2006-x",
 	"2006-xx-x",
 	"2006-xx-xx",
+	"2006-xx",
+	"20060102",
 }
 
 // Entry contains fields about a licensed or available journal, book, article or
@@ -136,7 +146,7 @@ func (e *Entry) ISSNList() []string {
 	return issns.SortedValues()
 }
 
-// Begin parses left boundary of license interval, returns a date far in the past
+// begin parses left boundary of license interval, returns a date far in the past
 // if it is not defined.
 func (e *Entry) begin() time.Time {
 	if e.parsed.FirstIssueDate.IsZero() {
@@ -151,7 +161,20 @@ func (e *Entry) begin() time.Time {
 	return e.parsed.FirstIssueDate
 }
 
-// End parses right boundary of license interval, returns a date far in the future
+// beginGranularity returns the begin date with a given granularity.
+func (e *Entry) beginGranularity(g DateGranularity) time.Time {
+	t := e.begin()
+	switch g {
+	case GRANULARITY_YEAR:
+		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+	case GRANULARITY_MONTH:
+		return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
+	default:
+		return t
+	}
+}
+
+// end parses right boundary of license interval, returns a date far in the future
 // if it is not defined.
 func (e *Entry) end() time.Time {
 	if e.parsed.LastIssueDate.IsZero() {
@@ -166,20 +189,84 @@ func (e *Entry) end() time.Time {
 	return e.parsed.LastIssueDate
 }
 
+// endGranularity returns the end date with a given granularity.
+func (e *Entry) endGranularity(g DateGranularity) time.Time {
+	t := e.end()
+	switch g {
+	case GRANULARITY_YEAR:
+		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+	case GRANULARITY_MONTH:
+		return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
+	default:
+		return t
+	}
+}
+
+// getGranularity returns the granularity for given layout.
+func getGranularity(layout string) DateGranularity {
+	switch layout {
+	case "2006":
+		return GRANULARITY_YEAR
+	case "2006-01-02":
+		return GRANULARITY_DAY
+	case "2006-":
+		return GRANULARITY_YEAR
+	case "2006-01-2":
+		return GRANULARITY_DAY
+	case "2006-01":
+		return GRANULARITY_MONTH
+	case "2006-1-02":
+		return GRANULARITY_DAY
+	case "2006-1-2":
+		return GRANULARITY_DAY
+	case "2006-1":
+		return GRANULARITY_MONTH
+	case "2006-Jan-02":
+		return GRANULARITY_DAY
+	case "2006-Jan-2":
+		return GRANULARITY_DAY
+	case "2006-Jan":
+		return GRANULARITY_MONTH
+	case "2006-January-02":
+		return GRANULARITY_DAY
+	case "2006-January-2":
+		return GRANULARITY_DAY
+	case "2006-January":
+		return GRANULARITY_MONTH
+	case "2006-x-x":
+		return GRANULARITY_YEAR
+	case "2006-x-xx":
+		return GRANULARITY_YEAR
+	case "2006-x":
+		return GRANULARITY_YEAR
+	case "2006-xx-x":
+		return GRANULARITY_YEAR
+	case "2006-xx-xx":
+		return GRANULARITY_YEAR
+	case "2006-xx":
+		return GRANULARITY_YEAR
+	case "20060102":
+		return GRANULARITY_DAY
+	default:
+		return GRANULARITY_DAY
+	}
+}
+
 // containsDate return nil, if the given date (as string), lies between this entries issue dates.
 func (e *Entry) containsDate(s string) (err error) {
 	if s == "" {
 		return nil
 	}
-	var t time.Time
 	for _, layout := range datePatterns {
-		if t, err = time.Parse(layout, s); err != nil {
+		t, err := time.Parse(layout, s)
+		if err != nil {
 			continue
 		}
-		if t.Before(e.begin()) {
+		gg := getGranularity(layout)
+		if t.Before(e.beginGranularity(gg)) {
 			return ErrBeforeFirstIssueDate
 		}
-		if t.After(e.end()) {
+		if t.After(e.endGranularity(gg)) {
 			return ErrAfterLastIssueDate
 		}
 		return nil
@@ -194,5 +281,9 @@ func (e *Entry) containsVolume(s string) error {
 // Covers is a generic method to determine, whether a given date, volume or issue
 // is covered by this entry.
 func (e *Entry) Covers(date, volume, issue string) error {
+	// within date
+	// valid wall
+	// within volumes
+	// within issues
 	return nil
 }
