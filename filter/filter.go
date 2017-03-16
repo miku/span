@@ -72,7 +72,6 @@ package filter
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strings"
@@ -80,8 +79,6 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
-	"github.com/miku/span/holdings"
-	"github.com/miku/span/holdings/generic"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
 )
@@ -92,8 +89,48 @@ type holdingsItem struct {
 	serialNumberMap map[string][]licensing.Entry
 }
 
-// holdingsCache maps url or filename to a holdings structure for reuse.
-var holdingsCache = make(map[string]holdingsItem)
+// holdingsCache caches items keyed by filename or url.
+type holdingsCache map[string]holdingsItem
+
+// addFile parses a holding file and adds it to the cache.
+func (c *holdingsCache) addFile(filename string) error {
+	if _, ok := (*c)[filename]; ok {
+		return nil
+	}
+	log.Printf("holdings: read: %s", filename)
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	h := new(kbart.Holdings)
+	if _, err := h.ReadFrom(file); err != nil {
+		return err
+	}
+	(*c)[filename] = holdingsItem{
+		holdings:        h,
+		serialNumberMap: h.SerialNumberMap(),
+	}
+	return nil
+}
+
+func (c *holdingsCache) addLink(link string) error {
+	if _, ok := (*c)[link]; ok {
+		return nil
+	}
+	log.Printf("holdings: fetch: %s", link)
+	h := new(kbart.Holdings)
+	if _, err := h.ReadFrom(&span.ZipOrPlainLinkReader{Link: link}); err != nil {
+		return err
+	}
+	(*c)[link] = holdingsItem{
+		holdings:        h,
+		serialNumberMap: h.SerialNumberMap(),
+	}
+	return nil
+}
+
+// cache caches holdings information.
+var cache = make(holdingsCache)
 
 // Filter returns go or no for a given record.
 type Filter interface {
@@ -297,106 +334,16 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// DeprecatedHoldingsFilter filters a record against a holding file. The holding file
-// might be in KBART, Ovid or Google format.
-type DeprecatedHoldingsFilter struct {
-	entries holdings.Entries
-	Verbose bool
-}
-
-// Apply tests validity against holding file. TODO(miku): holdings file
-// indentifiers can be ISSNs, ISBNs or DOIs.
-func (f *DeprecatedHoldingsFilter) Apply(is finc.IntermediateSchema) bool {
-	signature := holdings.Signature{
-		Date:   is.Date.Format("2006-01-02"),
-		Volume: is.Volume,
-		Issue:  is.Issue,
-	}
-
-	var err error
-
-	for _, issn := range append(is.ISSN, is.EISSN...) {
-		for _, license := range f.entries.Licenses(issn) {
-			if err = license.Covers(signature); err == nil {
-				return true
-			}
-			if !f.Verbose {
-				continue
-			}
-			b, merr := json.MarshalIndent(map[string]interface{}{
-				"document": is,
-				"err":      err.Error(),
-				"issn":     issn,
-				"license":  license}, "", "    ")
-			if merr == nil {
-				log.Printf(string(b))
-			} else {
-				log.Printf("cannot even serialize document: %s", merr)
-			}
-		}
-	}
-	return false
-}
-
-// UnmarshalJSON unwraps a JSON into a HoldingsFilter. Can use holding file from
-// file or a list of URLs, if both are given, only the file is used.
-// TODO(miku): Allow multiple files as well.
-func (f *DeprecatedHoldingsFilter) UnmarshalJSON(p []byte) error {
-	var s struct {
-		Holdings struct {
-			Filename string   `json:"file"`
-			Links    []string `json:"urls"`
-			Verbose  bool     `json:"verbose"`
-		} `json:"deprecatedholdings"`
-	}
-
-	if err := json.Unmarshal(p, &s); err != nil {
-		return err
-	}
-
-	f.Verbose = s.Holdings.Verbose
-
-	var readers []io.Reader
-	for _, link := range s.Holdings.Links {
-		readers = append(readers, &span.ZipOrPlainLinkReader{Link: link})
-	}
-
-	sr := span.SavedReaders{Readers: readers}
-
-	filename, err := sr.Save()
-	if err != nil {
-		return err
-	}
-	defer sr.Remove()
-
-	if s.Holdings.Filename != "" {
-		filename = s.Holdings.Filename
-	}
-
-	if filename == "" {
-		return fmt.Errorf("holdings filter: either file or urls must be given")
-	}
-
-	// TODO(miku): holdings should work with readers, so we could skip exposing temporary files.
-	file, err := generic.New(filename)
-	if err != nil {
-		return err
-	}
-
-	f.entries, err = file.ReadEntries()
-	return err
-}
-
 // HoldingsFilter uses the new licensing package.
 type HoldingsFilter struct {
-	origins []string // Keep cache keys only.
+	origins []string // Keep cache keys only (filename or URL of holdings document).
 	verbose bool
 }
 
 // count returns the number of entries loaded for this filter.
 func (f *HoldingsFilter) count() (count int) {
 	for _, name := range f.origins {
-		count += len(holdingsCache[name].serialNumberMap)
+		count += len(cache[name].serialNumberMap)
 	}
 	return
 }
@@ -415,67 +362,46 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.verbose = s.Holdings.Verbose
-
-	// Load holdings from file.
 	if s.Holdings.Filename != "" {
-		if _, ok := holdingsCache[s.Holdings.Filename]; !ok {
-			log.Printf("holdings: read: %s", s.Holdings.Filename)
-			h := new(kbart.Holdings)
-			file, err := os.Open(s.Holdings.Filename)
-			if err != nil {
-				return err
-			}
-			if _, err := h.ReadFrom(file); err != nil {
-				return err
-			}
-			holdingsCache[s.Holdings.Filename] = holdingsItem{
-				holdings:        h,
-				serialNumberMap: h.SerialNumberMap(),
-			}
+		if err := cache.addFile(s.Holdings.Filename); err != nil {
+			return err
 		}
 		f.origins = append(f.origins, s.Holdings.Filename)
 	}
-
-	// Load holdings from links.
 	for _, link := range s.Holdings.Links {
-		if _, ok := holdingsCache[link]; !ok {
-			log.Printf("holdings: fetch: %s", link)
-			h := new(kbart.Holdings)
-			if _, err := h.ReadFrom(&span.ZipOrPlainLinkReader{Link: link}); err != nil {
-				return err
-			}
-			holdingsCache[link] = holdingsItem{
-				holdings:        h,
-				serialNumberMap: h.SerialNumberMap(),
-			}
+		if err := cache.addLink(link); err != nil {
+			return err
 		}
 		f.origins = append(f.origins, link)
 	}
-
+	f.verbose = s.Holdings.Verbose
 	log.Printf("holdings: loaded: %d/%d", len(f.origins), f.count())
 	return nil
 }
 
 // Apply returns true, if there is a valid holding for a given record.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
-	var err error
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		for _, key := range f.origins {
-			item, ok := holdingsCache[key]
+			item, ok := cache[key]
 			if !ok {
-				log.Println("holdings: warning: item not cached")
+				log.Printf("holdings: warning: item %s not cached", key)
 				return false
 			}
 			for _, entry := range item.serialNumberMap[issn] {
-				if err = entry.Covers(is.RawDate, is.Volume, is.Issue); err == nil {
+				err := entry.Covers(is.RawDate, is.Volume, is.Issue)
+				if err == nil {
 					return true
 				}
 				if !f.verbose {
 					continue
 				}
-				msg := map[string]interface{}{"document": is, "err": err.Error(), "issn": issn, "entry": entry}
-				if b, err := json.MarshalIndent(msg, "", "    "); err == nil {
+				msg := map[string]interface{}{
+					"document": is,
+					"entry":    entry,
+					"err":      err.Error(),
+				}
+				if b, err := json.Marshal(msg); err == nil {
 					log.Println(string(b))
 				}
 			}
@@ -541,12 +467,6 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 		return &filter, nil
 	case "package":
 		var filter PackageFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "deprecatedholdings":
-		var filter DeprecatedHoldingsFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
