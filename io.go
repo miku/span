@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -121,7 +120,6 @@ func (r *FileReader) openFile() (err error) {
 		if r.f != nil {
 			return
 		}
-		log.Println("xxx")
 		r.f, err = os.Open(r.Filename)
 	})
 	return err

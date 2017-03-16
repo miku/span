@@ -184,7 +184,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 				issns.Add(s)
 			}
 			if issns.Size() == 0 {
-				log.Printf("warning: no ISSNs found on line: %s", line)
+				log.Printf("issn: warning: no ISSNs found on line: %s", line)
 			}
 			for _, issn := range issns.Values() {
 				f.values.Add(issn)
@@ -195,7 +195,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	for _, v := range s.ISSN.Values {
 		f.values.Add(v)
 	}
-	log.Printf("collected %d ISSN", f.values.Size())
+	log.Printf("issn: collected %d ISSN", f.values.Size())
 	return nil
 }
 
@@ -297,16 +297,16 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// HoldingsFilter filters a record against a holding file. The holding file
+// DeprecatedHoldingsFilter filters a record against a holding file. The holding file
 // might be in KBART, Ovid or Google format.
-type HoldingsFilter struct {
+type DeprecatedHoldingsFilter struct {
 	entries holdings.Entries
 	Verbose bool
 }
 
 // Apply tests validity against holding file. TODO(miku): holdings file
 // indentifiers can be ISSNs, ISBNs or DOIs.
-func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
+func (f *DeprecatedHoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	signature := holdings.Signature{
 		Date:   is.Date.Format("2006-01-02"),
 		Volume: is.Volume,
@@ -341,13 +341,13 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 // UnmarshalJSON unwraps a JSON into a HoldingsFilter. Can use holding file from
 // file or a list of URLs, if both are given, only the file is used.
 // TODO(miku): Allow multiple files as well.
-func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
+func (f *DeprecatedHoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
 			Filename string   `json:"file"`
 			Links    []string `json:"urls"`
 			Verbose  bool     `json:"verbose"`
-		} `json:"holdings"`
+		} `json:"deprecatedholdings"`
 	}
 
 	if err := json.Unmarshal(p, &s); err != nil {
@@ -387,8 +387,8 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	return err
 }
 
-// UpdatedHoldingsFilter uses the new licensing package.
-type UpdatedHoldingsFilter struct {
+// HoldingsFilter uses the new licensing package.
+type HoldingsFilter struct {
 	origins []string // Keep cache keys only.
 	verbose bool
 }
@@ -396,13 +396,13 @@ type UpdatedHoldingsFilter struct {
 // UnmarshalJSON deserializes this filter.
 // Ad-hoc test:
 // $ go run cmd/span-tag/main.go -c fixtures/updatedholdings.json <(echo '{"rft.issn": ["0006-2499"], "rft.date": "1996", "rft.volume": "30"}') | jq .
-func (f *UpdatedHoldingsFilter) UnmarshalJSON(p []byte) error {
+func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
 			Filename string   `json:"file"`
 			Links    []string `json:"urls"`
 			Verbose  bool     `json:"verbose"`
-		} `json:"updatedholdings"`
+		} `json:"holdings"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
@@ -449,18 +449,18 @@ func (f *UpdatedHoldingsFilter) UnmarshalJSON(p []byte) error {
 	for _, name := range f.origins {
 		count += len(holdingsCache[name].serialNumberMap)
 	}
-	log.Printf("loaded holdings: %s (%d)", f.origins, count)
+	log.Printf("holdings: loaded: %d/%d", len(f.origins), count)
 	return nil
 }
 
 // Apply returns true, if there is a valid holding for a given record.
-func (f *UpdatedHoldingsFilter) Apply(is finc.IntermediateSchema) bool {
+func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	var err error
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		for _, key := range f.origins {
 			item, ok := holdingsCache[key]
 			if !ok {
-				log.Println("warning: item not cached")
+				log.Println("holdings: warning: item not cached")
 				return false
 			}
 			for _, entry := range item.serialNumberMap[issn] {
@@ -541,14 +541,14 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 			return nil, err
 		}
 		return &filter, nil
-	case "holdings":
-		var filter HoldingsFilter
+	case "deprecatedholdings":
+		var filter DeprecatedHoldingsFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
 		return &filter, nil
-	case "updatedholdings":
-		var filter UpdatedHoldingsFilter
+	case "holdings":
+		var filter HoldingsFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
