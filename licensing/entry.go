@@ -16,16 +16,22 @@ import (
 	"github.com/miku/span/container"
 )
 
+var (
+	ErrBeforeFirstIssueDate = errors.New("before first issue")
+	ErrAfterLastIssueDate   = errors.New("after last issue")
+	ErrInvalidDate          = errors.New("invalid date")
+)
+
 // datePatterns are candidate patterns for parsing dates.
 var datePatterns = []string{
 	"2006",
+	"2006-01-02",
 	"2006-",
 	"2006-1",
 	"2006-01",
 	"2006-1-2",
 	"2006-1-02",
 	"2006-01-2",
-	"2006-01-02",
 	"2006-Jan",
 	"2006-January",
 	"2006-Jan-2",
