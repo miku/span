@@ -142,6 +142,28 @@ func (e *Entry) ISSNList() []string {
 	return issns.SortedValues()
 }
 
+// Covers is a generic method to determine, whether a given date, volume or issue
+// is covered by this entry.
+func (e *Entry) Covers(date, volume, issue string) error {
+	t, g, err := parseWithGranularity(date)
+	if err != nil {
+		return err
+	}
+	if err := e.containsDateTime(t, g); err != nil {
+		return err
+	}
+	if err := Embargo(e.Embargo).Compatible(t); err != nil {
+		return err
+	}
+	if err := e.containsVolume(volume); err != nil {
+		return err
+	}
+	if err := e.containsIssue(issue); err != nil {
+		return err
+	}
+	return nil
+}
+
 // begin parses left boundary of license interval, returns a date far in the past
 // if it is not defined.
 func (e *Entry) begin() time.Time {
@@ -244,28 +266,6 @@ func (e *Entry) containsIssue(s string) error {
 	}
 	if v > findInt(e.LastIssue) {
 		return ErrAfterLastIssue
-	}
-	return nil
-}
-
-// Covers is a generic method to determine, whether a given date, volume or issue
-// is covered by this entry.
-func (e *Entry) Covers(date, volume, issue string) error {
-	t, g, err := parseWithGranularity(date)
-	if err != nil {
-		return err
-	}
-	if err := e.containsDateTime(t, g); err != nil {
-		return err
-	}
-	if err := Embargo(e.Embargo).Compatible(t); err != nil {
-		return err
-	}
-	if err := e.containsVolume(volume); err != nil {
-		return err
-	}
-	if err := e.containsIssue(issue); err != nil {
-		return err
 	}
 	return nil
 }
