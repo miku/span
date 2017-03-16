@@ -248,6 +248,9 @@ func (e *Entry) containsDate(s string) (err error) {
 
 // containsIssue return nil, if the given volume (string) is contained in this entries volume range.
 func (e *Entry) containsVolume(s string) error {
+	if s == "" {
+		return nil
+	}
 	v := findInt(s)
 	if e.FirstVolume != "" && v < findInt(e.FirstVolume) {
 		return ErrBeforeFirstVolume
@@ -260,14 +263,14 @@ func (e *Entry) containsVolume(s string) error {
 
 // containsIssue return nil, if the given issue (string) is contained in this entries issue range.
 func (e *Entry) containsIssue(s string) error {
-	if e.FirstIssue == "" && e.LastIssue == "" {
+	if s == "" {
 		return nil
 	}
 	v := findInt(s)
-	if v < findInt(e.FirstIssue) {
+	if e.FirstIssue != "" && v < findInt(e.FirstIssue) {
 		return ErrBeforeFirstIssue
 	}
-	if v > findInt(e.LastIssue) {
+	if e.LastIssue != "" && v > findInt(e.LastIssue) {
 		return ErrAfterLastIssue
 	}
 	return nil

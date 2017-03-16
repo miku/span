@@ -151,7 +151,8 @@ func TestContainsVolume(t *testing.T) {
 		{Entry{LastVolume: "10th volume"}, "10", nil},
 		{Entry{LastVolume: "11th volume"}, "10", nil},
 		{Entry{LastVolume: "9"}, "10", ErrAfterLastVolume},
-		{Entry{FirstVolume: "9", LastVolume: "11"}, "10", nil},
+		{Entry{FirstVolume: "11", LastVolume: ""}, "10", ErrBeforeFirstVolume},
+		{Entry{FirstVolume: "11", LastVolume: ""}, "", nil},
 	}
 	for _, c := range cases {
 		err := c.entry.containsVolume(c.volume)
