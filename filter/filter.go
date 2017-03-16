@@ -393,6 +393,14 @@ type HoldingsFilter struct {
 	verbose bool
 }
 
+// count returns the number of entries loaded for this filter.
+func (f *HoldingsFilter) count() (count int) {
+	for _, name := range f.origins {
+		count += len(holdingsCache[name].serialNumberMap)
+	}
+	return
+}
+
 // UnmarshalJSON deserializes this filter.
 // Ad-hoc test:
 // $ go run cmd/span-tag/main.go -c fixtures/updatedholdings.json <(echo '{"rft.issn": ["0006-2499"], "rft.date": "1996", "rft.volume": "30"}') | jq .
@@ -445,11 +453,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		f.origins = append(f.origins, link)
 	}
 
-	count := 0
-	for _, name := range f.origins {
-		count += len(holdingsCache[name].serialNumberMap)
-	}
-	log.Printf("holdings: loaded: %d/%d", len(f.origins), count)
+	log.Printf("holdings: loaded: %d/%d", len(f.origins), f.count())
 	return nil
 }
 
