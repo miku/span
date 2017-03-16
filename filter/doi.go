@@ -7,13 +7,13 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// DOIFilter allows records with a given DOI. Use in conjuction with "not" to
-// create blacklists.
+// DOIFilter allows records with a given DOI. Can be used in conjuction with
+// "not" to create blacklists.
 type DOIFilter struct {
 	values []string
 }
 
-// Apply filters packages.
+// Apply applies the filter.
 func (f *DOIFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, v := range f.values {
 		if v == is.DOI {
@@ -34,19 +34,13 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-
 	if s.DOI.File != "" {
 		lines, err := span.ReadLines(s.DOI.File)
 		if err != nil {
 			return err
 		}
-		for _, line := range lines {
-			f.values = append(f.values, line)
-		}
+		f.values = append(f.values, lines...)
 	}
-
-	for _, v := range s.DOI.Values {
-		f.values = append(f.values, v)
-	}
+	f.values = append(f.values, s.DOI.Values...)
 	return nil
 }

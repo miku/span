@@ -1,13 +1,13 @@
 // Package filter implements flexible ISIL attachments with expression trees[1],
 // serialized as JSON. The top-level key is the label, that is to be given to a
-// record. Here, this label is an ISIL. Each ISIL specifies a tree of filters.
+// record. Here, this label is an ISIL. Each ISIL can specify a tree of filters.
 // Intermediate nodes can be "or", "and" or "not" filters, leaf nodes contain
-// filters, that are matched against records.
+// filters, that are matched against records (like "collection", "source" or "issn").
 //
-// The only method a filter needs to implement is Apply. If the filter takes
-// configuration options, it must implement UnmarshalJSON, so we can load the it
-// from a file. Each filter can define arbitrary options, for example a
-// HoldingsFilter can be loaded from a single file or a list of urls.
+// A filter needs to implement is Apply. If the filter takes configuration
+// options, it needs to implement UnmarshalJSON as well. Each filter can define
+// arbitrary options, for example a HoldingsFilter can load KBART data from a single
+// file or a list of urls.
 //
 // [1] https://en.wikipedia.org/wiki/Binary_expression_tree#Boolean_expressions
 //
@@ -23,11 +23,11 @@
 //
 // Another slightly more complex example: Here, the ISIL "DE-14" is attached to a
 // record, if the following conditions are met: There are two alternatives, each
-// consisting of a conjuntion. The first says: IF "the record is from source id 55
-// *and* if the record can be validated against one of the holding files given by
+// consisting of a conjuntion. The first says: IF "the record is from source id 55"
+// AND IF "the record can be validated against one of the holding files given by
 // their url", THEN "attach DE-14". The second says: IF "the record is from source
-// id 49 *and* it validates against any one of the holding files given by their
-// urls *and* the record belongs to any one of the given collections", THEN
+// id 49" AND "it validates against any one of the holding files given by their
+// urls" AND "the record belongs to any one of the given collections", THEN
 // "attach DE-14".
 //
 // {
@@ -80,8 +80,7 @@
 //   }
 // }
 //
-//
-// If is relatively easy to add additional filter. Imagine we want to build a filter that only allows record
+// If is relatively easy to add a new filter. Imagine we want to build a filter that only allows records
 // that have the word "awesome" in their title.
 //
 // We first define a new type:
@@ -115,10 +114,6 @@
 //
 //     {"DE-X": {"awesome": {}}}
 //
-// --------
-//
-// TODO(miku): Simplify some too long Unmarshaler, create filterutil if necessary.
 //
 // Further readings: http://theory.stanford.edu/~sergei/papers/sigmod10-index.pdf
-//
 package filter

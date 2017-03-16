@@ -7,7 +7,7 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// OrFilter returns true, if there is at least one filter matches.
+// OrFilter returns true, if at least one filter matches.
 type OrFilter struct {
 	filters []Filter
 }

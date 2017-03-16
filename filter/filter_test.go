@@ -36,7 +36,7 @@ func TestOrFilter1(t *testing.T) {
 		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, false},
 	}
 
-	var tree FilterTree
+	var tree Tree
 	if err := json.Unmarshal([]byte(s), &tree); err != nil {
 		t.Errorf("invalid filter: %s", err)
 	}
@@ -86,7 +86,7 @@ func TestOrFilter2(t *testing.T) {
 		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, true},
 	}
 
-	var tree FilterTree
+	var tree Tree
 	if err := json.Unmarshal([]byte(s), &tree); err != nil {
 		t.Errorf("invalid filter: %s", err)
 	}
@@ -127,7 +127,7 @@ func TestAndFilter1(t *testing.T) {
 		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, false},
 	}
 
-	var tree FilterTree
+	var tree Tree
 	if err := json.Unmarshal([]byte(s), &tree); err != nil {
 		t.Errorf("invalid filter: %s", err)
 	}
@@ -170,7 +170,7 @@ func TestNotFilter1(t *testing.T) {
 		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, true},
 	}
 
-	var tree FilterTree
+	var tree Tree
 	if err := json.Unmarshal([]byte(s), &tree); err != nil {
 		t.Errorf("invalid filter: %s", err)
 	}

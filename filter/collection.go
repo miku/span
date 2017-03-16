@@ -7,12 +7,12 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// CollectionFilter validates all records matching one of the given collections.
+// CollectionFilter returns true, if the record belongs to any one of the collections.
 type CollectionFilter struct {
 	values *container.StringSet
 }
 
-// Apply filters collections.
+// Apply filter.
 func (f *CollectionFilter) Apply(is finc.IntermediateSchema) bool {
 	return f.values.Contains(is.MegaCollection)
 }
