@@ -9,7 +9,7 @@ import (
 
 // CollectionFilter validates all records matching one of the given collections.
 type CollectionFilter struct {
-	values container.StringSet
+	values *container.StringSet
 }
 
 // Apply filters collections.
@@ -25,6 +25,6 @@ func (f *CollectionFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = *container.NewStringSet(s.Collections...)
+	f.values = container.NewStringSet(s.Collections...)
 	return nil
 }

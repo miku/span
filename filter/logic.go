@@ -7,7 +7,7 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// OrFilter returns true, if there is at least one filter matching.
+// OrFilter returns true, if there is at least one filter matches.
 type OrFilter struct {
 	filters []Filter
 }
@@ -23,19 +23,15 @@ func (f *OrFilter) Apply(is finc.IntermediateSchema) bool {
 }
 
 // UnmarshalJSON turns a config fragment into a or filter.
-func (f *OrFilter) UnmarshalJSON(p []byte) error {
+func (f *OrFilter) UnmarshalJSON(p []byte) (err error) {
 	var s struct {
 		Filters []json.RawMessage `json:"or"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	filters, err := unmarshalFilterList(s.Filters)
-	if err != nil {
-		return err
-	}
-	f.filters = filters
-	return nil
+	f.filters, err = unmarshalFilterList(s.Filters)
+	return err
 }
 
 // AndFilter returns true, only if all filters return true.
@@ -54,14 +50,13 @@ func (f *AndFilter) Apply(is finc.IntermediateSchema) bool {
 }
 
 // UnmarshalJSON turns a config fragment into an or filter.
-func (f *AndFilter) UnmarshalJSON(p []byte) error {
+func (f *AndFilter) UnmarshalJSON(p []byte) (err error) {
 	var s struct {
 		Filters []json.RawMessage `json:"and"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	var err error
 	f.filters, err = unmarshalFilterList(s.Filters)
 	return err
 }
@@ -77,15 +72,14 @@ func (f *NotFilter) Apply(is finc.IntermediateSchema) bool {
 }
 
 // UnmarshalJSON turns a config fragment into a not filter.
-func (f *NotFilter) UnmarshalJSON(p []byte) error {
+func (f *NotFilter) UnmarshalJSON(p []byte) (err error) {
 	var s struct {
 		Filter json.RawMessage `json:"not"`
 	}
-	var err error
-	if err := json.Unmarshal(p, &s); err != nil {
+	if err = json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	// TODO(miku): not should only work with a single filter, what is the
+	// TODO(miku): not should only work with a single filter, what would be the
 	// meaning of "not": [..., ..., ...] ...
 	filters, err := unmarshalFilterList([]json.RawMessage{s.Filter})
 	if err != nil {

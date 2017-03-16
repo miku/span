@@ -9,7 +9,7 @@ import (
 
 // PackageFilter allows all records of one of the given package name.
 type PackageFilter struct {
-	values container.StringSet
+	values *container.StringSet
 }
 
 // Apply filters packages.
@@ -30,6 +30,6 @@ func (f *PackageFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = *container.NewStringSet(s.Packages...)
+	f.values = container.NewStringSet(s.Packages...)
 	return nil
 }
