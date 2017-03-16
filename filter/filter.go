@@ -601,7 +601,7 @@ func firstKey(raw json.RawMessage) (string, error) {
 		return "", err
 	}
 	var keys []string
-	for k, _ := range peeker {
+	for k := range peeker {
 		keys = append(keys, k)
 	}
 	if len(keys) == 0 {
