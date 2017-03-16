@@ -161,3 +161,24 @@ func TestContainsVolume(t *testing.T) {
 		}
 	}
 }
+
+func TestContainsIssue(t *testing.T) {
+	var cases = []struct {
+		entry Entry
+		issue string
+		err   error
+	}{
+		{Entry{}, "", nil},
+		{Entry{}, "10", nil},
+		{Entry{FirstIssue: "1"}, "10", nil},
+		{Entry{LastIssue: "9"}, "10", ErrAfterLastIssue},
+		{Entry{FirstIssue: "11", LastIssue: ""}, "10", ErrBeforeFirstIssue},
+		{Entry{FirstIssue: "11", LastIssue: ""}, "", nil},
+	}
+	for _, c := range cases {
+		err := c.entry.containsIssue(c.issue)
+		if err != c.err {
+			t.Errorf("containsIssue(%v, %v): got %v, want %v", c.entry, c.issue, err, c.err)
+		}
+	}
+}
