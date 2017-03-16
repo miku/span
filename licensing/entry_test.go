@@ -182,3 +182,28 @@ func TestContainsIssue(t *testing.T) {
 		}
 	}
 }
+
+func TestCovers(t *testing.T) {
+	var cases = []struct {
+		entry  Entry
+		date   string
+		volume string
+		issue  string
+		err    error
+	}{
+		{Entry{}, "", "", "", ErrInvalidDate},
+		{Entry{}, "2000", "", "", nil},
+		{Entry{FirstIssueDate: "2001"}, "2000", "", "", ErrBeforeFirstIssueDate},
+		{Entry{FirstIssueDate: "2001"}, "2001", "", "", nil},
+		{Entry{FirstIssueDate: "2001"}, "2001-05-05", "", "", nil},
+		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05", "", "", nil},
+		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05-04", "", "", ErrBeforeFirstIssueDate},
+		{Entry{FirstIssueDate: "2001-05"}, "2001-05-04", "", "", nil},
+	}
+	for _, c := range cases {
+		err := c.entry.Covers(c.date, c.volume, c.issue)
+		if err != c.err {
+			t.Errorf("Covers(%v, %v, %v, %v): got %v, want %v", c.entry, c.date, c.volume, c.issue, err, c.err)
+		}
+	}
+}

@@ -29,8 +29,8 @@ const (
 )
 
 var (
-	ErrBeforeFirstIssueDate = errors.New("before first issue")
-	ErrAfterLastIssueDate   = errors.New("after last issue")
+	ErrBeforeFirstIssueDate = errors.New("before first issue date")
+	ErrAfterLastIssueDate   = errors.New("after last issue date")
 	ErrBeforeFirstVolume    = errors.New("before first volume")
 	ErrAfterLastVolume      = errors.New("after last volume")
 	ErrBeforeFirstIssue     = errors.New("before first issue")
