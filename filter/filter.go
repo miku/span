@@ -74,6 +74,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/miku/span"
@@ -81,7 +82,18 @@ import (
 	"github.com/miku/span/finc"
 	"github.com/miku/span/holdings"
 	"github.com/miku/span/holdings/generic"
+	"github.com/miku/span/licensing"
+	"github.com/miku/span/licensing/kbart"
 )
+
+// holdingsItem groups holdings and cache for fast lookups.
+type holdingsItem struct {
+	holdings        *kbart.Holdings
+	serialNumberMap map[string][]licensing.Entry
+}
+
+// holdingsCache maps url or filename to a holdings structure for reuse.
+var holdingsCache = make(map[string]holdingsItem)
 
 // Filter returns go or no for a given record.
 type Filter interface {
@@ -375,6 +387,99 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	return err
 }
 
+// UpdatedHoldingsFilter uses the new licensing package.
+type UpdatedHoldingsFilter struct {
+	origins []string // Keep cache keys only.
+	verbose bool
+}
+
+// UnmarshalJSON deserializes this filter.
+// Ad-hoc test:
+// $ go run cmd/span-tag/main.go -c fixtures/updatedholdings.json <(echo '{"rft.issn": ["0006-2499"], "rft.date": "1996", "rft.volume": "30"}') | jq .
+func (f *UpdatedHoldingsFilter) UnmarshalJSON(p []byte) error {
+	var s struct {
+		Holdings struct {
+			Filename string   `json:"file"`
+			Links    []string `json:"urls"`
+			Verbose  bool     `json:"verbose"`
+		} `json:"updatedholdings"`
+	}
+	if err := json.Unmarshal(p, &s); err != nil {
+		return err
+	}
+	f.verbose = s.Holdings.Verbose
+
+	// Load holdings from file.
+	if s.Holdings.Filename != "" {
+		if _, ok := holdingsCache[s.Holdings.Filename]; !ok {
+			log.Printf("holdings: read: %s", s.Holdings.Filename)
+			h := new(kbart.Holdings)
+			file, err := os.Open(s.Holdings.Filename)
+			if err != nil {
+				return err
+			}
+			if _, err := h.ReadFrom(file); err != nil {
+				return err
+			}
+			holdingsCache[s.Holdings.Filename] = holdingsItem{
+				holdings:        h,
+				serialNumberMap: h.SerialNumberMap(),
+			}
+		}
+		f.origins = append(f.origins, s.Holdings.Filename)
+	}
+
+	// Load holdings from links.
+	for _, link := range s.Holdings.Links {
+		if _, ok := holdingsCache[link]; !ok {
+			log.Printf("holdings: fetch: %s", link)
+			h := new(kbart.Holdings)
+			if _, err := h.ReadFrom(&span.ZipOrPlainLinkReader{Link: link}); err != nil {
+				return err
+			}
+			holdingsCache[link] = holdingsItem{
+				holdings:        h,
+				serialNumberMap: h.SerialNumberMap(),
+			}
+		}
+		f.origins = append(f.origins, link)
+	}
+
+	count := 0
+	for _, name := range f.origins {
+		count += len(holdingsCache[name].serialNumberMap)
+	}
+	log.Printf("loaded holdings: %s (%d)", f.origins, count)
+	return nil
+}
+
+// Apply returns true, if there is a valid holding for a given record.
+func (f *UpdatedHoldingsFilter) Apply(is finc.IntermediateSchema) bool {
+	var err error
+	for _, issn := range append(is.ISSN, is.EISSN...) {
+		for _, key := range f.origins {
+			item, ok := holdingsCache[key]
+			if !ok {
+				log.Println("warning: item not cached")
+				return false
+			}
+			for _, entry := range item.serialNumberMap[issn] {
+				if err = entry.Covers(is.RawDate, is.Volume, is.Issue); err == nil {
+					return true
+				}
+				if !f.verbose {
+					continue
+				}
+				msg := map[string]interface{}{"document": is, "err": err.Error(), "issn": issn, "entry": entry}
+				if b, err := json.MarshalIndent(msg, "", "    "); err == nil {
+					log.Println(string(b))
+				}
+			}
+		}
+	}
+	return false
+}
+
 // OrFilter returns true, if there is at least one filter matching.
 type OrFilter struct {
 	filters []Filter
@@ -438,6 +543,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 		return &filter, nil
 	case "holdings":
 		var filter HoldingsFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "updatedholdings":
+		var filter UpdatedHoldingsFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}

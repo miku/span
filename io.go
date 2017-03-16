@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -108,16 +109,21 @@ func (r *ZipContentReader) Read(p []byte) (int, error) {
 
 // FileReader creates a ReadCloser from a filename. If postpones error handling up
 // until the first read.
+// TODO: Throw this out.
 type FileReader struct {
 	Filename string
 	f        *os.File
+	once     sync.Once
 }
 
 func (r *FileReader) openFile() (err error) {
-	if r.f != nil {
-		return nil
-	}
-	r.f, err = os.Open(r.Filename)
+	r.once.Do(func() {
+		if r.f != nil {
+			return
+		}
+		log.Println("xxx")
+		r.f, err = os.Open(r.Filename)
+	})
 	return err
 }
 

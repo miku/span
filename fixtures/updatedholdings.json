@@ -1,0 +1,13 @@
+{
+	"X": {
+		"updatedholdings": {
+			"verbose": true
+		}
+	},
+	"Y": {
+		"updatedholdings": {
+			"file": "fixtures/kbart.txt",
+			"verbose": true
+		}
+	}
+}
