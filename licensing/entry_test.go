@@ -220,3 +220,64 @@ func TestCovers(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkCovers(b *testing.B) {
+	benchmarks := []struct {
+		name   string
+		entry  Entry
+		date   string
+		volume string
+		issue  string
+	}{
+		{
+			name: "full",
+			entry: Entry{
+				FirstIssueDate: "2000",
+				FirstVolume:    "4",
+				FirstIssue:     "28",
+				LastIssueDate:  "2008",
+				LastVolume:     "8",
+				LastIssue:      "42",
+			},
+			date: "2008", volume: "8", issue: "43",
+		},
+		{
+			name: "embargo",
+			entry: Entry{
+				FirstIssueDate: "2000",
+				FirstVolume:    "4",
+				FirstIssue:     "28",
+				LastIssueDate:  "2008",
+				LastVolume:     "8",
+				LastIssue:      "42",
+				Embargo:        "P60D",
+			},
+			date: "2008", volume: "8", issue: "43",
+		},
+		{
+			name: "partial",
+			entry: Entry{
+				FirstIssueDate: "2000",
+				LastIssueDate:  "2008",
+				LastVolume:     "1",
+			},
+			date: "2008", volume: "8", issue: "43",
+		},
+	}
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				bm.entry.Covers(bm.date, bm.volume, bm.issue)
+			}
+		})
+	}
+}
+
+// === RUN   TestCovers
+// --- PASS: TestCovers (0.00s)
+// BenchmarkContainsDate-4   	10000000	       221 ns/op
+// BenchmarkCovers/full-4    	 3000000	       466 ns/op
+// BenchmarkCovers/embargo-4 	 1000000	      1742 ns/op
+// BenchmarkCovers/partial-4 	 5000000	       362 ns/op
+// PASS
+// ok  	github.com/miku/span/licensing	8.267s

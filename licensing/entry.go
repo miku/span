@@ -143,7 +143,8 @@ func (e *Entry) ISSNList() []string {
 }
 
 // Covers is a generic method to determine, whether a given date, volume or issue
-// is covered by this entry.
+// is covered by this entry. It takes into account moving walls. If values are not
+// defined, we mostly assume they are not constrained.
 func (e *Entry) Covers(date, volume, issue string) error {
 	t, g, err := parseWithGranularity(date)
 	if err != nil {
