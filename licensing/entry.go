@@ -299,7 +299,7 @@ func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) 
 	return t, g, ErrInvalidDate
 }
 
-// getGranularity returns the granularity for given layout.
+// getGranularity returns the granularity for given date layout.
 func getGranularity(layout string) DateGranularity {
 	for _, dfmt := range datePatterns {
 		if dfmt.layout == layout {
