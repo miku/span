@@ -24,9 +24,6 @@ import (
 // methods.
 type Holdings []licensing.Entry
 
-// FilterFunc is a function that can match an Entry.
-type FilterFunc func(licensing.Entry) bool
-
 // ReadFrom create holdings struct from a reader. Expects a tab separated CSV with
 // a single header line.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
@@ -68,7 +65,7 @@ func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 
 // Filter finds entries with certain characteristics. This will be slow for KBART
 // files with thousands of entries.
-func (h *Holdings) Filter(f FilterFunc) (result []licensing.Entry) {
+func (h *Holdings) Filter(f licensing.FilterFunc) (result []licensing.Entry) {
 	cache := make(map[licensing.Entry]bool)
 	for _, e := range *h {
 		if f(e) {
