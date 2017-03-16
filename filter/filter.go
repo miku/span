@@ -12,13 +12,12 @@ type Filter interface {
 	Apply(finc.IntermediateSchema) bool
 }
 
-// FilterTree allows polymorphic filters.
+// Tree allows polymorphic filters.
 type Tree struct {
 	root Filter
 }
 
-// UnmarshalJSON will decide which filter is the top level one, by peeking into
-// the file.
+// UnmarshalJSON gathers the top level filter name and unmarshals the associated filter.
 func (f *Tree) UnmarshalJSON(p []byte) error {
 	name, err := firstKey(p)
 	if err != nil {
@@ -32,39 +31,33 @@ func (f *Tree) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-// Apply just applies the root filter.
+// Apply applies the root filter.
 func (f *Tree) Apply(is finc.IntermediateSchema) bool {
 	return f.root.Apply(is)
 }
 
 // Tagger is takes a list of tags (ISILs) and annotates and intermediate schema
-// accroding to a number of filter, defined per label. The tagger can be loaded
+// according to a number of filters, defined per label. The tagger can be loaded
 // directly from JSON.
 type Tagger struct {
 	filtermap map[string]Tree
 }
 
-// Tag takes an intermediate schema and returns a labeled version of that
-// schema.
+// Tag takes an intermediate schema record and returns a labeled version of that
+// record.
 func (t *Tagger) Tag(is finc.IntermediateSchema) finc.IntermediateSchema {
-	var tags []string
 	for tag, filter := range t.filtermap {
 		if filter.Apply(is) {
-			tags = append(tags, tag)
+			is.Labels = append(is.Labels, tag)
 		}
 	}
-	is.Labels = tags
 	return is
 }
 
 // UnmarshalJSON unmarshals a complete filter config from serialized JSON.
 func (t *Tagger) UnmarshalJSON(p []byte) error {
-	var fm = make(map[string]Tree)
-	if err := json.Unmarshal(p, &fm); err != nil {
-		return err
-	}
-	t.filtermap = fm
-	return nil
+	t.filtermap = make(map[string]Tree)
+	return json.Unmarshal(p, &t.filtermap)
 }
 
 // unmarshalFilter takes the name of a filter and a raw JSON message and
@@ -155,20 +148,19 @@ func firstKey(raw json.RawMessage) (string, error) {
 	return keys[0], nil
 }
 
-// unmarshalFilterList returns filters from a list of JSON fragments. Unknown
-// filter names will cause an error.
-func unmarshalFilterList(r []json.RawMessage) ([]Filter, error) {
-	var filters []Filter
-	for _, raw := range r {
-		name, err := firstKey(raw)
-		if err != nil {
-			return filters, err
+// unmarshalFilterList returns a list of filters from a list of JSON fragments. Unknown
+// filter names will cause errors.
+func unmarshalFilterList(raw []json.RawMessage) (filters []Filter, err error) {
+	var name string
+	var f Filter
+	for _, r := range raw {
+		if name, err = firstKey(r); err != nil {
+			return
 		}
-		filter, err := unmarshalFilter(name, raw)
-		if err != nil {
-			return filters, err
+		if f, err = unmarshalFilter(name, r); err != nil {
+			return
 		}
-		filters = append(filters, filter)
+		filters = append(filters, f)
 	}
-	return filters, nil
+	return
 }
