@@ -3,6 +3,7 @@ package licensing
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestISSNList(t *testing.T) {
@@ -193,12 +194,24 @@ func TestCovers(t *testing.T) {
 	}{
 		{Entry{}, "", "", "", ErrInvalidDate},
 		{Entry{}, "2000", "", "", nil},
-		{Entry{FirstIssueDate: "2001"}, "2000", "", "", ErrBeforeFirstIssueDate},
-		{Entry{FirstIssueDate: "2001"}, "2001", "", "", nil},
-		{Entry{FirstIssueDate: "2001"}, "2001-05-05", "", "", nil},
-		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05", "", "", nil},
+		{Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "1989", "", "", ErrBeforeFirstIssueDate},
+		{Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "2008-02", "", "", ErrAfterLastIssueDate},
+		{Entry{FirstIssueDate: "2000", FirstVolume: "3", FirstIssue: "21", LastIssueDate: "2008"}, "2000", "3", "20", ErrBeforeFirstIssue},
+		{Entry{FirstIssueDate: "2000", FirstVolume: "3", LastIssueDate: "2008"}, "2000", "1", "", ErrBeforeFirstVolume},
+		{Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2", LastIssue: "12"}, "2008", "2", "13", ErrAfterLastIssue},
+		{Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2"}, "2008", "3", "", ErrAfterLastVolume},
 		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05-04", "", "", ErrBeforeFirstIssueDate},
+		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05", "", "", nil},
 		{Entry{FirstIssueDate: "2001-05"}, "2001-05-04", "", "", nil},
+		{Entry{FirstIssueDate: "2001"}, "2000", "", "", ErrBeforeFirstIssueDate},
+		{Entry{FirstIssueDate: "2001"}, "2001-05-05", "", "", nil},
+		{Entry{FirstIssueDate: "2001"}, "2001", "", "", nil},
+		{
+			Entry{
+				FirstIssueDate: time.Now().Add(-168 * time.Hour).Format("2006-01-02"),
+				Embargo:        "P1Y",
+			}, time.Now().Format("2006-01-02"), "", "", ErrAfterMovingWall,
+		},
 	}
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
