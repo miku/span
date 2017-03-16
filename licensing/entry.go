@@ -94,6 +94,15 @@ type Entry struct {
 	OCLCLinkScheme                     string `csv:"oclc_link_scheme"`           // "wiley.book"
 	OCLCNumber                         string `csv:"oclc_number"`                // "122938128"
 	Action                             string `csv:"ACTION"`                     // "raw"
+
+	parsed struct {
+		FirstIssueDate time.Time
+		LastIssueDate  time.Time
+		FirstVolume    int
+		LastVolume     int
+		FirstIssue     int
+		LastIssue      int
+	}
 }
 
 // NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
