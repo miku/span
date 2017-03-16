@@ -295,6 +295,9 @@ func FindSerialNumbers(s string) []string {
 // parseWithGranularity tries to parse a string into a time. If successful, also
 // return the granularity.
 func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) {
+	if s == "" {
+		return time.Time{}, GRANULARITY_DAY, ErrInvalidDate
+	}
 	for _, dfmt := range datePatterns {
 		t, err = time.Parse(dfmt.layout, s)
 		if err != nil {

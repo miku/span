@@ -263,6 +263,9 @@ func BenchmarkCovers(b *testing.B) {
 			},
 			date: "2008", volume: "8", issue: "43",
 		},
+		{
+			name: "empty", entry: Entry{}, date: "", volume: "", issue: "",
+		},
 	}
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
