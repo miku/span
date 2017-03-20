@@ -14,8 +14,8 @@ import (
 
 // holdingsItem groups holdings and cache for fast lookups.
 type holdingsItem struct {
-	holdings        *kbart.Holdings
-	serialNumberMap map[string][]licensing.Entry
+	holdings        *kbart.Holdings              // raw holdings data
+	serialNumberMap map[string][]licensing.Entry // key: ISSN
 }
 
 // holdingsCache caches items keyed by filename or url. A configuration might
