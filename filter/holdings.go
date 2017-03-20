@@ -111,6 +111,8 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 // Apply returns true, if there is a valid holding for a given record. This will
 // take multiple attibutes like date, volume, issue and embargo into account.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
+	// TODO(miku): Add other checks here. Example: Use is.PackageName (48) to lookup
+	// parsed package names from kbart file.
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		for _, key := range f.origins {
 			item := cache[key] // The key is guaruanteed to be in cache.
