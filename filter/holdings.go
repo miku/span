@@ -2,6 +2,7 @@ package filter
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"os"
 
@@ -17,44 +18,41 @@ type holdingsItem struct {
 	serialNumberMap map[string][]licensing.Entry
 }
 
-// holdingsCache caches items keyed by filename or url.
+// holdingsCache caches items keyed by filename or url. A configuration might
+// refer to the same holding file hundreds or thousands of times.
 type holdingsCache map[string]holdingsItem
 
-// addFile parses a holding file and adds it to the cache.
-func (c *holdingsCache) addFile(filename string) error {
-	if _, ok := (*c)[filename]; ok {
+// addReader reads a holding file from a reader and caches it under the given key.
+func (c *holdingsCache) addReader(key string, r io.Reader) error {
+	if _, ok := (*c)[key]; ok {
+		log.Printf("holdings: already cached %s", key)
 		return nil
 	}
-	log.Printf("holdings: read: %s", filename)
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
 	h := new(kbart.Holdings)
-	if _, err := h.ReadFrom(file); err != nil {
+	if _, err := h.ReadFrom(r); err != nil {
 		return err
 	}
-	(*c)[filename] = holdingsItem{
+	(*c)[key] = holdingsItem{
 		holdings:        h,
 		serialNumberMap: h.SerialNumberMap(),
 	}
 	return nil
 }
 
-func (c *holdingsCache) addLink(link string) error {
-	if _, ok := (*c)[link]; ok {
-		return nil
-	}
-	log.Printf("holdings: fetch: %s", link)
-	h := new(kbart.Holdings)
-	if _, err := h.ReadFrom(&span.ZipOrPlainLinkReader{Link: link}); err != nil {
+// addFile parses a holding file and adds it to the cache.
+func (c *holdingsCache) addFile(filename string) error {
+	log.Printf("holdings: read: %s", filename)
+	file, err := os.Open(filename)
+	if err != nil {
 		return err
 	}
-	(*c)[link] = holdingsItem{
-		holdings:        h,
-		serialNumberMap: h.SerialNumberMap(),
-	}
-	return nil
+	return c.addReader(filename, file)
+}
+
+// addLink parses a holding file from a link and adds it to the cache.
+func (c *holdingsCache) addLink(link string) error {
+	log.Printf("holdings: fetch: %s", link)
+	return c.addReader(link, &span.ZipOrPlainLinkReader{Link: link})
 }
 
 // cache caches holdings information.
