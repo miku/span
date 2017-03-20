@@ -76,13 +76,20 @@ func (f *HoldingsFilter) count() (count int) {
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
-			Filename string   `json:"file"`
-			Links    []string `json:"urls"`
-			Verbose  bool     `json:"verbose"`
+			Filename  string   `json:"file"` // compat
+			Filenames []string `json:"files"`
+			Links     []string `json:"urls"`
+			Verbose   bool     `json:"verbose"`
 		} `json:"holdings"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
+	}
+	for _, fn := range s.Holdings.Filenames {
+		if err := cache.addFile(fn); err != nil {
+			return err
+		}
+		f.origins = append(f.origins, fn)
 	}
 	if s.Holdings.Filename != "" {
 		if err := cache.addFile(s.Holdings.Filename); err != nil {
