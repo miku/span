@@ -90,7 +90,7 @@ var (
 type Embargo string
 
 // Duration converts embargo like P12M, P1M, R10Y into a time.Duration. This
-// duration will non-negative. Time differences will have small shifts due to a
+// duration will be positive. Time differences will have small shifts due to a
 // month and a year being a fixed number of hours.
 func (embargo Embargo) Duration() (dur time.Duration, err error) {
 	e := strings.TrimSpace(string(embargo))

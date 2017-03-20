@@ -121,13 +121,14 @@ type Entry struct {
 	OCLCNumber                         string `csv:"oclc_number"`                // "122938128"
 	Action                             string `csv:"ACTION"`                     // "raw"
 
+	// cache data, that needs to be parsed, for performance
 	parsed struct {
 		FirstIssueDate time.Time
 		LastIssueDate  time.Time
 	}
 }
 
-// ISSNList returns a list of all ISSN from various fields.
+// ISSNList returns a list of normalized ISSN from various fields.
 func (e *Entry) ISSNList() []string {
 	issns := container.NewStringSet()
 	for _, issn := range []string{e.PrintIdentifier, e.OnlineIdentifier} {
@@ -221,7 +222,9 @@ func (e *Entry) endGranularity(g DateGranularity) time.Time {
 	}
 }
 
-// containsDateTime returns nil, if the given time lies between this entries dates.
+// containsDateTime returns nil, if the given time lies between this entries
+// dates. If the given time is the zero value, it will be contained by any
+// interval.
 func (e *Entry) containsDateTime(t time.Time, g DateGranularity) error {
 	if t.IsZero() {
 		return nil
@@ -235,7 +238,9 @@ func (e *Entry) containsDateTime(t time.Time, g DateGranularity) error {
 	return nil
 }
 
-// containsDate return nil, if the given date (as string), lies between this entries issue dates.
+// containsDate return nil, if the given date (as string), lies between this
+// entries issue dates. The empty string is interpreted as being inside all
+// intervals.
 func (e *Entry) containsDate(s string) (err error) {
 	if s == "" {
 		return nil
