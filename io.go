@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,6 +30,10 @@ func (r *LinkReader) fill() (err error) {
 			return
 		}
 		defer resp.Body.Close()
+		if resp.StatusCode >= 400 {
+			err = fmt.Errorf("request to %s failed with: %s", r.Link, resp.Status)
+			return
+		}
 		_, err = io.Copy(&r.buf, resp.Body)
 	})
 	return err
