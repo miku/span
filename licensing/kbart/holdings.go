@@ -71,9 +71,8 @@ func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
 	patterns := []*regexp.Regexp{
 		regexp.MustCompile(`https://www.wiso-net.de/toc_list/([A-Z]{3,4})`),
-		regexp.MustCompile(`https://www.wiso-net.de/dosearch?&dbShortcut=([A-Z]{3,4})`),
-		regexp.MustCompile(`https://www.wiso-net.de/dosearch?&dbShortcut=:2:2:([A-Z]{3,4})`),
-		regexp.MustCompile(`https://www.wiso-net.de/dosearch?explicitSearch=true&q=an%3E1&x=0&y=0&dbShortcut=([A-Z]{3,4})`),
+		regexp.MustCompile(`https://www.wiso-net.de/.*dbShortcut=:2:2:([A-Z]{3,4})`),
+		regexp.MustCompile(`https://www.wiso-net.de/.*dbShortcut=([A-Z]{3,4})`),
 	}
 	cache := make(map[string]map[licensing.Entry]bool)
 	for _, e := range *h {

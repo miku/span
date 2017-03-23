@@ -126,7 +126,7 @@ func BenchmarkLookupViaFilter(b *testing.B) {
 func TestWisoDatabaseMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.WisoDatabaseMap()
-	if len(m) != 339 {
-		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), 339)
+	if len(m) != 534 {
+		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), 534)
 	}
 }
