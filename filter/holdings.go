@@ -16,6 +16,7 @@ import (
 type holdingsItem struct {
 	holdings        *kbart.Holdings              // raw holdings data
 	serialNumberMap map[string][]licensing.Entry // key: ISSN
+	wisoDatabaseMap map[string][]licensing.Entry // key: WISO DB name
 }
 
 // holdingsCache caches items keyed by filename or url. A configuration might
@@ -35,6 +36,7 @@ func (c *holdingsCache) addReader(key string, r io.Reader) error {
 	(*c)[key] = holdingsItem{
 		holdings:        h,
 		serialNumberMap: h.SerialNumberMap(),
+		wisoDatabaseMap: h.WisoDatabaseMap(),
 	}
 	return nil
 }
@@ -131,6 +133,20 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 				}
 				if b, err := json.Marshal(msg); err == nil {
 					log.Println(string(b))
+				}
+			}
+		}
+	}
+
+	switch is.SourceID {
+	case "48": // Check for WISO database name.
+		for _, pkg := range is.Packages {
+			for _, key := range f.origins {
+				item := cache[key]
+				if len(item.wisoDatabaseMap[pkg]) > 0 {
+					log.Printf("attach by WISO database name: %s", pkg)
+					// At the moment we do not look deeper into an entry.
+					return true
 				}
 			}
 		}
