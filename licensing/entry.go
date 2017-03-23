@@ -137,9 +137,6 @@ func (e *Entry) ISSNList() []string {
 			issns.Add(s)
 		}
 	}
-	for _, issn := range FindSerialNumbers(e.OwnAnchor) {
-		issns.Add(issn)
-	}
 	for _, issn := range FindSerialNumbers(e.AllSerialNumbers) {
 		issns.Add(issn)
 	}
