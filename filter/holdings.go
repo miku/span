@@ -144,11 +144,11 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 		for _, pkg := range is.Packages {
 			for _, key := range f.names {
 				item := cache[key]
-				if len(item.wisoDatabaseMap[pkg]) > 0 {
-					log.Printf("attach by WISO database name: %s", pkg)
-					// At the moment we do not look deeper into an entry.
-					return true
+				if len(item.wisoDatabaseMap[pkg]) == 0 {
+					continue
 				}
+				// At the moment we do not look deeper into an entry.
+				return true
 			}
 		}
 	}
