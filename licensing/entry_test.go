@@ -24,14 +24,14 @@ func TestISSNList(t *testing.T) {
 			[]string{"1234-5678"},
 		},
 		{
-			Entry{PrintIdentifier: "22", OwnAnchor: "1234-5678; Hello 2222-222X"},
+			Entry{PrintIdentifier: "22", AllSerialNumbers: "1234-5678; Hello 2222-222X"},
 			[]string{"1234-5678", "2222-222X"},
 		},
 		{
 			Entry{
 				OnlineIdentifier: "4444-4444",
 				PrintIdentifier:  "3333-3333",
-				OwnAnchor:        "1234-5678; Hello 2222-222X",
+				AllSerialNumbers: "1234-5678; Hello 2222-222X",
 			},
 			[]string{"1234-5678", "2222-222X", "3333-3333", "4444-4444"},
 		},
