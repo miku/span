@@ -62,13 +62,13 @@ var cache = make(holdingsCache)
 
 // HoldingsFilter uses the new licensing package.
 type HoldingsFilter struct {
-	origins []string // Keep cache keys only (filename or URL of holdings document).
+	names   []string // Keep cache keys only (filename or URL of holdings document).
 	verbose bool
 }
 
 // count returns the number of entries loaded for this filter.
 func (f *HoldingsFilter) count() (count int) {
-	for _, name := range f.origins {
+	for _, name := range f.names {
 		count += len(cache[name].serialNumberMap)
 	}
 	return
@@ -91,22 +91,22 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		if err := cache.addFile(fn); err != nil {
 			return err
 		}
-		f.origins = append(f.origins, fn)
+		f.names = append(f.names, fn)
 	}
 	if s.Holdings.Filename != "" {
 		if err := cache.addFile(s.Holdings.Filename); err != nil {
 			return err
 		}
-		f.origins = append(f.origins, s.Holdings.Filename)
+		f.names = append(f.names, s.Holdings.Filename)
 	}
 	for _, link := range s.Holdings.Links {
 		if err := cache.addLink(link); err != nil {
 			return err
 		}
-		f.origins = append(f.origins, link)
+		f.names = append(f.names, link)
 	}
 	f.verbose = s.Holdings.Verbose
-	log.Printf("holdings: loaded: %d/%d", len(f.origins), f.count())
+	log.Printf("holdings: loaded: %d/%d", len(f.names), f.count())
 	return nil
 }
 
@@ -117,7 +117,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	// Default check by via serial number.
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		for _, key := range f.origins {
+		for _, key := range f.names {
 			item := cache[key]
 			for _, entry := range item.serialNumberMap[issn] {
 				err := entry.Covers(is.RawDate, is.Volume, is.Issue)
@@ -142,7 +142,7 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	switch is.SourceID {
 	case "48": // Check for WISO database name.
 		for _, pkg := range is.Packages {
-			for _, key := range f.origins {
+			for _, key := range f.names {
 				item := cache[key]
 				if len(item.wisoDatabaseMap[pkg]) > 0 {
 					log.Printf("attach by WISO database name: %s", pkg)
