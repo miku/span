@@ -13,6 +13,7 @@ package kbart
 
 import (
 	"io"
+	"regexp"
 
 	"github.com/miku/span"
 	"github.com/miku/span/encoding/tsv"
@@ -55,6 +56,40 @@ func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 			cache[issn][e] = true
 		}
 	}
+	// Make unique.
+	result := make(map[string][]licensing.Entry)
+	for issn, entrymap := range cache {
+		for k := range entrymap {
+			result[issn] = append(result[issn], k)
+		}
+	}
+	return result
+}
+
+// WisoDatabaseMap derives a structure from the holdings file, that maps WISO
+// database names to the associated entries, refs. #9534.
+func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
+	patterns := []*regexp.Regexp{
+		regexp.MustCompile(`https://www.wiso-net.de/toc_list/([A-Z]{3,4})`),
+		regexp.MustCompile(`https://www.wiso-net.de/dosearch?&dbShortcut=([A-Z]{3,4})`),
+		regexp.MustCompile(`https://www.wiso-net.de/dosearch?&dbShortcut=:2:2:([A-Z]{3,4})`),
+		regexp.MustCompile(`https://www.wiso-net.de/dosearch?explicitSearch=true&q=an%3E1&x=0&y=0&dbShortcut=([A-Z]{3,4})`),
+	}
+	cache := make(map[string]map[licensing.Entry]bool)
+	for _, e := range *h {
+		for _, p := range patterns {
+			matches := p.FindStringSubmatch(e.TitleURL)
+			if len(matches) < 2 {
+				continue
+			}
+			db := matches[1]
+			if cache[db] == nil {
+				cache[db] = make(map[licensing.Entry]bool)
+			}
+			cache[db][e] = true
+		}
+	}
+	// Make unique.
 	result := make(map[string][]licensing.Entry)
 	for issn, entrymap := range cache {
 		for k := range entrymap {

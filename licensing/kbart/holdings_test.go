@@ -122,3 +122,11 @@ func BenchmarkLookupViaFilter(b *testing.B) {
 // BenchmarkLookupViaFilter-4            	     100	  13340319 ns/op
 // PASS
 // ok  	github.com/miku/span/licensing/kbart	12.653s
+
+func TestWisoDatabaseMap(t *testing.T) {
+	holdings := loadHoldings(t)
+	m := holdings.WisoDatabaseMap()
+	if len(m) != 339 {
+		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), 339)
+	}
+}
