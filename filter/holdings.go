@@ -112,7 +112,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 
 // Apply returns true, if there is a valid holding for a given record. This will
 // take multiple attibutes like date, volume, issue and embargo into account. This
-// function is very ungeneral: it takes a specific format and it uses specific
+// function is very specific: it works only with intermediate format and it uses specific
 // information from that format to decide on attachment.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	// Default check by via serial number.
