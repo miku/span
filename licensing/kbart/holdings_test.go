@@ -71,8 +71,8 @@ func TestFilter(t *testing.T) {
 func TestSerialNumberMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.SerialNumberMap()
-	if len(m) != 79575 {
-		t.Errorf("SerialNumberMap: got %v, want %v", len(m), 79575)
+	if len(m) != 83721 {
+		t.Errorf("SerialNumberMap: got %v, want %v", len(m), 83721)
 	}
 }
 
