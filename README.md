@@ -24,8 +24,6 @@ Formats
 Also:
 
 * [KBART](http://www.uksg.org/KBART)
-* [OVID](http://rzblx4.uni-regensburg.de/ezeitdata/admin/ezb_export_ovid_v01.xsd) holdings
-* [Google holdings](http://scholar.google.com/intl/en/scholar/libraries.html)
 
 TODO
 ----
