@@ -83,6 +83,12 @@ func TestEmbargoCompatible(t *testing.T) {
 			err:     nil,
 		},
 		{
+			embargo: Embargo("P1Y"), // Access ends 1 year from relative date.
+			t:       mustParseTime("2006-01-02", "2000-01-01"),
+			rel:     mustParseTime("2006-01-02", "2001-01-01"),
+			err:     nil,
+		},
+		{
 			embargo: Embargo("R1Y"),                            // Access begin one year from relative date.
 			t:       mustParseTime("2006-01-02", "2000-01-03"), // Glitch due to fixed number of hours.
 			rel:     mustParseTime("2006-01-02", "2001-01-01"),
@@ -93,6 +99,26 @@ func TestEmbargoCompatible(t *testing.T) {
 		err := c.embargo.CompatibleTo(c.t, c.rel)
 		if err != c.err {
 			t.Errorf("CompatibleTo(%v, %v, %v): got %v, want %v", c.embargo, c.t, c.rel, err, c.err)
+		}
+	}
+}
+
+func TestEmbargoAccessBeginsAtWall(t *testing.T) {
+	var cases = []struct {
+		e                  Embargo
+		accessBeginsAtWall bool
+	}{
+		{Embargo("1"), false},
+		{Embargo("R1"), true},
+		{Embargo("R1D"), true},
+		{Embargo("R10M"), true},
+		{Embargo("?10M"), false},
+	}
+
+	for _, c := range cases {
+		got := c.e.AccessBeginsAtWall()
+		if got != c.accessBeginsAtWall {
+			t.Errorf("embargo.AccessBeginsAtWall() got %v, want %v", got, c.accessBeginsAtWall)
 		}
 	}
 }

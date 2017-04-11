@@ -186,37 +186,71 @@ func TestContainsIssue(t *testing.T) {
 
 func TestCovers(t *testing.T) {
 	var cases = []struct {
+		about  string
 		entry  Entry
 		date   string
 		volume string
 		issue  string
 		err    error
 	}{
-		{Entry{}, "", "", "", ErrInvalidDate},
-		{Entry{}, "2000", "", "", nil},
-		{Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "1989", "", "", ErrBeforeFirstIssueDate},
-		{Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "2008-02", "", "", ErrAfterLastIssueDate},
-		{Entry{FirstIssueDate: "2000", FirstVolume: "3", FirstIssue: "21", LastIssueDate: "2008"}, "2000", "3", "20", ErrBeforeFirstIssue},
-		{Entry{FirstIssueDate: "2000", FirstVolume: "3", LastIssueDate: "2008"}, "2000", "1", "", ErrBeforeFirstVolume},
-		{Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2", LastIssue: "12"}, "2008", "2", "13", ErrAfterLastIssue},
-		{Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2"}, "2008", "3", "", ErrAfterLastVolume},
-		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05-04", "", "", ErrBeforeFirstIssueDate},
-		{Entry{FirstIssueDate: "2001-05-05"}, "2001-05", "", "", nil},
-		{Entry{FirstIssueDate: "2001-05"}, "2001-05-04", "", "", nil},
-		{Entry{FirstIssueDate: "2001"}, "2000", "", "", ErrBeforeFirstIssueDate},
-		{Entry{FirstIssueDate: "2001"}, "2001-05-05", "", "", nil},
-		{Entry{FirstIssueDate: "2001"}, "2001", "", "", nil},
+		{"an empty date is not accepted",
+			Entry{}, "", "", "", ErrInvalidDate},
+		{"an empty does not impose constraints",
+			Entry{}, "2000", "", "", nil},
+		{"given date lies before entry interval",
+			Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "1989", "", "", ErrBeforeFirstIssueDate},
+		{"given date lies after entry interval",
+			Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "2008-02", "", "", ErrAfterLastIssueDate},
+		{"date ok, but issue too early",
+			Entry{FirstIssueDate: "2000", FirstVolume: "3", FirstIssue: "21", LastIssueDate: "2008"},
+			"2000", "3", "20", ErrBeforeFirstIssue},
+		{"date ok, but volume too early",
+			Entry{FirstIssueDate: "2000", FirstVolume: "3", LastIssueDate: "2008"},
+			"2000", "1", "", ErrBeforeFirstVolume},
+		{"date ok, but issue too late",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2", LastIssue: "12"},
+			"2008", "2", "13", ErrAfterLastIssue},
+		{"date ok, but volume too late",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2"},
+			"2008", "3", "", ErrAfterLastVolume},
+		{"date too early, same granularity",
+			Entry{FirstIssueDate: "2001-05-05"}, "2001-05-04", "", "", ErrBeforeFirstIssueDate},
+		{"date ok, use the coarser granularity",
+			Entry{FirstIssueDate: "2001-05-05"}, "2001-05", "", "", nil},
+		{"date ok, use the coarser granularity",
+			Entry{FirstIssueDate: "2001-05"}, "2001-05-04", "", "", nil},
+		{"date too early",
+			Entry{FirstIssueDate: "2001"}, "2000", "", "", ErrBeforeFirstIssueDate},
+		{"date ok, use the coarser granularity",
+			Entry{FirstIssueDate: "2001"}, "2001-05-05", "", "", nil},
+		{"date ok",
+			Entry{FirstIssueDate: "2001"}, "2001", "", "", nil},
 		{
+			"date ok, but moving wall hit",
 			Entry{
 				FirstIssueDate: time.Now().Add(-168 * time.Hour).Format("2006-01-02"),
 				Embargo:        "P1Y",
 			}, time.Now().Format("2006-01-02"), "", "", ErrAfterMovingWall,
 		},
+		{
+			"date ok and moving wall hit",
+			Entry{
+				FirstIssueDate: "2000-01-01",
+				Embargo:        "P1Y",
+			}, time.Now().Add(-4000 * time.Hour).Format("2006-01-02"), "", "", ErrAfterMovingWall,
+		},
+		{
+			"date ok and moving wall fine",
+			Entry{
+				FirstIssueDate: "2000-01-01",
+				Embargo:        "P1Y",
+			}, time.Now().Add(-10000 * time.Hour).Format("2006-01-02"), "", "", nil,
+		},
 	}
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
 		if err != c.err {
-			t.Errorf("Covers(%v, %v, %v, %v): got %v, want %v", c.entry, c.date, c.volume, c.issue, err, c.err)
+			t.Errorf("Covers(%#v, %v, %v, %v): got %v, want %v", c.entry, c.date, c.volume, c.issue, err, c.err)
 		}
 	}
 }
