@@ -110,45 +110,49 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
+// covers returns true, if entry covers given document.
+func (f *HoldingsFilter) covers(entry licensing.Entry, is finc.IntermediateSchema) bool {
+	err := entry.Covers(is.RawDate, is.Volume, is.Issue)
+	if err == nil {
+		return true
+	}
+	if f.verbose {
+		msg := map[string]interface{}{"document": is, "entry": entry, "err": err.Error()}
+		if b, err := json.Marshal(msg); err == nil {
+			log.Println(string(b))
+		}
+	}
+	return false
+}
+
 // Apply returns true, if there is a valid holding for a given record. This will
 // take multiple attibutes like date, volume, issue and embargo into account. This
 // function is very specific: it works only with intermediate format and it uses specific
 // information from that format to decide on attachment.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
-	// Default check by via serial number.
-	for _, issn := range append(is.ISSN, is.EISSN...) {
-		for _, key := range f.names {
-			item := cache[key]
-			for _, entry := range item.serialNumberMap[issn] {
-				err := entry.Covers(is.RawDate, is.Volume, is.Issue)
-				if err == nil {
-					return true
-				}
-				if !f.verbose {
-					continue
-				}
-				msg := map[string]interface{}{
-					"document": is,
-					"entry":    entry,
-					"err":      err.Error(),
-				}
-				if b, err := json.Marshal(msg); err == nil {
-					log.Println(string(b))
+	switch is.SourceID {
+	default:
+		// Default check by via serial number.
+		for _, issn := range append(is.ISSN, is.EISSN...) {
+			for _, key := range f.names {
+				item := cache[key]
+				for _, entry := range item.serialNumberMap[issn] {
+					if f.covers(entry, is) {
+						return true
+					}
 				}
 			}
 		}
-	}
-
-	switch is.SourceID {
-	case "48": // Check for WISO database name.
+	case "48":
+		// Check for WISO database name.
 		for _, pkg := range is.Packages {
 			for _, key := range f.names {
 				item := cache[key]
-				if len(item.wisoDatabaseMap[pkg]) == 0 {
-					continue
+				for _, entry := range item.wisoDatabaseMap[pkg] {
+					if f.covers(entry, is) {
+						return true
+					}
 				}
-				// At the moment we do not look deeper into an entry.
-				return true
 			}
 		}
 	}
