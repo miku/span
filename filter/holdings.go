@@ -143,6 +143,7 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 				}
 			}
 		}
+		fallthrough
 	case "48":
 		// Check for WISO database name.
 		for _, pkg := range is.Packages {
