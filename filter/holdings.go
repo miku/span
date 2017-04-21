@@ -132,7 +132,7 @@ func (f *HoldingsFilter) covers(entry licensing.Entry, is finc.IntermediateSchem
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	switch is.SourceID {
 	default:
-		// Default check by via serial number.
+		// By default test serial number.
 		for _, issn := range append(is.ISSN, is.EISSN...) {
 			for _, key := range f.names {
 				item := cache[key]
