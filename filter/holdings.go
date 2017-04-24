@@ -130,21 +130,20 @@ func (f *HoldingsFilter) covers(entry licensing.Entry, is finc.IntermediateSchem
 // function is very specific: it works only with intermediate format and it uses specific
 // information from that format to decide on attachment.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
-	switch is.SourceID {
-	default:
-		// By default test serial number.
-		for _, issn := range append(is.ISSN, is.EISSN...) {
-			for _, key := range f.names {
-				item := cache[key]
-				for _, entry := range item.serialNumberMap[issn] {
-					if f.covers(entry, is) {
-						return true
-					}
+	// By default test serial number.
+	for _, issn := range append(is.ISSN, is.EISSN...) {
+		for _, key := range f.names {
+			item := cache[key]
+			for _, entry := range item.serialNumberMap[issn] {
+				if f.covers(entry, is) {
+					return true
 				}
 			}
 		}
-		fallthrough
-	case "48":
+	}
+
+	// Additional handling for SID 48.
+	if is.SourceID == "48" {
 		// Check for WISO database name.
 		for _, pkg := range is.Packages {
 			for _, key := range f.names {
