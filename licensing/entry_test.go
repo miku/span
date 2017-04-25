@@ -215,8 +215,16 @@ func TestCovers(t *testing.T) {
 			Entry{LastIssueDate: "2001-06-01", LastVolume: "3"}, "2001-05-05", "4", "", ErrAfterLastVolume,
 		},
 		{
-			"extended date",
+			"extended date (1879)",
 			Entry{FirstIssueDate: "1870-05"}, "1879-12-01T00:00:00Z", "", "", nil,
+		},
+		{
+			"extended date (1967)",
+			Entry{FirstIssueDate: "1870-05"}, "1967-12-01T00:00:00Z", "", "", nil,
+		},
+		{
+			"bogus date",
+			Entry{FirstIssueDate: "1870-05"}, "06066-12-01T00:00:00Z", "", "", ErrInvalidDate,
 		},
 	}
 	for _, c := range cases {
