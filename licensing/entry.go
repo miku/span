@@ -157,6 +157,7 @@ func (e *Entry) Covers(date, volume, issue string) error {
 	if err := Embargo(e.Embargo).Compatible(t); err != nil {
 		return err
 	}
+
 	if err := e.containsVolume(volume); err != nil {
 		return err
 	}

@@ -246,6 +246,14 @@ func TestCovers(t *testing.T) {
 				Embargo:        "P1Y",
 			}, time.Now().Add(-10000 * time.Hour).Format("2006-01-02"), "", "", nil,
 		},
+		{
+			"date ok, first volume after record volume",
+			Entry{FirstIssueDate: "2000", FirstVolume: "6"}, "2001-05-05", "4", "", nil,
+		},
+		{
+			"date ok, last volume before record volume",
+			Entry{FirstIssueDate: "2000", FirstVolume: "2", LastVolume: "3"}, "2001-05-05", "4", "", nil,
+		},
 	}
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
