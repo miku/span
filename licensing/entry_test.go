@@ -252,7 +252,7 @@ func TestCovers(t *testing.T) {
 		},
 		{
 			"date ok, last volume before record volume",
-			Entry{FirstIssueDate: "2000", FirstVolume: "2", LastVolume: "3"}, "2001-05-05", "4", "", nil,
+			Entry{LastIssueDate: "2002", LastVolume: "3"}, "2001-05-05", "4", "", nil,
 		},
 	}
 	for _, c := range cases {
