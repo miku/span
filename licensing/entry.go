@@ -48,9 +48,9 @@ type dateFormat struct {
 
 // datePatterns are candidate patterns for parsing dates.
 var datePatterns = []dateFormat{
-	{"2006", GRANULARITY_YEAR},
-	{"2006-01-02", GRANULARITY_DAY},
 	{"2006-", GRANULARITY_YEAR},
+	{"2006-01-02", GRANULARITY_DAY},
+	{"2006-01-02T15:04:05Z", GRANULARITY_DAY},
 	{"2006-01-2", GRANULARITY_DAY},
 	{"2006-01", GRANULARITY_MONTH},
 	{"2006-1-02", GRANULARITY_DAY},
@@ -68,8 +68,9 @@ var datePatterns = []dateFormat{
 	{"2006-xx-x", GRANULARITY_YEAR},
 	{"2006-xx-xx", GRANULARITY_YEAR},
 	{"2006-xx", GRANULARITY_YEAR},
-	{"20060102", GRANULARITY_DAY},
+	{"2006", GRANULARITY_YEAR},
 	{"200601", GRANULARITY_MONTH},
+	{"20060102", GRANULARITY_DAY},
 }
 
 // Entry contains fields about a licensed or available journal, book, article or
