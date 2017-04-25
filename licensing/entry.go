@@ -158,11 +158,22 @@ func (e *Entry) Covers(date, volume, issue string) error {
 		return err
 	}
 
-	if err := e.containsVolume(volume); err != nil {
-		return err
+	if e.parsed.FirstIssueDate.Year() == t.Year() {
+		if e.FirstVolume != "" && volume != "" && findInt(volume) < findInt(e.FirstVolume) {
+			return ErrBeforeFirstVolume
+		}
+		if e.FirstIssue != "" && issue != "" && findInt(issue) < findInt(e.FirstIssue) {
+			return ErrBeforeFirstIssue
+		}
 	}
-	if err := e.containsIssue(issue); err != nil {
-		return err
+
+	if e.parsed.LastIssueDate.Year() == t.Year() {
+		if e.LastVolume != "" && volume != "" && findInt(volume) > findInt(e.LastVolume) {
+			return ErrAfterLastVolume
+		}
+		if e.LastIssue != "" && issue != "" && findInt(issue) > findInt(e.LastIssue) {
+			return ErrAfterLastIssue
+		}
 	}
 	return nil
 }

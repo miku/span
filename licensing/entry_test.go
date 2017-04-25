@@ -258,7 +258,7 @@ func TestCovers(t *testing.T) {
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
 		if err != c.err {
-			t.Errorf("Covers(%#v, %v, %v, %v): got %v, want %v", c.entry, c.date, c.volume, c.issue, err, c.err)
+			t.Errorf("Covers(%#v, %v, %v, %v): got %v, want %v (%s)", c.entry, c.date, c.volume, c.issue, err, c.err, c.about)
 		}
 	}
 }
