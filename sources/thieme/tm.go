@@ -194,6 +194,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: err.Error()}
 	}
 	output.Date = date
+	output.RawDate = date.Format("2006-01-02")
 
 	journal := doc.Journal
 	if journal.PublisherName != "" {
