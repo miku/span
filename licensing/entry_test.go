@@ -136,54 +136,6 @@ func BenchmarkContainsDate(b *testing.B) {
 	}
 }
 
-func TestContainsVolume(t *testing.T) {
-	var cases = []struct {
-		entry  Entry
-		volume string
-		err    error
-	}{
-		{Entry{}, "", nil},
-		{Entry{}, "10", nil},
-		{Entry{FirstVolume: "1"}, "10", nil},
-		{Entry{FirstVolume: "Vol. 1"}, "10", nil},
-		{Entry{FirstVolume: "Vol. 10"}, "10", nil},
-		{Entry{FirstVolume: "Vol. X"}, "10", nil},
-		{Entry{LastVolume: "10"}, "10", nil},
-		{Entry{LastVolume: "10th volume"}, "10", nil},
-		{Entry{LastVolume: "11th volume"}, "10", nil},
-		{Entry{LastVolume: "9"}, "10", ErrAfterLastVolume},
-		{Entry{FirstVolume: "11", LastVolume: ""}, "10", ErrBeforeFirstVolume},
-		{Entry{FirstVolume: "11", LastVolume: ""}, "", nil},
-	}
-	for _, c := range cases {
-		err := c.entry.containsVolume(c.volume)
-		if err != c.err {
-			t.Errorf("containsVolume(%v, %v): got %v, want %v", c.entry, c.volume, err, c.err)
-		}
-	}
-}
-
-func TestContainsIssue(t *testing.T) {
-	var cases = []struct {
-		entry Entry
-		issue string
-		err   error
-	}{
-		{Entry{}, "", nil},
-		{Entry{}, "10", nil},
-		{Entry{FirstIssue: "1"}, "10", nil},
-		{Entry{LastIssue: "9"}, "10", ErrAfterLastIssue},
-		{Entry{FirstIssue: "11", LastIssue: ""}, "10", ErrBeforeFirstIssue},
-		{Entry{FirstIssue: "11", LastIssue: ""}, "", nil},
-	}
-	for _, c := range cases {
-		err := c.entry.containsIssue(c.issue)
-		if err != c.err {
-			t.Errorf("containsIssue(%v, %v): got %v, want %v", c.entry, c.issue, err, c.err)
-		}
-	}
-}
-
 func TestCovers(t *testing.T) {
 	var cases = []struct {
 		about  string

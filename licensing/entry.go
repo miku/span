@@ -264,36 +264,6 @@ func (e *Entry) containsDate(s string) (err error) {
 	return e.containsDateTime(t, g)
 }
 
-// containsIssue return nil, if the given volume (string) is contained in this entries volume range.
-func (e *Entry) containsVolume(s string) error {
-	if s == "" {
-		return nil
-	}
-	v := findInt(s)
-	if e.FirstVolume != "" && v < findInt(e.FirstVolume) {
-		return ErrBeforeFirstVolume
-	}
-	if e.LastVolume != "" && v > findInt(e.LastVolume) {
-		return ErrAfterLastVolume
-	}
-	return nil
-}
-
-// containsIssue return nil, if the given issue (string) is contained in this entries issue range.
-func (e *Entry) containsIssue(s string) error {
-	if s == "" {
-		return nil
-	}
-	v := findInt(s)
-	if e.FirstIssue != "" && v < findInt(e.FirstIssue) {
-		return ErrBeforeFirstIssue
-	}
-	if e.LastIssue != "" && v > findInt(e.LastIssue) {
-		return ErrAfterLastIssue
-	}
-	return nil
-}
-
 // NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
 func NormalizeSerialNumber(s string) string {
 	s = strings.TrimSpace(s)
