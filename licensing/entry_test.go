@@ -214,6 +214,10 @@ func TestCovers(t *testing.T) {
 			"date ok, last volume before record volume, day granularity",
 			Entry{LastIssueDate: "2001-06-01", LastVolume: "3"}, "2001-05-05", "4", "", ErrAfterLastVolume,
 		},
+		{
+			"extended date",
+			Entry{FirstIssueDate: "1870-05"}, "1879-12-01T00:00:00Z", "", "", nil,
+		},
 	}
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
