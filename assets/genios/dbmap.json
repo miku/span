@@ -1,9 +1,149 @@
 {
-  "LAW": [
-    "Recht",
+  "VD": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "SPI": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "SCMW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "PHAP": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "PC": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "OGR": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "MUTE": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "MABL": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "LB": [
+    "Technik",
     "Fachzeitschriften"
   ],
   "KSM": [
+    "Recht",
+    "Fachzeitschriften"
+  ],
+  "JRW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "IGMW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "ICT": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "HTH": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "HREC": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "HBUS": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "GAGI": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "FK": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "ERIP": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "EPPE": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "ENRE": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "EMW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "EIRB": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "EI": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "DQW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "DQ": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "DEBA": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "DATA": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "CMW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "CDM": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "CAVE": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "BRSC": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "BIWI": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "AUPR": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "AUKO": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "AMW": [
+    "Technik",
+    "Fachzeitschriften"
+  ],
+  "LAW": [
     "Recht",
     "Fachzeitschriften"
   ],
