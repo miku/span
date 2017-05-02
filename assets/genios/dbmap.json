@@ -234,6 +234,7 @@
   ],
   "JBS": [
     "Psychologie",
+    "Sozialwissenschaften",
     "Fachzeitschriften"
   ],
   "IJAR": [
@@ -2414,6 +2415,7 @@
   ],
   "DI": [
     "Wirtschaftswissenschaften",
+    "Sozialwissenschaften",
     "Fachzeitschriften"
   ],
   "DMS": [
@@ -2458,6 +2460,7 @@
   ],
   "HILA": [
     "Wirtschaftswissenschaften",
+    "Sozialwissenschaften",
     "Fachzeitschriften"
   ],
   "HLOG": [
@@ -2486,6 +2489,7 @@
   ],
   "JPV": [
     "Wirtschaftswissenschaften",
+    "Sozialwissenschaften",
     "Fachzeitschriften"
   ],
   "LHMW": [
@@ -2518,6 +2522,7 @@
   ],
   "PJLS": [
     "Wirtschaftswissenschaften",
+    "Sozialwissenschaften",
     "Fachzeitschriften"
   ],
   "PSJ": [
@@ -2563,5 +2568,37 @@
   "WWON": [
     "Wirtschaftswissenschaften",
     "Fachzeitschriften"
+  ],
+  "DISK": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "JGSI": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "NEHO": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "PAPE": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "PJSS": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "POPE": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "TDIA": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
+  ],
+  "ZFF": [
+    "Fachzeitschriften",
+    "Sozialwissenschaften"
   ]
 }
