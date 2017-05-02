@@ -2680,5 +2680,21 @@
   ],
   "HPRW": [
     "Technik"
+  ],
+  "JOBS": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "JOS": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "PERI": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "SOAS": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
   ]
 }
