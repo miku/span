@@ -2600,5 +2600,85 @@
   "ZFF": [
     "Fachzeitschriften",
     "Sozialwissenschaften"
+  ],
+  "KTX": [
+    "Fachzeitschriften",
+    "Psychologie"
+  ],
+  "MAON": [
+    "Technik"
+  ],
+  "HTEC": [
+    "Technik"
+  ],
+  "TWNE": [
+    "Wirtschaftswissenschaften"
+  ],
+  "GUG": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "ELEO": [
+    "Technik"
+  ],
+  "AKS": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "ASPA": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "JER": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "PGE": [
+    "Wirtschaftswissenschaften"
+  ],
+  "FINE": [
+    "Wirtschaftswissenschaften"
+  ],
+  "MUB": [
+    "Wirtschaftswissenschaften"
+  ],
+  "FMAI": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "TUD": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "KUCH": [
+    "Wirtschaftswissenschaften"
+  ],
+  "FOWE": [
+    "Technik"
+  ],
+  "ENER": [
+    "Wirtschaftswissenschaften"
+  ],
+  "TIAM": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "SOA": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "KONZ": [
+    "Wirtschaftswissenschaften",
+    "Fachzeitschriften"
+  ],
+  "AUMO": [
+    "Technik"
+  ],
+  "KUSO": [
+    "Sozialwissenschaften",
+    "Fachzeitschriften"
+  ],
+  "HPRW": [
+    "Technik"
   ]
 }
