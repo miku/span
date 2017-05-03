@@ -41,7 +41,7 @@ import (
 
 const (
 	// AppVersion of span package. Commandline tools will show this on -v.
-	AppVersion = "0.1.149"
+	AppVersion = "0.1.150"
 	// KeyLengthLimit is a limit imposed by memcached protocol, which is used
 	// for blob storage as of June 2015. If we change the key value store,
 	// this limit might become obsolete.
