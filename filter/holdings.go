@@ -141,20 +141,5 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 			}
 		}
 	}
-
-	// Additional handling for SID 48.
-	if is.SourceID == "48" {
-		// Check for WISO database name.
-		for _, pkg := range is.Packages {
-			for _, key := range f.names {
-				item := cache[key]
-				for _, entry := range item.wisoDatabaseMap[pkg] {
-					if f.covers(entry, is) {
-						return true
-					}
-				}
-			}
-		}
-	}
 	return false
 }
