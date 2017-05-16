@@ -35,7 +35,8 @@ const (
 )
 
 var (
-	NOT_ASSIGNED    = "not assigned"
+	// NOT_ASSIGNED is the empty value, was "not assigned", refs #7092
+	NOT_ASSIGNED    = ""
 	NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
 )
 
