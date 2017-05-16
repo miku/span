@@ -160,12 +160,12 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 	}
 
 	if s.VF1Author == "" {
-		s.VF1Author = finc.NOT_ASSIGNED
+		// refs #7092
+		// s.VF1Author = finc.NOT_ASSIGNED
 	}
 
-	if len(authors) == 0 {
-		s.Authors = []string{finc.NOT_ASSIGNED}
-	} else {
+	// refs #7092
+	if len(authors) > 0 {
 		s.Authors = authors
 	}
 
