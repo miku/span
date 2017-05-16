@@ -143,7 +143,7 @@ func isNomenNescio(s string) bool {
 func (doc Document) Authors() (authors []finc.Author) {
 	for _, s := range doc.RawAuthors {
 		fields := strings.FieldsFunc(s, func(r rune) bool {
-			return r == ';' || r == '/'
+			return r == ';' || r == '/' || r == ','
 		})
 		for _, f := range fields {
 			if isNomenNescio(f) {
