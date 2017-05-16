@@ -159,11 +159,6 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
 	}
 
-	if s.VF1Author == "" {
-		// refs #7092
-		// s.VF1Author = finc.NOT_ASSIGNED
-	}
-
 	// refs #7092
 	if len(authors) > 0 {
 		s.Authors = authors
