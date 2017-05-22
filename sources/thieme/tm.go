@@ -43,8 +43,7 @@ const (
 )
 
 func leftPad(s string, padStr string, overallLen int) string {
-	var padCountInt int
-	padCountInt = 1 + ((overallLen - len(padStr)) / len(padStr))
+	padCountInt := 1 + ((overallLen - len(padStr)) / len(padStr))
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
 }
@@ -221,9 +220,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Abstract = doc.VernacularAbstract
 	}
 
-	for _, link := range doc.Links {
-		output.URL = append(output.URL, link)
-	}
+	output.URL = append(output.URL, doc.Links...)
 
 	var subjects []string
 	for _, s := range doc.Subject {

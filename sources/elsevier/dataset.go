@@ -552,9 +552,7 @@ func (e Elsevier) Iterate(r io.Reader) (<-chan []span.Importer, error) {
 
 	go func() {
 		docs := make([]span.Importer, len(outputs))
-		for i, output := range outputs {
-			docs[i] = output
-		}
+		copy(docs, outputs)
 		ch <- docs
 		close(ch)
 	}()

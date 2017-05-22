@@ -33,9 +33,7 @@ func mockDecoder(b []byte) (Importer, error) {
 func unroll(ch chan []Importer) []Importer {
 	var docs []Importer
 	for batch := range ch {
-		for _, doc := range batch {
-			docs = append(docs, doc)
-		}
+		docs = append(docs, batch...)
 	}
 	return docs
 }

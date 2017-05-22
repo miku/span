@@ -161,7 +161,7 @@ func main() {
 		file = f
 	}
 
-	source, _ := formats[*inputFormat]
+	source := formats[*inputFormat]
 
 	ch, err := source.Iterate(file)
 	if err != nil {

@@ -31,7 +31,7 @@ import (
 type StringMap map[string]string
 
 func (m StringMap) UnmarshalJSON(data []byte) error {
-	m = make(StringMap, 0)
+	m = make(StringMap)
 	return json.Unmarshal(data, &m)
 }
 
