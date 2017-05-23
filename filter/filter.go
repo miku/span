@@ -104,6 +104,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 			return nil, err
 		}
 		return &filter, nil
+	case "subject":
+		var filter SubjectFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
 	case "or":
 		var filter OrFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
