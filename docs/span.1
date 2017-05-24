@@ -72,10 +72,11 @@ Apply licensing information from a configuration file to an intermediate schema 
 \fB\fCspan\-tag \-c <(echo '{"DE\-15": {"any": {}}})' intermediate.file\fR
 .PP
 There are a couple of content filters available: \fB\fCany\fR, \fB\fCdoi\fR, \fB\fCissn\fR,
-\fB\fCpackage\fR, \fB\fCholdings\fR, \fB\fCcollection\fR, \fB\fCsource\fR\&. These content filters can be
-combined with: \fB\fCor\fR, \fB\fCand\fR and \fB\fCnot\fR\&. The configuration can be seen as an
-expression forest. The top level keys are the labels, that will be injected as
-\fB\fCx.labels\fR into the document, if the filter below the key evaluates to true.
+\fB\fCpackage\fR, \fB\fCholdings\fR, \fB\fCcollection\fR, \fB\fCsource\fR and \fB\fCsubject\fR\&. These content
+filters can be combined with: \fB\fCor\fR, \fB\fCand\fR and \fB\fCnot\fR\&. The configuration can be
+seen as an expression forest. The top level keys are the labels, that will be
+injected as \fB\fCx.labels\fR into the document, if the filter below the key evaluates
+to true.
 .PP
 More complex example for a configuration file:
 .PP
