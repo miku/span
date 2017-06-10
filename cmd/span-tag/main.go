@@ -3,6 +3,7 @@
 // to produce a stream of tagged records.
 //
 // $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
+//
 package main
 
 import (
@@ -14,6 +15,8 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+
+	"github.com/json-iterator/go"
 
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
@@ -85,13 +88,13 @@ func main() {
 		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
 			// business logic
 			var is finc.IntermediateSchema
-			if err := json.Unmarshal(b, &is); err != nil {
+			if err := jsoniter.Unmarshal(b, &is); err != nil {
 				return b, err
 			}
 
 			tagged := tagger.Tag(is)
 
-			bb, err := json.Marshal(tagged)
+			bb, err := jsoniter.Marshal(tagged)
 			if err != nil {
 				return bb, err
 			}

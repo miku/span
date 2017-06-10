@@ -30,6 +30,24 @@ TODO
 
 * Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
 
+Jsoniter testdrive
+==================
+
+* encoding/json
+
+```
+$ time taskcat GeniosIntermediateSchema | span-tag -c $(taskoutput AMSLFilterConfig) > /dev/null
+...
+real    11m48.803s
+user    40m15.980s
+sys      0m32.880s
+```
+
+* jsoniter/go
+
+```
+```
+
 Licence
 -------
 
