@@ -1,4 +1,3 @@
-// WIP.
 package exporter
 
 import (
@@ -10,7 +9,7 @@ import (
 	"github.com/miku/span/finc"
 )
 
-// WIP: Solr5Vufind3 is the basic solr 5 schema as of 2016-04-14. It is based on
+// Solr5Vufind3 is the basic solr 5 schema as of 2016-04-14. It is based on
 // VuFind 3. Same as Solr5Vufind3v12, but with fullrecord field, refs. #8031.
 type Solr5Vufind3 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
