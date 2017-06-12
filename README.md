@@ -59,3 +59,37 @@ Licence
 
 * GPLv3
 * This project uses the Compact Language Detector 2 - [CLD2](https://github.com/CLD2Owners/cld2), Apache License Version 2.0
+
+Next steps
+----------
+
+The intermediate format consists of two kinds of fields:
+
+* finc-independent (title, author, issn, ...)
+* finc-dependent (finc id, internal source id, specific format from mappings, ...)
+
+A catalog of input formats could be made reusable, by separating the above two concerns:
+
+```
+$ span-import -i <FORMAT> <FILE>
+```
+
+This could just a normalizer.
+
+```
+$ span-import -i <FORMAT> -finc <FILE>
+```
+
+Could add more finc-dependent fields.
+
+```
+type SomeFormat struct {}
+
+func (f SomeFormat) Normalize() (IntermediateSchema, error)
+
+func (f SomeFormat) FincFields() (FincFields, error)
+
+...
+
+// Merge the above two for output.
+```
