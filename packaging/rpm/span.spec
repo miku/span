@@ -24,6 +24,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-check $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
 
@@ -43,6 +44,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-check
 /usr/local/sbin/span-export
 /usr/local/sbin/span-import
+/usr/local/sbin/span-oa-check
 /usr/local/sbin/span-redact
 /usr/local/sbin/span-tag
 /usr/local/share/man/man1/span.1

@@ -49,7 +49,7 @@ sys      0m32.880s
 $ time taskcat GeniosIntermediateSchema | span-tag -c $(taskoutput AMSLFilterConfig) > /dev/null
 ...
 
-real    9m25.871s
+real     9m25.871s
 user    31m29.240s
 sys      0m32.572s
 ```
