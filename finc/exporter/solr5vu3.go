@@ -2,9 +2,9 @@
 package exporter
 
 import (
-	"encoding/json"
 	"fmt"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
@@ -74,7 +74,7 @@ func (s *Solr5Vufind3) Export(is finc.IntermediateSchema, withFullrecord bool) (
 	if err := s.convert(is, withFullrecord); err != nil {
 		return []byte{}, err
 	}
-	return json.Marshal(s)
+	return jsoniter.Marshal(s)
 }
 
 // convert converts intermediate schema to the Solr5Vufind3. The struct fields are populated.
@@ -190,7 +190,7 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 
 	if withFullrecord {
 		// refs. #8031
-		b, err := json.Marshal(is)
+		b, err := jsoniter.Marshal(is)
 		if err != nil {
 			return err
 		}

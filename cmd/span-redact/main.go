@@ -2,7 +2,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -10,6 +9,7 @@ import (
 	"os"
 	"runtime"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/finc"
@@ -46,7 +46,7 @@ func main() {
 		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
 			is := finc.IntermediateSchema{}
 
-			if err := json.Unmarshal(b, &is); err != nil {
+			if err := jsoniter.Unmarshal(b, &is); err != nil {
 				log.Printf("failed to unmarshal: %s", string(b))
 				return b, err
 			}
@@ -54,7 +54,7 @@ func main() {
 			// Redact full text.
 			is.Fulltext = ""
 
-			bb, err := json.Marshal(is)
+			bb, err := jsoniter.Marshal(is)
 			if err != nil {
 				return bb, err
 			}
