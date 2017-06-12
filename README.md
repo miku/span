@@ -74,10 +74,10 @@ A catalog of input formats could be made reusable, by separating the above two c
 $ span-import -i <FORMAT> <FILE>
 ```
 
-This could just a normalizer.
+This could just be a normalizer.
 
 ```
-$ span-import -i <FORMAT> -finc <FILE>
+$ span-import -i <FORMAT> -profile finc <FILE>
 ```
 
 Could add more finc-dependent fields.
@@ -87,7 +87,6 @@ type SomeFormat struct {}
 
 func (f SomeFormat) Normalize() (IntermediateSchema, error)
 
-func (f SomeFormat) FincFields() (FincFields, error)
 
 ...
 
