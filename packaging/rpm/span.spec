@@ -44,7 +44,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-check
 /usr/local/sbin/span-export
 /usr/local/sbin/span-import
-/usr/local/sbin/span-oa-check
+/usr/local/sbin/span-oa-filter
 /usr/local/sbin/span-redact
 /usr/local/sbin/span-tag
 /usr/local/share/man/man1/span.1
