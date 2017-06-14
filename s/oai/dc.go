@@ -27,5 +27,18 @@ type DublinCollection struct {
 				Source     []string `xml:"source"`
 			} `xml:"dc"`
 		} `xml:"dcCollection"`
+		DC struct {
+			Title      []string `xml:"title"`
+			Creator    []string `xml:"creator"`
+			Publisher  []string `xml:"publisher"`
+			Date       []string `xml:"date"`
+			Language   []string `xml:"language"`
+			Format     []string `xml:"format"`
+			Subject    []string `xml:"subject"`
+			Relation   []string `xml:"relation"`
+			Identifier []string `xml:"identifier"`
+			Rights     []string `xml:"rights"`
+			Source     []string `xml:"source"`
+		} `xml:"dc"`
 	} `xml:"metadata"`
 }
