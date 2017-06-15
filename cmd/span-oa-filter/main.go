@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"os"
@@ -11,7 +12,6 @@ import (
 
 	"bytes"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
@@ -34,7 +34,7 @@ func main() {
 
 	p := bytebatch.NewLineProcessor(os.Stdin, os.Stdout, func(b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
-		if err := jsoniter.Unmarshal(b, &is); err != nil {
+		if err := json.Unmarshal(b, &is); err != nil {
 			return nil, err
 		}
 		for _, issn := range is.ISSNList() {
@@ -43,7 +43,7 @@ func main() {
 				break
 			}
 		}
-		bb, err := jsoniter.Marshal(is)
+		bb, err := json.Marshal(is)
 		if err != nil {
 			return bb, err
 		}

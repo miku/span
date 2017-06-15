@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -14,7 +15,6 @@ import (
 
 	"bytes"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/finc"
@@ -96,7 +96,7 @@ func main() {
 			is := finc.IntermediateSchema{}
 
 			// TODO(miku): Unmarshal date correctly.
-			if err := jsoniter.Unmarshal(b, &is); err != nil {
+			if err := json.Unmarshal(b, &is); err != nil {
 				log.Printf("failed to unmarshal: %s", string(b))
 				return b, err
 			}

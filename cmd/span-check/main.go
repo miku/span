@@ -10,7 +10,6 @@ import (
 	"os"
 	"runtime"
 
-	jsoniter "github.com/json-iterator/go"
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/finc"
@@ -70,7 +69,7 @@ func main() {
 		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
 
 			var is finc.IntermediateSchema
-			if err := jsoniter.Unmarshal(b, &is); err != nil {
+			if err := json.Unmarshal(b, &is); err != nil {
 				return b, err
 			}
 
@@ -82,7 +81,7 @@ func main() {
 					}
 					errc <- issue.Err.Error()
 					if *verbose {
-						b, err := jsoniter.Marshal(issue)
+						b, err := json.Marshal(issue)
 						if err != nil {
 							log.Fatal(err)
 						}
