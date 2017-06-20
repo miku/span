@@ -314,6 +314,19 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
 
+	// TODO: use a file for this
+	publisherBlacklist := []string{
+		"Crossref Testing",
+		"test",
+		"crossref-test",
+	}
+
+	for _, s := range publisherBlacklist {
+		if doc.Publisher == s {
+			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_COLLECTION %s", output.RecordID)}
+		}
+	}
+
 	if doc.Publisher == "" {
 		output.MegaCollection = fmt.Sprintf("X-U (CrossRef)")
 	} else {
