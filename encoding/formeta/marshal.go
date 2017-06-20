@@ -75,7 +75,8 @@ func marshal(w io.Writer, k string, v interface{}) error {
 			// No toplevel key present and value is a string.
 			return ErrValueNotAllowed
 		}
-		if _, err := io.WriteString(w, fmt.Sprintf("%s: '%v', ", k, escaper.Replace(s))); err != nil {
+		ss := fmt.Sprintf("%s: '%v', ", k, escaper.Replace(s))
+		if _, err := io.WriteString(w, ss); err != nil {
 			return err
 		}
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
