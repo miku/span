@@ -12,9 +12,9 @@ span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter, span\-upda
 .PP
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] \fIfile\fP
 .PP
-\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] \fIfile\fP
+\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] \fIfile\fP
+\fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -55,7 +55,7 @@ If given log to file. \fB\fCspan\-import\fR only.
 \fB\fC\-f\fR
 File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
 .TP
-\fB\fC\-f\fR
+\fB\fC\-s\fR
 Field separator. \fB\fCspan\-update\-labels\fR only.
 .TP
 \fB\fC\-v\fR

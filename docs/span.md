@@ -17,9 +17,9 @@ SYNOPSIS
 
 `span-export` [`-o` *output-format*] *file*
 
-`span-oa-filter` [`-f` *file*] *file*
+`span-oa-filter` [`-f` *file*] < *file*
 
-`span-update-labels` [`-f` *file*, `-s` *separator*] *file*
+`span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
 DESCRIPTION
 -----------
@@ -64,7 +64,7 @@ OPTIONS
 `-f`
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
 
-`-f`
+`-s`
   Field separator. `span-update-labels` only.
 
 `-v`
