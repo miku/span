@@ -7,5 +7,14 @@
     "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
     "ElectronicSerial": "Journal, E-Journal",
     "ElectronicThesis": "Thesis",
-    "Unknown": "Unknown Format"
+    "Unknown": "Unknown Format",
+    "Book": "Book, E-Book",
+    "Manuscript": "Book, E-Book",
+    "Charter": "",
+    "Periodical": "Journal, E-Journal",
+    "Fragment": "Fragment",
+    "Map": "Map",
+    "Letter": "Letter",
+    "Article": "Article, E-Article",
+    "Text": "Text"
 }
