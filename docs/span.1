@@ -1,7 +1,7 @@
 .TH SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
 .SH NAME
 .PP
-span\-import, span\-tag, span\-check, span\-export \- intermediate schema tools
+span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter, span\-update\-labels \- intermediate schema tools
 .SH SYNOPSIS
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] \fIfile\fP
@@ -11,6 +11,10 @@ span\-import, span\-tag, span\-check, span\-export \- intermediate schema tools
 \fB\fCspan\-check\fR [\fB\fC\-verbose\fR] \fIfile\fP
 .PP
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] \fIfile\fP
+.PP
+\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] \fIfile\fP
+.PP
+\fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] \fIfile\fP
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -47,6 +51,12 @@ Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR only.
 .TP
 \fB\fC\-log\fR \fIlog\-file\fP
 If given log to file. \fB\fCspan\-import\fR only.
+.TP
+\fB\fC\-f\fR
+File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
+.TP
+\fB\fC\-f\fR
+Field separator. \fB\fCspan\-update\-labels\fR only.
 .TP
 \fB\fC\-v\fR
 Show version.
@@ -147,6 +157,14 @@ Export to a SOLR schema:
 Export to Metafacture formeta:
 .IP
 \fB\fCspan\-export \-o formeta intermediate.file\fR
+.PP
+Set OA flag:
+.IP
+\fB\fCecho '{"rft.issn": ["A"]}' | span\-oa\-filter \-f <(echo 'A')\fR
+.PP
+Update labels:
+.IP
+\fB\fCecho '{"finc.record_id": "1"}' | span\-update\-labels \-f <(echo '1,X,Y')\fR
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To

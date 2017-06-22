@@ -4,7 +4,7 @@ SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
 NAME
 ----
 
-span-import, span-tag, span-check, span-export - intermediate schema tools
+span-import, span-tag, span-check, span-export, span-oa-filter, span-update-labels - intermediate schema tools
 
 SYNOPSIS
 --------
@@ -16,6 +16,10 @@ SYNOPSIS
 `span-check` [`-verbose`] *file*
 
 `span-export` [`-o` *output-format*] *file*
+
+`span-oa-filter` [`-f` *file*] *file*
+
+`span-update-labels` [`-f` *file*, `-s` *separator*] *file*
 
 DESCRIPTION
 -----------
@@ -56,6 +60,12 @@ OPTIONS
 
 `-log` *log-file*
   If given log to file. `span-import` only.
+
+`-f`
+  File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
+
+`-f`
+  Field separator. `span-update-labels` only.
 
 `-v`
   Show version.
@@ -154,6 +164,14 @@ Export to a SOLR schema:
 Export to Metafacture formeta:
 
   `span-export -o formeta intermediate.file`
+
+Set OA flag:
+
+  `echo '{"rft.issn": ["A"]}' | span-oa-filter -f <(echo 'A')`
+
+Update labels:
+
+  `echo '{"finc.record_id": "1"}' | span-update-labels -f <(echo '1,X,Y')`
 
 FILES
 -----
