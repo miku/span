@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -12,14 +13,21 @@ import (
 
 	"bytes"
 
+	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
 )
 
 func main() {
+	showVersion := flag.Bool("v", false, "prints current program version")
 	issnFile := flag.String("f", "", "path to file with one issn per line")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
 
 	b, err := ioutil.ReadFile(*issnFile)
 	if err != nil {
