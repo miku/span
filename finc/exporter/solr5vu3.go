@@ -91,7 +91,11 @@ func (s *Solr5Vufind3) convert(is finc.IntermediateSchema, withFullrecord bool) 
 	s.PublishDateSort = is.Date.Year()
 	s.PublishDate = []string{is.Date.Format("2006-01-02")}
 	s.Publishers = is.Publishers
-	s.RecordType = finc.AIRecordType
+	if withFullrecord {
+		s.RecordType = finc.IntermediateSchemaRecordType
+	} else {
+		s.RecordType = finc.AIRecordType
+	}
 
 	if is.JournalTitle != "" {
 		s.Series = append(s.Series, is.JournalTitle)

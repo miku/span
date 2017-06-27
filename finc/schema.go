@@ -30,8 +30,9 @@ import (
 )
 
 const (
-	AIRecordType              = "ai"
-	IntermediateSchemaVersion = "0.9"
+	IntermediateSchemaRecordType = "is"
+	AIRecordType                 = "ai"
+	IntermediateSchemaVersion    = "0.9"
 )
 
 var (
