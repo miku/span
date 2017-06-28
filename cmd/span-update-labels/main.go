@@ -30,6 +30,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	// No label file, nothing to change.
+	if *labelFile == "" {
+		os.Exit(0)
+	}
+
 	f, err := os.Open(*labelFile)
 	if err != nil {
 		log.Fatal(err)
