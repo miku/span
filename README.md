@@ -1,6 +1,13 @@
 Span
 ====
 
+The span tools convert to and from an intermediate schema and support license
+tagging and quality assurance.
+
+The intermediate schema is a normalization vehicle, spec: https://github.com/ubleipzig/intermediateschema
+
+----
+
 Install with
 
     $ go get github.com/miku/span/cmd/...
@@ -25,9 +32,12 @@ Also:
 
 * [KBART](http://www.uksg.org/KBART)
 
-TODO
-----
+Ideas for span 0.2.0
+--------------------
 
+* Reuse more generic code, e.g. [parallel](http://github.com/miku/parallel)
+* Make conversions a simpler with [xmlstream](https://github.com/miku/xmlstream)
+* Do not require recompilation for mapping updates (allow various sources)
 * Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
 
 Licence
