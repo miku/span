@@ -1,4 +1,4 @@
-// span-unify is a dumbed down span-import.
+// span-reshape is a dumbed down span-import.
 package main
 
 import (
@@ -41,7 +41,7 @@ func main() {
 		tag := scanner.Element()
 		converter, ok := tag.(IntermediateSchemaer)
 		if !ok {
-			continue
+			log.Fatal("cannot convert to intermediate schema")
 		}
 		output, err := converter.ToIntermediateSchema()
 		if err != nil {
