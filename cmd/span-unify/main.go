@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 
+	"bufio"
+
 	"github.com/miku/span/finc"
 	"github.com/miku/span/s"
 	"github.com/miku/xmlstream"
@@ -30,7 +32,10 @@ func main() {
 		log.Fatalf("unknown format: %s", *formatName)
 	}
 
-	scanner := xmlstream.NewScanner(os.Stdin, fmap[*formatName])
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
+	scanner := xmlstream.NewScanner(bufio.NewReader(os.Stdin), fmap[*formatName])
 
 	for scanner.Scan() {
 		tag := scanner.Element()
@@ -42,7 +47,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err := json.NewEncoder(os.Stdout).Encode(output); err != nil {
+		if err := json.NewEncoder(w).Encode(output); err != nil {
 			log.Fatal(err)
 		}
 	}
