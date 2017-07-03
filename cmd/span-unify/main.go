@@ -20,20 +20,17 @@ type IntermediateSchemaer interface {
 func main() {
 	formatName := flag.String("i", "", "input format name")
 	flag.Parse()
-	if *formatName == "" {
-		log.Fatal("input format name required")
+
+	fmap := map[string]interface{}{
+		"highwire": new(s.Record),
+		"ceeol":    new(s.Article),
 	}
 
-	var scanner *xmlstream.Scanner
-
-	switch *formatName {
-	case "highwire":
-		scanner = xmlstream.NewScanner(os.Stdin, new(s.Record))
-	case "ceeol":
-		scanner = xmlstream.NewScanner(os.Stdin, new(s.Article))
-	default:
+	if _, ok := fmap[*formatName]; !ok {
 		log.Fatalf("unknown format: %s", *formatName)
 	}
+
+	scanner := xmlstream.NewScanner(os.Stdin, fmap[*formatName])
 
 	for scanner.Scan() {
 		tag := scanner.Element()
