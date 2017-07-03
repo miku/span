@@ -49,4 +49,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 }
