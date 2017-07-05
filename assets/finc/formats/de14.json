@@ -1,7 +1,7 @@
 {
     "eBook": "Book, E-Book",
     "ElectronicArticle": "Article, E-Article",
-    "ElectronicBookPart": "Book, E-Book",
+    "ElectronicBookPart": "Article, E-Article",
     "ElectronicJournal": "Journal, E-Journal",
     "ElectronicProceeding": "Proceeding",
     "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
