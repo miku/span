@@ -296,6 +296,11 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.RecordID)}
 	}
 
+	// refs #10864
+	if strings.HasPrefix(doc.Type, "book-") {
+		output.ArticleTitle = fmt.Sprintf("%s: %s", output.JournalTitle, output.ArticleTitle)
+	}
+
 	if len(doc.Subtitle) > 0 {
 		output.ArticleSubtitle = span.UnescapeTrim(doc.Subtitle[0])
 	}
