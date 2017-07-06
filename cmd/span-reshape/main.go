@@ -23,6 +23,7 @@ type IntermediateSchemaer interface {
 func main() {
 	formatName := flag.String("i", "", "input format name")
 	listFormats := flag.Bool("l", false, "list input formats")
+	exitWithZero := flag.Bool("z", false, "exit with 0, even in the presence of errors")
 	flag.Parse()
 
 	fmap := map[string]interface{}{
@@ -54,13 +55,22 @@ func main() {
 		}
 		output, err := converter.ToIntermediateSchema()
 		if err != nil {
-			log.Fatal(err)
+			if *exitWithZero {
+				log.Println(err)
+				continue
+			} else {
+				log.Fatal(err)
+			}
 		}
 		if err := json.NewEncoder(w).Encode(output); err != nil {
 			log.Fatal(err)
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		if *exitWithZero {
+			log.Printf("scan: %v", err)
+		} else {
+			log.Fatalf("scan: %v", err)
+		}
 	}
 }
