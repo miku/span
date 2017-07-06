@@ -4,6 +4,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -21,11 +22,19 @@ type IntermediateSchemaer interface {
 
 func main() {
 	formatName := flag.String("i", "", "input format name")
+	listFormats := flag.Bool("l", false, "list input formats")
 	flag.Parse()
 
 	fmap := map[string]interface{}{
 		"highwire": new(s.Record),
 		"ceeol":    new(s.Article),
+	}
+
+	if *listFormats {
+		for k := range fmap {
+			fmt.Println(k)
+		}
+		os.Exit(0)
 	}
 
 	if _, ok := fmap[*formatName]; !ok {
