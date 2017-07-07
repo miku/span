@@ -1,17 +1,14 @@
 package ceeol
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"strings"
 
 	"time"
 
 	"github.com/miku/span"
 	"github.com/miku/span/finc"
-	"github.com/miku/xmlstream"
 	"github.com/shantanubhadoria/go-roman/roman"
 )
 
@@ -106,24 +103,4 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		}
 	}
 	return output, nil
-}
-
-// Placeholder is just a placeholder. TODO(miku): unify this part.
-func Placeholder(r io.Reader, w io.Writer) error {
-	scanner := xmlstream.NewScanner(r, new(Article))
-	for scanner.Scan() {
-		tag := scanner.Element()
-		switch el := tag.(type) {
-		case *Article:
-			article := *el
-			output, err := article.ToIntermediateSchema()
-			if err != nil {
-				return err
-			}
-			if err := json.NewEncoder(w).Encode(output); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
