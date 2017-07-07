@@ -1,4 +1,4 @@
-package s
+package highwire
 
 import (
 	"encoding/base64"
@@ -83,15 +83,8 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Publishers = append(output.Publishers, v)
 	}
 	for _, v := range r.Metadata.DC.Language {
-		v = strings.TrimSpace(v)
-		if len(v) == 2 {
-			tlc, ok := span.ISO639OneToThree[v]
-			if !ok {
-				return output, fmt.Errorf("unknown iso code: %v", v)
-			}
-			output.Languages = append(output.Languages, tlc)
-		} else {
-			return output, fmt.Errorf("not a three letter code: %v", v)
+		if isocode := span.LanguageIdentifier(v); isocode != "" {
+			output.Languages = append(output.Languages, isocode)
 		}
 	}
 	for _, v := range r.Metadata.DC.Subject {

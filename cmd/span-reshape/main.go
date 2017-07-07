@@ -11,7 +11,8 @@ import (
 	"bufio"
 
 	"github.com/miku/span/finc"
-	"github.com/miku/span/s"
+	"github.com/miku/span/s/ceeol"
+	"github.com/miku/span/s/highwire"
 	"github.com/miku/xmlstream"
 )
 
@@ -27,8 +28,8 @@ func main() {
 	flag.Parse()
 
 	fmap := map[string]interface{}{
-		"highwire": new(s.Record),
-		"ceeol":    new(s.Article),
+		"highwire": new(highwire.Record),
+		"ceeol":    new(ceeol.Article),
 	}
 
 	if *listFormats {

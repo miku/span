@@ -1,4 +1,4 @@
-package s
+package ceeol
 
 import (
 	"encoding/json"
@@ -9,9 +9,19 @@ import (
 
 	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/finc"
 	"github.com/miku/xmlstream"
 	"github.com/shantanubhadoria/go-roman/roman"
+)
+
+// SourceIdentifier for internal bookkeeping.
+const (
+	SourceIdentifier = "53"
+	Format           = "ElectronicArticle"
+	Genre            = "article"
+	DefaultRefType   = "EJOUR"
+	Collection       = "CEEOL"
 )
 
 // Article from CEEOL, refs #9398.
@@ -85,15 +95,14 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Subjects = article.SubjectTerms
 	output.URL = append(output.URL, article.ArticleURL)
 	output.RecordID = fmt.Sprintf("ai-53-%s", article.UniqueID)
-	output.SourceID = "53"
-	output.Format = "ElectronicArticle"
-	output.Genre = "article"
-	output.MegaCollection = "CEEOL"
-	output.RefType = "EJOUR"
+	output.SourceID = SourceIdentifier
+	output.Format = Format
+	output.Genre = Genre
+	output.MegaCollection = Collection
+	output.RefType = DefaultRefType
 	for _, lang := range article.Languages {
-		switch lang {
-		case "Romanian":
-			output.Languages = append(output.Languages, "rom")
+		if isocode := span.LanguageIdentifier(lang); isocode != "" {
+			output.Languages = append(output.Languages, isocode)
 		}
 	}
 	return output, nil
