@@ -28,7 +28,6 @@ install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-reshape $RPM_BUILD_ROOT/usr/local/sbin
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
@@ -48,7 +47,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-import
 /usr/local/sbin/span-oa-filter
 /usr/local/sbin/span-redact
-/usr/local/sbin/span-reshape
 /usr/local/sbin/span-tag
 /usr/local/sbin/span-update-labels
 /usr/local/share/man/man1/span.1
