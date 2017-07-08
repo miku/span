@@ -20,6 +20,7 @@ import (
 	"github.com/miku/span/s/geniosnext"
 	"github.com/miku/span/s/highwire"
 	"github.com/miku/span/s/ieeenext"
+	"github.com/miku/span/s/jstornext"
 	"github.com/miku/xmlstream"
 )
 
@@ -31,6 +32,7 @@ var FormatMap = map[string]interface{}{
 	"crossref": new(crossrefnext.Document),
 	"ieee":     new(ieeenext.Publication),
 	"genios":   new(geniosnext.Document),
+	"jstor":    new(jstornext.Article),
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -107,7 +109,7 @@ func main() {
 	defer w.Flush()
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios":
+	case "highwire", "ceeol", "ieee", "genios", "jstor":
 		if err := processXML(os.Stdin, w, *name); err != nil {
 			log.Fatal(err)
 		}
