@@ -1,6 +1,21 @@
 package span
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/rainycape/cld2"
+	"golang.org/x/text/language"
+)
+
+// DetectLang3 returns the best guess 3-letter language code for a given text.
+func DetectLang3(text string) (string, error) {
+	c := cld2.Detect(text)
+	b, err := language.ParseBase(c)
+	if err != nil {
+		return "", err
+	}
+	return b.ISO3(), nil
+}
 
 // LanguageIdentifier returns the three letter identifier from any string.
 // All data from http://www-01.sil.org/iso639-3/codes.asp.
