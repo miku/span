@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
+	"github.com/miku/span/formats/doaj"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -25,8 +25,6 @@ func leftPad(s string, padStr string, overallLen int) string {
 	var retStr = strings.Repeat(padStr, padCountInt) + s
 	return retStr[(len(retStr) - overallLen):]
 }
-
-var LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
 
 type Document struct {
 	xml.Name `xml:"Article"`
@@ -187,10 +185,12 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Subjects = subjects
 
 	if doc.Language != "" {
-		output.Languages = append(output.Languages, LanguageMap.LookupDefault(strings.ToUpper(doc.Language), "und"))
+		output.Languages = append(output.Languages,
+			span.WithDefaultString(doaj.LanguageMap, strings.ToUpper(doc.Language), "und"))
 	} else {
 		if doc.VernacularLanguage != "" {
-			output.Languages = append(output.Languages, LanguageMap.LookupDefault(strings.ToUpper(doc.VernacularLanguage), "und"))
+			output.Languages = append(output.Languages,
+				span.WithDefaultString(doaj.LanguageMap, strings.ToUpper(doc.VernacularLanguage), "und"))
 		}
 	}
 
