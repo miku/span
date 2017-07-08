@@ -62,7 +62,9 @@ type IntermediateSchemaer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
-// processXML convert XML based formats, given a format name.
+// processXML converts XML based formats, given a format name. It reads XML as
+// stream, finds records by given xml.Name and converts them to an intermediate
+// schema at the moment.
 func processXML(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)
@@ -88,7 +90,7 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 	return scanner.Err()
 }
 
-// processJSON convert JSON based formats.
+// processJSON convert JSON based formats. Input is interpreted as newline delimited JSON.
 func processJSON(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)

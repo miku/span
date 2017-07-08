@@ -39,6 +39,7 @@ TODO:
 
 * Do not require recompilation for mapping updates (allow various sources)
 * Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
+* Allow loadable assets from ~/.config/span/maps, some specified location or a single JSON file.
 
 DONE:
 
