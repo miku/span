@@ -9,13 +9,13 @@ span-import, span-tag, span-check, span-export, span-oa-filter, span-update-labe
 SYNOPSIS
 --------
 
-`span-import` [`-i` *input-format*] *file*
+`span-import` [`-i` *input-format*] < *file*
 
-`span-tag` [`-c` *config*] *file*
+`span-tag` [`-c` *config*] < *file*
 
-`span-check` [`-verbose`] *file*
+`span-export` [`-o` *output-format*] < *file*
 
-`span-export` [`-o` *output-format*] *file*
+`span-check` [`-verbose`] < *file*
 
 `span-oa-filter` [`-f` *file*] < *file*
 
@@ -47,7 +47,7 @@ OPTIONS
   List support formats. `span-import`, `span-export` only.
 
 `-verbose`
-  More output. `span-import`, `span-check` only.
+  More output. `span-check` only.
 
 `-b` *N*
   Batch size (default N=20000). `span-tag`, `span-check`, `span-export` only.
@@ -57,9 +57,6 @@ OPTIONS
 
 `-cpuprofile` *pprof-file*
   Profiling. `span-import`, `span-tag` only.
-
-`-log` *log-file*
-  If given log to file. `span-import` only.
 
 `-f`
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
@@ -179,13 +176,6 @@ FILES
 Assets (mostly string to string mappings) are compiled into the executable. To
 change these mappings, edit the suitable file under
 https://github.com/miku/span/tree/master/assets, commit and recompile.
-
-ENVIRONMENT
------------
-
-`GOMAXPROCS`
-  The GOMAXPROCS variable limits the number of operating system threads that can
-  execute user-level Go code simultaneously.
 
 DIAGNOSTICS
 -----------

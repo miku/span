@@ -4,13 +4,13 @@
 span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter, span\-update\-labels \- intermediate schema tools
 .SH SYNOPSIS
 .PP
-\fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] \fIfile\fP
+\fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP] \fIfile\fP
+\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-check\fR [\fB\fC\-verbose\fR] \fIfile\fP
+\fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] \fIfile\fP
+\fB\fCspan\-check\fR [\fB\fC\-verbose\fR] < \fIfile\fP
 .PP
 \fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] < \fIfile\fP
 .PP
@@ -38,7 +38,7 @@ EXAMPLE for a CONFIGURATION FILE.
 List support formats. \fB\fCspan\-import\fR, \fB\fCspan\-export\fR only.
 .TP
 \fB\fC\-verbose\fR
-More output. \fB\fCspan\-import\fR, \fB\fCspan\-check\fR only.
+More output. \fB\fCspan\-check\fR only.
 .TP
 \fB\fC\-b\fR \fIN\fP
 Batch size (default N=20000). \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR only.
@@ -48,9 +48,6 @@ Number of workers (defaults to CPU count). \fB\fCspan\-tag\fR, \fB\fCspan\-check
 .TP
 \fB\fC\-cpuprofile\fR \fIpprof\-file\fP
 Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR only.
-.TP
-\fB\fC\-log\fR \fIlog\-file\fP
-If given log to file. \fB\fCspan\-import\fR only.
 .TP
 \fB\fC\-f\fR
 File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
@@ -170,11 +167,6 @@ Update labels:
 Assets (mostly string to string mappings) are compiled into the executable. To
 change these mappings, edit the suitable file under
 \[la]https://github.com/miku/span/tree/master/assets\[ra], commit and recompile.
-.SH ENVIRONMENT
-.TP
-\fB\fCGOMAXPROCS\fR
-The GOMAXPROCS variable limits the number of operating system threads that can
-execute user\-level Go code simultaneously.
 .SH DIAGNOSTICS
 .PP
 Any error (like faulty JSON, IO errors, ...) will lead to an immediate halt.
