@@ -32,6 +32,32 @@ Also:
 
 * [KBART](http://www.uksg.org/KBART)
 
+Addings data sources
+--------------------
+
+The following kinds of data shapes are supported at the moment:
+
+* A stream of XML, containing zero, one or more records, identified by an XML
+tag. Moderately fast.
+* Newline delimited JSON, containing zero, one or more records, one record per
+line. Fast.
+* Single records of arbitrary shape. Slow.
+
+Use span, if
+[metafacture](https://github.com/culturegraph/metafacture-core/wiki) or
+[jq](https://stedolan.github.io/jq/) or a Python snippet are not sufficient.
+
+Steps:
+
+* Add a new subpackage for your format, e.g. [dummy](https://github.com/miku/span/tree/master/formats/dummy).
+* Add a [struct](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/formats/dummy/example.go#L12-L15) representing the original record (XML, JSON, bytes).
+* Implement the conversion functions required, e.g. [ToIntermediateSchema](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/formats/dummy/example.go#L17-L22)
+* Add an entry into the [format map](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/cmd/span-import/main.go#L57) for span-import
+* [Decide](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/cmd/span-import/main.go#L202),
+which kind of source this is (XML stream, newline delimited JSON, single
+records, something else)
+* Recompile and ship.
+
 Ideas for span 0.2.0
 --------------------
 
