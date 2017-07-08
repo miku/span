@@ -52,7 +52,7 @@ Steps:
 * Add a new subpackage for your format, e.g. [dummy](https://github.com/miku/span/tree/master/formats/dummy).
 * Add a [struct](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/formats/dummy/example.go#L12-L15) representing the original record (XML, JSON, bytes).
 * Implement the conversion functions required, e.g. [ToIntermediateSchema](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/formats/dummy/example.go#L17-L22)
-* Add an entry into the [format map](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/cmd/span-import/main.go#L57) for span-import
+* Add an entry into the [format map](https://github.com/miku/span/blob/f89ef0337249ba5f75d05d8a3db7c85b5c389eaa/cmd/span-import/main.go#L59) for span-import
 * [Decide](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/cmd/span-import/main.go#L202),
 which kind of source this is (XML stream, newline delimited JSON, single
 records, something else)
