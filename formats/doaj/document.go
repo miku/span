@@ -46,7 +46,7 @@ const (
 
 var (
 	LCCPatterns = assetutil.MustLoadRegexpMap("assets/finc/lcc.json")
-	LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
+	// LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
 )
 
 // Response from elasticsearch.
@@ -227,7 +227,9 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	subjects := container.NewStringSet()
 	for _, s := range doc.Index.SchemaCode {
-		class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NOT_ASSIGNED)
+		key := strings.Replace(s, "LCC:", "", -1)
+		class := span.WithDefaultRegexp(finc.LibraryOfCongressClassification, key, finc.NOT_ASSIGNED)
+		// class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NOT_ASSIGNED)
 		if class != finc.NOT_ASSIGNED {
 			subjects.Add(class)
 		}
@@ -240,7 +242,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Index.Language {
-		languages.Add(LanguageMap.LookupDefault(l, "und"))
+		languages.Add(span.WithDefaultString(LanguageMap, l, "und"))
 	}
 	output.Languages = languages.Values()
 

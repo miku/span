@@ -240,8 +240,8 @@ var LibraryOfCongressClassification = map[string]string{
 	"^T+.*":              "Technik",
 }
 
-// SubjectsMaps maps various subjects to a coarser schema.
-var SubjectsMaps = map[string][]string{
+// SubjectsMapping maps various subjects to a coarser schema.
+var SubjectMapping = map[string][]string{
 	"Accounting":                       []string{"Wirtschaftswissenschaften"},
 	"Acoustics and Ultrasonics":        []string{"Physik"},
 	"Advanced and Specialised Nursing": []string{"Medizin"},
@@ -572,8 +572,8 @@ var SubjectsMaps = map[string][]string{
 	"Water Science and Technology":                         []string{"Geographie", "Technik"},
 }
 
-// LanguageNameMap maps identifiers to english language names. TODO(miku): move to langutil.go.
-var LanguageNameMap = map[string]string{
+// LanguageMap maps identifiers to english language names. TODO(miku): move to langutil.go.
+var LanguageMap = map[string]string{
 	"aaa": "Ghotuo",
 	"aab": "Alumu-Tesu",
 	"aac": "Ari",

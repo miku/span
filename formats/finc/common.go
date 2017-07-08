@@ -28,9 +28,9 @@ import (
 )
 
 var (
-	SubjectMapping = assetutil.MustLoadStringSliceMap("assets/finc/subjects.json")
-	LanguageMap    = assetutil.MustLoadStringMap("assets/finc/iso-639-3-language.json")
-	AIAccessFacet  = "Electronic Resources"
+	// SubjectMapping = assetutil.MustLoadStringSliceMap("assets/finc/subjects.json")
+	// LanguageMap   = assetutil.MustLoadStringMap("assets/finc/iso-639-3-language.json")
+	AIAccessFacet = "Electronic Resources"
 
 	FormatDe105  = assetutil.MustLoadStringMap("assets/finc/formats/de105.json")
 	FormatDe14   = assetutil.MustLoadStringMap("assets/finc/formats/de14.json")

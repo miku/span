@@ -6,6 +6,7 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/kennygrant/sanitize"
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 )
 
@@ -118,7 +119,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	classes := container.NewStringSet()
 	for _, s := range is.Subjects {
-		for _, class := range SubjectMapping.LookupDefault(s, []string{}) {
+		// for _, class := range SubjectMapping.LookupDefault(s, []string{}) {
+		for _, class := range span.WithDefaultStringSlice(SubjectMapping, s, []string{}) {
 			classes.Add(class)
 		}
 	}
@@ -141,7 +143,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	}
 
 	for _, lang := range is.Languages {
-		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
+		// s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
+		s.Languages = append(s.Languages, span.WithDefaultString(LanguageMap, lang, lang))
 	}
 
 	// collect sanizized authors

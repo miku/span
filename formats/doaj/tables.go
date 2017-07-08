@@ -1,7 +1,7 @@
 package doaj
 
-// LanguageNames maps DOAJ specific language strings to ISO identifiers.
-var LanguageNames = map[string]string{
+// LanguageMap maps DOAJ specific language strings to ISO identifiers.
+var LanguageMap = map[string]string{
 	"AB": "abk",
 	"Aboriginal languages": "und",
 	"AF":                        "afr",

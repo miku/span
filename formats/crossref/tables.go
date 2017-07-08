@@ -1,7 +1,7 @@
 package crossref
 
-// FormatMap maps crossref type to format.
-var FormatMap = map[string]string{
+// Formats maps crossref type to format.
+var Formats = map[string]string{
 	"book":                "eBook",
 	"book-chapter":        "ElectronicBookPart",
 	"book-part":           "ElectronicBookPart",
@@ -22,8 +22,8 @@ var FormatMap = map[string]string{
 	"report-series":       "eBook",
 }
 
-// GenreMap crossref types to Open URL genres.
-var GenreMap = map[string]string{
+// Genres crossref types to Open URL genres.
+var Genres = map[string]string{
 	"book":                "book",
 	"book-chapter":        "bookitem",
 	"book-part":           "bookitem",
@@ -44,8 +44,8 @@ var GenreMap = map[string]string{
 	"report-series":       "report",
 }
 
-// RefTypeMap maps crossref types to reference type.
-var RefTypeMap = map[string]string{
+// RefTypes maps crossref types to reference type.
+var RefTypes = map[string]string{
 	"book":                "EBOOK",
 	"book-chapter":        "ECHAP",
 	"book-part":           "ECHAP",

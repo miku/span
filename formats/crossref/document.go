@@ -31,13 +31,12 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 )
 
 const (
-	// Internal bookkeeping.
-	SourceID = "49"
+	SourceID      = "49"
+	DefaultFormat = "ElectronicArticle"
 )
 
 var (
@@ -46,13 +45,6 @@ var (
 )
 
 var (
-	DefaultFormat = "ElectronicArticle"
-
-	// Load assets
-	Formats  = assetutil.MustLoadStringMap("assets/crossref/formats.json")
-	Genres   = assetutil.MustLoadStringMap("assets/crossref/genres.json")
-	RefTypes = assetutil.MustLoadStringMap("assets/crossref/reftypes.json")
-
 	// AuthorReplacer is a special cleaner for author names.
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
 
@@ -65,7 +57,7 @@ var (
 		regexp.MustCompile(`[?]{6,}`),
 	}
 
-	// Future, if a publication date lies beyond it, it gets skipped.
+	// Future starts here.
 	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
 )
 
@@ -125,6 +117,7 @@ func (pi *PageInfo) PageCount() int {
 	return 0
 }
 
+// Authors returns a list of authors.
 func (doc *Document) Authors() (authors []finc.Author) {
 	for _, ra := range doc.Author {
 		authors = append(authors, finc.Author{
@@ -260,13 +253,13 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.DOI = strings.Replace(doc.DOI, "//", "/", -1) // refs #6312
-	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
-	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
+	output.Format = span.WithDefaultString(Formats, doc.Type, DefaultFormat)
+	output.Genre = span.WithDefaultString(Genres, doc.Type, "unknown")
 	output.ISSN = doc.ISSN
 	output.Issue = doc.Issue
 	output.Languages = []string{"eng"}
 	output.Publishers = append(output.Publishers, doc.Publisher)
-	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
+	output.RefType = span.WithDefaultString(RefTypes, doc.Type, "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subjects
 	output.Type = doc.Type
