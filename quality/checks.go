@@ -1,5 +1,5 @@
-// Package qa implements quality assurance helpers.
-package qa
+// Package quality implements quality checks.
+package quality
 
 import (
 	"encoding/json"

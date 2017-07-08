@@ -14,7 +14,7 @@ import (
 	"github.com/miku/parallel"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/qa"
+	"github.com/miku/span/quality"
 )
 
 func main() {
@@ -38,9 +38,9 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return b, err
 		}
-		for _, t := range qa.TestSuite {
+		for _, t := range quality.TestSuite {
 			if err := t.TestRecord(is); err != nil {
-				issue, ok := err.(qa.Issue)
+				issue, ok := err.(quality.Issue)
 				if !ok {
 					log.Fatalf("unexpected error type: %T", err)
 				}
