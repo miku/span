@@ -15,8 +15,8 @@ import (
 
 	"bytes"
 
+	"github.com/miku/parallel"
 	"github.com/miku/span"
-	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -71,53 +71,50 @@ func main() {
 		log.Fatalf("unknown export schema: %s", *format)
 	}
 
-	var readers []io.Reader
+	var reader io.Reader = os.Stdin
 
-	if flag.NArg() == 0 {
-		readers = append(readers, os.Stdin)
-	} else {
+	if flag.NArg() > 0 {
+		var files []io.Reader
 		for _, filename := range flag.Args() {
-			file, err := os.Open(filename)
+			f, err := os.Open(filename)
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer file.Close()
-			readers = append(readers, file)
+			defer f.Close()
+			files = append(files, f)
 		}
+		reader = io.MultiReader(files...)
 	}
 
-	for _, r := range readers {
-		// business logic
-		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
-			if len(bytes.TrimSpace(b)) == 0 {
-				return nil, nil
-			}
-			is := finc.IntermediateSchema{}
-
-			// TODO(miku): Unmarshal date correctly.
-			if err := json.Unmarshal(b, &is); err != nil {
-				log.Printf("failed to unmarshal: %s", string(b))
-				return b, err
-			}
-
-			// Get export format.
-			schema := exportSchemaFunc()
-
-			bb, err := schema.Export(is, *withFullrecord)
-			if err != nil {
-				log.Printf("failed to convert: %v", is)
-				return bb, err
-			}
-
-			bb = append(bb, '\n')
-			return bb, nil
-		})
-
-		p.NumWorkers = *numWorkers
-		p.BatchSize = *size
-
-		if err := p.Run(); err != nil {
-			log.Fatal(err)
+	p := parallel.NewProcessor(reader, os.Stdout, func(b []byte) ([]byte, error) {
+		if len(bytes.TrimSpace(b)) == 0 {
+			return nil, nil
 		}
+		is := finc.IntermediateSchema{}
+
+		// TODO(miku): Unmarshal date correctly.
+		if err := json.Unmarshal(b, &is); err != nil {
+			log.Printf("failed to unmarshal: %s", string(b))
+			return b, err
+		}
+
+		// Get export format.
+		schema := exportSchemaFunc()
+
+		bb, err := schema.Export(is, *withFullrecord)
+		if err != nil {
+			log.Printf("failed to convert: %v", is)
+			return bb, err
+		}
+
+		bb = append(bb, '\n')
+		return bb, nil
+	})
+
+	p.NumWorkers = *numWorkers
+	p.BatchSize = *size
+
+	if err := p.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
