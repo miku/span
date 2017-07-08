@@ -23,6 +23,7 @@ import (
 	"github.com/miku/span/s/highwire"
 	"github.com/miku/span/s/ieeenext"
 	"github.com/miku/span/s/jstornext"
+	"github.com/miku/span/s/thiemenext"
 	"github.com/miku/xmlstream"
 )
 
@@ -37,6 +38,7 @@ var FormatMap = map[string]interface{}{
 	"jstor":        new(jstornext.Article),
 	"degruyter":    new(degruyternext.Article),
 	"elsevier-tar": struct{}{}, // It's complicated.
+	"thieme-tm":    new(thiemenext.Document),
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
