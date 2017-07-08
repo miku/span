@@ -34,6 +34,7 @@ import (
 	"github.com/miku/span/assetutil"
 	"github.com/miku/span/container"
 	"github.com/miku/span/finc"
+	"github.com/miku/span/s/fincnext"
 )
 
 const (
@@ -121,16 +122,16 @@ type BibJSON struct {
 }
 
 // ToIntermediateSchema returns an intermediate schema from a DOAJ elasticsearch response.
-func (resp *Response) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (resp *Response) ToIntermediateSchema() (*fincnext.IntermediateSchema, error) {
 	resp.Source.Type = resp.Type
 	return resp.Source.ToIntermediateSchema()
 
 }
 
 // Authors returns a list of authors.
-func (doc Document) Authors() (authors []finc.Author) {
+func (doc Document) Authors() (authors []fincnext.Author) {
 	for _, author := range doc.BibJSON.Author {
-		authors = append(authors, finc.Author{Name: html.UnescapeString(author.Name)})
+		authors = append(authors, fincnext.Author{Name: html.UnescapeString(author.Name)})
 	}
 	return authors
 }
@@ -165,10 +166,10 @@ func (doc Document) DOI() string {
 
 // ToIntermediateSchema converts a doaj document to intermediate schema. For
 // now any record, that has no usable date will be skipped.
-func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (doc Document) ToIntermediateSchema() (*fincnext.IntermediateSchema, error) {
 	var err error
 
-	output := finc.NewIntermediateSchema()
+	output := fincnext.NewIntermediateSchema()
 	output.Date, err = doc.Date()
 	if err != nil {
 		return output, span.Skip{Reason: err.Error()}

@@ -10,7 +10,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/s/fincnext"
 	"golang.org/x/text/language"
 )
 
@@ -286,14 +286,14 @@ func (article *Article) Identifiers() (Identifiers, error) {
 
 // Authors returns the authors as slice.
 // TODO(miku): get rid of cross-format dependency.
-func (article *Article) Authors() []finc.Author {
-	var authors []finc.Author
+func (article *Article) Authors() []fincnext.Author {
+	var authors []fincnext.Author
 	group := article.Front.Article.ContribGroup
 	for _, contrib := range group.Contrib {
 		if contrib.Type != "author" {
 			continue
 		}
-		authors = append(authors, finc.Author{
+		authors = append(authors, fincnext.Author{
 			LastName:  contrib.Name.Surname.Value,
 			FirstName: contrib.Name.GivenNames.Value})
 	}
@@ -456,8 +456,8 @@ func (article *Article) Languages() []string {
 
 // ToInternalSchema converts a jats article into an internal schema.
 // This is a basic implementation, different source might implement their own.
-func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
-	output := finc.NewIntermediateSchema()
+func (article *Article) ToIntermediateSchema() (*fincnext.IntermediateSchema, error) {
+	output := fincnext.NewIntermediateSchema()
 
 	output.Date = article.Date()
 	output.RawDate = output.Date.Format("2006-01-02")

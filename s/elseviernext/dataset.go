@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/s/fincnext"
 )
 
 const (
@@ -352,10 +352,10 @@ func (article Article) Title() string {
 	return article.SimpleHead.Title
 }
 
-func (article Article) Authors() []finc.Author {
-	var authors []finc.Author
+func (article Article) Authors() []fincnext.Author {
+	var authors []fincnext.Author
 	for _, author := range article.Head.AuthorGroup.Author {
-		authors = append(authors, finc.Author{
+		authors = append(authors, fincnext.Author{
 			FirstName: author.GivenName,
 			LastName:  author.Surname,
 			Name:      fmt.Sprintf("%s %s", author.GivenName, author.Surname),
@@ -364,7 +364,7 @@ func (article Article) Authors() []finc.Author {
 	if len(authors) == 0 {
 		// assume it is a simple article and try to get authors from there
 		for _, author := range article.SimpleHead.AuthorGroup.Author {
-			authors = append(authors, finc.Author{
+			authors = append(authors, fincnext.Author{
 				FirstName: author.GivenName,
 				LastName:  author.Surname,
 				Name:      fmt.Sprintf("%s %s", author.GivenName, author.Surname),
@@ -453,8 +453,8 @@ func NewShipment(r io.Reader) (Shipment, error) {
 }
 
 // BatchConvert converts all items for a shipment into importable objects.
-func (s Shipment) BatchConvert() ([]finc.IntermediateSchema, error) {
-	var outputs []finc.IntermediateSchema
+func (s Shipment) BatchConvert() ([]fincnext.IntermediateSchema, error) {
+	var outputs []fincnext.IntermediateSchema
 
 	for _, ji := range s.dataset.DatasetContent.JournalIssue {
 		pii := ji.JournalIssueUniqueIds.Pii
@@ -465,7 +465,7 @@ func (s Shipment) BatchConvert() ([]finc.IntermediateSchema, error) {
 		}
 		for _, sec := range si.IssueBody.IssueSec {
 			for _, ii := range sec.IncludeItem {
-				output := finc.NewIntermediateSchema()
+				output := fincnext.NewIntermediateSchema()
 
 				article, ok := s.articles[ii.Pii]
 

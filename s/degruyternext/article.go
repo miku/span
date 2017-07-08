@@ -28,7 +28,7 @@ import (
 	"fmt"
 
 	"github.com/miku/span"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/s/fincnext"
 	"github.com/miku/span/s/jatsnext"
 )
 
@@ -61,7 +61,7 @@ func (article *Article) Identifiers() (jatsnext.Identifiers, error) {
 }
 
 // ToInternalSchema converts a jats article into an internal schema.
-func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (article *Article) ToIntermediateSchema() (*fincnext.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
 	if err != nil {
 		return output, err

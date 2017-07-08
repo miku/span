@@ -33,9 +33,8 @@ import (
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
 	"github.com/miku/span/container"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/s/fincnext"
 	"github.com/miku/span/s/jatsnext"
-	"github.com/miku/span/sources/jats"
 	"golang.org/x/text/language"
 )
 
@@ -65,20 +64,20 @@ type Article struct {
 
 // Identifiers returns the doi and the dependent url and recordID in a struct.
 // Records from this source do not need a DOI necessarily.
-func (article *Article) Identifiers() (jats.Identifiers, error) {
+func (article *Article) Identifiers() (jatsnext.Identifiers, error) {
 	locator := article.Front.Article.SelfURI.Value
 
 	doi := DOIPattern.FindString(locator)
 	recordID := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
-	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
+	return jatsnext.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
 }
 
 // Authors returns the authors as slice.
-func (article *Article) Authors() []finc.Author {
-	var authors []finc.Author
+func (article *Article) Authors() []fincnext.Author {
+	var authors []fincnext.Author
 	group := article.Front.Article.ContribGroup
 	for _, contrib := range group.Contrib {
-		authors = append(authors, finc.Author{
+		authors = append(authors, fincnext.Author{
 			LastName:  contrib.StringName.Surname.Value,
 			FirstName: contrib.StringName.GivenNames.Value})
 	}
@@ -116,7 +115,7 @@ func (article *Article) ReviewedProduct() string {
 
 // ToInternalSchema converts an article into an internal schema. There are a
 // couple of content-dependent choices here.
-func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (article *Article) ToIntermediateSchema() (*fincnext.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
 	if err != nil {
 		return output, err

@@ -23,11 +23,8 @@ package crossrefnext
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,7 +32,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/assetutil"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/s/fincnext"
 )
 
 const (
@@ -71,20 +68,6 @@ var (
 	// Future, if a publication date lies beyond it, it gets skipped.
 	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
 )
-
-// Crossref source.
-type Crossref struct{}
-
-func (c Crossref) Iterate(r io.Reader) (<-chan []span.Importer, error) {
-	return span.FromLines(r, func(b []byte) (span.Importer, error) {
-		doc := new(Document)
-		err := json.Unmarshal(b, doc)
-		if err != nil {
-			log.Printf("%s", string(b))
-		}
-		return doc, err
-	})
-}
 
 // DatePart consists of up to three int, representing year, month, day.
 type DatePart []int
@@ -142,9 +125,9 @@ func (pi *PageInfo) PageCount() int {
 	return 0
 }
 
-func (doc *Document) Authors() (authors []finc.Author) {
+func (doc *Document) Authors() (authors []fincnext.Author) {
 	for _, ra := range doc.Author {
-		authors = append(authors, finc.Author{
+		authors = append(authors, fincnext.Author{
 			FirstName: AuthorReplacer.Replace(span.UnescapeTrim(ra.Given)),
 			LastName:  AuthorReplacer.Replace(span.UnescapeTrim(ra.Family)),
 		})
@@ -227,9 +210,9 @@ func (doc *Document) ShortTitle() (s string) {
 }
 
 // ToIntermediateSchema converts a crossref document into IS.
-func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (doc *Document) ToIntermediateSchema() (*fincnext.IntermediateSchema, error) {
 	var err error
-	output := finc.NewIntermediateSchema()
+	output := fincnext.NewIntermediateSchema()
 
 	output.Date, err = doc.Issued.Date()
 

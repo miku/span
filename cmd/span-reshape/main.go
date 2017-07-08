@@ -13,12 +13,12 @@ import (
 
 	"github.com/miku/parallel"
 	"github.com/miku/span"
-	"github.com/miku/span/finc"
 	"github.com/miku/span/s/ceeol"
 	"github.com/miku/span/s/crossrefnext"
 	"github.com/miku/span/s/degruyternext"
 	"github.com/miku/span/s/doajnext"
 	"github.com/miku/span/s/elseviernext"
+	"github.com/miku/span/s/fincnext"
 	"github.com/miku/span/s/geniosnext"
 	"github.com/miku/span/s/highwire"
 	"github.com/miku/span/s/ieeenext"
@@ -41,7 +41,7 @@ var FormatMap = map[string]interface{}{
 
 // IntermediateSchemaer wrap a basic conversion method.
 type IntermediateSchemaer interface {
-	ToIntermediateSchema() (*finc.IntermediateSchema, error)
+	ToIntermediateSchema() (*fincnext.IntermediateSchema, error)
 }
 
 // processXML convert XML based formats, given a format name.
