@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
@@ -24,6 +25,7 @@ import (
 	"github.com/miku/span/formats/genios"
 	"github.com/miku/span/formats/highwire"
 	"github.com/miku/span/formats/ieee"
+	"github.com/miku/span/formats/imslp"
 	"github.com/miku/span/formats/jstor"
 	"github.com/miku/span/formats/thieme"
 	"github.com/miku/xmlstream"
@@ -49,6 +51,7 @@ var FormatMap = map[string]interface{}{
 	"degruyter":    new(degruyter.Article),
 	"elsevier-tar": struct{}{}, // It's complicated.
 	"thieme-tm":    new(thieme.Document),
+	"imslp":        struct{}{}, // Use raw bytes.
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -135,7 +138,6 @@ func main() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
-
 	var reader io.Reader = os.Stdin
 
 	if flag.NArg() > 0 {
@@ -174,6 +176,21 @@ func main() {
 			if encoder.Encode(doc); err != nil {
 				log.Fatal(err)
 			}
+		}
+	case "imslp":
+		b, err := ioutil.ReadAll(reader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data := imslp.Data(b)
+		output, err := data.ToIntermediateSchema()
+		if err != nil {
+			if _, ok := err.(span.Skip); !ok {
+				log.Fatal(err)
+			}
+		}
+		if err := json.NewEncoder(w).Encode(output); err != nil {
+			log.Fatal(err)
 		}
 	default:
 		log.Fatalf("unknown format: %s", *name)
