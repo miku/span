@@ -30,7 +30,6 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
@@ -77,8 +76,6 @@ var (
 	rawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
 	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
-	// dbmap maps a database name to one or more "package names"
-	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
 )
 
 // Headings returns subject headings.
@@ -233,7 +230,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genre
 	output.Languages = doc.Languages()
 
-	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
+	packageNames := span.WithDefaultStringSlice(DatabasePackageMap, doc.DB, []string{})
 
 	var prefixedPackageNames []string
 	for _, name := range packageNames {

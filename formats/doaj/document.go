@@ -31,7 +31,6 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
@@ -42,11 +41,6 @@ const (
 	Format           = "ElectronicArticle"
 	Genre            = "article" // Default ris.type
 	DefaultRefType   = "EJOUR"
-)
-
-var (
-	LCCPatterns = assetutil.MustLoadRegexpMap("assets/finc/lcc.json")
-	// LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
 )
 
 // Response from elasticsearch.
@@ -229,7 +223,6 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, s := range doc.Index.SchemaCode {
 		key := strings.Replace(s, "LCC:", "", -1)
 		class := span.WithDefaultRegexp(finc.LibraryOfCongressClassification, key, finc.NOT_ASSIGNED)
-		// class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NOT_ASSIGNED)
 		if class != finc.NOT_ASSIGNED {
 			subjects.Add(class)
 		}
