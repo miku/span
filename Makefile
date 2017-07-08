@@ -65,7 +65,7 @@ rpm: all
 	cp $(HOME)/rpmbuild/RPMS/x86_64/span*.rpm .
 
 cloc:
-	cloc --max-file-size 1 --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
+	cloc --max-file-size 1 --exclude-dir vendor --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
 
 docs/span.1: docs/span.md
 	md2man-roff docs/span.md > docs/span.1
