@@ -16,6 +16,7 @@ import (
 	"github.com/miku/span/finc"
 	"github.com/miku/span/s/ceeol"
 	"github.com/miku/span/s/crossrefnext"
+	"github.com/miku/span/s/degruyternext"
 	"github.com/miku/span/s/doajnext"
 	"github.com/miku/span/s/geniosnext"
 	"github.com/miku/span/s/highwire"
@@ -26,13 +27,14 @@ import (
 
 // FormatMap maps format name to pointer to format struct.
 var FormatMap = map[string]interface{}{
-	"highwire": new(highwire.Record),
-	"ceeol":    new(ceeol.Article),
-	"doaj":     new(doajnext.Response),
-	"crossref": new(crossrefnext.Document),
-	"ieee":     new(ieeenext.Publication),
-	"genios":   new(geniosnext.Document),
-	"jstor":    new(jstornext.Article),
+	"highwire":  new(highwire.Record),
+	"ceeol":     new(ceeol.Article),
+	"doaj":      new(doajnext.Response),
+	"crossref":  new(crossrefnext.Document),
+	"ieee":      new(ieeenext.Publication),
+	"genios":    new(geniosnext.Document),
+	"jstor":     new(jstornext.Article),
+	"degruyter": new(degruyternext.Article),
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
