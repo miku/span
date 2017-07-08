@@ -5,73 +5,117 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
 	"bufio"
 
+	"github.com/miku/parallel"
+	"github.com/miku/span"
 	"github.com/miku/span/finc"
 	"github.com/miku/span/s/ceeol"
+	"github.com/miku/span/s/crossrefnext"
+	"github.com/miku/span/s/doajnext"
+	"github.com/miku/span/s/geniosnext"
 	"github.com/miku/span/s/highwire"
+	"github.com/miku/span/s/ieeenext"
 	"github.com/miku/xmlstream"
 )
+
+// FormatMap maps format name to pointer to format struct.
+var FormatMap = map[string]interface{}{
+	"highwire": new(highwire.Record),
+	"ceeol":    new(ceeol.Article),
+	"doaj":     new(doajnext.Response),
+	"crossref": new(crossrefnext.Document),
+	"ieee":     new(ieeenext.Publication),
+	"genios":   new(geniosnext.Document),
+}
 
 // IntermediateSchemaer wrap a basic conversion method.
 type IntermediateSchemaer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
+// processXML convert XML based formats, given a format name.
+func processXML(r io.Reader, w io.Writer, name string) error {
+	if _, ok := FormatMap[name]; !ok {
+		return fmt.Errorf("unknown format name: %s", name)
+	}
+	scanner := xmlstream.NewScanner(bufio.NewReader(r), FormatMap[name])
+	for scanner.Scan() {
+		tag := scanner.Element()
+		converter, ok := tag.(IntermediateSchemaer)
+		if !ok {
+			return fmt.Errorf("cannot convert to intermediate schema: %T", tag)
+		}
+		output, err := converter.ToIntermediateSchema()
+		if err != nil {
+			return err
+		}
+		if err := json.NewEncoder(w).Encode(output); err != nil {
+			return err
+		}
+	}
+	return scanner.Err()
+}
+
+// processJSON convert JSON based formats.
+func processJSON(r io.Reader, w io.Writer, name string) error {
+	if _, ok := FormatMap[name]; !ok {
+		return fmt.Errorf("unknown format name: %s", name)
+	}
+	v := FormatMap[name]
+	p := parallel.NewProcessor(r, w, func(b []byte) ([]byte, error) {
+		if err := json.Unmarshal(b, v); err != nil {
+			return nil, err
+		}
+		converter, ok := v.(IntermediateSchemaer)
+		if !ok {
+			return nil, fmt.Errorf("cannot convert to intermediate schema: %T", v)
+		}
+		output, err := converter.ToIntermediateSchema()
+		if err != nil {
+			switch err.(type) {
+			case span.Skip:
+				log.Println(err)
+				return nil, nil
+			default:
+				return nil, err
+			}
+		}
+		return json.Marshal(output)
+	})
+	return p.Run()
+}
+
 func main() {
-	formatName := flag.String("i", "", "input format name")
-	listFormats := flag.Bool("l", false, "list input formats")
-	exitWithZero := flag.Bool("z", false, "exit with 0, even in the presence of errors")
+	name := flag.String("i", "", "input format name")
+	list := flag.Bool("l", false, "list input formats")
+
 	flag.Parse()
 
-	fmap := map[string]interface{}{
-		"highwire": new(highwire.Record),
-		"ceeol":    new(ceeol.Article),
-	}
-
-	if *listFormats {
-		for k := range fmap {
+	if *list {
+		for k := range FormatMap {
 			fmt.Println(k)
 		}
 		os.Exit(0)
 	}
 
-	if _, ok := fmap[*formatName]; !ok {
-		log.Fatalf("unknown format: %s", *formatName)
-	}
-
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
-	scanner := xmlstream.NewScanner(bufio.NewReader(os.Stdin), fmap[*formatName])
-
-	for scanner.Scan() {
-		tag := scanner.Element()
-		converter, ok := tag.(IntermediateSchemaer)
-		if !ok {
-			log.Fatal("cannot convert to intermediate schema")
-		}
-		output, err := converter.ToIntermediateSchema()
-		if err != nil {
-			if *exitWithZero {
-				log.Println(err)
-				continue
-			} else {
-				log.Fatal(err)
-			}
-		}
-		if err := json.NewEncoder(w).Encode(output); err != nil {
+	switch *name {
+	case "highwire", "ceeol", "ieee", "genios":
+		if err := processXML(os.Stdin, w, *name); err != nil {
 			log.Fatal(err)
 		}
-	}
-	if err := scanner.Err(); err != nil {
-		if *exitWithZero {
-			log.Printf("scan: %v", err)
-		} else {
-			log.Fatalf("scan: %v", err)
+	case "doaj", "crossref":
+		if err := processJSON(os.Stdin, w, *name); err != nil {
+			log.Fatal(err)
 		}
+	default:
+		log.Fatalf("unknown format: %s", *name)
 	}
 }
