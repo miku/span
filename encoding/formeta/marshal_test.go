@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 func TestEncoding(t *testing.T) {

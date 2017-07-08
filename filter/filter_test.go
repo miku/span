@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // TestOrFilter1 simple OR.

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // Filter returns go or no for a given record.

@@ -3,7 +3,7 @@ package filter
 import (
 	"encoding/json"
 
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // SourceFilter allows all records with the given source id or ids.

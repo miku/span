@@ -7,7 +7,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // ISSNFilter allows records with a certain ISSN.

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/miku/span/container"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // PackageFilter allows all records of one of the given package name.

@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/miku/span"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
 )

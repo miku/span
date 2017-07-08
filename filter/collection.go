@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/miku/span/container"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // CollectionFilter returns true, if the record belongs to any one of the collections.

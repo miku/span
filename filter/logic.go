@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // OrFilter returns true, if at least one filter matches.

@@ -1,6 +1,6 @@
 package filter
 
-import "github.com/miku/span/finc"
+import "github.com/miku/span/formats/finc"
 
 // AnyFilter validates any record.
 type AnyFilter struct {

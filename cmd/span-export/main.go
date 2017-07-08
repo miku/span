@@ -17,14 +17,13 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/bytebatch"
-	"github.com/miku/span/finc"
-	"github.com/miku/span/finc/exporter"
+	"github.com/miku/span/formats/finc"
 )
 
 // Exporters holds available export formats
 var Exporters = map[string]func() finc.Exporter{
-	"solr5vu3": func() finc.Exporter { return new(exporter.Solr5Vufind3) },
-	"formeta":  func() finc.Exporter { return new(exporter.Formeta) },
+	"solr5vu3": func() finc.Exporter { return new(finc.Solr5Vufind3) },
+	"formeta":  func() finc.Exporter { return new(finc.Formeta) },
 }
 
 func main() {

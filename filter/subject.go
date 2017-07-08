@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/miku/span/container"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // SubjectFilter returns true, if the record has an exact string match to one of the given subjects.

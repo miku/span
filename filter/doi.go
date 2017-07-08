@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/miku/span"
-	"github.com/miku/span/finc"
+	"github.com/miku/span/formats/finc"
 )
 
 // DOIFilter allows records with a given DOI. Can be used in conjuction with
