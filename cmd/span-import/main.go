@@ -41,20 +41,22 @@ var (
 	cpuprofile  = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
+// Factory creates things.
+type Factory func() interface{}
+
 // FormatMap maps format name to pointer to format struct.
-var FormatMap = map[string]interface{}{
-	"highwire":     new(highwire.Record),
-	"ceeol":        new(ceeol.Article),
-	"doaj":         new(doaj.Response),
-	"crossref":     new(crossref.Document),
-	"ieee":         new(ieee.Publication),
-	"genios":       new(genios.Document),
-	"jstor":        new(jstor.Article),
-	"degruyter":    new(degruyter.Article),
-	"elsevier-tar": struct{}{}, // It's complicated.
-	"thieme-tm":    new(thieme.Document),
-	"imslp":        new(imslp.Data),
-	"dummy":        new(dummy.Example),
+var FormatMap = map[string]Factory{
+	"highwire":  func() interface{} { return new(highwire.Record) },
+	"ceeol":     func() interface{} { return new(ceeol.Article) },
+	"doaj":      func() interface{} { return new(doaj.Response) },
+	"crossref":  func() interface{} { return new(crossref.Document) },
+	"ieee":      func() interface{} { return new(ieee.Publication) },
+	"genios":    func() interface{} { return new(genios.Document) },
+	"jstor":     func() interface{} { return new(jstor.Article) },
+	"degruyter": func() interface{} { return new(degruyter.Article) },
+	"thieme-tm": func() interface{} { return new(thieme.Document) },
+	"imslp":     func() interface{} { return new(imslp.Data) },
+	"dummy":     func() interface{} { return new(dummy.Example) },
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -69,7 +71,8 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)
 	}
-	scanner := xmlstream.NewScanner(bufio.NewReader(r), FormatMap[name])
+	obj := FormatMap[name]()
+	scanner := xmlstream.NewScanner(bufio.NewReader(r), obj)
 	for scanner.Scan() {
 		tag := scanner.Element()
 		converter, ok := tag.(IntermediateSchemaer)
@@ -86,6 +89,9 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 		if err := json.NewEncoder(w).Encode(output); err != nil {
 			return err
 		}
+		if _, err := io.WriteString(w, "\n"); err != nil {
+			return err
+		}
 	}
 	return scanner.Err()
 }
@@ -95,8 +101,8 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)
 	}
-	v := FormatMap[name]
 	p := parallel.NewProcessor(r, w, func(b []byte) ([]byte, error) {
+		v := FormatMap[name]()
 		if err := json.Unmarshal(b, v); err != nil {
 			return nil, err
 		}
@@ -111,7 +117,12 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 		if err != nil {
 			return nil, err
 		}
-		return json.Marshal(output)
+		bb, err := json.Marshal(output)
+		if err != nil {
+			return nil, err
+		}
+		bb = append(bb, '\n')
+		return bb, nil
 	})
 	return p.RunWorkers(*numWorkers)
 }
@@ -122,7 +133,7 @@ func processText(r io.Reader, w io.Writer, name string) error {
 		return fmt.Errorf("unknown format name: %s", name)
 	}
 	// Get the format.
-	data := FormatMap[name]
+	data := FormatMap[name]()
 
 	// We need an unmarshaller first.
 	unmarshaler, ok := data.(encoding.TextUnmarshaler)
