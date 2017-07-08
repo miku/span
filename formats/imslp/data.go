@@ -14,10 +14,16 @@ const SourceIdentifier = "15"
 // Data is just the raw bytes.
 type Data []byte
 
+// UnmarshalText unmarshals textual representation of itself.
+func (data *Data) UnmarshalText(text []byte) error {
+	*data = append(*data, text...)
+	return nil
+}
+
 // ToIntermediateSchema converts record to intermediate schema.
-func (data Data) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (data *Data) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	doc := etree.NewDocument()
-	if err := doc.ReadFromBytes([]byte(data)); err != nil {
+	if err := doc.ReadFromBytes([]byte(*data)); err != nil {
 		return nil, err
 	}
 	output := finc.NewIntermediateSchema()

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -51,7 +52,7 @@ var FormatMap = map[string]interface{}{
 	"degruyter":    new(degruyter.Article),
 	"elsevier-tar": struct{}{}, // It's complicated.
 	"thieme-tm":    new(thieme.Document),
-	"imslp":        struct{}{}, // Use raw bytes.
+	"imslp":        new(imslp.Data),
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -111,6 +112,42 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 	return p.RunWorkers(*numWorkers)
 }
 
+// processText processes a single record from raw bytes.
+func processText(r io.Reader, w io.Writer, name string) error {
+	if _, ok := FormatMap[name]; !ok {
+		return fmt.Errorf("unknown format name: %s", name)
+	}
+	// Get the format.
+	data := FormatMap[name]
+
+	// We need an unmarshaller first.
+	unmarshaler, ok := data.(encoding.TextUnmarshaler)
+	if !ok {
+		return fmt.Errorf("cannot unmarshal text: %T", data)
+	}
+	b, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	if err := unmarshaler.UnmarshalText(b); err != nil {
+		return err
+	}
+
+	// Now that data is populated we can convert.
+	converter, ok := data.(IntermediateSchemaer)
+	if !ok {
+		return fmt.Errorf("cannot convert to intermediate schema: %T", data)
+	}
+	output, err := converter.ToIntermediateSchema()
+	if _, ok := err.(span.Skip); ok {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return json.NewEncoder(w).Encode(output)
+}
+
 func main() {
 	flag.Parse()
 
@@ -162,6 +199,10 @@ func main() {
 		if err := processJSON(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
+	case "imslp":
+		if err := processText(reader, w, *name); err != nil {
+			log.Fatal(err)
+		}
 	case "elsevier-tar":
 		shipment, err := elsevier.NewShipment(reader)
 		if err != nil {
@@ -176,21 +217,6 @@ func main() {
 			if encoder.Encode(doc); err != nil {
 				log.Fatal(err)
 			}
-		}
-	case "imslp":
-		b, err := ioutil.ReadAll(reader)
-		if err != nil {
-			log.Fatal(err)
-		}
-		data := imslp.Data(b)
-		output, err := data.ToIntermediateSchema()
-		if err != nil {
-			if _, ok := err.(span.Skip); !ok {
-				log.Fatal(err)
-			}
-		}
-		if err := json.NewEncoder(w).Encode(output); err != nil {
-			log.Fatal(err)
 		}
 	default:
 		log.Fatalf("unknown format: %s", *name)
