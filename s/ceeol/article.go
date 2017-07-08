@@ -12,7 +12,6 @@ import (
 	"github.com/shantanubhadoria/go-roman/roman"
 )
 
-// SourceIdentifier for internal bookkeeping.
 const (
 	SourceIdentifier = "53"
 	Format           = "ElectronicArticle"
@@ -91,7 +90,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Date, err = time.Parse("2006-01-02", fmt.Sprintf("%s-01-01", article.PublicationYear))
 	output.Subjects = article.SubjectTerms
 	output.URL = append(output.URL, article.ArticleURL)
-	output.RecordID = fmt.Sprintf("ai-53-%s", article.UniqueID)
+	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, article.UniqueID)
 	output.SourceID = SourceIdentifier
 	output.Format = Format
 	output.Genre = Genre
