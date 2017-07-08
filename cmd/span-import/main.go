@@ -135,14 +135,20 @@ func main() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
+
 	var reader io.Reader = os.Stdin
+
 	if flag.NArg() > 0 {
-		file, err := os.Open(flag.Arg(0))
-		if err != nil {
-			log.Fatal(err)
+		var files []io.Reader
+		for _, filename := range flag.Args() {
+			f, err := os.Open(filename)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			files = append(files, f)
 		}
-		defer file.Close()
-		reader = file
+		reader = io.MultiReader(files...)
 	}
 
 	switch *name {

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,8 +14,8 @@ import (
 
 	"bytes"
 
+	"github.com/miku/parallel"
 	"github.com/miku/span"
-	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
@@ -40,7 +41,10 @@ func main() {
 		issnset.Add(string(bytes.TrimSpace(v)))
 	}
 
-	p := bytebatch.NewLineProcessor(os.Stdin, os.Stdout, func(b []byte) ([]byte, error) {
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
+	p := parallel.NewProcessor(bufio.NewReader(os.Stdin), w, func(b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
 		if err := json.Unmarshal(b, &is); err != nil {
 			return nil, err

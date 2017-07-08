@@ -7,6 +7,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -16,8 +17,8 @@ import (
 	"runtime"
 	"runtime/pprof"
 
+	"github.com/miku/parallel"
 	"github.com/miku/span"
-	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
 )
@@ -67,44 +68,46 @@ func main() {
 		}
 	}
 
-	var readers []io.Reader
+	var reader io.Reader = os.Stdin
 
-	if flag.NArg() == 0 {
-		readers = append(readers, os.Stdin)
-	} else {
+	if flag.NArg() > 0 {
+		var files []io.Reader
 		for _, filename := range flag.Args() {
-			file, err := os.Open(filename)
+			f, err := os.Open(filename)
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer file.Close()
-			readers = append(readers, file)
+			defer f.Close()
+			files = append(files, f)
 		}
+		reader = io.MultiReader(files...)
 	}
 
-	for _, r := range readers {
-		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
-			// business logic
-			var is finc.IntermediateSchema
-			if err := json.Unmarshal(b, &is); err != nil {
-				return b, err
-			}
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
 
-			tagged := tagger.Tag(is)
-
-			bb, err := json.Marshal(tagged)
-			if err != nil {
-				return bb, err
-			}
-			bb = append(bb, '\n')
-			return bb, nil
-		})
-
-		p.NumWorkers = *numWorkers
-		p.BatchSize = *size
-
-		if err := p.Run(); err != nil {
-			log.Fatal(err)
+	p := parallel.NewProcessor(bufio.NewReader(reader), w, func(b []byte) ([]byte, error) {
+		// business logic
+		var is finc.IntermediateSchema
+		if err := json.Unmarshal(b, &is); err != nil {
+			return b, err
 		}
+
+		tagged := tagger.Tag(is)
+
+		bb, err := json.Marshal(tagged)
+		if err != nil {
+			return bb, err
+		}
+		bb = append(bb, '\n')
+		return bb, nil
+	})
+
+	p.NumWorkers = *numWorkers
+	p.BatchSize = *size
+
+	if err := p.Run(); err != nil {
+		log.Fatal(err)
 	}
+
 }
