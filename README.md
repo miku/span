@@ -35,10 +35,15 @@ Also:
 Ideas for span 0.2.0
 --------------------
 
-* Reuse more generic code, e.g. [parallel](http://github.com/miku/parallel)
-* Make conversions a simpler with [xmlstream](https://github.com/miku/xmlstream)
+TODO:
+
 * Do not require recompilation for mapping updates (allow various sources)
 * Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
+
+DONE:
+
+* Reuse more generic code, e.g. [parallel](http://github.com/miku/parallel)
+* Make conversions a simpler with [xmlstream](https://github.com/miku/xmlstream)
 
 Licence
 -------
