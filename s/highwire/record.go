@@ -13,7 +13,7 @@ import (
 
 // SourceIdentifier for internal bookkeeping.
 const (
-	SourceIdentifier = "200"
+	SourceIdentifier = "200" // TODO(miku): find correct id
 	Format           = "ElectronicArticle"
 	Genre            = "article"
 	DefaultRefType   = "EJOUR"
