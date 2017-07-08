@@ -2,9 +2,8 @@ package span
 
 import "strings"
 
-// All data from http://www-01.sil.org/iso639-3/codes.asp.
-
 // LanguageIdentifier returns the three letter identifier from any string.
+// All data from http://www-01.sil.org/iso639-3/codes.asp.
 func LanguageIdentifier(s string) string {
 	s = strings.TrimSpace(s)
 	switch len(s) {
@@ -30,7 +29,7 @@ func LanguageIdentifier(s string) string {
 // ISO639OneToThree maps 639-1 identifier (two letters) (if there is one) to a
 // three-letter 639-3 identifier.
 var ISO639OneToThree = map[string]string{
-	// Created with `awk -F $'\t' '$4 != "" { print $4, $1}' iso-639-3_20170202.tsv`.
+	// awk -F $'\t' '$4 != "" { print $4, $1 }' iso-639-3_20170202.tsv
 	"aa": "aar",
 	"ab": "abk",
 	"ae": "ave",
