@@ -52,6 +52,9 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 		}
 		output, err := converter.ToIntermediateSchema()
 		if err != nil {
+			if _, ok := err.(span.Skip); ok {
+				continue
+			}
 			return err
 		}
 		if err := json.NewEncoder(w).Encode(output); err != nil {
@@ -76,14 +79,11 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 			return nil, fmt.Errorf("cannot convert to intermediate schema: %T", v)
 		}
 		output, err := converter.ToIntermediateSchema()
+		if _, ok := err.(span.Skip); ok {
+			return nil, nil
+		}
 		if err != nil {
-			switch err.(type) {
-			case span.Skip:
-				log.Println(err)
-				return nil, nil
-			default:
-				return nil, err
-			}
+			return nil, err
 		}
 		return json.Marshal(output)
 	})
