@@ -2,30 +2,20 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"runtime"
+	"sync/atomic"
 
+	"github.com/miku/parallel"
 	"github.com/miku/span"
-	"github.com/miku/span/bytebatch"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/qa"
 )
-
-// stats keeps count on the error types
-var stats = make(map[string]int)
-
-// statsCounter will increment the stats map by one for a given key.
-func statsCounter(ch chan string, done chan bool) {
-	for key := range ch {
-		stats[key]++
-	}
-	done <- true
-}
 
 func main() {
 
@@ -41,76 +31,45 @@ func main() {
 		os.Exit(0)
 	}
 
-	var readers []io.Reader
+	errStats := make(map[string]*int64)
 
-	if flag.NArg() == 0 {
-		readers = append(readers, os.Stdin)
-	} else {
-		for _, filename := range flag.Args() {
-			file, err := os.Open(filename)
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer file.Close()
-			readers = append(readers, file)
+	p := parallel.NewProcessor(bufio.NewReader(os.Stdin), os.Stdout, func(b []byte) ([]byte, error) {
+		var is finc.IntermediateSchema
+		if err := json.Unmarshal(b, &is); err != nil {
+			return b, err
 		}
-	}
-
-	errc := make(chan string)
-	done := make(chan bool)
-
-	go statsCounter(errc, done)
-
-	out := make(chan []byte)
-
-	go span.ByteSink(os.Stdout, out, done)
-
-	for _, r := range readers {
-		p := bytebatch.NewLineProcessor(r, os.Stdout, func(b []byte) ([]byte, error) {
-
-			var is finc.IntermediateSchema
-			if err := json.Unmarshal(b, &is); err != nil {
-				return b, err
-			}
-
-			for _, t := range qa.TestSuite {
-				if err := t.TestRecord(is); err != nil {
-					issue, ok := err.(qa.Issue)
-					if !ok {
-						log.Fatalf("unexpected error type: %s", err)
-					}
-					errc <- issue.Err.Error()
-					if *verbose {
-						b, err := json.Marshal(issue)
-						if err != nil {
-							log.Fatal(err)
-						}
-						out <- b
-					}
+		for _, t := range qa.TestSuite {
+			if err := t.TestRecord(is); err != nil {
+				issue, ok := err.(qa.Issue)
+				if !ok {
+					log.Fatalf("unexpected error type: %T", err)
+				}
+				key := issue.Err.Error()
+				if errStats[key] == nil {
+					var x int64
+					errStats[key] = &x
+				}
+				atomic.AddInt64(errStats[key], 1)
+				if *verbose {
+					return json.Marshal(issue)
 				}
 			}
-
-			return nil, nil
-
-		})
-
-		p.NumWorkers = *numWorkers
-		p.BatchSize = *size
-
-		if err := p.Run(); err != nil {
-			log.Fatal(err)
 		}
+		return nil, nil
+	})
+
+	p.NumWorkers = *numWorkers
+	p.BatchSize = *size
+
+	if err := p.Run(); err != nil {
+		log.Fatal(err)
 	}
 
-	close(errc)
-	close(out)
-	// wait for both queue and writer
-	<-done
-	<-done
-
-	b, err := json.Marshal(map[string]interface{}{"stats": stats})
+	b, err := json.Marshal(errStats)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Fprintln(os.Stderr, string(b))
+	if !*verbose {
+		fmt.Println(string(b))
+	}
 }
