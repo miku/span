@@ -21,6 +21,7 @@ import (
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/formats/degruyter"
 	"github.com/miku/span/formats/doaj"
+	"github.com/miku/span/formats/dummy"
 	"github.com/miku/span/formats/elsevier"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/formats/genios"
@@ -53,6 +54,7 @@ var FormatMap = map[string]interface{}{
 	"elsevier-tar": struct{}{}, // It's complicated.
 	"thieme-tm":    new(thieme.Document),
 	"imslp":        new(imslp.Data),
+	"dummy":        new(dummy.Example),
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -195,7 +197,7 @@ func main() {
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
-	case "doaj", "crossref":
+	case "doaj", "crossref", "dummy":
 		if err := processJSON(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
