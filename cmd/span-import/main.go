@@ -206,7 +206,7 @@ func main() {
 	}
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios", "jstor":
+	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
