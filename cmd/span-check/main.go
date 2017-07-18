@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -34,6 +35,9 @@ func main() {
 	errStats := make(map[string]*int64)
 
 	p := parallel.NewProcessor(bufio.NewReader(os.Stdin), os.Stdout, func(b []byte) ([]byte, error) {
+		if len(bytes.TrimSpace(b)) == 0 {
+			return nil, nil
+		}
 		var is finc.IntermediateSchema
 		if err := json.Unmarshal(b, &is); err != nil {
 			return b, err
