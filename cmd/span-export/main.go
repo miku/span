@@ -13,8 +13,6 @@ import (
 	"sort"
 	"strings"
 
-	"bytes"
-
 	"github.com/miku/parallel"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
@@ -87,9 +85,6 @@ func main() {
 	}
 
 	p := parallel.NewProcessor(reader, os.Stdout, func(b []byte) ([]byte, error) {
-		if len(bytes.TrimSpace(b)) == 0 {
-			return nil, nil
-		}
 		is := finc.IntermediateSchema{}
 
 		// TODO(miku): Unmarshal date correctly.
