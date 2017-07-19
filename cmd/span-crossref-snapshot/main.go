@@ -34,7 +34,7 @@ func main() {
 
 	w := bufio.NewWriter(f)
 
-	for _, filename := range flag.Args() {
+	for i, filename := range flag.Args() {
 		f, err := os.Open(filename)
 		if err != nil {
 			log.Fatal(err)
@@ -49,7 +49,7 @@ func main() {
 			if err := json.Unmarshal(b, &resp); err != nil {
 				return nil, err
 			}
-			fmt.Println(resp.Message.NextCursor)
+			fmt.Printf("%d/%d: %s", i, flag.NArg(), resp.Message.NextCursor)
 			return nil, nil
 		})
 		p.BatchSize = 5 // Each item might be large.
