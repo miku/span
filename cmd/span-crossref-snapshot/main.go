@@ -21,6 +21,10 @@ func main() {
 	// This file is sorted by DOI and deposited date, only the latest date is kept.
 	// Then, for each file extract only the newest records (must keep a list of DOI in
 	// memory or maybe in an embedded key value store, say bolt).
+	// ...
+	// For each file (sha), keep the extracted list compressed and cached at
+	// ~/.cache/span-crossref-snapshot/. Also, keep a result cache for a set of files.
+
 	flag.Parse()
 
 	// f, err := ioutil.TempFile("", "span-crossref-snapshot-")
