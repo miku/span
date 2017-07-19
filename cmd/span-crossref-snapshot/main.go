@@ -49,9 +49,10 @@ func main() {
 			if err := json.Unmarshal(b, &resp); err != nil {
 				return nil, err
 			}
-			fmt.Printf("%d/%d: %s", i, flag.NArg(), resp.Message.NextCursor)
+			fmt.Println(resp.Message.NextCursor)
 			return nil, nil
 		})
+		fmt.Printf("%d/%d\n", i, flag.NArg())
 		p.BatchSize = 5 // Each item might be large.
 		if err := p.Run(); err != nil {
 			log.Fatal(err)
