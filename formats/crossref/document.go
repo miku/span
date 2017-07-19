@@ -65,7 +65,7 @@ var (
 		regexp.MustCompile(`[?]{6,}`),
 	}
 
-	// Future, if a publication date lies beyond it, it gets skipped.
+	// Future ends soon.
 	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
 )
 
