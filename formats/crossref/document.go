@@ -69,6 +69,18 @@ var (
 	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
 )
 
+// BulkResponse for a bulk request containing multiple items.
+type BulkResponse struct {
+	Status         string `json:"status"`
+	MessageType    string `json:"message-type"`
+	MessageVersion string `json:"message-version"`
+	Message        struct {
+		NextCursor   string     `json:"next-cursor"`
+		TotalResults int        `json:"total-results"`
+		Items        []Document `json:"items"`
+	} `json:"message"`
+}
+
 // DatePart consists of up to three int, representing year, month, day.
 type DatePart []int
 
