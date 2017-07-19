@@ -33,32 +33,42 @@ func main() {
 	}()
 
 	w := bufio.NewWriter(f)
+	defer w.Flush()
 
-	for i, filename := range flag.Args() {
+	for _, filename := range flag.Args() {
 		f, err := os.Open(filename)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer f.Close()
 		br := bufio.NewReader(f)
-		p := parallel.NewProcessor(br, w, func(b []byte) ([]byte, error) {
-			if len(bytes.TrimSpace(b)) == 0 {
-				return nil, nil
-			}
-			var resp crossref.BulkResponse
-			if err := json.Unmarshal(b, &resp); err != nil {
-				return nil, err
-			}
-			fmt.Println(resp.Message.NextCursor)
-			return nil, nil
-		})
-		fmt.Printf("%d/%d\n", i, flag.NArg())
+
+		// Close over filename, so we can safely use it with goroutines.
+		var createProcessor = func(filename string) *parallel.Processor {
+			p := parallel.NewProcessor(br, w, func(b []byte) ([]byte, error) {
+				var resp crossref.BulkResponse
+				if err := json.Unmarshal(b, &resp); err != nil {
+					return nil, err
+				}
+				var items [][]byte
+				for _, doc := range resp.Message.Items {
+					date, err := doc.Deposited.Date()
+					if err != nil {
+						return nil, err
+					}
+					s := fmt.Sprintf("%s\t%s\t%s\n", filename, date.Format("2006-01-02"), doc.DOI)
+					items = append(items, []byte(s))
+				}
+				return bytes.Join(items, []byte("\n")), nil
+			})
+			return p
+		}
+
+		// Create, configure, run.
+		p := createProcessor(filename)
 		p.BatchSize = 5 // Each item might be large.
 		if err := p.Run(); err != nil {
 			log.Fatal(err)
 		}
-	}
-	if err := w.Flush(); err != nil {
-		log.Fatal(err)
 	}
 }
