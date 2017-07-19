@@ -52,6 +52,7 @@ func main() {
 			fmt.Println(resp.Message.NextCursor)
 			return nil, nil
 		})
+		p.BatchSize = 5 // Each item might be large.
 		if err := p.Run(); err != nil {
 			log.Fatal(err)
 		}
