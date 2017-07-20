@@ -40,7 +40,7 @@ func main() {
 	w := bufio.NewWriter(f)
 
 	for _, filename := range flag.Args() {
-
+		log.Println(filename)
 		f, err := os.Open(filename)
 		if err != nil {
 			log.Fatal(err)
