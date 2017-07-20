@@ -51,7 +51,7 @@ func main() {
 	// For each file (sha), keep the extracted list compressed and cached at
 	// ~/.cache/span-crossref-snapshot/. Also, keep a result cache for a set of files.
 
-	batchSize := flag.Int("b", 10, "batch size")
+	batchSize := flag.Int("b", 20, "batch size")
 
 	flag.Parse()
 
