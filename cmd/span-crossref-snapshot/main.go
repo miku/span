@@ -4,9 +4,11 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -27,17 +29,14 @@ func main() {
 
 	flag.Parse()
 
-	// f, err := ioutil.TempFile("", "span-crossref-snapshot-")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer func() {
-	// 	f.Close()
-	// 	os.Remove(f.Name())
-	// }()
+	f, err := ioutil.TempFile("", "span-crossref-snapshot-")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
 
-	w := bufio.NewWriter(os.Stdout)
-	defer w.Flush()
+	bw := bufio.NewWriter(f)
+	w := gzip.NewWriter(bw)
 
 	for _, filename := range flag.Args() {
 
@@ -46,7 +45,6 @@ func main() {
 			log.Fatal(err)
 		}
 		br := bufio.NewReader(f)
-		defer f.Close()
 
 		// Close over filename, so we can safely use it with goroutines.
 		var createProcessor = func(filename string) *parallel.Processor {
@@ -75,5 +73,18 @@ func main() {
 		if err := p.Run(); err != nil {
 			log.Fatal(err)
 		}
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
 	}
+
+	if err := w.Flush(); err != nil {
+		log.Fatal(err)
+	}
+	if err := bw.Flush(); err != nil {
+		log.Fatal(err)
+	}
+
+	// At this point, f knows about all DOI and dates.
+	log.Println(f.Name())
 }
