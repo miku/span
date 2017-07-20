@@ -22,24 +22,9 @@ import (
 
 const tmpPrefix = "span-crossref-snapshot-"
 
-// line is a list of fields.
-type line struct {
-	cols []string
-}
-
-// MarshalText returns a tab-separated columns.
-func (l line) MarshalText() ([]byte, error) {
-	return []byte(fmt.Sprintf("%s\n", strings.Join(l.cols, "\t"))), nil
-}
-
-// WriteTo implements io.WriterTo.
-func (l line) WriteTo(w io.Writer) (int64, error) {
-	b, err := l.MarshalText()
-	if err != nil {
-		return 0, err
-	}
-	n, err := w.Write(b)
-	return int64(n), err
+// WriteFields writes a variable number of fields as tab separated values into a writer.
+func WriteFields(w io.Writer, s ...string) (int, error) {
+	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(s, "\t")))
 }
 
 func main() {
@@ -86,8 +71,8 @@ func main() {
 					if err != nil {
 						return nil, err
 					}
-					l := line{[]string{filename, date.Format("2006-01-02"), doc.DOI}}
-					if _, err := l.WriteTo(&buf); err != nil {
+					isodate := date.Format("2006-01-02")
+					if _, err := WriteFields(&buf, filename, isodate, doc.DOI); err != nil {
 						return nil, err
 					}
 				}
