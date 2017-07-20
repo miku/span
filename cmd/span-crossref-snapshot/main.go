@@ -105,9 +105,11 @@ func main() {
 	}
 
 	log.Println("Sorting.")
+	// Sort by DOI (3), then date reversed (2); then unique by DOI (3). Should keep the entry of
+	// the last update (filename, document date, DOI).
+	t := "LC_ALL=C sort -S25% -k3,3 -rk2,2 {{ input }} | LC_ALL=C sort -S25% -k3,3 -u > {{ output }}"
 
-	output, err := clam.RunOutput("LC_ALL=C sort -S25% -k3,3 -k2,2 {{ input }} | LC_ALL=C sort -S25% -k3,3 -u > {{ output }}",
-		clam.Map{"input": f.Name()})
+	output, err := clam.RunOutput(t, clam.Map{"input": f.Name()})
 	if err != nil {
 		log.Fatal(err)
 	}
