@@ -4,13 +4,14 @@ package main
 
 import (
 	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 
 	"bufio"
 
@@ -35,8 +36,8 @@ func main() {
 	}
 	defer f.Close()
 
-	bw := bufio.NewWriter(f)
-	w := gzip.NewWriter(bw)
+	log.Println(f.Name())
+	w := bufio.NewWriter(f)
 
 	for _, filename := range flag.Args() {
 
@@ -81,10 +82,24 @@ func main() {
 	if err := w.Flush(); err != nil {
 		log.Fatal(err)
 	}
-	if err := bw.Flush(); err != nil {
+
+	g, err := ioutil.TempFile("", "span-crossref-snapshot-")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer g.Close()
+
+	log.Println("Rewinding.")
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		log.Fatal(err)
 	}
 
-	// At this point, f knows about all DOI and dates.
-	log.Println(f.Name())
+	log.Println("Sorting.")
+	cmd := exec.Command("sort", "-S25%", "-k3,3", "-k2,2", "-u")
+	cmd.Stdin = f
+	cmd.Stdout = g
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+	log.Println(g.Name())
 }
