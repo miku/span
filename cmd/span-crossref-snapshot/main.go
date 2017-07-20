@@ -60,12 +60,17 @@ func main() {
 
 		// Close over filename, so we can safely use it with goroutines.
 		var setupProcessor = func(filename string) *parallel.Processor {
-			p := parallel.NewProcessor(br, w, func(b []byte) ([]byte, error) {
+
+			// reduceDoc is our transformation function.
+			reduceDoc := func(b []byte) ([]byte, error) {
+				// We are given a BulkResponse.
 				var resp crossref.BulkResponse
 				if err := json.Unmarshal(b, &resp); err != nil {
 					return nil, err
 				}
 				var buf bytes.Buffer
+
+				// Iterate over records and serialize interesting bits into buffer.
 				for _, doc := range resp.Message.Items {
 					date, err := doc.Deposited.Date()
 					if err != nil {
@@ -77,7 +82,9 @@ func main() {
 					}
 				}
 				return buf.Bytes(), nil
-			})
+			}
+
+			p := parallel.NewProcessor(br, w, reduceDoc)
 			p.BatchSize = *batchSize
 			return p
 		}
