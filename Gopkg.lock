@@ -8,10 +8,22 @@
   version = "v0"
 
 [[projects]]
+  name = "github.com/fatih/color"
+  packages = ["."]
+  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
+  version = "v1.5.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/fatih/structs"
   packages = ["."]
   revision = "7e5a8eef611ee84dd359503f3969f80df4c50723"
+
+[[projects]]
+  name = "github.com/hoisie/mustache"
+  packages = ["."]
+  revision = "6dfe7cd5e765063d31ecdfcda4c6568d7cdd39b6"
+  version = "0.0.1"
 
 [[projects]]
   name = "github.com/kennygrant/sanitize"
@@ -20,10 +32,22 @@
   version = "v1.2"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/miku/parallel"
+  name = "github.com/mattn/go-colorable"
   packages = ["."]
-  revision = "dd55491c9ac3848f3b7ac92efd87e691f1b19b7b"
+  revision = "941b50ebc6efddf4c41c8e4537a5f68a4e686b24"
+  version = "v0.0.8"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
+  version = "v0.0.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/miku/clam"
+  packages = ["."]
+  revision = "8054bf3dfcec90524127673fe9b5fe21911ada44"
 
 [[projects]]
   branch = "master"
@@ -39,6 +63,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/reusee/mmh3"
+  packages = ["."]
+  revision = "64b85163255bbb6af4f0d0eab61ecdda7ea7cd96"
+
+[[projects]]
+  branch = "master"
   name = "github.com/shantanubhadoria/go-roman"
   packages = ["roman"]
   revision = "3deecbc03f4d887ed2716a1c346fea357c5e8054"
@@ -47,7 +77,13 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["html","html/atom"]
-  revision = "02ac38e2528ff4adea90f184d71a3faa04b4b1b0"
+  revision = "ab5485076ff3407ad2d02db054635913f017b0ed"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  revision = "7a4fde3fda8ef580a89dbae8138c26041be14299"
 
 [[projects]]
   branch = "master"
@@ -58,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "33327f46bac7937d169a31d066aafd2bbf02af7eb4267c8af894daa7ffaddf7a"
+  inputs-digest = "67f414a74b8395b94b385f1f804f0880329f76d238ca281eda60aa03b07e389a"
   solver-name = "gps-cdcl"
   solver-version = 1
