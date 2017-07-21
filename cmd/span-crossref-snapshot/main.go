@@ -77,7 +77,7 @@ func SetupProcessor(f *os.File, w io.Writer) *parallel.Processor {
 				return nil, err
 			}
 			isodate := date.Format("2006-01-02")
-			if _, err := WriteFields(&buf, f.Name(), fmt.Sprintf("%d", i), fmt.Sprintf("%d", j), isodate, doc.DOI); err != nil {
+			if _, err := WriteFields(&buf, f.Name(), isodate, doc.DOI, fmt.Sprintf("%d", i), fmt.Sprintf("%d", j)); err != nil {
 				return nil, err
 			}
 		}
