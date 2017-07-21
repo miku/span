@@ -22,9 +22,38 @@ import (
 
 const tmpPrefix = "span-crossref-snapshot-"
 
+var batchSize = flag.Int("b", 20, "batch size")
+
 // WriteFields writes a variable number of fields as tab separated values into a writer.
 func WriteFields(w io.Writer, s ...string) (int, error) {
 	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(s, "\t")))
+}
+
+// SetupProcessor creates a new processor. Here, we extract the interesting bits
+// from the given file and write them as tabular values into the given writer.
+func SetupProcessor(f *os.File, w io.Writer) *parallel.Processor {
+	// reduceDocs is our transformation function.
+	reduceDocs := func(b []byte) ([]byte, error) {
+		var resp crossref.BulkResponse
+		if err := json.Unmarshal(b, &resp); err != nil {
+			return nil, err
+		}
+		var buf bytes.Buffer
+		for _, doc := range resp.Message.Items {
+			date, err := doc.Deposited.Date()
+			if err != nil {
+				return nil, err
+			}
+			isodate := date.Format("2006-01-02")
+			if _, err := WriteFields(&buf, f.Name(), isodate, doc.DOI); err != nil {
+				return nil, err
+			}
+		}
+		return buf.Bytes(), nil
+	}
+	p := parallel.NewProcessor(bufio.NewReader(f), w, reduceDocs)
+	p.BatchSize = *batchSize
+	return p
 }
 
 func main() {
@@ -36,8 +65,6 @@ func main() {
 	// For each file (sha), keep the extracted list compressed and cached at
 	// ~/.cache/span-crossref-snapshot/. Also, keep a result cache for a set of files.
 
-	batchSize := flag.Int("b", 20, "batch size")
-
 	flag.Parse()
 
 	f, err := ioutil.TempFile("", tmpPrefix)
@@ -45,51 +72,16 @@ func main() {
 		log.Fatal(err)
 	}
 	defer f.Close()
-
-	log.Println(f.Name())
 	w := bufio.NewWriter(f)
+	log.Println(f.Name())
 
 	for _, filename := range flag.Args() {
 		log.Println(filename)
-
 		f, err := os.Open(filename)
 		if err != nil {
 			log.Fatal(err)
 		}
-		br := bufio.NewReader(f)
-
-		// Close over filename, so we can safely use it with goroutines.
-		var setupProcessor = func(filename string) *parallel.Processor {
-
-			// reduceDoc is our transformation function.
-			reduceDoc := func(b []byte) ([]byte, error) {
-				// We are given a BulkResponse.
-				var resp crossref.BulkResponse
-				if err := json.Unmarshal(b, &resp); err != nil {
-					return nil, err
-				}
-				var buf bytes.Buffer
-
-				// Iterate over records and serialize interesting bits into buffer.
-				for _, doc := range resp.Message.Items {
-					date, err := doc.Deposited.Date()
-					if err != nil {
-						return nil, err
-					}
-					isodate := date.Format("2006-01-02")
-					if _, err := WriteFields(&buf, filename, isodate, doc.DOI); err != nil {
-						return nil, err
-					}
-				}
-				return buf.Bytes(), nil
-			}
-
-			p := parallel.NewProcessor(br, w, reduceDoc)
-			p.BatchSize = *batchSize
-			return p
-		}
-
-		if err := setupProcessor(filename).Run(); err != nil {
+		if err := SetupProcessor(f, w).Run(); err != nil {
 			log.Fatal(err)
 		}
 		if err := f.Close(); err != nil {
@@ -104,7 +96,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println("Sorting.")
 	// Sort by DOI (3), then date reversed (2); then unique by DOI (3). Should keep the entry of
 	// the last update (filename, document date, DOI).
 	t := "LC_ALL=C sort -S25% -k3,3 -rk2,2 {{ input }} | LC_ALL=C sort -S25% -k3,3 -u > {{ output }}"
