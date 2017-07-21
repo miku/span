@@ -3,26 +3,53 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
-
-	"bufio"
 
 	"github.com/miku/clam"
 	"github.com/miku/parallel"
 	"github.com/miku/span/formats/crossref"
 )
 
-const tmpPrefix = "span-crossref-snapshot-"
+const (
+	tmpPrefix = "span-crossref-snapshot-"
+)
 
-var batchSize = flag.Int("b", 20, "batch size")
+var (
+	batchSize = flag.Int("b", 20, "batch size")
+	cacheBase = filepath.Join(UserHomeDir(), ".cache/span-crossref-snapshot")
+)
+
+// UserHomeDir returns the home of the user.
+func UserHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
+}
+
+// HashReader returns the sha256 hex digest of the given reader.
+func HashReader(r io.Reader) (hexdigest string, err error) {
+	hasher := sha256.New()
+	if _, err = io.Copy(hasher, r); err != nil {
+		return
+	}
+	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
+}
 
 // WriteFields writes a variable number of fields as tab separated values into a writer.
 func WriteFields(w io.Writer, s ...string) (int, error) {
@@ -67,40 +94,68 @@ func main() {
 
 	flag.Parse()
 
-	f, err := ioutil.TempFile("", tmpPrefix)
-	if err != nil {
-		log.Fatal(err)
+	// Setup cache directory.
+	cacheDir := filepath.Join(cacheBase, "tables")
+	if _, err := os.Stat(cacheDir); err != nil {
+		if os.IsNotExist(err) {
+			if err := os.MkdirAll(cacheDir, 0755); err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			log.Fatal(err)
+		}
 	}
-	defer f.Close()
-	w := bufio.NewWriter(f)
-	log.Println(f.Name())
+
+	// Collect filenames of extracted files here.
+	var files []string
 
 	for _, filename := range flag.Args() {
+
 		log.Println(filename)
+
 		f, err := os.Open(filename)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err := SetupProcessor(f, w).Run(); err != nil {
+
+		hexdigest, err := HashReader(f)
+		if err != nil {
 			log.Fatal(err)
 		}
-		if err := f.Close(); err != nil {
+		if _, err := f.Seek(0, io.SeekStart); err != nil {
 			log.Fatal(err)
 		}
+
+		cacheFile := filepath.Join(cacheDir, hexdigest)
+		log.Println(cacheFile)
+
+		// If we have nothing cached create the file.
+		if _, err := os.Stat(cacheFile); err != nil {
+			if os.IsNotExist(err) {
+				f, err := os.Create(cacheFile)
+				if err != nil {
+					log.Fatal(err)
+				}
+				bw := bufio.NewWriter(f)
+				if err := SetupProcessor(f, bw).Run(); err != nil {
+					log.Fatal(err)
+				}
+				if err := bw.Flush(); err != nil {
+					log.Fatal(err)
+				}
+				if err := f.Close(); err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
+		files = append(files, cacheFile)
 	}
 
-	if err := w.Flush(); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := f.Seek(0, io.SeekStart); err != nil {
-		log.Fatal(err)
-	}
+	// Concatenate files. Sort by DOI (3), then date reversed (2); then unique by DOI
+	// (3). Should keep the entry of the last update (filename, document date, DOI).
+	t := "cat {{ files }} | LC_ALL=C sort -S25% -k3,3 -rk2,2 | LC_ALL=C sort -S25% -k3,3 -u > {{ output }}"
 
-	// Sort by DOI (3), then date reversed (2); then unique by DOI (3). Should keep the entry of
-	// the last update (filename, document date, DOI).
-	t := "LC_ALL=C sort -S25% -k3,3 -rk2,2 {{ input }} | LC_ALL=C sort -S25% -k3,3 -u > {{ output }}"
-
-	output, err := clam.RunOutput(t, clam.Map{"input": f.Name()})
+	output, err := clam.RunOutput(t, clam.Map{"files": strings.Join(files, " ")})
 	if err != nil {
 		log.Fatal(err)
 	}
