@@ -53,7 +53,7 @@ func HashReader(r io.ReadSeeker) (hexdigest string, err error) {
 	if _, err = r.Seek(0, io.SeekStart); err != nil {
 		return
 	}
-	return fmt.Sprintf("mmh3-%x-batchsize-%d", hasher.Sum(nil), batchSize), nil
+	return fmt.Sprintf("mmh3-%x-batchsize-%d", hasher.Sum(nil), *batchSize), nil
 }
 
 // WriteFields writes a variable number of fields as tab separated values into a writer.
