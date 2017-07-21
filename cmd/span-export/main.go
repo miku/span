@@ -13,9 +13,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/miku/parallel"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/parallel"
 )
 
 // Exporters holds available export formats

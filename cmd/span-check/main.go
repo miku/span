@@ -11,9 +11,9 @@ import (
 	"runtime"
 	"sync/atomic"
 
-	"github.com/miku/parallel"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/parallel"
 	"github.com/miku/span/quality"
 )
 

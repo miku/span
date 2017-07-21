@@ -15,7 +15,6 @@ import (
 
 	"bufio"
 
-	"github.com/miku/parallel"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/ceeol"
 	"github.com/miku/span/formats/crossref"
@@ -30,6 +29,7 @@ import (
 	"github.com/miku/span/formats/imslp"
 	"github.com/miku/span/formats/jstor"
 	"github.com/miku/span/formats/thieme"
+	"github.com/miku/span/parallel"
 	"github.com/miku/xmlstream"
 )
 

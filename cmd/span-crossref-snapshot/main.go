@@ -19,8 +19,8 @@ import (
 	"io/ioutil"
 
 	"github.com/miku/clam"
-	"github.com/miku/parallel"
 	"github.com/miku/span/formats/crossref"
+	"github.com/miku/span/parallel"
 	"github.com/reusee/mmh3"
 )
 

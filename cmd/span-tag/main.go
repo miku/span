@@ -17,10 +17,10 @@ import (
 	"runtime"
 	"runtime/pprof"
 
-	"github.com/miku/parallel"
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/parallel"
 )
 
 func main() {
