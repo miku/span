@@ -5,7 +5,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"crypto/sha256"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -16,9 +15,12 @@ import (
 	"runtime"
 	"strings"
 
+	"io/ioutil"
+
 	"github.com/miku/clam"
 	"github.com/miku/parallel"
 	"github.com/miku/span/formats/crossref"
+	"github.com/reusee/mmh3"
 )
 
 const (
@@ -43,12 +45,15 @@ func UserHomeDir() string {
 }
 
 // HashReader returns the sha256 hex digest of the given reader.
-func HashReader(r io.Reader) (hexdigest string, err error) {
-	hasher := sha256.New()
+func HashReader(r io.ReadSeeker) (hexdigest string, err error) {
+	hasher := mmh3.New128()
 	if _, err = io.Copy(hasher, r); err != nil {
 		return
 	}
-	return fmt.Sprintf("%x", hasher.Sum(nil)), nil
+	if _, err = r.Seek(0, io.SeekStart); err != nil {
+		return
+	}
+	return fmt.Sprintf("mmh3-%x", hasher.Sum(nil)), nil
 }
 
 // WriteFields writes a variable number of fields as tab separated values into a writer.
@@ -105,45 +110,43 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+	log.Println(cacheDir)
 
 	// Collect filenames of extracted files here.
 	var files []string
 
 	for _, filename := range flag.Args() {
 
-		log.Println(filename)
+		log.Printf(filename)
 
 		f, err := os.Open(filename)
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer f.Close()
 
 		hexdigest, err := HashReader(f)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if _, err := f.Seek(0, io.SeekStart); err != nil {
-			log.Fatal(err)
-		}
+		log.Println(hexdigest)
 
 		cacheFile := filepath.Join(cacheDir, hexdigest)
-		log.Println(cacheFile)
 
-		// If we have nothing cached create the file.
 		if _, err := os.Stat(cacheFile); err != nil {
 			if os.IsNotExist(err) {
-				f, err := os.Create(cacheFile)
+				tf, err := ioutil.TempFile("", tmpPrefix)
 				if err != nil {
 					log.Fatal(err)
 				}
-				bw := bufio.NewWriter(f)
+				bw := bufio.NewWriter(tf)
 				if err := SetupProcessor(f, bw).Run(); err != nil {
 					log.Fatal(err)
 				}
 				if err := bw.Flush(); err != nil {
 					log.Fatal(err)
 				}
-				if err := f.Close(); err != nil {
+				if err := os.Rename(tf.Name(), cacheFile); err != nil {
 					log.Fatal(err)
 				}
 			}
@@ -159,5 +162,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(output)
+	fmt.Println(output)
 }
