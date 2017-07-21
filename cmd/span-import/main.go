@@ -101,7 +101,7 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)
 	}
-	p := parallel.NewProcessor(r, w, func(b []byte) ([]byte, error) {
+	p := parallel.NewProcessor(r, w, func(_ int64, b []byte) ([]byte, error) {
 		v := FormatMap[name]()
 		if err := json.Unmarshal(b, v); err != nil {
 			return nil, err

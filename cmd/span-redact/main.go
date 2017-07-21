@@ -46,7 +46,7 @@ func main() {
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
-	p := parallel.NewProcessor(bufio.NewReader(reader), w, func(b []byte) ([]byte, error) {
+	p := parallel.NewProcessor(bufio.NewReader(reader), w, func(_ int64, b []byte) ([]byte, error) {
 		is := finc.IntermediateSchema{}
 
 		if err := json.Unmarshal(b, &is); err != nil {

@@ -33,7 +33,7 @@ func main() {
 
 	errStats := make(map[string]*int64)
 
-	p := parallel.NewProcessor(bufio.NewReader(os.Stdin), os.Stdout, func(b []byte) ([]byte, error) {
+	p := parallel.NewProcessor(bufio.NewReader(os.Stdin), os.Stdout, func(_ int64, b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
 		if err := json.Unmarshal(b, &is); err != nil {
 			return b, err

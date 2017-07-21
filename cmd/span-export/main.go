@@ -84,7 +84,7 @@ func main() {
 		reader = io.MultiReader(files...)
 	}
 
-	p := parallel.NewProcessor(reader, os.Stdout, func(b []byte) ([]byte, error) {
+	p := parallel.NewProcessor(reader, os.Stdout, func(_ int64, b []byte) ([]byte, error) {
 		is := finc.IntermediateSchema{}
 
 		// TODO(miku): Unmarshal date correctly.

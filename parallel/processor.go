@@ -12,9 +12,15 @@ import (
 // Version of library.
 const Version = "0.1.0"
 
+// Record groups a value and a corresponding line number.
+type Record struct {
+	lineno int64
+	value  []byte
+}
+
 // BytesBatch is a slice of byte slices.
 type BytesBatch struct {
-	b [][]byte
+	b []Record
 }
 
 // NewBytesBatch creates a new BytesBatch with a given capacity.
@@ -24,11 +30,11 @@ func NewBytesBatch() *BytesBatch {
 
 // NewBytesBatchCapacity creates a new BytesBatch with a given capacity.
 func NewBytesBatchCapacity(cap int) *BytesBatch {
-	return &BytesBatch{b: make([][]byte, 0, cap)}
+	return &BytesBatch{b: make([]Record, 0, cap)}
 }
 
 // Add adds an element to the batch.
-func (bb *BytesBatch) Add(b []byte) {
+func (bb *BytesBatch) Add(b Record) {
 	bb.b = append(bb.b, b)
 }
 
@@ -43,28 +49,17 @@ func (bb *BytesBatch) Size() int {
 }
 
 // Slice returns a slice of byte slices.
-func (bb *BytesBatch) Slice() [][]byte {
-	b := make([][]byte, len(bb.b))
+func (bb *BytesBatch) Slice() []Record {
+	b := make([]Record, len(bb.b))
 	for i := 0; i < len(bb.b); i++ {
 		b[i] = bb.b[i]
 	}
 	return b
 }
 
-// SimpleTransformerFunc converts bytes to bytes.
-type SimpleTransformerFunc func([]byte) []byte
-
-// TransformerFunc takes a slice of bytes and returns a slice of bytes and a
+// TransformerFunc takes a line number and a slice of bytes and returns a slice of bytes and a
 // an error. A common denominator of functions that transform data.
-type TransformerFunc func([]byte) ([]byte, error)
-
-// ToTransformerFunc takes a simple transformer and wraps it so it can be used in
-// places where a TransformerFunc is expected.
-func ToTransformerFunc(f SimpleTransformerFunc) TransformerFunc {
-	return func(b []byte) ([]byte, error) {
-		return f(b), nil
-	}
-}
+type TransformerFunc func(lineno int64, b []byte) ([]byte, error)
 
 // Processor can process lines in parallel.
 type Processor struct {
@@ -106,11 +101,11 @@ func (p *Processor) Run() error {
 	var wErr error
 
 	// worker takes []byte batches from a channel queue, executes f and sends the result to the out channel.
-	worker := func(queue chan [][]byte, out chan []byte, f TransformerFunc, wg *sync.WaitGroup) {
+	worker := func(queue chan []Record, out chan []byte, f TransformerFunc, wg *sync.WaitGroup) {
 		defer wg.Done()
 		for batch := range queue {
-			for _, b := range batch {
-				r, err := f(b)
+			for _, record := range batch {
+				r, err := f(record.lineno, record.value)
 				if err != nil {
 					wErr = err
 				}
@@ -133,7 +128,7 @@ func (p *Processor) Run() error {
 		done <- true
 	}
 
-	queue := make(chan [][]byte)
+	queue := make(chan []Record)
 	out := make(chan []byte)
 	done := make(chan bool)
 
@@ -148,6 +143,7 @@ func (p *Processor) Run() error {
 
 	batch := NewBytesBatchCapacity(p.BatchSize)
 	br := bufio.NewReader(p.r)
+	var i int64
 
 	for {
 		b, err := br.ReadBytes(p.RecordSeparator)
@@ -160,7 +156,7 @@ func (p *Processor) Run() error {
 		if len(bytes.TrimSpace(b)) == 0 && p.SkipEmptyLines {
 			continue
 		}
-		batch.Add(b)
+		batch.Add(Record{lineno: i, value: b})
 		if batch.Size() == p.BatchSize {
 			// To avoid checking on each loop, we only check for worker or write errors here.
 			if wErr != nil {
@@ -169,6 +165,7 @@ func (p *Processor) Run() error {
 			queue <- batch.Slice()
 			batch.Reset()
 		}
+		i++
 	}
 
 	queue <- batch.Slice()

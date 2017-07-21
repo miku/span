@@ -13,7 +13,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 
 	"io/ioutil"
@@ -66,19 +65,19 @@ func WriteFields(w io.Writer, s ...string) (int, error) {
 // from the given file and write them as tabular values into the given writer.
 func SetupProcessor(f *os.File, w io.Writer) *parallel.Processor {
 	// reduceDocs is our transformation function.
-	reduceDocs := func(b []byte) ([]byte, error) {
+	reduceDocs := func(i int64, b []byte) ([]byte, error) {
 		var resp crossref.BulkResponse
 		if err := json.Unmarshal(b, &resp); err != nil {
 			return nil, err
 		}
 		var buf bytes.Buffer
-		for i, doc := range resp.Message.Items {
+		for j, doc := range resp.Message.Items {
 			date, err := doc.Deposited.Date()
 			if err != nil {
 				return nil, err
 			}
 			isodate := date.Format("2006-01-02")
-			if _, err := WriteFields(&buf, f.Name(), strconv.Itoa(i), isodate, doc.DOI); err != nil {
+			if _, err := WriteFields(&buf, f.Name(), fmt.Sprintf("%d", i+int64(j)), isodate, doc.DOI); err != nil {
 				return nil, err
 			}
 		}
