@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"io/ioutil"
@@ -46,7 +47,7 @@ func UserHomeDir() string {
 
 // HashReader returns the sha256 hex digest of the given reader.
 func HashReader(r io.ReadSeeker) (hexdigest string, err error) {
-	hasher := mmh3.New128()
+	hasher := mmh3.New32()
 	if _, err = io.Copy(hasher, r); err != nil {
 		return
 	}
@@ -71,13 +72,13 @@ func SetupProcessor(f *os.File, w io.Writer) *parallel.Processor {
 			return nil, err
 		}
 		var buf bytes.Buffer
-		for _, doc := range resp.Message.Items {
+		for i, doc := range resp.Message.Items {
 			date, err := doc.Deposited.Date()
 			if err != nil {
 				return nil, err
 			}
 			isodate := date.Format("2006-01-02")
-			if _, err := WriteFields(&buf, f.Name(), isodate, doc.DOI); err != nil {
+			if _, err := WriteFields(&buf, f.Name(), strconv.Itoa(i), isodate, doc.DOI); err != nil {
 				return nil, err
 			}
 		}
@@ -162,5 +163,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Println(output)
 }
