@@ -22,7 +22,6 @@ import (
 	"os"
 	"runtime/pprof"
 	"strings"
-	"time"
 
 	gzip "github.com/klauspost/pgzip"
 
@@ -98,10 +97,7 @@ func main() {
 		log.Printf("excludes: %d", len(excludes))
 	}
 
-	started := time.Now()
-
-	// Stage 1: Extract minimum amount of information from the raw data and write to
-	// temporary file.
+	// Stage 1: Extract minimum amount of information from the raw data, write to tempfile.
 	tf, err := ioutil.TempFile("", "span-crossref-snapshot-")
 	if err != nil {
 		log.Fatal(err)
@@ -139,21 +135,16 @@ func main() {
 	if err := tf.Close(); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("stage 1: %s", time.Since(started))
-	started = time.Now()
 
-	// Stage 2: Identify relevant records. Concatenate files. Sort by DOI (3), then
+	// Stage 2: Identify relevant records. Sort by DOI (3), then
 	// date reversed (2); then unique by DOI (3). Should keep the entry of the last
 	// update (filename, document date, DOI).
-	fastsort := "LC_ALL=C sort -S20%"
+	fastsort := `LC_ALL=C sort -S20%`
 	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
 	output, err := clam.RunOutput(cmd, clam.Map{"f": fastsort, "input": tf.Name()})
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	log.Printf("stage 2: %s", time.Since(started))
-	started = time.Now()
 
 	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
 	// TODO: fallback to less fast version, when unpigz, filterline not installed.
@@ -168,5 +159,4 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	log.Printf("stage 3: %s", time.Since(started))
 }
