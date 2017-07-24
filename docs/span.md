@@ -22,7 +22,7 @@ SYNOPSIS
 
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
-`span-crossref-snapshot` [`-x *file*`] -o *file* *file*
+`span-crossref-snapshot` [`-x` *file*] -o *file* *file*
 
 DESCRIPTION
 -----------
