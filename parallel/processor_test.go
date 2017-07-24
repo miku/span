@@ -52,21 +52,21 @@ func TestSimple(t *testing.T) {
 			about:    `No input produces no output.`,
 			r:        strings.NewReader(""),
 			expected: "",
-			f:        func(b []byte) ([]byte, error) { return []byte{}, nil },
+			f:        func(_ int64, b []byte) ([]byte, error) { return []byte{}, nil },
 			err:      nil,
 		},
 		{
 			about:    `Order is not guaranteed.`,
 			r:        strings.NewReader("a\nb\n"),
 			expected: "B\nA\n",
-			f:        func(b []byte) ([]byte, error) { return bytes.ToUpper(b), nil },
+			f:        func(_ int64, b []byte) ([]byte, error) { return bytes.ToUpper(b), nil },
 			err:      nil,
 		},
 		{
 			about:    `Like grep, we can filter out items by returning nothing.`,
 			r:        strings.NewReader("a\nb\n"),
 			expected: "B\n",
-			f: func(b []byte) ([]byte, error) {
+			f: func(_ int64, b []byte) ([]byte, error) {
 				if strings.TrimSpace(string(b)) == "a" {
 					return []byte{}, nil
 				}
@@ -78,7 +78,7 @@ func TestSimple(t *testing.T) {
 			about:    `Empty lines skipped.`,
 			r:        strings.NewReader("a\na\na\na\n\n\nb\n"),
 			expected: "B\n",
-			f: func(b []byte) ([]byte, error) {
+			f: func(_ int64, b []byte) ([]byte, error) {
 				if strings.TrimSpace(string(b)) == "a" {
 					return []byte{}, nil
 				}
@@ -90,7 +90,7 @@ func TestSimple(t *testing.T) {
 			about:    `On empty input, the transformer func is never called.`,
 			r:        strings.NewReader(""),
 			expected: "",
-			f: func(b []byte) ([]byte, error) {
+			f: func(_ int64, b []byte) ([]byte, error) {
 				return nil, errFake1
 			},
 			err: nil,
@@ -99,7 +99,7 @@ func TestSimple(t *testing.T) {
 			about:    `Error does not come through, if all lines are skipped.`,
 			r:        strings.NewReader("\n"),
 			expected: "",
-			f: func(b []byte) ([]byte, error) {
+			f: func(_ int64, b []byte) ([]byte, error) {
 				return nil, errFake1
 			},
 			err: nil,
