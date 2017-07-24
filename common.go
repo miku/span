@@ -22,8 +22,10 @@
 package span
 
 import (
+	"bufio"
 	"fmt"
 	"html"
+	"io"
 	"regexp"
 	"strings"
 )
@@ -53,4 +55,20 @@ func (s Skip) Error() string {
 // UnescapeTrim unescapes HTML character references and trims the space of a given string.
 func UnescapeTrim(s string) string {
 	return strings.TrimSpace(html.UnescapeString(s))
+}
+
+// LoadSet reads the content of from a reader and creates a set from each line.
+func LoadSet(r io.Reader, m map[string]struct{}) error {
+	br := bufio.NewReader(r)
+	for {
+		v, err := br.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		m[strings.TrimSpace(v)] = struct{}{}
+	}
+	return nil
 }
