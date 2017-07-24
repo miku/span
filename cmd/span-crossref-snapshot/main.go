@@ -106,7 +106,7 @@ func main() {
 	// date reversed (2); then unique by DOI (3). Should keep the entry of the last
 	// update (filename, document date, DOI).
 	fastsort := "LC_ALL=C sort -S20%"
-	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} > {{ output }}`
+	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
 	output, err := clam.RunOutput(cmd, clam.Map{"f": fastsort, "input": tf.Name()})
 	if err != nil {
 		log.Fatal(err)
