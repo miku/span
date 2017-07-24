@@ -16,6 +16,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	gzip "github.com/klauspost/pgzip"
 
@@ -65,6 +66,8 @@ func main() {
 		reader = g
 	}
 
+	started := time.Now()
+
 	// Stage 1: Extract minimum amount of information from the raw data and write to
 	// temporary file.
 	tf, err := ioutil.TempFile("", "span-crossref-snapshot-")
@@ -101,6 +104,8 @@ func main() {
 	if err := tf.Close(); err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("stage 1: %s", time.Since(started))
+	started = time.Now()
 
 	// Stage 2: Identify relevant records. Concatenate files. Sort by DOI (3), then
 	// date reversed (2); then unique by DOI (3). Should keep the entry of the last
@@ -111,6 +116,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Printf("stage 2: %s", time.Since(started))
+	started = time.Now()
 
 	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
 	// TODO: fallback to less fast version, when unpigz, filterline not installed.
@@ -125,4 +133,5 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+	log.Printf("stage 3: %s", time.Since(started))
 }
