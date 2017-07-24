@@ -2,7 +2,12 @@
 // smaller file, which contains only the most recent version of each document.
 //
 // Works in a three stage, two pass fashion: (1) extract, (2) identify, (3) extract.
-// Sample data point for a set of 200M records: (1) 92min, (2) Xmin, (3) Xmin.
+// Performance data point (30M compressed records, 11m33.871s):
+//
+// 2017/07/24 18:26:10 stage 1: 8m13.799431646s
+// 2017/07/24 18:26:55 stage 2: 45.746997314s
+// 2017/07/24 18:29:30 stage 3: 2m34.23537293s
+
 package main
 
 import (
