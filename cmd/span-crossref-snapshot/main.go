@@ -85,7 +85,7 @@ func main() {
 			return nil, err
 		}
 		var buf bytes.Buffer
-		if _, err := WriteFields(&buf, lineno, date.Format("2006-01-02"), doc.DOI); err != nil {
+		if _, err := WriteFields(&buf, lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
 			return nil, err
 		}
 		return buf.Bytes(), nil
