@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"runtime/pprof"
 	"strings"
 
@@ -30,6 +31,23 @@ import (
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
 )
+
+// filterlineFallback awk script is used, if the filterline executable is not found.
+var filterlineFallback = `
+#!/bin/bash
+LIST="$1" LC_ALL=C awk '
+  function nextline() {
+    if ((getline n < list) <=0) exit
+  }
+  BEGIN{
+    list = ENVIRON["LIST"]
+    nextline()
+  }
+  NR == n {
+    print
+    nextline()
+  }' < "$2"
+`
 
 // errCache allows multiple calls without error checks. First error sticks and
 // is kept for inspection.
@@ -166,17 +184,52 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
-	// TODO: fallback to less fast version, when unpigz, filterline not installed.
-	cmd = `filterline {{ L }} {{ F }} > {{ output }}`
-	if *compressed {
-		cmd = `filterline {{ L }} <(unpigz -c {{ F }}) | pigz -c > {{ output }}`
+	// External tools and fallbacks for stage 3.
+	comp, decomp := `gzip -c`, `gunzip -c`
+	if _, err := exec.LookPath("unpigz"); err == nil {
+		comp, decomp = `pigz -c`, `unpigz -c`
 	}
-	if output, err := clam.RunOutput(cmd, clam.Map{"L": output, "F": f.Name()}); err != nil {
-		log.Fatal(err)
-	} else {
-		if err := os.Rename(output, *outputFile); err != nil {
+
+	filterline := `filterline`
+	if _, err := exec.LookPath("filterline"); err != nil {
+		if _, err := exec.LookPath("awk"); err != nil {
+			log.Fatal("filterline (git.io/v7qak) or awk is required")
+		}
+		tf, err := ioutil.TempFile("", "span-crossref-snapshot-filterline-")
+		if err != nil {
 			log.Fatal(err)
 		}
+		if _, err := io.WriteString(tf, filterlineFallback); err != nil {
+			log.Fatal(err)
+		}
+		if err := tf.Close(); err != nil {
+			log.Fatal(err)
+		}
+		if err := os.Chmod(tf.Name(), 0755); err != nil {
+			log.Fatal(err)
+		}
+		defer os.Remove(tf.Name())
+		filterline = tf.Name()
+	}
+
+	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
+	// TODO: fallback to less fast version, when unpigz, filterline not installed.
+	cmd = `{{ filterline }} {{ L }} {{ F }} > {{ output }}`
+	if *compressed {
+		cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
+	}
+
+	output, err := clam.RunOutput(cmd, clam.Map{
+		"L":          output,
+		"F":          f.Name(),
+		"filterline": filterline,
+		"decomp":     decomp,
+		"comp":       comp,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := os.Rename(output, *outputFile); err != nil {
+		log.Fatal(err)
 	}
 }
