@@ -79,13 +79,13 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	if flag.NArg() == 0 {
+		log.Fatal("input file required")
+	}
 	if *outputFile == "" {
 		log.Fatal("output filename required")
 	}
 
-	if flag.NArg() == 0 {
-		log.Fatal("input file required")
-	}
 	var reader io.Reader
 
 	f, err := os.Open(flag.Arg(0))
