@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime/pprof"
 	"strings"
 	"time"
 
@@ -38,8 +39,18 @@ func main() {
 	outputFile := flag.String("o", "", "output file")
 	compressed := flag.Bool("z", false, "input is gzip compressed")
 	batchsize := flag.Int("b", 100000, "batch size")
+	cpuprofile := flag.String("cpuprofile", "", "write cpuprofile to file")
 
 	flag.Parse()
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	if *outputFile == "" {
 		log.Fatal("output filename required")
