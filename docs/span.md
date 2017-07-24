@@ -4,7 +4,8 @@ SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
 NAME
 ----
 
-span-import, span-tag, span-check, span-export, span-oa-filter, span-update-labels - intermediate schema tools
+span-import, span-tag, span-check, span-export, span-oa-filter,
+span-update-labels, span-crossref-snapshot - intermediate schema tools
 
 SYNOPSIS
 --------
@@ -20,6 +21,8 @@ SYNOPSIS
 `span-oa-filter` [`-f` *file*] < *file*
 
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
+
+`span-crossref-snapshot` [`-x *file*`] -o *file* *file*
 
 DESCRIPTION
 -----------
@@ -50,13 +53,13 @@ OPTIONS
   More output. `span-check` only.
 
 `-b` *N*
-  Batch size (default N=20000). `span-tag`, `span-check`, `span-export` only.
+  Batch size. `span-tag`, `span-check`, `span-export`, `span-crossref-snapshot` only.
 
 `-w` *N*
   Number of workers (defaults to CPU count). `span-tag`, `span-check`, `span-export` only.
 
 `-cpuprofile` *pprof-file*
-  Profiling. `span-import`, `span-tag` only.
+  Profiling. `span-import`, `span-tag`, `span-crossref-snapshot` only.
 
 `-f`
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
@@ -66,6 +69,12 @@ OPTIONS
 
 `-v`
   Show version.
+
+`-x`
+  Filename to DOI to exclude, one per line. `span-crossref-snapshot` only.
+
+`-z`
+  Input is gzip compressed. `span-crossref-snapshot` only.
 
 `-h`
   Show usage.
@@ -169,6 +178,15 @@ Set OA flag:
 Update labels:
 
   `echo '{"finc.record_id": "1"}' | span-update-labels -f <(echo '1,X,Y')`
+
+Create a snapshot of crossref works API message items:
+
+  `span-crossref-snapshot -o snapshot.ldj.gz messages.ldj.gz`
+
+The `messages.ldj.gz` must contain only the message portion of an crossref API
+response - one per line - for example:
+
+  `curl -sL goo.gl/Cq34Bd | jq .message`
 
 FILES
 -----

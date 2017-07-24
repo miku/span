@@ -1,7 +1,8 @@
 .TH SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
 .SH NAME
 .PP
-span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter, span\-update\-labels \- intermediate schema tools
+span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter,
+span\-update\-labels, span\-crossref\-snapshot \- intermediate schema tools
 .SH SYNOPSIS
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
@@ -15,6 +16,8 @@ span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter, span\-upda
 \fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
+.PP
+\fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x *file*\fR] \-o \fIfile\fP \fIfile\fP
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -41,13 +44,13 @@ List support formats. \fB\fCspan\-import\fR, \fB\fCspan\-export\fR only.
 More output. \fB\fCspan\-check\fR only.
 .TP
 \fB\fC\-b\fR \fIN\fP
-Batch size (default N=20000). \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR only.
+Batch size. \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR, \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
 \fB\fC\-w\fR \fIN\fP
 Number of workers (defaults to CPU count). \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR only.
 .TP
 \fB\fC\-cpuprofile\fR \fIpprof\-file\fP
-Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR only.
+Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR, \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
 \fB\fC\-f\fR
 File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
@@ -57,6 +60,12 @@ Field separator. \fB\fCspan\-update\-labels\fR only.
 .TP
 \fB\fC\-v\fR
 Show version.
+.TP
+\fB\fC\-x\fR
+Filename to DOI to exclude, one per line. \fB\fCspan\-crossref\-snapshot\fR only.
+.TP
+\fB\fC\-z\fR
+Input is gzip compressed. \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
 \fB\fC\-h\fR
 Show usage.
@@ -162,6 +171,15 @@ Set OA flag:
 Update labels:
 .IP
 \fB\fCecho '{"finc.record_id": "1"}' | span\-update\-labels \-f <(echo '1,X,Y')\fR
+.PP
+Create a snapshot of crossref works API message items:
+.IP
+\fB\fCspan\-crossref\-snapshot \-o snapshot.ldj.gz messages.ldj.gz\fR
+.PP
+The \fB\fCmessages.ldj.gz\fR must contain only the message portion of an crossref API
+response \- one per line \- for example:
+.IP
+\fB\fCcurl \-sL goo.gl/Cq34Bd | jq .message\fR
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To
