@@ -219,7 +219,7 @@ func main() {
 		cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
 	}
 
-	output, err := clam.RunOutput(cmd, clam.Map{
+	output, err = clam.RunOutput(cmd, clam.Map{
 		"L":          output,
 		"F":          f.Name(),
 		"filterline": filterline,
