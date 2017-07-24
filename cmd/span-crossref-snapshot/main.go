@@ -121,6 +121,8 @@ func main() {
 	if output, err := clam.RunOutput(cmd, clam.Map{"L": output, "F": f.Name()}); err != nil {
 		log.Fatal(err)
 	} else {
-		log.Fatal(os.Rename(output, *outputFile))
+		if err := os.Rename(output, *outputFile); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
