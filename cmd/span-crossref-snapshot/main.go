@@ -27,6 +27,7 @@ import (
 	gzip "github.com/klauspost/pgzip"
 
 	"github.com/miku/clam"
+	"github.com/miku/span"
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
 )
@@ -41,6 +42,7 @@ func WriteFields(w io.Writer, values ...interface{}) (int, error) {
 }
 
 func main() {
+	excludeFile := flag.String("x", "", "a list of DOI to further ignore")
 	outputFile := flag.String("o", "", "output file")
 	compressed := flag.Bool("z", false, "input is gzip compressed")
 	batchsize := flag.Int("b", 100000, "batch size")
@@ -82,6 +84,20 @@ func main() {
 		reader = g
 	}
 
+	excludes := make(map[string]struct{})
+
+	if *excludeFile != "" {
+		file, err := os.Open(*excludeFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+		if err := span.LoadSet(file, excludes); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("excludes: %d", len(excludes))
+	}
+
 	started := time.Now()
 
 	// Stage 1: Extract minimum amount of information from the raw data and write to
@@ -102,6 +118,9 @@ func main() {
 		date, err := doc.Deposited.Date()
 		if err != nil {
 			return nil, err
+		}
+		if _, ok := excludes[doc.DOI]; ok {
+			return nil, nil
 		}
 		var buf bytes.Buffer
 		if _, err := WriteFields(&buf, lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
