@@ -20,7 +20,7 @@ func WriteFields(w io.Writer, values []interface{}) (int, error) {
 	for _, v := range values {
 		s = append(s, fmt.Sprintf("%v", v))
 	}
-	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(s, "\t")))
+	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(s, ",")))
 }
 
 func main() {
