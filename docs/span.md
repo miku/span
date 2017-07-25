@@ -5,7 +5,8 @@ NAME
 ----
 
 span-import, span-tag, span-check, span-export, span-oa-filter,
-span-update-labels, span-crossref-snapshot - intermediate schema tools
+span-update-labels, span-crossref-snapshot, span-local-data - intermediate
+schema tools
 
 SYNOPSIS
 --------
@@ -23,6 +24,8 @@ SYNOPSIS
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
 `span-crossref-snapshot` [`-x` *file*] -o *file* *file*
+
+`span-local-data` < *file*
 
 DESCRIPTION
 -----------
@@ -187,6 +190,15 @@ The `messages.ldj.gz` must contain only the message portion of an crossref API
 response - one per line - for example:
 
   `curl -sL goo.gl/Cq34Bd | jq .message`
+
+Given an intermediate schema file, extract record id, source id, doi and labels
+(ISIL). Can be fed into groupcover(1) for deduplication.
+
+  `span-local-data < input.ldj > output.tsv`
+
+Example output:
+
+  `ai-49-aHR0cDovL2R4LmRva...    49    10.2307/3102818    DE-15-FID    DE-Ch1    DE-105`
 
 FILES
 -----

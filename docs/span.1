@@ -2,7 +2,8 @@
 .SH NAME
 .PP
 span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter,
-span\-update\-labels, span\-crossref\-snapshot \- intermediate schema tools
+span\-update\-labels, span\-crossref\-snapshot, span\-local\-data \- intermediate
+schema tools
 .SH SYNOPSIS
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
@@ -18,6 +19,8 @@ span\-update\-labels, span\-crossref\-snapshot \- intermediate schema tools
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x\fR \fIfile\fP] \-o \fIfile\fP \fIfile\fP
+.PP
+\fB\fCspan\-local\-data\fR < \fIfile\fP
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -180,6 +183,17 @@ The \fB\fCmessages.ldj.gz\fR must contain only the message portion of an crossre
 response \- one per line \- for example:
 .IP
 \fB\fCcurl \-sL goo.gl/Cq34Bd | jq .message\fR
+.PP
+Given an intermediate schema file, extract record id, source id, doi and labels
+(ISIL). Can be fed into 
+.BR groupcover (1) 
+for deduplication.
+.IP
+\fB\fCspan\-local\-data < input.ldj > output.tsv\fR
+.PP
+Example output:
+.IP
+\fB\fCai\-49\-aHR0cDovL2R4LmRva...    49    10.2307/3102818    DE\-15\-FID    DE\-Ch1    DE\-105\fR
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To
