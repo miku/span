@@ -7,7 +7,6 @@
 // 2017/07/24 18:26:10 stage 1: 8m13.799431646s
 // 2017/07/24 18:26:55 stage 2: 45.746997314s
 // 2017/07/24 18:29:30 stage 3: 2m34.23537293s
-
 package main
 
 import (
@@ -32,8 +31,8 @@ import (
 	"github.com/miku/span/parallel"
 )
 
-// filterlineFallback awk script is used, if the filterline executable is not found.
-var filterlineFallback = `
+// fallback awk script is used, if the filterline executable is not found.
+var fallback = `
 #!/bin/bash
 LIST="$1" LC_ALL=C awk '
   function nextline() {
@@ -199,7 +198,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if _, err := io.WriteString(tf, filterlineFallback); err != nil {
+		if _, err := io.WriteString(tf, fallback); err != nil {
 			log.Fatal(err)
 		}
 		if err := tf.Close(); err != nil {
