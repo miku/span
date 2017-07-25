@@ -29,6 +29,7 @@ import (
 	"github.com/miku/span/formats/imslp"
 	"github.com/miku/span/formats/jstor"
 	"github.com/miku/span/formats/thieme"
+	"github.com/miku/span/formats/zvdd"
 	"github.com/miku/span/parallel"
 	"github.com/miku/xmlstream"
 )
@@ -56,6 +57,7 @@ var FormatMap = map[string]Factory{
 	"degruyter": func() interface{} { return new(degruyter.Article) },
 	"thieme-tm": func() interface{} { return new(thieme.Document) },
 	"imslp":     func() interface{} { return new(imslp.Data) },
+	"zvdd":      func() interface{} { return new(zvdd.Record) },
 	"dummy":     func() interface{} { return new(dummy.Example) },
 }
 
@@ -206,7 +208,7 @@ func main() {
 	}
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm":
+	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
