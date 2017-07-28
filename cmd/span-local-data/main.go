@@ -25,7 +25,7 @@ func WriteFields(w io.Writer, values []interface{}) (int, error) {
 }
 
 func main() {
-	batchsize := flag.Int("b", 250000, "batch size")
+	batchsize := flag.Int("b", 100000, "batch size")
 	flag.Parse()
 
 	bw := bufio.NewWriter(os.Stdout)
