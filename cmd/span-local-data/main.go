@@ -34,7 +34,9 @@ func main() {
 		}
 		var buf bytes.Buffer
 		var fields = []interface{}{doc.RecordID, doc.SourceID, doc.DOI}
-		fields = append(fields, doc.Labels...)
+		for _, label := range doc.Labels {
+			fields = append(fields, label)
+		}
 		if _, err := WriteFields(&buf, fields); err != nil {
 			return nil, err
 		}
