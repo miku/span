@@ -11,17 +11,20 @@ import (
 	"os"
 	"strings"
 
-	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
 )
 
+// record is a subset of the intermediate schema fields.
+type record struct {
+	RecordID string   `json:"finc.record_id,omitempty"`
+	SourceID string   `json:"finc.source_id,omitempty"`
+	DOI      string   `json:"doi,omitempty"`
+	Labels   []string `json:"x.labels,omitempty"`
+}
+
 // WriteFields writes a variable number of fields as tab separated values into a writer.
-func WriteFields(w io.Writer, values []interface{}) (int, error) {
-	var s []string
-	for _, v := range values {
-		s = append(s, fmt.Sprintf("%v", v))
-	}
-	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(s, ",")))
+func WriteFields(w io.Writer, values []string) (int, error) {
+	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(values, ",")))
 }
 
 func main() {
@@ -32,16 +35,12 @@ func main() {
 	defer bw.Flush()
 
 	p := parallel.NewProcessor(os.Stdin, os.Stdout, func(_ int64, b []byte) ([]byte, error) {
-		var doc finc.IntermediateSchema
+		var doc record
 		if err := json.Unmarshal(b, &doc); err != nil {
 			return nil, err
 		}
 		var buf bytes.Buffer
-		var fields = []interface{}{doc.RecordID, doc.SourceID, doc.DOI}
-		for _, label := range doc.Labels {
-			fields = append(fields, label)
-		}
-		if _, err := WriteFields(&buf, fields); err != nil {
+		if _, err := WriteFields(&buf, append([]string{doc.RecordID, doc.SourceID, doc.DOI}, doc.Labels...)); err != nil {
 			return nil, err
 		}
 		return buf.Bytes(), nil
