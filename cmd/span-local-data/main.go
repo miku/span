@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -24,6 +25,9 @@ func WriteFields(w io.Writer, values []interface{}) (int, error) {
 }
 
 func main() {
+	batchsize := flag.Int("b", 250000, "batch size")
+	flag.Parse()
+
 	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
 
@@ -42,7 +46,7 @@ func main() {
 		}
 		return buf.Bytes(), nil
 	})
-
+	p.BatchSize = *batchsize
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
