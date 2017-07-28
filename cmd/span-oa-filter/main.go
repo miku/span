@@ -23,6 +23,8 @@ import (
 func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
 	issnFile := flag.String("f", "", "path to file with one issn per line")
+	batchsize := flag.Int("b", 25000, "batch size")
+
 	flag.Parse()
 
 	if *showVersion {
@@ -63,6 +65,7 @@ func main() {
 		return bb, nil
 	})
 
+	p.BatchSize = *batchsize
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
