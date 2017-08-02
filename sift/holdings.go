@@ -120,6 +120,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 // covers returns true, if entry covers given document.
 func (f *HoldingsFilter) covers(entry licensing.Entry, v interface{}) bool {
 	var date, volume, issue string
+
 	if vv, ok := v.(PublicationDater); ok {
 		date = vv.PublicationDate()
 	}

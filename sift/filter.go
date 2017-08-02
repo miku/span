@@ -57,7 +57,6 @@ type Filter interface {
 	Apply(interface{}) bool
 }
 
-
 // firstKey returns the top level key of an object, given as a raw JSON message.
 // It peeks into the fragment. An empty document will cause an error, as
 // multiple top level keys.
@@ -106,12 +105,26 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 		return &AnyFilter{}, nil
 	case "none":
 		return &NoneFilter{}, nil
+
 	case "collection":
 		var filter CollectionsFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}
 		return &filter, nil
+	case "doi":
+		var filter DocumentObjectIdentifiersFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "holdings":
+		var filter HoldingsFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+
 	case "issn":
 		var filter SerialNumbersFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
@@ -124,6 +137,19 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 			return nil, err
 		}
 		return &filter, nil
+	case "source":
+		var filter SourceIdentifierFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "subject":
+		var filter SubjectsFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+
 	case "and":
 		var filter AndFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
