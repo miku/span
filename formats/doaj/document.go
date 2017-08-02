@@ -227,13 +227,13 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	subjects := container.NewStringSet()
 	for _, s := range doc.Index.SchemaCode {
-		class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NOT_ASSIGNED)
-		if class != finc.NOT_ASSIGNED {
+		class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NotAssigned)
+		if class != finc.NotAssigned {
 			subjects.Add(class)
 		}
 	}
 	if subjects.Size() == 0 {
-		output.Subjects = []string{finc.NOT_ASSIGNED}
+		output.Subjects = []string{finc.NotAssigned}
 	} else {
 		output.Subjects = subjects.SortedValues()
 	}

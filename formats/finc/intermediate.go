@@ -36,11 +36,11 @@ const (
 )
 
 var (
-	// NOT_ASSIGNED is the empty value, was "not assigned", refs #7092
-	NOT_ASSIGNED    = ""
+	NotAssigned     = "" // was "not assigned", refs #7092
 	NonAlphaNumeric = regexp.MustCompile("/[^A-Za-z0-9]+/")
 )
 
+// Exporter implements a basic export method that serializes an intermediate schema.
 type Exporter interface {
 	// Export turns an intermediate schema into bytes. Lower level
 	// representation than ExportSchema.Convert. Allows JSON, XML, Marc,
@@ -83,11 +83,14 @@ func (author *Author) String() string {
 // hints at the origin of the field, e.g. OpenURL, RIS, finc.
 //
 // Notes on the format:
-// - The x namespace is experimental.
-// - RawDate must be in ISO8601 (YYYY-MM-DD) format.
-// - Version is mandatory.
-// - Headings and Subjects are not bound to any format yet.
-// - Use plural for slices, if possible.
+//
+// * The x namespace is experimental.
+// * RawDate must be in ISO8601 (YYYY-MM-DD) format.
+// * Version is mandatory.
+// * Headings and Subjects are not bound to any format yet.
+// * Use plural for slices, if possible.
+//
+// TODO(miku): Clean up naming and date parsing.
 type IntermediateSchema struct {
 	Format         string `json:"finc.format,omitempty"`
 	MegaCollection string `json:"finc.mega_collection,omitempty"`
@@ -154,6 +157,8 @@ type IntermediateSchema struct {
 	License    []string `json:"x.license,omitempty"`
 }
 
+// NewIntermediateSchema creates a new intermediate schema document with the
+// current version.
 func NewIntermediateSchema() *IntermediateSchema {
 	return &IntermediateSchema{Version: IntermediateSchemaVersion}
 }
@@ -270,7 +275,7 @@ func (is *IntermediateSchema) Imprint() (s string) {
 	return
 }
 
-// SortableAuthor is loosely based on solrmarcs builtin getSortableTitle
+// SortableTitle is loosely based on getSortableTitle in SOLRMARC.
 func (is *IntermediateSchema) SortableTitle() string {
 	switch {
 	case is.BookTitle != "":
@@ -280,7 +285,7 @@ func (is *IntermediateSchema) SortableTitle() string {
 	}
 }
 
-// SortableAuthor is loosely based on solrmarcs builtin getSortableAuthor
+// SortableAuthor is loosely based on getSortableAuthor in SOLRMARC.
 func (is *IntermediateSchema) SortableAuthor() string {
 	var buf bytes.Buffer
 	for _, author := range is.Authors {
@@ -290,6 +295,7 @@ func (is *IntermediateSchema) SortableAuthor() string {
 	return buf.String()
 }
 
+// StrippedSchema is a snippet of an IntermediateSchema.
 type StrippedSchema struct {
 	DOI      string   `json:"doi"`
 	Labels   []string `json:"x.labels"`
