@@ -168,6 +168,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 			return nil, err
 		}
 		return &filter, nil
+	case "id":
+		var filter IdentifierFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
 	default:
 		return nil, fmt.Errorf("unknown filter: %s", name)
 	}
