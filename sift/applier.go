@@ -7,7 +7,7 @@ type Collectioner interface {
 
 // SerialNumberer returns a list of ISSN as strings.
 type SerialNumberer interface {
-	SerialNumber() []string
+	SerialNumbers() []string
 }
 
 // DocumentObjectIdentifier returns a single document object identifier as string.
@@ -76,4 +76,26 @@ func (c Collection) Apply(v interface{}) bool {
 		}
 	}
 	return c.Fallback
+}
+
+// SerialNumber filters serial numbers given as a list.
+type SerialNumber struct {
+	SerialNumbers struct {
+		Fallback bool     `json:"fallback"`
+		Values   []string `json:"values"`
+	} `json:"issn"`
+}
+
+// Apply checks, if a value belongs to a given collection.
+func (s SerialNumber) Apply(v interface{}) bool {
+	if w, ok := v.(SerialNumberer); ok {
+		for _, a := range w.SerialNumbers() {
+			for _, b := range s.SerialNumbers.Values {
+				if a == b {
+					return true
+				}
+			}
+		}
+	}
+	return s.SerialNumbers.Fallback
 }
