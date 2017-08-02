@@ -144,7 +144,7 @@ func TestAndFilter(t *testing.T) {
 			t.Error(err)
 		}
 		if got, want := ap.Apply(c.value), c.result; got != want {
-			t.Errorf("#%d, %T.Apply(%v, %T): got %v, want %v (filter was: %s)", i, ap, c.value, c.value, got, want, ap)
+			t.Errorf("#%d, %T.Apply(%v, %T): got %v, want %v (%s)", i, ap, c.value, c.value, got, want, ap)
 		}
 	}
 }
@@ -188,7 +188,7 @@ func TestOrFilter(t *testing.T) {
 			t.Error(err)
 		}
 		if got, want := ap.Apply(c.value), c.result; got != want {
-			t.Errorf("#%d, %T.Apply(%v, %T): got %v, want %v (filter was: %s)", i, ap, c.value, c.value, got, want, ap)
+			t.Errorf("#%d, %T.Apply(%v, %T): got %v, want %v (%s)", i, ap, c.value, c.value, got, want, ap)
 		}
 	}
 }
@@ -232,7 +232,7 @@ func TestNotFilter(t *testing.T) {
 			t.Error(err)
 		}
 		if got, want := ap.Apply(c.value), c.result; got != want {
-			t.Errorf("#%d, %T.Apply(%v, %T): got %v, want %v (filter was: %s)", i, ap, c.value, c.value, got, want, ap)
+			t.Errorf("#%d, %T.Apply(%v, %T): got %v, want %v (%s)", i, ap, c.value, c.value, got, want, ap)
 		}
 	}
 }
