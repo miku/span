@@ -55,7 +55,7 @@ func main() {
 			log.Fatal(err)
 		}
 		parts := strings.Split(strings.TrimSpace(line), *separator)
-		if len(parts) > 1 {
+		if len(parts) > 0 {
 			isilmap[parts[0]] = parts[1:]
 		}
 	}
