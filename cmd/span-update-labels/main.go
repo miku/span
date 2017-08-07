@@ -24,7 +24,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
 	labelFile := flag.String("f", "", "path to comma separated file with ID and ISIL")
 	separator := flag.String("s", ",", "separator value")
-	size := flag.Int("b", 200000, "batch size")
+	size := flag.Int("b", 100000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	flag.Parse()
 
