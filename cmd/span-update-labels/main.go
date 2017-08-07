@@ -15,10 +15,17 @@ import (
 	"bufio"
 
 	"github.com/miku/span"
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
 )
+
+// SplitTrim splits a strings s on a separator and trims whitespace off the resulting parts.
+func SplitTrim(s, sep string) (result []string) {
+	for _, r := range strings.Split(s, sep) {
+		result = append(result, strings.TrimSpace(r))
+	}
+	return
+}
 
 func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
@@ -26,6 +33,7 @@ func main() {
 	separator := flag.String("s", ",", "separator value")
 	size := flag.Int("b", 100000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+
 	flag.Parse()
 
 	if *showVersion {
@@ -46,8 +54,8 @@ func main() {
 
 	br := bufio.NewReader(f)
 
-	// map ID to a list of ISIL
-	isilmap := container.StringSliceMap{}
+	// Map record ids to a list of labels (ISIL).
+	labelMap := make(map[string][]string)
 
 	for {
 		line, err := br.ReadString('\n')
@@ -57,9 +65,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		parts := strings.Split(strings.TrimSpace(line), *separator)
-		if len(parts) > 0 {
-			isilmap[parts[0]] = parts[1:]
+		if parts := SplitTrim(line, *separator); len(parts) > 0 {
+			labelMap[parts[0]] = parts[1:]
 		}
 	}
 
@@ -71,7 +78,7 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return nil, err
 		}
-		if v, ok := isilmap[is.RecordID]; ok {
+		if v, ok := labelMap[is.RecordID]; ok {
 			is.Labels = v
 		}
 		bb, err := json.Marshal(is)
