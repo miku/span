@@ -48,27 +48,6 @@ LIST="$1" LC_ALL=C awk '
   }' < "$2"
 `
 
-// errCache allows multiple calls without error checks. First error sticks and
-// is kept for inspection.
-type errCache struct {
-	err error
-}
-
-// Call calls a function and keeps the error around, if it returns one.
-func (ec *errCache) Call(f func() error) {
-	if ec.err != nil {
-		return
-	}
-	if err := f(); err != nil {
-		ec.err = err
-	}
-}
-
-// Err allows to check, whether any call of the group failed.
-func (ec *errCache) Err() error {
-	return ec.err
-}
-
 // WriteFields writes a variable number of fields as tab separated values into a writer.
 func WriteFields(w io.Writer, values ...interface{}) (int, error) {
 	var s []string
@@ -165,11 +144,13 @@ func main() {
 
 	p.BatchSize = *batchsize
 
-	var ec errCache
-	ec.Call(p.Run)
-	ec.Call(bw.Flush)
-	ec.Call(tf.Close)
-	if ec.Err() != nil {
+	if err := p.Run(); err != nil {
+		log.Fatal(err)
+	}
+	if err := bw.Flush(); err != nil {
+		log.Fatal(err)
+	}
+	if err := tf.Close(); err != nil {
 		log.Fatal(err)
 	}
 
