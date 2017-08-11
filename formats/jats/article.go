@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
@@ -317,6 +318,11 @@ func (article *Article) CombinedTitle() string {
 	}
 	if group.Subtitle.Value != "" {
 		return strings.TrimSpace(group.Subtitle.Value)
+	}
+	for _, product := range article.Front.Article.Products {
+		if product.Source.Value != "" {
+			return strings.TrimSpace(sanitize.HTML(product.Source.Value))
+		}
 	}
 	return ""
 }
