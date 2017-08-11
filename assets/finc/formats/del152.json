@@ -1,6 +1,6 @@
 {
     "eBook": "Book, E-Book",
-    "ElectronicArticle": "Article, E-Article",
+    "ElectronicArticle": "Book, E-Book",
     "ElectronicBookPart": "Book, E-Book",
     "ElectronicJournal": "Journal, E-Journal",
     "ElectronicProceeding": "Proceeding",
