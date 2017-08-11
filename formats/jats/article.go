@@ -302,6 +302,12 @@ func (article *Article) Authors() []finc.Author {
 
 // CombinedTitle returns a longish title.
 func (article *Article) CombinedTitle() string {
+	// TODO: Title can appear elsewhere, too.
+	// <product xlink:type="simple">
+	// <source>
+	//    <bold>American Sociology and Pragmatism: Mead ...</bold>
+	// </source>
+	// See: https://goo.gl/ZyCcfS
 	group := article.Front.Article.TitleGroup
 	if group.Title.Value != "" {
 		if group.Subtitle.Value != "" {
