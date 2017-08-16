@@ -91,9 +91,6 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 		if err := json.NewEncoder(w).Encode(output); err != nil {
 			return err
 		}
-		if _, err := io.WriteString(w, "\n"); err != nil {
-			return err
-		}
 	}
 	return scanner.Err()
 }
