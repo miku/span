@@ -66,7 +66,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	} else {
 		output.Volume = fmt.Sprintf("%d", v)
 	}
-	if article.PublicationTitleEnglish == "" {
+	if article.PublicationTitleEnglish == "" || article.PublicationTitleEnglish == article.PublicationTitle {
 		output.JournalTitle = article.PublicationTitle
 	} else {
 		output.JournalTitle = fmt.Sprintf("%s [%s]", article.PublicationTitle, article.PublicationTitleEnglish)
