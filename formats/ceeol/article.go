@@ -94,9 +94,13 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	}
 	for _, author := range article.Authors {
 		name := strings.TrimSpace(author)
+		if len(name) < 4 {
+			continue
+		}
 		// Simple blacklist, refs #9398.
 		if strings.HasPrefix(name, "No Author Specified") ||
 			strings.HasPrefix(name, "Miscellaneous, Miscellaneous") ||
+			strings.HasPrefix(name, "Anonymous, Anonymous") ||
 			strings.HasPrefix(name, "Various, Authors") ||
 			strings.HasPrefix(name, "TOL, TOL") {
 			continue
