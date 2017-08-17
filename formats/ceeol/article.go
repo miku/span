@@ -57,10 +57,13 @@ func normalizeString(s string) string {
 // ToIntermediateSchema converts an article to intermediate schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
-	if article.ArticleTitleEnglish == "" {
-		output.ArticleTitle = article.ArticleTitle
+	if strings.TrimSpace(article.ArticleTitleEnglish) == "" ||
+		normalizeString(article.ArticleTitleEnglish) == normalizeString(article.ArticleTitle) {
+		output.ArticleTitle = strings.TrimSpace(article.ArticleTitle)
 	} else {
-		output.ArticleTitle = fmt.Sprintf("%s [%s]", article.ArticleTitle, article.ArticleTitleEnglish)
+		output.ArticleTitle = fmt.Sprintf("%s [%s]",
+			strings.TrimSpace(article.ArticleTitle),
+			strings.TrimSpace(article.ArticleTitleEnglish))
 	}
 	output.ISSN = append(output.ISSN, article.ISSN)
 	output.EISSN = append(output.EISSN, article.EISSN)
