@@ -84,7 +84,15 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		output.Publishers = append(output.Publishers, article.PublisherEnglish)
 	}
 	for _, author := range article.Authors {
-		output.Authors = append(output.Authors, finc.Author{Name: strings.TrimSpace(author)})
+		name := strings.TrimSpace(author)
+		// Simple blacklist, refs #9398.
+		if strings.HasPrefix(name, "No Author Specified") ||
+			strings.HasPrefix(name, "Miscellaneous, Miscellaneous") ||
+			strings.HasPrefix(name, "Various, Authors") ||
+			strings.HasPrefix(name, "TOL, TOL") {
+			continue
+		}
+		output.Authors = append(output.Authors, finc.Author{Name: name})
 	}
 	output.RawDate = fmt.Sprintf("%s-01-01", article.PublicationYear)
 	output.Date, err = time.Parse("2006-01-02", fmt.Sprintf("%s-01-01", article.PublicationYear))
