@@ -50,6 +50,10 @@ type Article struct {
 	FileID                  string   `xml:"FileID"`
 }
 
+func normalizeString(s string) string {
+	return strings.TrimSpace(strings.ToLower(s))
+}
+
 // ToIntermediateSchema converts an article to intermediate schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
@@ -66,10 +70,12 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	} else {
 		output.Volume = fmt.Sprintf("%d", v)
 	}
-	if article.PublicationTitleEnglish == "" || article.PublicationTitleEnglish == article.PublicationTitle {
-		output.JournalTitle = article.PublicationTitle
+	if strings.TrimSpace(article.PublicationTitleEnglish) == "" ||
+		normalizeString(article.PublicationTitleEnglish) == normalizeString(article.PublicationTitle) {
+		output.JournalTitle = strings.TrimSpace(article.PublicationTitle)
 	} else {
-		output.JournalTitle = fmt.Sprintf("%s [%s]", article.PublicationTitle, article.PublicationTitleEnglish)
+		output.JournalTitle = fmt.Sprintf("%s [%s]", strings.TrimSpace(article.PublicationTitle),
+			strings.TrimSpace(article.PublicationTitleEnglish))
 	}
 	if article.IsOpenAccess != "0" {
 		output.OpenAccess = true
