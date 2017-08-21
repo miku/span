@@ -32,6 +32,7 @@ func main() {
 	format := flag.String("o", "solr5vu3", "output format")
 	listFormats := flag.Bool("list", false, "list output formats")
 	withFullrecord := flag.Bool("with-fullrecord", false, "populate fullrecord field with originating intermediate schema record")
+	freeContent := flag.String("free-content", "", "path to JSON file with information about free content")
 
 	flag.Parse()
 
@@ -62,6 +63,26 @@ func main() {
 	if *format == "solr5vu3v12" {
 		*withFullrecord = true
 		*format = "solr5vu3"
+	}
+
+	// Optionally load a freeContent API response, refs #11285.
+	if *freeContent != "" {
+		file, err := os.Open(*freeContent)
+		if err != nil {
+			log.Fatal(err)
+		}
+		items := make([]finc.FreeContentItem, 0)
+		if err := json.NewDecoder(file).Decode(&items); err != nil {
+			log.Fatal(err)
+		}
+		contentMap := make(map[string]bool)
+		for _, item := range items {
+			if item.FreeContent == "Ja" {
+				contentMap[fmt.Sprintf("%s/%s", item.SourceID, item.Collection)] = true
+			}
+		}
+		log.Printf("loaded %d items into a free content map", len(contentMap))
+		finc.FreeContentMap = contentMap
 	}
 
 	exportSchemaFunc, ok := Exporters[*format]
