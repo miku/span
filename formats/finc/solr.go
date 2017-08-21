@@ -18,6 +18,7 @@ type Solr5Vufind3 struct {
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
 	Edition              string   `json:"edition,omitempty"`
+	FacetAvail           []string `json:"facet_avail"`
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
