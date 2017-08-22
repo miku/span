@@ -9,17 +9,6 @@ import (
 	"github.com/miku/span/container"
 )
 
-// FreeContentItem via AMSL.
-type FreeContentItem struct {
-	SourceID    string `json:"sid"`
-	Collection  string `json:"mega_collection"`
-	FreeContent string `json:"freeContent"`
-}
-
-// FreeContentMap maps a concatenated string "source_id/collection" to a bool,
-// which is true, if this sid/collection is a free data source.
-var FreeContentMap = make(map[string]bool)
-
 // Solr5Vufind3 is the basic solr 5 schema as of 2016-04-14. It is based on
 // VuFind 3. Same as Solr5Vufind3v12, but with fullrecord field, refs. #8031.
 type Solr5Vufind3 struct {
@@ -212,16 +201,10 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.Fullrecord = string(b)
 	}
 
-	// Default facet for online contents.
+	// Default facet for online contents, refs #11285.
 	s.FacetAvail = []string{"Online"}
-
-	// Additionally, mark as free, if source and collection appear in the free content map, refs #11285.
-	for _, collection := range s.MegaCollections {
-		key := fmt.Sprintf("%s/%s", s.SourceID, collection)
-		if _, ok := FreeContentMap[key]; ok {
-			s.FacetAvail = append(s.FacetAvail, "Free")
-			break
-		}
+	if is.OpenAccess {
+		s.FacetAvail = append(s.FacetAvail, "Free")
 	}
 
 	return nil
