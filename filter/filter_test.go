@@ -30,10 +30,10 @@ func TestOrFilter1(t *testing.T) {
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "C"}, true},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "A"}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "A"}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, false},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, false},
 	}
 
 	var tree Tree
@@ -80,10 +80,10 @@ func TestOrFilter2(t *testing.T) {
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "C"}, true},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "A"}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "A"}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, true},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, true},
 	}
 
 	var tree Tree
@@ -121,10 +121,10 @@ func TestAndFilter1(t *testing.T) {
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "C"}, false},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "A"}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "A"}, false},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, false},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, false},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, false},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, false},
 	}
 
 	var tree Tree
@@ -164,10 +164,10 @@ func TestNotFilter1(t *testing.T) {
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "C"}, true},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollection: "A"}, false},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "A"}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollection: "C"}, true},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
+		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, false},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
+		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, true},
 	}
 
 	var tree Tree
