@@ -115,7 +115,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.SourceID = SourceIdentifier
 	output.Format = Format
 	output.Genre = Genre
-	output.MegaCollection = Collection
+	output.MegaCollections = []string{Collection}
 	output.RefType = DefaultRefType
 	for _, lang := range article.Languages {
 		if isocode := span.LanguageIdentifier(lang); isocode != "" {

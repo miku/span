@@ -138,7 +138,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Authors = article.Authors()
 	output.Format = Format
 	output.Languages = article.Languages()
-	output.MegaCollection = SourceName
+	output.MegaCollections = []string{SourceName}
 	output.SourceID = SourceID
 
 	var normalized []string

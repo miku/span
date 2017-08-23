@@ -248,10 +248,10 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Packages = append([]string{doc.DB}, prefixedPackageNames...)
 
 	if len(prefixedPackageNames) > 0 {
-		output.MegaCollection = prefixedPackageNames[0]
+		output.MegaCollections = []string{prefixedPackageNames[0]}
 	} else {
 		log.Printf("genios: db is not associated with package: %s, using generic default", doc.DB)
-		output.MegaCollection = fmt.Sprintf("Genios")
+		output.MegaCollections = []string{fmt.Sprintf("Genios")}
 	}
 
 	id := doc.RecordID()

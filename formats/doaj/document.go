@@ -187,7 +187,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genre
 	output.ISSN = doc.Index.ISSN
 	output.JournalTitle = doc.BibJSON.Journal.Title
-	output.MegaCollection = Collection
+	output.MegaCollections = []string{Collection}
 
 	publisher := strings.TrimSpace(doc.BibJSON.Journal.Publisher)
 	if publisher != "" {

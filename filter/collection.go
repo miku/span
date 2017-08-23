@@ -14,7 +14,12 @@ type CollectionFilter struct {
 
 // Apply filter.
 func (f *CollectionFilter) Apply(is finc.IntermediateSchema) bool {
-	return f.values.Contains(is.MegaCollection)
+	for _, c := range is.MegaCollections {
+		if f.values.Contains(c) {
+			return true
+		}
+	}
+	return false
 }
 
 // UnmarshalJSON turns a config fragment into a ISSN filter.

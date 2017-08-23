@@ -481,7 +481,7 @@ func (s Shipment) BatchConvert() ([]finc.IntermediateSchema, error) {
 				output.ISSN = []string{si.IssueInfo.Issn}
 				output.Issue = si.IssueInfo.VolumeIssueNumber.IssFirst
 				output.Languages = []string{"eng"}
-				output.MegaCollection = Collection
+				output.MegaCollections = []string{Collection}
 				output.RecordID = fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(article.ItemInfo.Doi)))
 				output.RefType = DefaultRefType
 				output.SourceID = SourceID

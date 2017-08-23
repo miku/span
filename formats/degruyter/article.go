@@ -82,7 +82,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.URL = append(output.URL, ids.URL)
 
 	output.Format = Format
-	output.MegaCollection = SourceName
+	output.MegaCollections = []string{SourceName}
 	output.SourceID = SourceID
 
 	return output, nil

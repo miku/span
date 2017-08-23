@@ -61,7 +61,7 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genre
 	output.Format = Format
 	output.RefType = DefaultRefType
-	output.MegaCollection = Collection
+	output.MegaCollections = []string{Collection}
 
 	if len(r.Metadata.DC.Title) > 0 {
 		output.ArticleTitle = r.Metadata.DC.Title[0]

@@ -328,9 +328,9 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	if doc.Publisher == "" {
-		output.MegaCollection = fmt.Sprintf("X-U (CrossRef)")
+		output.MegaCollections = []string{fmt.Sprintf("X-U (CrossRef)")}
 	} else {
-		output.MegaCollection = fmt.Sprintf("%s (CrossRef)", doc.Publisher)
+		output.MegaCollections = []string{fmt.Sprintf("%s (CrossRef)", doc.Publisher)}
 	}
 
 	return output, nil

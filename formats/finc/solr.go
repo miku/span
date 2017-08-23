@@ -88,7 +88,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.ISSN = is.ISSNList()
 	s.ISBN = is.ISBNList()
 	s.Edition = is.Edition
-	s.MegaCollections = append(s.MegaCollections, is.MegaCollection)
+	s.MegaCollections = is.MegaCollections
 	s.PublishDateSort = is.Date.Year()
 	s.PublishDate = []string{is.Date.Format("2006-01-02")}
 	s.Publishers = is.Publishers

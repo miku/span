@@ -134,7 +134,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.RecordID = id
 	output.SourceID = SourceID
-	output.MegaCollection = Collection
+	output.MegaCollections = []string{Collection}
 	output.Genre = Genre
 	output.Format = Format
 

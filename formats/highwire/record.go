@@ -58,7 +58,7 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RefType = DefaultRefType
 
 	if len(r.Metadata.DC.Publisher) > 0 {
-		output.MegaCollection = fmt.Sprintf("%s (HighWire)", r.Metadata.DC.Publisher[0])
+		output.MegaCollections = []string{fmt.Sprintf("%s (HighWire)", r.Metadata.DC.Publisher[0])}
 	}
 
 	if len(r.Metadata.DC.Title) > 0 {

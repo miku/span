@@ -281,7 +281,7 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is.URL = []string{}
 
 	is.SourceID = SourceID
-	is.MegaCollection = Collection
+	is.MegaCollections = []string{Collection}
 	is.Format = Format
 
 	if p.Volume.Article.Articleinfo.Amsid != "" {

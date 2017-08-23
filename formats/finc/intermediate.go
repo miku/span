@@ -92,10 +92,10 @@ func (author *Author) String() string {
 //
 // TODO(miku): Clean up naming and date parsing.
 type IntermediateSchema struct {
-	Format         string `json:"finc.format,omitempty"`
-	MegaCollection string `json:"finc.mega_collection,omitempty"`
-	RecordID       string `json:"finc.record_id,omitempty"`
-	SourceID       string `json:"finc.source_id,omitempty"`
+	Format          string   `json:"finc.format,omitempty"`
+	MegaCollections []string `json:"finc.mega_collection,omitempty"`
+	RecordID        string   `json:"finc.record_id,omitempty"`
+	SourceID        string   `json:"finc.source_id,omitempty"`
 
 	Database     string `json:"ris.db,omitempty"`
 	DataProvider string `json:"ris.dp,omitempty"`
