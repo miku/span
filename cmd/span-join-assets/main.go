@@ -1,4 +1,35 @@
-// span-join-assets combines a directory of json configurations into a single file.
+// span-join-assets combines a directory of json or single column TSV configurations into a single file.
+//
+// From:
+//
+// .
+// ├── a
+// │   └── b
+// │       └── c.json
+// └── d
+//     ├── e.json
+//     └── f.tsv
+//
+// To:
+//
+// {
+//     "a": {
+//       "b": {
+//         "c": {
+//           "switch": "on"
+//         }
+//       }
+//     },
+//     "d": {
+//       "e": {
+//         "switch": "off"
+//       },
+//       "f": [
+//         "1",
+//         "2"
+//       ]
+//     }
+// }
 package main
 
 import (
