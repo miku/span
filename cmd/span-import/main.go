@@ -75,6 +75,7 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 	}
 	obj := FormatMap[name]()
 	scanner := xmlstream.NewScanner(bufio.NewReader(r), obj)
+	scanner.Decoder.Strict = false // Errors of the invalid character entity kind are common.
 	for scanner.Scan() {
 		tag := scanner.Element()
 		converter, ok := tag.(IntermediateSchemaer)
