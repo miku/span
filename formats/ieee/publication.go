@@ -325,9 +325,5 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.Packages = append(is.Packages, p.Publicationinfo.Packagemembers...)
 
-	if len(is.ISSN) == 0 && len(is.EISSN) == 0 {
-		log.Printf("warning: no ISSN: %s", is.ArticleTitle)
-	}
-
 	return is, nil
 }
