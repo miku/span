@@ -275,7 +275,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
 	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
-	output.Issue = doc.Issue
+	output.Issue = strings.TrimLeft(doc.Issue, "0")
 	output.Languages = []string{"eng"}
 	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
@@ -283,7 +283,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Subjects = doc.Subjects
 	output.Type = doc.Type
 	output.URL = append(output.URL, doc.URL)
-	output.Volume = doc.Volume
+	output.Volume = strings.TrimLeft(doc.Volume, "0")
 
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = span.UnescapeTrim(doc.ContainerTitle[0])
