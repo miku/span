@@ -1,11 +1,11 @@
 {
-    "eBook": "Book, E-Book",
-    "ElectronicArticle": "Book, E-Book",
-    "ElectronicBookPart": "Book, E-Book",
+    "eBook": "Buch",
+    "ElectronicArticle": "Buch",
+    "ElectronicBookPart": "Buch",
     "ElectronicJournal": "Journal, E-Journal",
     "ElectronicProceeding": "Proceeding",
     "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
     "ElectronicSerial": "Journal, E-Journal",
-    "ElectronicThesis": "Thesis",
+    "ElectronicThesis": "Buch",
     "Unknown": "Unknown Format"
 }
