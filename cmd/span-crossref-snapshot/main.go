@@ -62,7 +62,7 @@ func main() {
 	excludeFile := flag.String("x", "", "a list of DOI to further ignore")
 	outputFile := flag.String("o", "", "output file")
 	compressed := flag.Bool("z", false, "input is gzip compressed")
-	batchsize := flag.Int("b", 100000, "batch size")
+	batchsize := flag.Int("b", 40000, "batch size")
 	cpuprofile := flag.String("cpuprofile", "", "write cpuprofile to file")
 	verbose := flag.Bool("verbose", false, "be verbose")
 
