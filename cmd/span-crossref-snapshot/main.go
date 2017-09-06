@@ -17,18 +17,19 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"runtime/pprof"
 	"strings"
 
 	gzip "github.com/klauspost/pgzip"
+	"github.com/sirupsen/logrus"
 
 	"github.com/miku/clam"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
+	log "github.com/sirupsen/logrus"
 )
 
 // fallback awk script is used, if the filterline executable is not found.
@@ -63,8 +64,13 @@ func main() {
 	compressed := flag.Bool("z", false, "input is gzip compressed")
 	batchsize := flag.Int("b", 100000, "batch size")
 	cpuprofile := flag.String("cpuprofile", "", "write cpuprofile to file")
+	verbose := flag.Bool("verbose", false, "be verbose")
 
 	flag.Parse()
+
+	if *verbose {
+		log.SetLevel(log.DebugLevel)
+	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -111,8 +117,15 @@ func main() {
 		if err := span.LoadSet(file, excludes); err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("excludes: %d", len(excludes))
+		log.Debugf("excludes: %d", len(excludes))
 	}
+
+	log.WithFields(logrus.Fields{
+		"prefix":       "stage 1",
+		"input":        f.Name(),
+		"excludesFile": *excludeFile,
+		"excludes":     len(excludes),
+	}).Info("preparing extraction")
 
 	// Stage 1: Extract minimum amount of information from the raw data, write to tempfile.
 	tf, err := ioutil.TempFile("", "span-crossref-snapshot-")
@@ -144,6 +157,11 @@ func main() {
 
 	p.BatchSize = *batchsize
 
+	log.WithFields(logrus.Fields{
+		"prefix":    "stage 1",
+		"batchsize": *batchsize,
+	}).Info("starting extraction")
+
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -159,6 +177,12 @@ func main() {
 	// document date, DOI).
 	fastsort := `LC_ALL=C sort -S20%`
 	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
+
+	log.WithFields(logrus.Fields{
+		"prefix":    "stage 2",
+		"batchsize": *batchsize,
+	}).Info("identifying relevant records")
+
 	output, err := clam.RunOutput(cmd, clam.Map{"f": fastsort, "input": tf.Name()})
 	if err != nil {
 		log.Fatal(err)
@@ -190,6 +214,13 @@ func main() {
 		defer os.Remove(tf.Name())
 		filterline = tf.Name()
 	}
+
+	log.WithFields(logrus.Fields{
+		"prefix":     "stage 3",
+		"comp":       comp,
+		"decomp":     decomp,
+		"filterline": filterline,
+	}).Info("extract relevant records")
 
 	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
 	cmd = `{{ filterline }} {{ L }} {{ F }} > {{ output }}`
