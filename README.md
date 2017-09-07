@@ -67,6 +67,25 @@ TODO:
 * Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
 * Allow loadable assets from ~/.config/span/maps, some specified location or a single JSON file.
 
+More taggable formats:
+
+Let formats implement a single function interface, that takes a filter value.
+How to make this filter generic? Or use Tag as an adapeter?
+
+```go
+// Tag alters the document by applying a filter to it.
+func (doc *Document) Tag(f Filter) error {
+    // Adapt.
+    record = FilterRecord{
+	ISSN: doc.ISSN,
+	Title: doc.CombinedTitle(),
+	// ...
+    }
+    // Apply.
+    return f.Apply(record)
+}
+```
+
 DONE:
 
 * Reuse more generic code, e.g. [parallel](http://github.com/miku/parallel)
