@@ -183,20 +183,31 @@ func (p Publication) ISBNList() (isbns []string) {
 	return
 }
 
+// Date returns the date of the publication. There are multiple dates, "LastEdit",
+// "LastInspecUpd", "OriginalPub", "ePub" - use OriginalPub.
 func (p Publication) Date() (time.Time, error) {
 	if len(p.Volume.Article.Articleinfo.Date) == 0 {
 		return time.Time{}, ErrNoDate
 	}
+
+	// Use the first date as default.
 	date := p.Volume.Article.Articleinfo.Date[0]
+
+	for _, dt := range p.Volume.Article.Articleinfo.Date {
+		if dt.Datetype == "OriginalPub" {
+			date = dt
+			break
+		}
+	}
+
 	y, m, d := "1970", "Jan", "1"
 	if date.Year == "" {
 		return time.Time{}, ErrNoDate
-	} else {
-		if _, err := strconv.Atoi(date.Year); err != nil {
-			return time.Time{}, err
-		}
-		y = date.Year
 	}
+	if _, err := strconv.Atoi(date.Year); err != nil {
+		return time.Time{}, err
+	}
+	y = date.Year
 	if date.Month != "" {
 		if len(date.Month) > 3 {
 			date.Month = date.Month[:3]
