@@ -27,6 +27,7 @@ var (
 	ErrNoIdentifier = errors.New("missing identifier")
 )
 
+// Publication represents a publication.
 type Publication struct {
 	xml.Name          `xml:"publication"`
 	Title             string `xml:"title"`
@@ -154,6 +155,7 @@ type Publication struct {
 	} `xml:"volume"`
 }
 
+// PaperISSN returns the online ISSN found in the publication.
 func (p Publication) PaperISSN() (issns []string) {
 	for _, issn := range p.Publicationinfo.Issn {
 		if strings.ToLower(issn.Mediatype) == "paper" {
@@ -163,6 +165,7 @@ func (p Publication) PaperISSN() (issns []string) {
 	return
 }
 
+// OnlineISSN returns the online ISSN found in the publication.
 func (p Publication) OnlineISSN() (issns []string) {
 	for _, issn := range p.Publicationinfo.Issn {
 		if strings.ToLower(issn.Mediatype) == "online" {
@@ -172,6 +175,7 @@ func (p Publication) OnlineISSN() (issns []string) {
 	return
 }
 
+// ISBNList returns a list of ISBN.
 func (p Publication) ISBNList() (isbns []string) {
 	for _, isbn := range p.Publicationinfo.Isbn {
 		isbns = append(isbns, isbn.Value)
@@ -232,6 +236,7 @@ func (p Publication) Date() (time.Time, error) {
 	return time.Time{}, fmt.Errorf(fmt.Sprintf("%s", p.Volume.Article.Articleinfo.Date))
 }
 
+// Authors returns authors.
 func (p Publication) Authors() []finc.Author {
 	var authors []finc.Author
 	for _, author := range p.Volume.Article.Articleinfo.Authorgroup.Author {
@@ -240,6 +245,7 @@ func (p Publication) Authors() []finc.Author {
 	return authors
 }
 
+// PageCount the page count as string.
 func (p Publication) PageCount() string {
 	start, err := strconv.Atoi(p.Volume.Article.Articleinfo.Artpagenums.Startpage)
 	if err != nil {
