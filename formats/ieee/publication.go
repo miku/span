@@ -41,7 +41,7 @@ type Publication struct {
 		Acronym               string   `xml:"acronym"`
 		Pubstatus             string   `xml:"pubstatus"`
 		Publicationopenaccess string   `xml:"publicationopenaccess"`
-		StandardId            string   `xml:"standard_id"`
+		StandardID            string   `xml:"standard_id"`
 		Packagemembers        []string `xml:"packagememberset>packagemember"`
 		Isbn                  []struct {
 			Isbntype  string `xml:"isbntype,attr"`
