@@ -323,7 +323,6 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.RefType = DefaultRefType
 
-	// test addition fields
 	is.Packages = []string{
 		p.Publicationinfo.Publicationtype,
 		p.Publicationinfo.Publicationsubtype,
