@@ -44,6 +44,7 @@ type Solr5Vufind3 struct {
 	Topics               []string `json:"topic,omitempty"`
 	URL                  []string `json:"url,omitempty"`
 	PublishDate          []string `json:"publishDate,omitempty"`
+	Physical             []string `json:"physical,omitempty"`
 
 	VF1Author           string   `json:"vf1_author,omitempty"`
 	VF1SecondaryAuthors []string `json:"vf1_author2,omitempty"`
@@ -206,6 +207,9 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	if is.OpenAccess {
 		s.FacetAvail = append(s.FacetAvail, "Free")
 	}
+
+	// refs #11478
+	s.Physical = []string{is.Pages}
 
 	return nil
 }
