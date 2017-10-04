@@ -26,6 +26,7 @@ package doaj
 import (
 	"fmt"
 	"html"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -47,6 +48,7 @@ const (
 var (
 	LCCPatterns = assetutil.MustLoadRegexpMap("assets/finc/lcc.json")
 	LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
+	DOIPattern  = regexp.MustCompile(`10[.][a-zA-Z0-9]+/[\S]*$`)
 )
 
 // Response from elasticsearch.
@@ -157,7 +159,11 @@ func (doc Document) Date() (time.Time, error) {
 func (doc Document) DOI() string {
 	for _, identifier := range doc.BibJSON.Identifier {
 		if identifier.Type == "doi" {
-			return identifier.ID
+			id := strings.TrimSpace(identifier.ID)
+			if !strings.Contains(id, "http") {
+				return id
+			}
+			return DOIPattern.FindString(id)
 		}
 	}
 	return ""
