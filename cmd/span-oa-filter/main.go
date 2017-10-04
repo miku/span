@@ -1,5 +1,5 @@
-// span-oa-filter will set x.oa to true, if the ISSN of the record is contained in
-// a given ISSN list.
+// span-oa-filter will set x.oa to true, if the given KBART file validates is
+// valid for a record.
 package main
 
 import (
@@ -10,19 +10,15 @@ import (
 	"log"
 	"os"
 
-	"io/ioutil"
-
-	"bytes"
-
 	"github.com/miku/span"
-	"github.com/miku/span/container"
+	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
 )
 
 func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
-	issnFile := flag.String("f", "", "path to file with one issn per line")
+	kbartFile := flag.String("f", "", "path to a single KBART file")
 	batchsize := flag.Int("b", 25000, "batch size")
 
 	flag.Parse()
@@ -32,15 +28,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	b, err := ioutil.ReadFile(*issnFile)
-	if err != nil {
+	// Create a small config, from which we can unmarshal a filter.
+	config := fmt.Sprintf(`{"holdings": {"file": %q}}`, *kbartFile)
+
+	// Create a holdings filter.
+	filter := filter.HoldingsFilter{}
+	if err := filter.UnmarshalJSON([]byte(config)); err != nil {
 		log.Fatal(err)
-	}
-
-	issnset := container.NewStringSet()
-
-	for _, v := range bytes.Split(b, []byte("\n")) {
-		issnset.Add(string(bytes.TrimSpace(v)))
 	}
 
 	w := bufio.NewWriter(os.Stdout)
@@ -51,11 +45,8 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return nil, err
 		}
-		for _, issn := range is.ISSNList() {
-			if issnset.Contains(issn) {
-				is.OpenAccess = true
-				break
-			}
+		if filter.Apply(is) {
+			is.OpenAccess = true
 		}
 		bb, err := json.Marshal(is)
 		if err != nil {
