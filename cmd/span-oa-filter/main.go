@@ -1,5 +1,4 @@
-// span-oa-filter will set x.oa to true, if the given KBART file validates is
-// valid for a record.
+// span-oa-filter will set x.oa to true, if the given KBART file validates a record.
 package main
 
 import (
