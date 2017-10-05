@@ -1,0 +1,1067 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="./oai2.xsl" type="text/xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2017-10-05T12:17:53Z</responseDate>
+  <request verb="GetRecord" identifier="oai:www.zvdd.de:urn:nbn:de:hbz:466:1-43488" metadataPrefix="mets">http://www.zvdd.de/oai2/</request>
+  <GetRecord>
+    <record>
+      <header>
+        <identifier>oai:www.zvdd.de:urn:nbn:de:hbz:466:1-43488</identifier>
+        <datestamp>2017-09-30T00:18:18Z</datestamp>
+      </header>
+      <metadata>
+        <mets:mets xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mets="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:vlz="http://visuallibrary.net/vlz/1.0/" xmlns:dv="http://dfg-viewer.de/" xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/version18/mets.xsd" OBJID="6" LABEL="Digitale Sammlungen">
+          <mets:metsHdr CREATEDATE="2017-09-29T05:11:45">
+            <mets:agent ROLE="OTHER" TYPE="OTHER" OTHERTYPE="SOFTWARE">
+              <mets:name>vls/2.17.3</mets:name>
+            </mets:agent>
+            <mets:agent ROLE="OTHER" TYPE="OTHER" OTHERTYPE="INSTANCE">
+              <mets:name>ubpb-gina</mets:name>
+            </mets:agent>
+            <mets:agent ROLE="OTHER" TYPE="OTHER" OTHERTYPE="REPOSITORY">
+              <mets:name>digital.ub.uni-paderborn.de</mets:name>
+            </mets:agent>
+            <mets:agent ROLE="OTHER" TYPE="OTHER" OTHERTYPE="BUILDER">
+              <mets:name>vd</mets:name>
+            </mets:agent>
+          </mets:metsHdr>
+          <mets:dmdSec ID="md2572377">
+            <mets:mdWrap MIMETYPE="text/xml" MDTYPE="MODS">
+              <mets:xmlData>
+                <mods:mods version="3.5" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd">
+                  <mods:titleInfo>
+                    <mods:title>Ausstellung München 1908</mods:title>
+                    <mods:subTitle>30 Ansichten</mods:subTitle>
+                  </mods:titleInfo>
+                  <mods:typeOfResource>text</mods:typeOfResource>
+                  <mods:genre authority="marcgt">book</mods:genre>
+                  <mods:originInfo>
+                    <mods:place>
+                      <mods:placeTerm type="text">München</mods:placeTerm>
+                    </mods:place>
+                    <mods:dateIssued>[1908]</mods:dateIssued>
+                    <mods:dateIssued encoding="w3cdtf" keyDate="yes">1908</mods:dateIssued>
+                    <mods:issuance>monographic</mods:issuance>
+                  </mods:originInfo>
+                  <mods:originInfo>
+                    <mods:place>
+                      <mods:placeTerm type="text">Paderborn</mods:placeTerm>
+                    </mods:place>
+                    <mods:publisher>Universitätsbibliothek Paderborn</mods:publisher>
+                    <mods:edition>[Electronic ed.]</mods:edition>
+                    <mods:dateIssued>2017</mods:dateIssued>
+                  </mods:originInfo>
+                  <mods:language>
+                    <mods:languageTerm authority="iso639-2b" type="code">ger</mods:languageTerm>
+                  </mods:language>
+                  <mods:physicalDescription>
+                    <mods:extent>[13] Bl.</mods:extent>
+                    <mods:note>nur Ill.</mods:note>
+                  </mods:physicalDescription>
+                  <mods:note type="statement of responsibility">Künstler-, Karten-, Herstellungs- und Vertriebs-Gesellschaft</mods:note>
+                  <mods:identifier type="eki">HBZHT019429725</mods:identifier>
+                  <mods:identifier type="urn">urn:nbn:de:hbz:466:1-43488</mods:identifier>
+                  <mods:identifier type="hbz-idn">CT006003563</mods:identifier>
+                  <mods:location>
+                    <mods:physicalLocation authority="local library code">466</mods:physicalLocation>
+                    <mods:holdingSimple>
+                      <mods:copyInformation>
+                        <mods:subLocation>02</mods:subLocation>
+                        <mods:shelfLocator>SE1354</mods:shelfLocator>
+                      </mods:copyInformation>
+                    </mods:holdingSimple>
+                  </mods:location>
+                  <mods:extension>
+                    <vlz:info xmlns:vlz="http://visuallibrary.net/vlz/1.0/" version="2"/>
+                  </mods:extension>
+                  <mods:recordInfo>
+                    <mods:recordCreationDate encoding="marc">20170824</mods:recordCreationDate>
+                    <mods:recordIdentifier source="ubpbihd">HT019429725</mods:recordIdentifier>
+                    <mods:descriptionStandard>rak</mods:descriptionStandard>
+                  </mods:recordInfo>
+                  <mods:identifier type="oai">oai:digital.ub.uni-paderborn.de:2572377</mods:identifier>
+                  <mods:classification authority="zvdd.de">ubpbihd.digital.ub.uni.paderborn.de</mods:classification>
+                </mods:mods>
+              </mets:xmlData>
+            </mets:mdWrap>
+          </mets:dmdSec>
+          <mets:amdSec ID="amd2572377">
+            <mets:rightsMD ID="rights2572377">
+              <mets:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" OTHERMDTYPE="DVRIGHTS">
+                <mets:xmlData>
+                  <dv:rights xmlns:dv="http://dfg-viewer.de/">
+                    <dv:ownerLogo>http://digital.ub.uni-paderborn.de//domainresource/static/graphics/connectors/viewerLogo.gif</dv:ownerLogo>
+                    <dv:owner>Universitätsbibliothek Paderborn</dv:owner>
+                    <dv:ownerSiteURL>http://www.ub.uni-paderborn.de/</dv:ownerSiteURL>
+                  </dv:rights>
+                </mets:xmlData>
+              </mets:mdWrap>
+            </mets:rightsMD>
+            <mets:digiprovMD ID="digiprov2572377">
+              <mets:mdWrap MIMETYPE="text/xml" MDTYPE="OTHER" OTHERMDTYPE="DVLINKS">
+                <mets:xmlData>
+                  <dv:links xmlns:dv="http://dfg-viewer.de/">
+                    <dv:reference>http://katalog.ub.uni-paderborn.de/searches?q=HT019429725&amp;scope=catalog</dv:reference>
+                    <dv:presentation>http://digital.ub.uni-paderborn.de/id/2572377</dv:presentation>
+                    <dv:sru>http://digital.ub.uni-paderborn.de/proto_ftsearch/2572377</dv:sru>
+                  </dv:links>
+                </mets:xmlData>
+              </mets:mdWrap>
+            </mets:digiprovMD>
+          </mets:amdSec>
+          <mets:fileSec>
+            <mets:fileGrp USE="DOWNLOAD">
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="e1cdb9bb41aaa3b335b670c317fa7bae32b5ca6f" CREATED="2017-09-28T20:08:29Z" CHECKSUMTYPE="SHA-1" SIZE="4078095" ID="PDF_2572377">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2572377" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="f810be63dc121b8e5288fed349fca4583534d889" CREATED="2017-09-28T20:07:47Z" CHECKSUMTYPE="SHA-1" SIZE="359503" ID="PDF_2573092">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2573092" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="29a63fc51f13e58c5589bb59714741cbf8b63a16" CREATED="2017-09-28T20:07:49Z" CHECKSUMTYPE="SHA-1" SIZE="325832" ID="PDF_2573095">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2573095" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="2ba00da1069c2d88084f8a318a4d14eac44bc6c6" CREATED="2017-09-28T20:07:52Z" CHECKSUMTYPE="SHA-1" SIZE="3497959" ID="PDF_2573098">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2573098" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="52796d7c3dda72976bf9c507b9e7d9b2aa8f9f62" CREATED="2017-09-28T20:08:29Z" CHECKSUMTYPE="SHA-1" SIZE="298713" ID="PDF_2580954">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580954" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="0a80428d96db51654725e6e6cdd93022cd38b527" CREATED="2017-09-28T20:08:29Z" CHECKSUMTYPE="SHA-1" SIZE="269917" ID="PDF_2580964">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580964" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="b5c7fe7a8419edf6eaff0b404d3c6a5f0d985bc4" CREATED="2017-09-28T20:08:30Z" CHECKSUMTYPE="SHA-1" SIZE="287650" ID="PDF_2580966">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580966" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="8a7792108c0378246e44843d2efb23fc6386360d" CREATED="2017-09-28T20:08:30Z" CHECKSUMTYPE="SHA-1" SIZE="288459" ID="PDF_2580968">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580968" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="fff76d0e40811e8751894317c8811e9976ce14a7" CREATED="2017-09-28T20:08:30Z" CHECKSUMTYPE="SHA-1" SIZE="292806" ID="PDF_2580973">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580973" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="1e93613434f9bf053ac9c9e3add7a2d11a82556a" CREATED="2017-09-28T20:08:31Z" CHECKSUMTYPE="SHA-1" SIZE="250383" ID="PDF_2580975">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580975" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="d96f6b2677b6ed3e7364ef8937c30f84ffea67e9" CREATED="2017-09-28T20:08:28Z" CHECKSUMTYPE="SHA-1" SIZE="277962" ID="PDF_2580977">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580977" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="3ef21205cc67d54378604a7d7f01c1508f6bddea" CREATED="2017-09-28T20:08:31Z" CHECKSUMTYPE="SHA-1" SIZE="235437" ID="PDF_2580979">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580979" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="07d31ed8b514fa529abaf619104b76e605fd7d6f" CREATED="2017-09-28T20:08:32Z" CHECKSUMTYPE="SHA-1" SIZE="247429" ID="PDF_2580984">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580984" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="12d035753e68e74dde5c269e37e8520934e3336b" CREATED="2017-09-28T20:08:32Z" CHECKSUMTYPE="SHA-1" SIZE="250585" ID="PDF_2580986">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580986" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="5aaf9a505117dbea14e8ce0a55c3551c1f71ec8d" CREATED="2017-09-28T20:08:32Z" CHECKSUMTYPE="SHA-1" SIZE="285289" ID="PDF_2580988">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580988" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="8062e24641e158d9cc3c615a69e9a9631de3e793" CREATED="2017-09-28T20:08:33Z" CHECKSUMTYPE="SHA-1" SIZE="239263" ID="PDF_2580990">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580990" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="e33b7e517651ca04e1df00261b53cb40cbf04a7b" CREATED="2017-09-28T20:07:33Z" CHECKSUMTYPE="SHA-1" SIZE="282124" ID="PDF_2580995">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580995" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="68d8e4ad9985e073653eb908923edcabb5cd22f0" CREATED="2017-09-28T20:07:34Z" CHECKSUMTYPE="SHA-1" SIZE="293862" ID="PDF_2580998">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2580998" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="a9b8556a2c38db0b84140eaef39d7c5654fe718c" CREATED="2017-09-28T20:07:35Z" CHECKSUMTYPE="SHA-1" SIZE="249633" ID="PDF_2581000">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581000" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="cadc505fa89bfaa1dfcea7f950af1cbcf4438c59" CREATED="2017-09-28T20:07:35Z" CHECKSUMTYPE="SHA-1" SIZE="232698" ID="PDF_2581002">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581002" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="2f5c4beab7db2a1e7a877854bf52c76a346193d0" CREATED="2017-09-28T20:07:35Z" CHECKSUMTYPE="SHA-1" SIZE="260947" ID="PDF_2581004">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581004" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="e6e49c10426de0adb72b9f44d2f451c726d0a930" CREATED="2017-09-28T20:07:36Z" CHECKSUMTYPE="SHA-1" SIZE="245708" ID="PDF_2581006">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581006" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="831a956f7f4e586e66995172c5b0f803d38e2421" CREATED="2017-09-28T20:07:43Z" CHECKSUMTYPE="SHA-1" SIZE="248917" ID="PDF_2581008">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581008" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="032c3a9820f94b6e9239d37e64365bb8b23e29f9" CREATED="2017-09-28T20:07:43Z" CHECKSUMTYPE="SHA-1" SIZE="249733" ID="PDF_2581010">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581010" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="d9eb91bb93e4bd0457e6d0bcd7f043a7b474f3ce" CREATED="2017-09-28T20:07:44Z" CHECKSUMTYPE="SHA-1" SIZE="292289" ID="PDF_2581012">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581012" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="44c84eb0f30ce3e3455ebb1c587eba4aa6c8e2cc" CREATED="2017-09-28T20:07:44Z" CHECKSUMTYPE="SHA-1" SIZE="244666" ID="PDF_2581015">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581015" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="e896e702e69a90738826144f31ec77857463365a" CREATED="2017-09-28T20:07:45Z" CHECKSUMTYPE="SHA-1" SIZE="253085" ID="PDF_2581017">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581017" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="24948277d266e7806204f6292be72d05d1fa1913" CREATED="2017-09-28T20:07:45Z" CHECKSUMTYPE="SHA-1" SIZE="283527" ID="PDF_2581019">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581019" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="261103ff11b362242929f6960e1f150012176950" CREATED="2017-09-28T20:07:46Z" CHECKSUMTYPE="SHA-1" SIZE="232181" ID="PDF_2581024">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581024" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="bbeb696fbf72db335fb966417b4c93174935965d" CREATED="2017-09-28T20:07:47Z" CHECKSUMTYPE="SHA-1" SIZE="286322" ID="PDF_2581026">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581026" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="8c258381c158109552702a58d2bb4c7795cad282" CREATED="2017-09-28T20:07:48Z" CHECKSUMTYPE="SHA-1" SIZE="236281" ID="PDF_2581029">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581029" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="168797425f1be56e7ca6d59db4fb99532ac6e3a2" CREATED="2017-09-28T20:08:25Z" CHECKSUMTYPE="SHA-1" SIZE="284789" ID="PDF_2581032">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581032" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="53ead17029f8d96bb055ca1e31351b817784abaa" CREATED="2017-09-28T20:08:28Z" CHECKSUMTYPE="SHA-1" SIZE="287478" ID="PDF_2581034">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581034" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="ca8df1797d7a7de01022b493d31f558a87c3d343" CREATED="2017-09-28T20:07:52Z" CHECKSUMTYPE="SHA-1" SIZE="283375" ID="PDF_2581037">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2581037" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="application/pdf" CHECKSUM="9d489e45ac6be3f1c2e26956d59f1c2db5286721" CREATED="2017-09-28T20:08:25Z" CHECKSUMTYPE="SHA-1" SIZE="364778" ID="PDF_2573129">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/pdf/2573129" LOCTYPE="URL"/>
+              </mets:file>
+            </mets:fileGrp>
+            <mets:fileGrp USE="FRONTIMAGE">
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:31Z" ID="IMG_FRONTIMAGE_2573093">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/304/2573093" LOCTYPE="URL"/>
+              </mets:file>
+            </mets:fileGrp>
+            <mets:fileGrp USE="DEFAULT">
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:31Z" ID="IMG_DEFAULT_2573093">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573093" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_DEFAULT_2573094">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573094" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_DEFAULT_2573096">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573096" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_DEFAULT_2573097">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573097" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_DEFAULT_2573099">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573099" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_DEFAULT_2573100">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573100" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_DEFAULT_2573101">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573101" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_DEFAULT_2573102">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573102" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_DEFAULT_2573103">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573103" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_DEFAULT_2573104">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573104" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_DEFAULT_2573105">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573105" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_DEFAULT_2573106">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573106" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_DEFAULT_2573107">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573107" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_DEFAULT_2573108">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573108" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_DEFAULT_2573109">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573109" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_DEFAULT_2573110">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573110" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_DEFAULT_2573111">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573111" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_DEFAULT_2573112">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573112" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_DEFAULT_2573113">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573113" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_DEFAULT_2573114">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573114" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_DEFAULT_2573115">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573115" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_DEFAULT_2573116">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573116" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_DEFAULT_2573117">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573117" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_DEFAULT_2573118">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573118" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_DEFAULT_2573119">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573119" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_DEFAULT_2573120">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573120" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_DEFAULT_2573121">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573121" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_DEFAULT_2573122">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573122" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_DEFAULT_2573123">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573123" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_DEFAULT_2573124">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573124" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_DEFAULT_2573125">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573125" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_DEFAULT_2573126">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573126" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_DEFAULT_2573127">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573127" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_DEFAULT_2573128">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573128" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_DEFAULT_2573130">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573130" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:40Z" ID="IMG_DEFAULT_2573131">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1000/2573131" LOCTYPE="URL"/>
+              </mets:file>
+            </mets:fileGrp>
+            <mets:fileGrp USE="THUMBS">
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:31Z" ID="IMG_THUMBS_2573093">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573093" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_THUMBS_2573094">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573094" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_THUMBS_2573096">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573096" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_THUMBS_2573097">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573097" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_THUMBS_2573099">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573099" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_THUMBS_2573100">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573100" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_THUMBS_2573101">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573101" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_THUMBS_2573102">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573102" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_THUMBS_2573103">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573103" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_THUMBS_2573104">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573104" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_THUMBS_2573105">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573105" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_THUMBS_2573106">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573106" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_THUMBS_2573107">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573107" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_THUMBS_2573108">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573108" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_THUMBS_2573109">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573109" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_THUMBS_2573110">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573110" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_THUMBS_2573111">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573111" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_THUMBS_2573112">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573112" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_THUMBS_2573113">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573113" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_THUMBS_2573114">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573114" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_THUMBS_2573115">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573115" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_THUMBS_2573116">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573116" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_THUMBS_2573117">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573117" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_THUMBS_2573118">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573118" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_THUMBS_2573119">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573119" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_THUMBS_2573120">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573120" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_THUMBS_2573121">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573121" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_THUMBS_2573122">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573122" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_THUMBS_2573123">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573123" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_THUMBS_2573124">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573124" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_THUMBS_2573125">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573125" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_THUMBS_2573126">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573126" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_THUMBS_2573127">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573127" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_THUMBS_2573128">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573128" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_THUMBS_2573130">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573130" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:40Z" ID="IMG_THUMBS_2573131">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/128/2573131" LOCTYPE="URL"/>
+              </mets:file>
+            </mets:fileGrp>
+            <mets:fileGrp USE="MIN">
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:31Z" ID="IMG_MIN_2573093">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573093" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MIN_2573094">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573094" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MIN_2573096">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573096" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MIN_2573097">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573097" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MIN_2573099">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573099" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MIN_2573100">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573100" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MIN_2573101">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573101" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MIN_2573102">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573102" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MIN_2573103">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573103" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MIN_2573104">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573104" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MIN_2573105">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573105" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MIN_2573106">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573106" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MIN_2573107">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573107" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MIN_2573108">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573108" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MIN_2573109">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573109" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MIN_2573110">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573110" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MIN_2573111">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573111" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MIN_2573112">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573112" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MIN_2573113">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573113" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_MIN_2573114">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573114" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_MIN_2573115">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573115" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_MIN_2573116">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573116" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MIN_2573117">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573117" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MIN_2573118">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573118" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MIN_2573119">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573119" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MIN_2573120">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573120" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MIN_2573121">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573121" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MIN_2573122">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573122" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MIN_2573123">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573123" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MIN_2573124">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573124" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MIN_2573125">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573125" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MIN_2573126">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573126" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MIN_2573127">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573127" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MIN_2573128">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573128" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MIN_2573130">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573130" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:40Z" ID="IMG_MIN_2573131">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/600/2573131" LOCTYPE="URL"/>
+              </mets:file>
+            </mets:fileGrp>
+            <mets:fileGrp USE="MAX">
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:31Z" ID="IMG_MAX_2573093">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573093" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MAX_2573094">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573094" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MAX_2573096">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573096" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MAX_2573097">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573097" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:32Z" ID="IMG_MAX_2573099">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573099" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MAX_2573100">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573100" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MAX_2573101">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573101" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MAX_2573102">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573102" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MAX_2573103">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573103" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:33Z" ID="IMG_MAX_2573104">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573104" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MAX_2573105">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573105" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MAX_2573106">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573106" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MAX_2573107">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573107" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:34Z" ID="IMG_MAX_2573108">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573108" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MAX_2573109">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573109" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MAX_2573110">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573110" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MAX_2573111">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573111" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MAX_2573112">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573112" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:35Z" ID="IMG_MAX_2573113">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573113" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_MAX_2573114">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573114" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_MAX_2573115">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573115" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:36Z" ID="IMG_MAX_2573116">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573116" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MAX_2573117">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573117" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MAX_2573118">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573118" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MAX_2573119">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573119" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MAX_2573120">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573120" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:37Z" ID="IMG_MAX_2573121">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573121" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MAX_2573122">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573122" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MAX_2573123">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573123" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MAX_2573124">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573124" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:38Z" ID="IMG_MAX_2573125">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573125" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MAX_2573126">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573126" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MAX_2573127">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573127" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MAX_2573128">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573128" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:39Z" ID="IMG_MAX_2573130">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573130" LOCTYPE="URL"/>
+              </mets:file>
+              <mets:file MIMETYPE="image/jpeg" CREATED="2017-09-11T20:02:40Z" ID="IMG_MAX_2573131">
+                <mets:FLocat xlink:href="http://digital.ub.uni-paderborn.de/download/webcache/1504/2573131" LOCTYPE="URL"/>
+              </mets:file>
+            </mets:fileGrp>
+          </mets:fileSec>
+          <mets:structMap TYPE="PHYSICAL">
+            <mets:div TYPE="physSequence" ID="physroot">
+              <mets:div ID="phys2573093" TYPE="page" LABEL="[Seite]" ORDER="1">
+                <mets:fptr FILEID="IMG_DEFAULT_2573093"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573093"/>
+                <mets:fptr FILEID="IMG_MIN_2573093"/>
+                <mets:fptr FILEID="IMG_MAX_2573093"/>
+              </mets:div>
+              <mets:div ID="phys2573094" TYPE="page" LABEL="[Seite]" ORDER="2">
+                <mets:fptr FILEID="IMG_DEFAULT_2573094"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573094"/>
+                <mets:fptr FILEID="IMG_MIN_2573094"/>
+                <mets:fptr FILEID="IMG_MAX_2573094"/>
+              </mets:div>
+              <mets:div ID="phys2573096" TYPE="page" LABEL="[Seite]" ORDER="3">
+                <mets:fptr FILEID="IMG_DEFAULT_2573096"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573096"/>
+                <mets:fptr FILEID="IMG_MIN_2573096"/>
+                <mets:fptr FILEID="IMG_MAX_2573096"/>
+              </mets:div>
+              <mets:div ID="phys2573097" TYPE="page" LABEL="[Seite]" ORDER="4">
+                <mets:fptr FILEID="IMG_DEFAULT_2573097"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573097"/>
+                <mets:fptr FILEID="IMG_MIN_2573097"/>
+                <mets:fptr FILEID="IMG_MAX_2573097"/>
+              </mets:div>
+              <mets:div ID="phys2573099" TYPE="page" LABEL="[Seite]" ORDER="5">
+                <mets:fptr FILEID="IMG_DEFAULT_2573099"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573099"/>
+                <mets:fptr FILEID="IMG_MIN_2573099"/>
+                <mets:fptr FILEID="IMG_MAX_2573099"/>
+              </mets:div>
+              <mets:div ID="phys2573100" TYPE="page" LABEL="[Seite]" ORDER="6">
+                <mets:fptr FILEID="IMG_DEFAULT_2573100"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573100"/>
+                <mets:fptr FILEID="IMG_MIN_2573100"/>
+                <mets:fptr FILEID="IMG_MAX_2573100"/>
+              </mets:div>
+              <mets:div ID="phys2573101" TYPE="page" LABEL="[Seite]" ORDER="7">
+                <mets:fptr FILEID="IMG_DEFAULT_2573101"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573101"/>
+                <mets:fptr FILEID="IMG_MIN_2573101"/>
+                <mets:fptr FILEID="IMG_MAX_2573101"/>
+              </mets:div>
+              <mets:div ID="phys2573102" TYPE="page" LABEL="[Seite]" ORDER="8">
+                <mets:fptr FILEID="IMG_DEFAULT_2573102"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573102"/>
+                <mets:fptr FILEID="IMG_MIN_2573102"/>
+                <mets:fptr FILEID="IMG_MAX_2573102"/>
+              </mets:div>
+              <mets:div ID="phys2573103" TYPE="page" LABEL="[Seite]" ORDER="9">
+                <mets:fptr FILEID="IMG_DEFAULT_2573103"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573103"/>
+                <mets:fptr FILEID="IMG_MIN_2573103"/>
+                <mets:fptr FILEID="IMG_MAX_2573103"/>
+              </mets:div>
+              <mets:div ID="phys2573104" TYPE="page" LABEL="[Seite]" ORDER="10">
+                <mets:fptr FILEID="IMG_DEFAULT_2573104"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573104"/>
+                <mets:fptr FILEID="IMG_MIN_2573104"/>
+                <mets:fptr FILEID="IMG_MAX_2573104"/>
+              </mets:div>
+              <mets:div ID="phys2573105" TYPE="page" LABEL="[Seite]" ORDER="11">
+                <mets:fptr FILEID="IMG_DEFAULT_2573105"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573105"/>
+                <mets:fptr FILEID="IMG_MIN_2573105"/>
+                <mets:fptr FILEID="IMG_MAX_2573105"/>
+              </mets:div>
+              <mets:div ID="phys2573106" TYPE="page" LABEL="[Seite]" ORDER="12">
+                <mets:fptr FILEID="IMG_DEFAULT_2573106"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573106"/>
+                <mets:fptr FILEID="IMG_MIN_2573106"/>
+                <mets:fptr FILEID="IMG_MAX_2573106"/>
+              </mets:div>
+              <mets:div ID="phys2573107" TYPE="page" LABEL="[Seite]" ORDER="13">
+                <mets:fptr FILEID="IMG_DEFAULT_2573107"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573107"/>
+                <mets:fptr FILEID="IMG_MIN_2573107"/>
+                <mets:fptr FILEID="IMG_MAX_2573107"/>
+              </mets:div>
+              <mets:div ID="phys2573108" TYPE="page" LABEL="[Seite]" ORDER="14">
+                <mets:fptr FILEID="IMG_DEFAULT_2573108"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573108"/>
+                <mets:fptr FILEID="IMG_MIN_2573108"/>
+                <mets:fptr FILEID="IMG_MAX_2573108"/>
+              </mets:div>
+              <mets:div ID="phys2573109" TYPE="page" LABEL="[Seite]" ORDER="15">
+                <mets:fptr FILEID="IMG_DEFAULT_2573109"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573109"/>
+                <mets:fptr FILEID="IMG_MIN_2573109"/>
+                <mets:fptr FILEID="IMG_MAX_2573109"/>
+              </mets:div>
+              <mets:div ID="phys2573110" TYPE="page" LABEL="[Seite]" ORDER="16">
+                <mets:fptr FILEID="IMG_DEFAULT_2573110"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573110"/>
+                <mets:fptr FILEID="IMG_MIN_2573110"/>
+                <mets:fptr FILEID="IMG_MAX_2573110"/>
+              </mets:div>
+              <mets:div ID="phys2573111" TYPE="page" LABEL="[Seite]" ORDER="17">
+                <mets:fptr FILEID="IMG_DEFAULT_2573111"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573111"/>
+                <mets:fptr FILEID="IMG_MIN_2573111"/>
+                <mets:fptr FILEID="IMG_MAX_2573111"/>
+              </mets:div>
+              <mets:div ID="phys2573112" TYPE="page" LABEL="[Seite]" ORDER="18">
+                <mets:fptr FILEID="IMG_DEFAULT_2573112"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573112"/>
+                <mets:fptr FILEID="IMG_MIN_2573112"/>
+                <mets:fptr FILEID="IMG_MAX_2573112"/>
+              </mets:div>
+              <mets:div ID="phys2573113" TYPE="page" LABEL="[Seite]" ORDER="19">
+                <mets:fptr FILEID="IMG_DEFAULT_2573113"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573113"/>
+                <mets:fptr FILEID="IMG_MIN_2573113"/>
+                <mets:fptr FILEID="IMG_MAX_2573113"/>
+              </mets:div>
+              <mets:div ID="phys2573114" TYPE="page" LABEL="[Seite]" ORDER="20">
+                <mets:fptr FILEID="IMG_DEFAULT_2573114"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573114"/>
+                <mets:fptr FILEID="IMG_MIN_2573114"/>
+                <mets:fptr FILEID="IMG_MAX_2573114"/>
+              </mets:div>
+              <mets:div ID="phys2573115" TYPE="page" LABEL="[Seite]" ORDER="21">
+                <mets:fptr FILEID="IMG_DEFAULT_2573115"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573115"/>
+                <mets:fptr FILEID="IMG_MIN_2573115"/>
+                <mets:fptr FILEID="IMG_MAX_2573115"/>
+              </mets:div>
+              <mets:div ID="phys2573116" TYPE="page" LABEL="[Seite]" ORDER="22">
+                <mets:fptr FILEID="IMG_DEFAULT_2573116"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573116"/>
+                <mets:fptr FILEID="IMG_MIN_2573116"/>
+                <mets:fptr FILEID="IMG_MAX_2573116"/>
+              </mets:div>
+              <mets:div ID="phys2573117" TYPE="page" LABEL="[Seite]" ORDER="23">
+                <mets:fptr FILEID="IMG_DEFAULT_2573117"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573117"/>
+                <mets:fptr FILEID="IMG_MIN_2573117"/>
+                <mets:fptr FILEID="IMG_MAX_2573117"/>
+              </mets:div>
+              <mets:div ID="phys2573118" TYPE="page" LABEL="[Seite]" ORDER="24">
+                <mets:fptr FILEID="IMG_DEFAULT_2573118"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573118"/>
+                <mets:fptr FILEID="IMG_MIN_2573118"/>
+                <mets:fptr FILEID="IMG_MAX_2573118"/>
+              </mets:div>
+              <mets:div ID="phys2573119" TYPE="page" LABEL="[Seite]" ORDER="25">
+                <mets:fptr FILEID="IMG_DEFAULT_2573119"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573119"/>
+                <mets:fptr FILEID="IMG_MIN_2573119"/>
+                <mets:fptr FILEID="IMG_MAX_2573119"/>
+              </mets:div>
+              <mets:div ID="phys2573120" TYPE="page" LABEL="[Seite]" ORDER="26">
+                <mets:fptr FILEID="IMG_DEFAULT_2573120"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573120"/>
+                <mets:fptr FILEID="IMG_MIN_2573120"/>
+                <mets:fptr FILEID="IMG_MAX_2573120"/>
+              </mets:div>
+              <mets:div ID="phys2573121" TYPE="page" LABEL="[Seite]" ORDER="27">
+                <mets:fptr FILEID="IMG_DEFAULT_2573121"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573121"/>
+                <mets:fptr FILEID="IMG_MIN_2573121"/>
+                <mets:fptr FILEID="IMG_MAX_2573121"/>
+              </mets:div>
+              <mets:div ID="phys2573122" TYPE="page" LABEL="[Seite]" ORDER="28">
+                <mets:fptr FILEID="IMG_DEFAULT_2573122"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573122"/>
+                <mets:fptr FILEID="IMG_MIN_2573122"/>
+                <mets:fptr FILEID="IMG_MAX_2573122"/>
+              </mets:div>
+              <mets:div ID="phys2573123" TYPE="page" LABEL="[Seite]" ORDER="29">
+                <mets:fptr FILEID="IMG_DEFAULT_2573123"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573123"/>
+                <mets:fptr FILEID="IMG_MIN_2573123"/>
+                <mets:fptr FILEID="IMG_MAX_2573123"/>
+              </mets:div>
+              <mets:div ID="phys2573124" TYPE="page" LABEL="[Seite]" ORDER="30">
+                <mets:fptr FILEID="IMG_DEFAULT_2573124"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573124"/>
+                <mets:fptr FILEID="IMG_MIN_2573124"/>
+                <mets:fptr FILEID="IMG_MAX_2573124"/>
+              </mets:div>
+              <mets:div ID="phys2573125" TYPE="page" LABEL="[Seite]" ORDER="31">
+                <mets:fptr FILEID="IMG_DEFAULT_2573125"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573125"/>
+                <mets:fptr FILEID="IMG_MIN_2573125"/>
+                <mets:fptr FILEID="IMG_MAX_2573125"/>
+              </mets:div>
+              <mets:div ID="phys2573126" TYPE="page" LABEL="[Seite]" ORDER="32">
+                <mets:fptr FILEID="IMG_DEFAULT_2573126"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573126"/>
+                <mets:fptr FILEID="IMG_MIN_2573126"/>
+                <mets:fptr FILEID="IMG_MAX_2573126"/>
+              </mets:div>
+              <mets:div ID="phys2573127" TYPE="page" LABEL="[Seite]" ORDER="33">
+                <mets:fptr FILEID="IMG_DEFAULT_2573127"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573127"/>
+                <mets:fptr FILEID="IMG_MIN_2573127"/>
+                <mets:fptr FILEID="IMG_MAX_2573127"/>
+              </mets:div>
+              <mets:div ID="phys2573128" TYPE="page" LABEL="[Seite]" ORDER="34">
+                <mets:fptr FILEID="IMG_DEFAULT_2573128"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573128"/>
+                <mets:fptr FILEID="IMG_MIN_2573128"/>
+                <mets:fptr FILEID="IMG_MAX_2573128"/>
+              </mets:div>
+              <mets:div ID="phys2573130" TYPE="page" LABEL="[Seite]" ORDER="35">
+                <mets:fptr FILEID="IMG_DEFAULT_2573130"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573130"/>
+                <mets:fptr FILEID="IMG_MIN_2573130"/>
+                <mets:fptr FILEID="IMG_MAX_2573130"/>
+              </mets:div>
+              <mets:div ID="phys2573131" TYPE="page" LABEL="[Seite]" ORDER="36">
+                <mets:fptr FILEID="IMG_DEFAULT_2573131"/>
+                <mets:fptr FILEID="IMG_THUMBS_2573131"/>
+                <mets:fptr FILEID="IMG_MIN_2573131"/>
+                <mets:fptr FILEID="IMG_MAX_2573131"/>
+              </mets:div>
+            </mets:div>
+          </mets:structMap>
+          <mets:structMap TYPE="LOGICAL">
+            <mets:div ID="log2572377" DMDID="md2572377" ADMID="amd2572377" TYPE="section" LABEL="Ausstellung München 1908" ORDER="1" CONTENTIDS="urn:nbn:de:hbz:466:1-43488">
+              <mets:mptr LOCTYPE="URL" xlink:href="http://digital.ub.uni-paderborn.de/oai/?verb=GetRecord&amp;metadataPrefix=mets&amp;identifier=2572377"/>
+              <mets:fptr FILEID="PDF_2572377"/>
+              <mets:fptr FILEID="IMG_FRONTIMAGE_2573093"/>
+              <mets:div ID="log2573092" TYPE="section" ORDER="1">
+                <mets:fptr FILEID="PDF_2573092"/>
+              </mets:div>
+              <mets:div ID="log2573095" TYPE="section" ORDER="2">
+                <mets:fptr FILEID="PDF_2573095"/>
+              </mets:div>
+              <mets:div ID="log2573098" TYPE="section" LABEL="30 Ansichten" ORDER="3">
+                <mets:fptr FILEID="PDF_2573098"/>
+                <mets:div ID="log2580954" TYPE="section" LABEL="Haupteingang. Architekten: Gebr. Rank." ORDER="1">
+                  <mets:fptr FILEID="PDF_2580954"/>
+                </mets:div>
+                <mets:div ID="log2580964" TYPE="section" LABEL="Verwaltungsgebäude. Architekten: Gebr. Rank." ORDER="2">
+                  <mets:fptr FILEID="PDF_2580964"/>
+                </mets:div>
+                <mets:div ID="log2580966" TYPE="section" LABEL="Künstlertheater mit Arkaden. Architekten: Prof. M. Littmann - Prof. P. Pfann." ORDER="3">
+                  <mets:fptr FILEID="PDF_2580966"/>
+                </mets:div>
+                <mets:div ID="log2580968" TYPE="section" LABEL="Mittelbau von Halle III. Architekt: W. Bertsch." ORDER="4">
+                  <mets:fptr FILEID="PDF_2580968"/>
+                </mets:div>
+                <mets:div ID="log2580973" TYPE="section" LABEL="Verbindungsbau mit Giebel-Relief. Architekt: Prof. P. Pfann." ORDER="5">
+                  <mets:fptr FILEID="PDF_2580973"/>
+                </mets:div>
+                <mets:div ID="log2580975" TYPE="section" LABEL="Theater-Café. Architekt: Prof. P. Pfann." ORDER="6">
+                  <mets:fptr FILEID="PDF_2580975"/>
+                </mets:div>
+                <mets:div ID="log2580977" TYPE="section" LABEL="Theater-Café. Ausstattung: A. Niemeyer." ORDER="7">
+                  <mets:fptr FILEID="PDF_2580977"/>
+                </mets:div>
+                <mets:div ID="log2580979" TYPE="section" LABEL="Theater-Café. Ausstattung: A. Niemeyer." ORDER="8">
+                  <mets:fptr FILEID="PDF_2580979"/>
+                </mets:div>
+                <mets:div ID="log2580984" TYPE="section" LABEL="Frühstückshalle im Nahrungsmittelhof. Architekt: R. Riemerschmid." ORDER="9">
+                  <mets:fptr FILEID="PDF_2580984"/>
+                </mets:div>
+                <mets:div ID="log2580986" TYPE="section" LABEL="Nahrungsmittelhof und Kosthallen. Architekt: Rich. Riemerschmid." ORDER="10">
+                  <mets:fptr FILEID="PDF_2580986"/>
+                </mets:div>
+                <mets:div ID="log2580988" TYPE="section" LABEL="Terrasse vor Halle II mit Steinbockfigur. Architekt: W. Bertsch. Bildhauer: U. Jansen." ORDER="11">
+                  <mets:fptr FILEID="PDF_2580988"/>
+                </mets:div>
+                <mets:div ID="log2580990" TYPE="section" LABEL="Halle I, Haupteingang. Architekt: W. Bertsch." ORDER="12">
+                  <mets:fptr FILEID="PDF_2580990"/>
+                </mets:div>
+                <mets:div ID="log2580995" TYPE="section" LABEL="Lichthof in Halle I. Architekt: P. Pfann. Bildhauer A. von Hildebrand." ORDER="13">
+                  <mets:fptr FILEID="PDF_2580995"/>
+                </mets:div>
+                <mets:div ID="log2580998" TYPE="section" LABEL="Friedhof. Architekt: W. Bestelmeyer." ORDER="14">
+                  <mets:fptr FILEID="PDF_2580998"/>
+                </mets:div>
+                <mets:div ID="log2581000" TYPE="section" LABEL="Zugang zum Friedhof. Architekt: W. Bestelmeyer." ORDER="15">
+                  <mets:fptr FILEID="PDF_2581000"/>
+                </mets:div>
+                <mets:div ID="log2581002" TYPE="section" LABEL="Kirchen-Raum. Architekt: W. Spannagel." ORDER="16">
+                  <mets:fptr FILEID="PDF_2581002"/>
+                </mets:div>
+                <mets:div ID="log2581004" TYPE="section" LABEL="Laubengang mit Groteskfiguren. Architekt: W. Bertsch. Bildhauer: J. Wackerle" ORDER="17">
+                  <mets:fptr FILEID="PDF_2581004"/>
+                </mets:div>
+                <mets:div ID="log2581006" TYPE="section" LABEL="Uhrturm und Postamt. Architekten: R. Schachner - E. Schweighart." ORDER="18">
+                  <mets:fptr FILEID="PDF_2581006"/>
+                </mets:div>
+                <mets:div ID="log2581008" TYPE="section" LABEL="Haupt-Restaurant (Mittelbau). Architekt: E. v. Seidl" ORDER="19">
+                  <mets:fptr FILEID="PDF_2581008"/>
+                </mets:div>
+                <mets:div ID="log2581010" TYPE="section" LABEL="Arkaden im Hauptrestaurant. Architekt: E. v. Seidl." ORDER="20">
+                  <mets:fptr FILEID="PDF_2581010"/>
+                </mets:div>
+                <mets:div ID="log2581012" TYPE="section" LABEL="Arkaden und Pavillon des Hauptrestaurants. Architekt: E. v. Seidl." ORDER="21">
+                  <mets:fptr FILEID="PDF_2581012"/>
+                </mets:div>
+                <mets:div ID="log2581015" TYPE="section" LABEL="Freske aus den Arkaden des Haupt-Restaurants. Prof. Jul. Diez." ORDER="22">
+                  <mets:fptr FILEID="PDF_2581015"/>
+                </mets:div>
+                <mets:div ID="log2581017" TYPE="section" LABEL="Gruppe „Reichtum&quot; an der Fontaine. Architekt: E. v. Seidl. Bildhauer: B. Bleecker." ORDER="23">
+                  <mets:fptr FILEID="PDF_2581017"/>
+                </mets:div>
+                <mets:div ID="log2581019" TYPE="section" LABEL="Blick in den Park. Reh von E. Georgii." ORDER="24">
+                  <mets:fptr FILEID="PDF_2581019"/>
+                </mets:div>
+                <mets:div ID="log2581024" TYPE="section" LABEL="Statue im Park: Der Sommer. von K. Ebbinghaus." ORDER="25">
+                  <mets:fptr FILEID="PDF_2581024"/>
+                </mets:div>
+                <mets:div ID="log2581026" TYPE="section" LABEL="Ländliches Gasthaus im Vergnügungspark. Architekt: Frz. Zell." ORDER="26">
+                  <mets:fptr FILEID="PDF_2581026"/>
+                </mets:div>
+                <mets:div ID="log2581029" TYPE="section" LABEL="Arbeiterhaus im Vergnügungspark. Architekt: R. Riemerschmid." ORDER="27">
+                  <mets:fptr FILEID="PDF_2581029"/>
+                </mets:div>
+                <mets:div ID="log2581032" TYPE="section" LABEL="Strasse im Vergnügungspark. Gesamtanordnung Architekt: R. Schachner." ORDER="28">
+                  <mets:fptr FILEID="PDF_2581032"/>
+                </mets:div>
+                <mets:div ID="log2581034" TYPE="section" LABEL="Ceylon-Teestube im Vergnügungspark. P. Danzer." ORDER="29">
+                  <mets:fptr FILEID="PDF_2581034"/>
+                </mets:div>
+                <mets:div ID="log2581037" TYPE="section" LABEL="Platz vor der Bierhalle. Architekten: O. Dietrich - O. Kurz - Frz. Zell." ORDER="30">
+                  <mets:fptr FILEID="PDF_2581037"/>
+                </mets:div>
+              </mets:div>
+              <mets:div ID="log2573129" TYPE="section" ORDER="4">
+                <mets:fptr FILEID="PDF_2573129"/>
+              </mets:div>
+            </mets:div>
+          </mets:structMap>
+          <mets:structLink>
+            <mets:smLink xlink:from="log2573092" xlink:to="phys2573093"/>
+            <mets:smLink xlink:from="log2573092" xlink:to="phys2573094"/>
+            <mets:smLink xlink:from="log2573095" xlink:to="phys2573096"/>
+            <mets:smLink xlink:from="log2573095" xlink:to="phys2573097"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573099"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573100"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573101"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573102"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573103"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573104"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573105"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573106"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573107"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573108"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573109"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573110"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573111"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573112"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573113"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573114"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573115"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573116"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573117"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573118"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573119"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573120"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573121"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573122"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573123"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573124"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573125"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573126"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573127"/>
+            <mets:smLink xlink:from="log2573098" xlink:to="phys2573128"/>
+            <mets:smLink xlink:from="log2580954" xlink:to="phys2573099"/>
+            <mets:smLink xlink:from="log2580964" xlink:to="phys2573100"/>
+            <mets:smLink xlink:from="log2580966" xlink:to="phys2573101"/>
+            <mets:smLink xlink:from="log2580968" xlink:to="phys2573102"/>
+            <mets:smLink xlink:from="log2580973" xlink:to="phys2573103"/>
+            <mets:smLink xlink:from="log2580975" xlink:to="phys2573104"/>
+            <mets:smLink xlink:from="log2580977" xlink:to="phys2573105"/>
+            <mets:smLink xlink:from="log2580979" xlink:to="phys2573106"/>
+            <mets:smLink xlink:from="log2580984" xlink:to="phys2573107"/>
+            <mets:smLink xlink:from="log2580986" xlink:to="phys2573108"/>
+            <mets:smLink xlink:from="log2580988" xlink:to="phys2573109"/>
+            <mets:smLink xlink:from="log2580990" xlink:to="phys2573110"/>
+            <mets:smLink xlink:from="log2580995" xlink:to="phys2573111"/>
+            <mets:smLink xlink:from="log2580998" xlink:to="phys2573112"/>
+            <mets:smLink xlink:from="log2581000" xlink:to="phys2573113"/>
+            <mets:smLink xlink:from="log2581002" xlink:to="phys2573114"/>
+            <mets:smLink xlink:from="log2581004" xlink:to="phys2573115"/>
+            <mets:smLink xlink:from="log2581006" xlink:to="phys2573116"/>
+            <mets:smLink xlink:from="log2581008" xlink:to="phys2573117"/>
+            <mets:smLink xlink:from="log2581010" xlink:to="phys2573118"/>
+            <mets:smLink xlink:from="log2581012" xlink:to="phys2573119"/>
+            <mets:smLink xlink:from="log2581015" xlink:to="phys2573120"/>
+            <mets:smLink xlink:from="log2581017" xlink:to="phys2573121"/>
+            <mets:smLink xlink:from="log2581019" xlink:to="phys2573122"/>
+            <mets:smLink xlink:from="log2581024" xlink:to="phys2573123"/>
+            <mets:smLink xlink:from="log2581026" xlink:to="phys2573124"/>
+            <mets:smLink xlink:from="log2581029" xlink:to="phys2573125"/>
+            <mets:smLink xlink:from="log2581032" xlink:to="phys2573126"/>
+            <mets:smLink xlink:from="log2581034" xlink:to="phys2573127"/>
+            <mets:smLink xlink:from="log2581037" xlink:to="phys2573128"/>
+            <mets:smLink xlink:from="log2573129" xlink:to="phys2573130"/>
+            <mets:smLink xlink:from="log2573129" xlink:to="phys2573131"/>
+          </mets:structLink>
+        </mets:mets>
+      </metadata>
+    </record>
+  </GetRecord>
+</OAI-PMH>
