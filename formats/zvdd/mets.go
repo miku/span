@@ -4,12 +4,12 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"log"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -230,8 +230,7 @@ func (r *MetsRecord) ToIntermediateSchema() (output *finc.IntermediateSchema, er
 		output.RawDate = dates[0]
 		output.Date, err = parseDate(output.RawDate)
 		if err != nil {
-			log.Println(err)
-			return output, nil
+			return output, span.Skip{Reason: fmt.Sprintf("Unparsed date: %s", output.RawDate)}
 		}
 	}
 
