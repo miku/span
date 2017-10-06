@@ -57,7 +57,8 @@ var FormatMap = map[string]Factory{
 	"degruyter": func() interface{} { return new(degruyter.Article) },
 	"thieme-tm": func() interface{} { return new(thieme.Document) },
 	"imslp":     func() interface{} { return new(imslp.Data) },
-	"zvdd":      func() interface{} { return new(zvdd.Record) },
+	"zvdd":      func() interface{} { return new(zvdd.DublicCoreRecord) },
+	"zvdd-mets": func() interface{} { return new(zvdd.MetsRecord) },
 	"dummy":     func() interface{} { return new(dummy.Example) },
 }
 
@@ -206,7 +207,7 @@ func main() {
 	}
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter":
+	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}

@@ -18,8 +18,8 @@ const (
 	Collection       = "ZVDD"
 )
 
-// Record is a sketch for highwire XML.
-type Record struct {
+// DublicCoreRecord is a sketch for highwire XML.
+type DublicCoreRecord struct {
 	XMLName xml.Name `xml:"Record"`
 	Header  struct {
 		Status     string   `xml:"status,attr"`
@@ -47,7 +47,7 @@ type Record struct {
 }
 
 // ToIntermediateSchema sketch.
-func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (r DublicCoreRecord) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	// oai:www.zvdd.de:urn:nbn:de:gbv:3:1-771990
