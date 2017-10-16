@@ -271,7 +271,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.RecordID)}
 	}
 
-	output.DOI = strings.Replace(doc.DOI, "//", "/", -1) // refs #6312
+	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
 	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
 	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
