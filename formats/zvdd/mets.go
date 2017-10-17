@@ -182,6 +182,7 @@ func (r *MetsRecord) URL() (urls []string) {
 	return
 }
 
+// URN returns the urn or an empty string.
 func (r *MetsRecord) URN() string {
 	mets := r.Metadata.Mets
 	mods := mets.DmdSection.Wrap.Data.Mods
