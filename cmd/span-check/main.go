@@ -38,7 +38,7 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return b, err
 		}
-		for _, t := range quality.TestSuite {
+		for _, t := range quality.TestSuiteFinc {
 			if err := t.TestRecord(is); err != nil {
 				issue, ok := err.(quality.Issue)
 				if !ok {

@@ -1,4 +1,5 @@
 // Package quality implements quality checks.
+// TODO: Look at the JSON schema.
 package quality
 
 import (
@@ -81,6 +82,11 @@ var TestSuite = []Tester{
 	TesterFunc(TestTitleTooLong),
 }
 
+var TestSuiteFinc = []Tester{
+	TesterFunc(TestFincStageOne),
+	TesterFunc(TestFincStageTwo),
+}
+
 // Tester is a intermediate record checker.
 type Tester interface {
 	TestRecord(finc.IntermediateSchema) error
@@ -108,6 +114,59 @@ func (i Issue) MarshalJSON() ([]byte, error) {
 		"err":    i.Err.Error(),
 		"record": i.Record,
 	})
+}
+
+// TestFincStageOne refers to stages from #9803.
+func TestFincStageOne(is finc.IntermediateSchema) error {
+	// rft.atitle (Artikel-/Chaptertitel)
+	// rft.jtitle (Zeitschriftentitel) | rft.btitle (Buchtitel)
+	// rft.date (Jahr)
+	// url | doi
+	if is.ArticleTitle == "" ||
+		is.JournalTitle == "" ||
+		is.Date.IsZero() ||
+		len(is.URL) == 0 || is.DOI == "" {
+		return fmt.Errorf("stage one fail")
+	}
+	return nil
+}
+
+// TestFincStageOne refers to stages from #9803.
+func TestFincStageTwo(is finc.IntermediateSchema) error {
+	// authors | rft.aucorp
+	// rft.volume
+	// rft.issue
+	// rft.pages | rft.spage & rft.epage
+	// alternativ: rft.artnum (Article Number) | rft.ssn (Season) | rft.quarter | (rft.chron)
+	// rft.issn | rft.eissn | rft.isbn | rft.eisbn
+	if err := TestFincStageOne(is); err != nil {
+		return err
+	}
+	if len(is.Authors) == 0 || is.Volume == "" || is.Issue == "" ||
+		is.Pages == "" || is.StartPage == "" || is.EndPage == "" {
+		return fmt.Errorf("stage two fail")
+	}
+	return nil
+}
+
+// TestFincStageeThree refers to stages from #9803.
+func TestFincStageThree(is finc.IntermediateSchema) error {
+	// abstract
+	// languages
+	// x.headings
+	// x.subjects
+	// x.fulltext
+	// rft.stitle (Kurztitel der ZS)
+	// rft.series
+	// rft.pub (publisher)
+	// rft.place (place of publication)
+	// rft.part
+	// rft.genre (Format)
+	// rft.edition
+	if err := TestFincStageTwo(is); err != nil {
+		return err
+	}
+	return nil // TODO
 }
 
 // TestKeyLength checks the length of the record id. memcachedb limits is 250 bytes.
