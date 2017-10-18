@@ -126,12 +126,12 @@ func TestFincStageOne(is finc.IntermediateSchema) error {
 		is.JournalTitle == "" ||
 		is.Date.IsZero() ||
 		len(is.URL) == 0 || is.DOI == "" {
-		return fmt.Errorf("stage one fail")
+		return Issue{Err: "stage one fail", Record: is}
 	}
 	return nil
 }
 
-// TestFincStageOne refers to stages from #9803.
+// TestFincStageTwo refers to stages from #9803.
 func TestFincStageTwo(is finc.IntermediateSchema) error {
 	// authors | rft.aucorp
 	// rft.volume
@@ -144,12 +144,12 @@ func TestFincStageTwo(is finc.IntermediateSchema) error {
 	}
 	if len(is.Authors) == 0 || is.Volume == "" || is.Issue == "" ||
 		is.Pages == "" || is.StartPage == "" || is.EndPage == "" {
-		return fmt.Errorf("stage two fail")
+		return Issue{Err: "stage two fail", Record: is}
 	}
 	return nil
 }
 
-// TestFincStageeThree refers to stages from #9803.
+// TestFincStageThree refers to stages from #9803.
 func TestFincStageThree(is finc.IntermediateSchema) error {
 	// abstract
 	// languages
