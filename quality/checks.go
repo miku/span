@@ -126,7 +126,7 @@ func TestFincStageOne(is finc.IntermediateSchema) error {
 		is.JournalTitle == "" ||
 		is.Date.IsZero() ||
 		len(is.URL) == 0 || is.DOI == "" {
-		return Issue{Err: "stage one fail", Record: is}
+		return Issue{Err: fmt.Errorf("stage one fail"), Record: is}
 	}
 	return nil
 }
@@ -144,7 +144,7 @@ func TestFincStageTwo(is finc.IntermediateSchema) error {
 	}
 	if len(is.Authors) == 0 || is.Volume == "" || is.Issue == "" ||
 		is.Pages == "" || is.StartPage == "" || is.EndPage == "" {
-		return Issue{Err: "stage two fail", Record: is}
+		return Issue{Err: fmt.Errorf("stage two fail"), Record: is}
 	}
 	return nil
 }
