@@ -244,6 +244,8 @@ func (r *MetsRecord) ToIntermediateSchema() (output *finc.IntermediateSchema, er
 		base64.RawURLEncoding.EncodeToString([]byte(r.Header.Identifier)))
 	output.MegaCollections = []string{"ZVDD"}
 	output.Genre = "document"
+	output.RefType = "EJOUR"
+	output.Format = "ElectronicArticle"
 	return output, nil
 }
 
