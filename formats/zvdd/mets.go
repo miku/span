@@ -236,7 +236,17 @@ func (r *MetsRecord) ToIntermediateSchema() (output *finc.IntermediateSchema, er
 	}
 
 	for _, lang := range mods.Language {
-		output.Languages = append(output.Languages, lang.Value)
+		if len(lang.Value) == 3 {
+			output.Languages = append(output.Languages, lang.Value)
+		} else {
+			l, err := span.DetectLang3(output.ArticleTitle)
+			if err != nil {
+				output.Languages = []string{"eng"}
+			} else {
+				output.Languages = []string{l}
+			}
+		}
+
 	}
 
 	output.SourceID = "93"
