@@ -45,6 +45,7 @@ type Solr5Vufind3 struct {
 	URL                  []string `json:"url,omitempty"`
 	PublishDate          []string `json:"publishDate,omitempty"`
 	Physical             []string `json:"physical,omitempty"`
+	Description          string   `json:"description"`
 
 	VF1Author           string   `json:"vf1_author,omitempty"`
 	VF1SecondaryAuthors []string `json:"vf1_author2,omitempty"`
@@ -192,6 +193,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.ContainerTitle = is.JournalTitle
 
 	s.Institutions = is.Labels
+	s.Description = is.Abstract
 
 	if withFullrecord {
 		// refs. #8031
