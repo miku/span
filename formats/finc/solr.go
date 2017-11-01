@@ -68,6 +68,7 @@ type Solr5Vufind3 struct {
 	FormatDeZi4  []string `json:"format_dezi4,omitempty"`
 	FormatDeZwi2 []string `json:"format_dezwi2,omitempty"`
 	FormatNrw    []string `json:"format_nrw,omitempty"`
+	BranchNrw    string   `json:"branch_nrw,omitempty"` // refs #11605
 }
 
 // Export fulfuls finc.Exporter interface, so we can plug this into cmd/span-export. Takes
@@ -171,6 +172,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	}
 
 	s.AccessFacet = AIAccessFacet
+	s.BranchNrw = s.AccessFacet // refs #11605
 
 	// site specific formats, TODO: fix this soon
 	s.FormatDe105 = []string{FormatDe105.LookupDefault(is.Format, "")}
