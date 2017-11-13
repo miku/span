@@ -226,6 +226,14 @@ func TestCovers(t *testing.T) {
 			"bogus date",
 			Entry{FirstIssueDate: "1870-05"}, "06066-12-01T00:00:00Z", "", "", ErrInvalidDate,
 		},
+		{
+			"only issn, refs #11579",
+			Entry{OnlineIdentifier: "2477-5975"}, "", "", "", ErrInvalidDate,
+		},
+		{
+			"only issn, refs #11579, record has date",
+			Entry{OnlineIdentifier: "2477-5975"}, "1967-12-01T00:00:00Z", "", "", nil,
+		},
 	}
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
