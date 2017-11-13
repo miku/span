@@ -16,6 +16,12 @@ Hello	123
 publication_title	print_identifier	online_identifier	date_first_issue_online	num_first_vol_online	num_first_issue_online	date_last_issue_online	num_last_vol_online	num_last_issue_online	title_url	first_author	title_id	embargo_info	coverage_depth	coverage_notes	publisher_name	own_anchor	package:collection	il_relevance	il_nationwide	il_electronic_transmission	il_comment	all_issns	zdb_id
  Bill of Rights Journal (via Hein Online)	0006-2499		1968	1		1996	29		http://heinonline.org/HOL/Index?index=journals/blorij&collection=journals		227801		Volltext		via Hein Online		HEIN:hein	Keine Fernleihe				0006-2499	2805467-2
 `
+
+	// Test a single ISSN list, refs #11579.
+	testThree = `
+	online_identifier
+	2560-6050
+`
 )
 
 type TestSimple struct {
@@ -127,6 +133,22 @@ func TestDecodeKbart(t *testing.T) {
 		InterlibraryComment:                "",
 		AllSerialNumbers:                   "0006-2499",
 		ZDBID:                              "2805467-2",
+	}
+	if !reflect.DeepEqual(example, expected) {
+		t.Errorf("Decode: got %#v, want %#v", example, expected)
+	}
+}
+
+func TestDecodeSingleColumnKbart(t *testing.T) {
+	dec := NewDecoder(strings.NewReader(testThree))
+
+	var example TestEntry
+	if err := dec.Decode(&example); err != nil {
+		t.Errorf(err.Error())
+	}
+
+	expected := TestEntry{
+		OnlineIdentifier: "2560-6050",
 	}
 	if !reflect.DeepEqual(example, expected) {
 		t.Errorf("Decode: got %#v, want %#v", example, expected)
