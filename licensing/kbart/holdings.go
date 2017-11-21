@@ -45,7 +45,7 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 }
 
 // SerialNumberMap creates a map from ISSN to associated licensing entries. This
-// is here for performance mostly, so we can do fast lookups per ISSN.
+// is here for performance mostly, so we can access relevant licensing entry by ISSN.
 func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 	cache := make(map[string]map[licensing.Entry]bool)
 	for _, e := range *h {

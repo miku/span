@@ -126,7 +126,7 @@ func (f *HoldingsFilter) covers(entry licensing.Entry, is finc.IntermediateSchem
 }
 
 // Apply returns true, if there is a valid holding for a given record. This will
-// take multiple attibutes like date, volume, issue and embargo into account. This
+// take multiple attributes like date, volume, issue and embargo into account. This
 // function is very specific: it works only with intermediate format and it uses specific
 // information from that format to decide on attachment.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {

@@ -36,8 +36,8 @@ func (f *Tree) Apply(is finc.IntermediateSchema) bool {
 	return f.root.Apply(is)
 }
 
-// Tagger is takes a list of tags (ISILs) and annotates and intermediate schema
-// according to a number of filters, defined per label. The tagger can be loaded
+// Tagger takes a list of tags (ISILs) and annotates an intermediate schema
+// according to a number of filters, defined per label. The tagger is loaded
 // directly from JSON.
 type Tagger struct {
 	filtermap map[string]Tree
@@ -134,7 +134,7 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 }
 
 // firstKey returns the top level key of an object, given as a raw JSON message.
-// It peeks into the fragment. An empty document will cause an error, as
+// It peeks into the fragment. An empty document will cause an error, as will
 // multiple top level keys.
 func firstKey(raw json.RawMessage) (string, error) {
 	var peeker = make(map[string]interface{})
