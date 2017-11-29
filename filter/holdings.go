@@ -21,7 +21,10 @@ type holdingsItem struct {
 }
 
 // holdingsCache caches items keyed by filename or url. A configuration might
-// refer to the same holding file hundreds or thousands of times.
+// refer to the same holding file hundreds or thousands of times, but we only
+// want to store the content once. This map serves as a private singleton that
+// holds licensing entries and precomputed shortcuts to find relevant entries
+// (rows from KBART) by issn, wiso db name or title.
 type holdingsCache map[string]holdingsItem
 
 // addReader reads a holding file from a reader and caches it under the given key.
@@ -63,7 +66,11 @@ func (c *holdingsCache) addLink(link string) error {
 // cache caches holdings information.
 var cache = make(holdingsCache)
 
-// HoldingsFilter uses the new licensing package.
+// HoldingsFilter compares a record to a kbart file. Since this filter lives in
+// memory and the configuration for a single run (which this filter value is
+// part of) might contain many other holdings filters, we only want to store
+// the content once. This is done via a private cache. The holdings filter only
+// needs to remember the keys (filename or URL) to access entries at runtime.
 type HoldingsFilter struct {
 	names          []string // Keep cache keys only (filename or URL of holdings document).
 	verbose        bool
