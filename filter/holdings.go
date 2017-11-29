@@ -17,6 +17,7 @@ type holdingsItem struct {
 	holdings        *kbart.Holdings              // raw holdings data
 	serialNumberMap map[string][]licensing.Entry // key: ISSN
 	wisoDatabaseMap map[string][]licensing.Entry // key: WISO DB name
+	titleMap        map[string][]licensing.Entry // key: publication title
 }
 
 // holdingsCache caches items keyed by filename or url. A configuration might
@@ -33,10 +34,12 @@ func (c *holdingsCache) addReader(key string, r io.Reader) error {
 	if _, err := h.ReadFrom(r); err != nil {
 		return err
 	}
+	// Precompute shortcuts to entries.
 	(*c)[key] = holdingsItem{
 		holdings:        h,
 		serialNumberMap: h.SerialNumberMap(),
 		wisoDatabaseMap: h.WisoDatabaseMap(),
+		titleMap:        h.TitleMap(),
 	}
 	return nil
 }
@@ -62,8 +65,9 @@ var cache = make(holdingsCache)
 
 // HoldingsFilter uses the new licensing package.
 type HoldingsFilter struct {
-	names   []string // Keep cache keys only (filename or URL of holdings document).
-	verbose bool
+	names          []string // Keep cache keys only (filename or URL of holdings document).
+	verbose        bool
+	compareByTitle bool // Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
 }
 
 // count returns the number of entries loaded for this filter.
@@ -78,10 +82,11 @@ func (f *HoldingsFilter) count() (count int) {
 func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	var s struct {
 		Holdings struct {
-			Filename  string   `json:"file"` // compat
-			Filenames []string `json:"files"`
-			Links     []string `json:"urls"`
-			Verbose   bool     `json:"verbose"`
+			Filename       string   `json:"file"` // compat
+			Filenames      []string `json:"files"`
+			Links          []string `json:"urls"`
+			Verbose        bool     `json:"verbose"`
+			CompareByTitle bool     `json:"compare-by-title"`
 		} `json:"holdings"`
 	}
 	if err := json.Unmarshal(p, &s); err != nil {
@@ -105,7 +110,10 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		}
 		f.names = append(f.names, link)
 	}
+
 	f.verbose = s.Holdings.Verbose
+	f.compareByTitle = s.Holdings.CompareByTitle
+
 	log.Printf("holdings: loaded: %d/%d", len(f.names), f.count())
 	return nil
 }
@@ -135,6 +143,17 @@ func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 		for _, key := range f.names {
 			item := cache[key]
 			for _, entry := range item.serialNumberMap[issn] {
+				if f.covers(entry, is) {
+					return true
+				}
+			}
+		}
+	}
+	// Optionally test by title, refs. #10707.
+	if f.compareByTitle {
+		for _, key := range f.names {
+			item := cache[key]
+			for _, entry := range item.titleMap[is.ArticleTitle] {
 				if f.covers(entry, is) {
 					return true
 				}

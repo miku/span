@@ -66,6 +66,25 @@ func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 	return result
 }
 
+// TitleMap maps an exact title to a list of entries.
+func (h *Holdings) TitleMap() map[string][]licensing.Entry {
+	cache := make(map[string]map[licensing.Entry]bool)
+	for _, e := range *h {
+		if cache[e.PublicationTitle] == nil {
+			cache[e.PublicationTitle] = make(map[licensing.Entry]bool)
+		}
+		cache[e.PublicationTitle][e] = true
+	}
+	// Make unique.
+	result := make(map[string][]licensing.Entry)
+	for title, entrymap := range cache {
+		for k := range entrymap {
+			result[title] = append(result[title], k)
+		}
+	}
+	return result
+}
+
 // WisoDatabaseMap derives a structure from the holdings file, that maps WISO
 // database names to the associated entries, refs. #9534.
 func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
