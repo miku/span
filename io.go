@@ -111,9 +111,8 @@ func (r *ZipContentReader) Read(p []byte) (int, error) {
 	return r.buf.Read(p)
 }
 
-// FileReader creates a ReadCloser from a filename. If postpones error handling up
-// until the first read.
-// TODO: Throw this out.
+// FileReader creates a ReadCloser from a filename. If postpones error handling
+// up until the first read.  TODO(miku): Throw this out.
 type FileReader struct {
 	Filename string
 	f        *os.File
