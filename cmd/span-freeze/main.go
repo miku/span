@@ -91,7 +91,7 @@ func main() {
 		resp, err := http.Get(u)
 		if err != nil {
 			if *bestEffort {
-				log.Printf("[%04d %u] %s", i, u, err)
+				log.Printf("[%04d %s] %v", i, u, err)
 				continue
 			} else {
 				log.Fatal(err)
