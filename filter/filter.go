@@ -40,13 +40,13 @@ func (t *Tree) Apply(is finc.IntermediateSchema) bool {
 // according to a number of filters, defined per label. The tagger is loaded
 // directly from JSON.
 type Tagger struct {
-	filtermap map[string]Tree
+	FilterMap map[string]Tree
 }
 
 // Tag takes an intermediate schema record and returns a labeled version of that
 // record.
 func (t *Tagger) Tag(is finc.IntermediateSchema) finc.IntermediateSchema {
-	for tag, filter := range t.filtermap {
+	for tag, filter := range t.FilterMap {
 		if filter.Apply(is) {
 			is.Labels = append(is.Labels, tag)
 		}
@@ -56,8 +56,8 @@ func (t *Tagger) Tag(is finc.IntermediateSchema) finc.IntermediateSchema {
 
 // UnmarshalJSON unmarshals a complete filter config from serialized JSON.
 func (t *Tagger) UnmarshalJSON(p []byte) error {
-	t.filtermap = make(map[string]Tree)
-	return json.Unmarshal(p, &t.filtermap)
+	t.FilterMap = make(map[string]Tree)
+	return json.Unmarshal(p, &t.FilterMap)
 }
 
 // unmarshalFilter takes the name of a filter and a raw JSON message and
