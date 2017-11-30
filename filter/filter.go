@@ -14,7 +14,7 @@ type Filter interface {
 
 // Tree allows polymorphic filters.
 type Tree struct {
-	root Filter
+	Root Filter
 }
 
 // UnmarshalJSON gathers the top level filter name and unmarshals the associated filter.
@@ -27,13 +27,13 @@ func (t *Tree) UnmarshalJSON(p []byte) error {
 	if err != nil {
 		return err
 	}
-	t.root = filter
+	t.Root = filter
 	return nil
 }
 
 // Apply applies the root filter.
 func (t *Tree) Apply(is finc.IntermediateSchema) bool {
-	return t.root.Apply(is)
+	return t.Root.Apply(is)
 }
 
 // Tagger takes a list of tags (ISILs) and annotates an intermediate schema
