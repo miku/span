@@ -80,7 +80,7 @@ func main() {
 		}
 
 		dec := gob.NewDecoder(f)
-		if err := dec.Decode(tagger); err != nil {
+		if err := dec.Decode(&tagger); err != nil {
 			log.Fatal(err)
 		}
 		log.Printf("unfreeze from %s completed", *unfreeze)
