@@ -74,7 +74,7 @@ func main() {
 
 	for i, u := range uniq {
 		// Do not break on mailto: and the like.
-		if !strings.HasPrefix("http", u) {
+		if !strings.HasPrefix(u, "http") {
 			log.Printf("ignoring %s", u)
 			continue
 		}
