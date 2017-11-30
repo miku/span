@@ -19,6 +19,7 @@ import (
 	"runtime/pprof"
 
 	"github.com/miku/span"
+	"github.com/miku/span/container"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
@@ -57,6 +58,7 @@ func main() {
 	var tagger filter.Tagger
 
 	// Register types to freeze.
+	gob.Register(container.StringSet{})
 	gob.Register(filter.AndFilter{})
 	gob.Register(filter.AnyFilter{})
 	gob.Register(filter.CollectionFilter{})
