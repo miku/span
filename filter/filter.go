@@ -18,7 +18,7 @@ type Tree struct {
 }
 
 // UnmarshalJSON gathers the top level filter name and unmarshals the associated filter.
-func (f *Tree) UnmarshalJSON(p []byte) error {
+func (t *Tree) UnmarshalJSON(p []byte) error {
 	name, err := firstKey(p)
 	if err != nil {
 		return err
@@ -27,13 +27,13 @@ func (f *Tree) UnmarshalJSON(p []byte) error {
 	if err != nil {
 		return err
 	}
-	f.root = filter
+	t.root = filter
 	return nil
 }
 
 // Apply applies the root filter.
-func (f *Tree) Apply(is finc.IntermediateSchema) bool {
-	return f.root.Apply(is)
+func (t *Tree) Apply(is finc.IntermediateSchema) bool {
+	return t.root.Apply(is)
 }
 
 // Tagger takes a list of tags (ISILs) and annotates an intermediate schema

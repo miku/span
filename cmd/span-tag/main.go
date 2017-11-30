@@ -8,6 +8,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/gob"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -29,6 +30,7 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	freeze := flag.String("freeze", "", "freeze a filterconfig to a given filename")
 
 	flag.Parse()
 
@@ -50,19 +52,21 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// the configuration tree
+	// The configuration tree.
 	var tagger filter.Tagger
 
-	// test, if we are given JSON directly
+	// XXX: Check, if we should unfreeze a configuration.
+	// ...
+
+	// Test, if we are given JSON directly.
 	err := json.Unmarshal([]byte(*config), &tagger)
 	if err != nil {
-		// read and parse config file
+		// Read and parse config file.
 		f, err := os.Open(*config)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer f.Close()
-
 		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
 			log.Fatal(err)
 		}
@@ -81,6 +85,22 @@ func main() {
 			files = append(files, f)
 		}
 		reader = io.MultiReader(files...)
+	}
+
+	// At this points, we should have an in-memory representation of the free.
+	if *freeze != "" {
+		f, err := os.Create(*freeze)
+		if err != nil {
+			log.Fatal(err)
+		}
+		enc := gob.NewEncoder(f)
+		if err := enc.Encode(tagger); err != nil {
+			log.Fatal(err)
+		}
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
 	}
 
 	w := bufio.NewWriter(os.Stdout)
