@@ -89,7 +89,7 @@ func (doc *Document) Tag(f Filter) error {
 DONE:
 
 * Reuse more generic code, e.g. [parallel](http://github.com/miku/parallel)
-* Make conversions a simpler with [xmlstream](https://github.com/miku/xmlstream)
+* Make conversions a simpler with [xmlstream](https://github.com/miku/xmlstream), [zek](https://github.com/miku/zek)
 
 Licence
 -------
