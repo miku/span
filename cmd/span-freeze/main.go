@@ -1,7 +1,11 @@
-// freeze file containing urls along with the content of all urls.
+// Freeze file containing urls along with the content of all urls. Frozen file
+// will be a zip file, containing (by default):
 //
 //     /blob
+//     /mapping.json
 //     /files/<sha1 of url>
+//     /files/<sha1 of url>
+//     /files/...
 //
 package main
 
@@ -21,6 +25,12 @@ import (
 	"mvdan.cc/xurls"
 )
 
+const (
+	NameBlob    = "blob"
+	NameMapping = "mapping.json"
+	NameDir     = "files"
+)
+
 func main() {
 	output := flag.String("o", "", "output file")
 	flag.Parse()
@@ -29,7 +39,6 @@ func main() {
 		log.Fatal("output file required")
 	}
 
-	// Output will be a zipfile.
 	file, err := os.Create(*output)
 	if err != nil {
 		log.Fatal(err)
@@ -37,21 +46,21 @@ func main() {
 
 	w := zip.NewWriter(file)
 
-	seen := make(map[string]bool)
-	var uniq []string
-
 	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	f, err := w.Create("blob")
+	f, err := w.Create(NameBlob)
 	if err != nil {
 		log.Fatal(err)
 	}
 	f.Write(b)
 
 	urls := xurls.Strict().FindAllString(string(b), -1)
+
+	seen := make(map[string]bool)
+	var uniq []string
 
 	for _, u := range urls {
 		if _, ok := seen[u]; !ok {
@@ -60,14 +69,13 @@ func main() {
 		}
 	}
 
-	// Keep an additional mapping to simplify reading later.
+	// Not necessary, but keep an additional mapping to simplify reading later.
 	mapping := make(map[string]string)
 
-	for _, u := range uniq {
-		// Create a unique name.
+	for i, u := range uniq {
 		h := sha1.New()
 		h.Write([]byte(u))
-		name := fmt.Sprintf("files/%x", h.Sum(nil))
+		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
 
 		mapping[u] = name
 
@@ -77,7 +85,6 @@ func main() {
 		}
 		defer resp.Body.Close()
 
-		// Create zip entry.
 		f, err := w.Create(name)
 		if err != nil {
 			log.Fatal(err)
@@ -85,17 +92,16 @@ func main() {
 		if _, err := io.Copy(f, resp.Body); err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("%s -> %s", u, name)
+		log.Printf("[%04d %s] %s", i, name, u)
 	}
 
-	f, err = w.Create("mapping.json")
+	f, err = w.Create(NameMappings)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if err := json.NewEncoder(f).Encode(mapping); err != nil {
 		log.Fatal(err)
 	}
-
 	if err := w.Close(); err != nil {
 		log.Fatal(err)
 	}
