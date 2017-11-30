@@ -8,7 +8,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/gob"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -19,7 +18,6 @@ import (
 	"runtime/pprof"
 
 	"github.com/miku/span"
-	"github.com/miku/span/container"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
@@ -31,8 +29,6 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	freeze := flag.String("freeze", "", "freeze a filterconfig to a given filename")
-	unfreeze := flag.String("unfreeze", "", "unfreeze a filterconfig from a file")
 
 	flag.Parse()
 
@@ -41,7 +37,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *config == "" && *freeze == "" && *unfreeze == "" {
+	if *config == "" {
 		log.Fatal("config file required, or unfreeze")
 	}
 
@@ -57,62 +53,18 @@ func main() {
 	// The configuration tree.
 	var tagger filter.Tagger
 
-	// Register types to freeze.
-	gob.Register(container.StringSet{})
-	gob.Register(filter.AndFilter{})
-	gob.Register(filter.AnyFilter{})
-	gob.Register(filter.CollectionFilter{})
-	gob.Register(filter.DOIFilter{})
-	gob.Register(filter.HoldingsFilter{})
-	gob.Register(filter.ISSNFilter{})
-	gob.Register(filter.NotFilter{})
-	gob.Register(filter.OrFilter{})
-	gob.Register(filter.PackageFilter{})
-	gob.Register(filter.SourceFilter{})
-	gob.Register(filter.SubjectFilter{})
-
-	// Unfreezing preferred. XXX(miku): Unfreeze holdings and cache.
-	if *unfreeze != "" {
-		f, err := os.Open(*unfreeze)
+	// Test, if we are given JSON directly.
+	err := json.Unmarshal([]byte(*config), &tagger)
+	if err != nil {
+		// Fallback to parse config file.
+		f, err := os.Open(*config)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		dec := gob.NewDecoder(f)
-		if err := dec.Decode(&tagger); err != nil {
+		defer f.Close()
+		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("unfreeze from %s completed", *unfreeze)
-	} else {
-		// Test, if we are given JSON directly.
-		err := json.Unmarshal([]byte(*config), &tagger)
-		if err != nil {
-			// Fallback to parse config file.
-			f, err := os.Open(*config)
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer f.Close()
-			if err := json.NewDecoder(f).Decode(&tagger); err != nil {
-				log.Fatal(err)
-			}
-		}
-	}
-
-	// At this points, we should have an in-memory representation of the tree.
-	if *freeze != "" {
-		f, err := os.Create(*freeze)
-		if err != nil {
-			log.Fatal(err)
-		}
-		enc := gob.NewEncoder(f)
-		if err := enc.Encode(tagger); err != nil {
-			log.Fatal(err)
-		}
-		if err := f.Close(); err != nil {
-			log.Fatal(err)
-		}
-		os.Exit(0)
 	}
 
 	w := bufio.NewWriter(os.Stdout)
