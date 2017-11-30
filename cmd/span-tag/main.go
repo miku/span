@@ -55,7 +55,13 @@ func main() {
 	var tagger filter.Tagger
 
 	if *unfreeze != "" {
-		log.Fatal("unfreeze me")
+		dir, filterconfig, err := span.UnfreezeFilterConfig(*unfreeze)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("unfrooze filterconfig to: %s", filterconfig)
+		defer os.RemoveAll(dir)
+		*config = filterconfig
 	}
 
 	// Test, if we are given JSON directly.
