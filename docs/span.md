@@ -224,6 +224,10 @@ Example usage:
 
   `span-freeze -o frozen.zip < filterconfig.json`
 
+Generic usage:
+
+  `span-freeze -b -o site.zip < <(curl -sL http://www.ub.uni-leipzig.de)`
+
 FILES
 -----
 
