@@ -8,7 +8,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/gob"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -56,13 +55,13 @@ func main() {
 	// The configuration tree.
 	var tagger filter.Tagger
 
-	// Unfreezing preferred.
+	// Unfreezing preferred. XXX(miku): Unfreeze holdings and cache.
 	if *unfreeze != "" {
 		f, err := os.Open(*unfreeze)
 		if err != nil {
 			log.Fatal(err)
 		}
-		dec := gob.NewDecoder(f)
+		dec := json.NewDecoder(f)
 		if err := dec.Decode(tagger); err != nil {
 			log.Fatal(err)
 		}
@@ -89,7 +88,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		enc := gob.NewEncoder(f)
+		enc := json.NewEncoder(f)
 		if err := enc.Encode(tagger); err != nil {
 			log.Fatal(err)
 		}
