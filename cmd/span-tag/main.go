@@ -74,6 +74,7 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println(string(b))
+		os.Exit(0)
 	}
 
 	w := bufio.NewWriter(os.Stdout)
