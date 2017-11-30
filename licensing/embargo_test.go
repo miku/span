@@ -30,7 +30,13 @@ func TestEmbargoDuration(t *testing.T) {
 			embargo: Embargo("R1Y"), dur: mustParseDuration("8760h"), err: nil,
 		},
 		{
+			embargo: Embargo("R1M"), dur: mustParseDuration("730h"), err: nil,
+		},
+		{
 			embargo: Embargo("RaY"), dur: 0, err: ErrInvalidEmbargo,
+		},
+		{
+			embargo: Embargo("RRR"), dur: 0, err: ErrInvalidEmbargo,
 		},
 	}
 	for _, c := range cases {
