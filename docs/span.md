@@ -5,7 +5,7 @@ NAME
 ----
 
 span-import, span-tag, span-check, span-export, span-oa-filter,
-span-update-labels, span-crossref-snapshot, span-local-data - intermediate
+span-update-labels, span-crossref-snapshot, span-local-data, span-freeze - intermediate
 schema tools
 
 SYNOPSIS
