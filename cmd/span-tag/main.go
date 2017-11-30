@@ -31,6 +31,7 @@ func main() {
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 	freeze := flag.String("freeze", "", "freeze a filterconfig to a given filename")
+	unfreeze := flag.String("unfreeze", "", "unfreeze a filterconfig from a file")
 
 	flag.Parse()
 
@@ -39,8 +40,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *config == "" {
-		log.Fatal("config file required")
+	if *config == "" && *freeze == "" {
+		log.Fatal("config file required, or unfreeze")
 	}
 
 	if *cpuprofile != "" {
@@ -55,36 +56,31 @@ func main() {
 	// The configuration tree.
 	var tagger filter.Tagger
 
-	// XXX: Check, if we should unfreeze a configuration.
-	// ...
-
-	// Test, if we are given JSON directly.
-	err := json.Unmarshal([]byte(*config), &tagger)
-	if err != nil {
-		// Read and parse config file.
-		f, err := os.Open(*config)
+	// Unfreezing preferred.
+	if *unfreeze != "" {
+		f, err := os.Open(*unfreeze)
 		if err != nil {
 			log.Fatal(err)
 		}
-		defer f.Close()
-		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
+		dec := gob.NewDecoder(f)
+		if err := dec.Decode(tagger); err != nil {
 			log.Fatal(err)
 		}
-	}
-
-	var reader io.Reader = os.Stdin
-
-	if flag.NArg() > 0 {
-		var files []io.Reader
-		for _, filename := range flag.Args() {
-			f, err := os.Open(filename)
+		log.Printf("unfreeze from %s completed", *unfreeze)
+	} else {
+		// Test, if we are given JSON directly.
+		err := json.Unmarshal([]byte(*config), &tagger)
+		if err != nil {
+			// Fallback to parse config file.
+			f, err := os.Open(*config)
 			if err != nil {
 				log.Fatal(err)
 			}
 			defer f.Close()
-			files = append(files, f)
+			if err := json.NewDecoder(f).Decode(&tagger); err != nil {
+				log.Fatal(err)
+			}
 		}
-		reader = io.MultiReader(files...)
 	}
 
 	// At this points, we should have an in-memory representation of the free.
@@ -105,6 +101,21 @@ func main() {
 
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
+
+	var reader io.Reader = os.Stdin
+
+	if flag.NArg() > 0 {
+		var files []io.Reader
+		for _, filename := range flag.Args() {
+			f, err := os.Open(filename)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer f.Close()
+			files = append(files, f)
+		}
+		reader = io.MultiReader(files...)
+	}
 
 	p := parallel.NewProcessor(bufio.NewReader(reader), w, func(_ int64, b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
@@ -128,5 +139,4 @@ func main() {
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
-
 }
