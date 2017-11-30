@@ -8,12 +8,12 @@ import (
 
 // SourceFilter allows all records with the given source id or ids.
 type SourceFilter struct {
-	values []string
+	Values []string
 }
 
 // Apply filter.
 func (f *SourceFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.values {
+	for _, v := range f.Values {
 		if v == is.SourceID {
 			return true
 		}
@@ -29,6 +29,6 @@ func (f *SourceFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = s.Sources
+	f.Values = s.Sources
 	return nil
 }

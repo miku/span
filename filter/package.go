@@ -9,13 +9,13 @@ import (
 
 // PackageFilter allows all records of one of the given package name.
 type PackageFilter struct {
-	values *container.StringSet
+	Values *container.StringSet
 }
 
 // Apply filters packages.
 func (f *PackageFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, pkg := range is.Packages {
-		if f.values.Contains(pkg) {
+		if f.Values.Contains(pkg) {
 			return true
 		}
 	}
@@ -30,6 +30,6 @@ func (f *PackageFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = container.NewStringSet(s.Packages...)
+	f.Values = container.NewStringSet(s.Packages...)
 	return nil
 }

@@ -9,12 +9,12 @@ import (
 
 // OrFilter returns true, if at least one filter matches.
 type OrFilter struct {
-	filters []Filter
+	Filters []Filter
 }
 
 // Apply returns true, if any of the filters returns true. Short circuited.
 func (f *OrFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, f := range f.filters {
+	for _, f := range f.Filters {
 		if f.Apply(is) {
 			return true
 		}
@@ -30,18 +30,18 @@ func (f *OrFilter) UnmarshalJSON(p []byte) (err error) {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.filters, err = unmarshalFilterList(s.Filters)
+	f.Filters, err = unmarshalFilterList(s.Filters)
 	return err
 }
 
 // AndFilter returns true, only if all filters return true.
 type AndFilter struct {
-	filters []Filter
+	Filters []Filter
 }
 
 // Apply returns false if any of the filters returns false. Short circuited.
 func (f *AndFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, f := range f.filters {
+	for _, f := range f.Filters {
 		if !f.Apply(is) {
 			return false
 		}
@@ -57,18 +57,18 @@ func (f *AndFilter) UnmarshalJSON(p []byte) (err error) {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.filters, err = unmarshalFilterList(s.Filters)
+	f.Filters, err = unmarshalFilterList(s.Filters)
 	return err
 }
 
 // NotFilter inverts another filter.
 type NotFilter struct {
-	filter Filter
+	Filter Filter
 }
 
 // Apply inverts another filter.
 func (f *NotFilter) Apply(is finc.IntermediateSchema) bool {
-	return !f.filter.Apply(is)
+	return !f.Filter.Apply(is)
 }
 
 // UnmarshalJSON turns a config fragment into a not filter.
@@ -88,6 +88,6 @@ func (f *NotFilter) UnmarshalJSON(p []byte) (err error) {
 	if len(filters) == 0 {
 		return fmt.Errorf("no filter to invert")
 	}
-	f.filter = filters[0]
+	f.Filter = filters[0]
 	return nil
 }

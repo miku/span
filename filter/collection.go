@@ -9,13 +9,13 @@ import (
 
 // CollectionFilter returns true, if the record belongs to any one of the collections.
 type CollectionFilter struct {
-	values *container.StringSet
+	Values *container.StringSet
 }
 
 // Apply filter.
 func (f *CollectionFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, c := range is.MegaCollections {
-		if f.values.Contains(c) {
+		if f.Values.Contains(c) {
 			return true
 		}
 	}
@@ -30,6 +30,6 @@ func (f *CollectionFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = container.NewStringSet(s.Collections...)
+	f.Values = container.NewStringSet(s.Collections...)
 	return nil
 }

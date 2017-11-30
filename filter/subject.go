@@ -9,13 +9,13 @@ import (
 
 // SubjectFilter returns true, if the record has an exact string match to one of the given subjects.
 type SubjectFilter struct {
-	values *container.StringSet
+	Values *container.StringSet
 }
 
 // Apply filter.
 func (f *SubjectFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, s := range is.Subjects {
-		if f.values.Contains(s) {
+		if f.Values.Contains(s) {
 			return true
 		}
 	}
@@ -30,6 +30,6 @@ func (f *SubjectFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = container.NewStringSet(s.Subjects...)
+	f.Values = container.NewStringSet(s.Subjects...)
 	return nil
 }

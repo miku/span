@@ -12,14 +12,14 @@ import (
 
 // ISSNFilter allows records with a certain ISSN.
 type ISSNFilter struct {
-	values *container.StringSet
+	Values *container.StringSet
 }
 
 // Apply applies ISSN filter on intermediate schema, no distinction between ISSN
 // and EISSN.
 func (f *ISSNFilter) Apply(is finc.IntermediateSchema) bool {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		if f.values.Contains(issn) {
+		if f.Values.Contains(issn) {
 			return true
 		}
 	}
@@ -38,7 +38,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.values = container.NewStringSet()
+	f.Values = container.NewStringSet()
 
 	if s.ISSN.Link != "" {
 		slink := span.SavedLink{Link: s.ISSN.Link}
@@ -66,11 +66,11 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			if issns.Size() == 0 {
 				log.Printf("issn: warning: no ISSNs found on line: %s", line)
 			}
-			f.values.AddAll(issns.Values()...)
+			f.Values.AddAll(issns.Values()...)
 		}
 	}
 	// Add any ISSN given as string in configuration.
-	f.values.AddAll(s.ISSN.Values...)
-	log.Printf("issn: collected %d ISSN", f.values.Size())
+	f.Values.AddAll(s.ISSN.Values...)
+	log.Printf("issn: collected %d ISSN", f.Values.Size())
 	return nil
 }

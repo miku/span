@@ -10,12 +10,12 @@ import (
 // DOIFilter allows records with a given DOI. Can be used in conjuction with
 // "not" to create blacklists.
 type DOIFilter struct {
-	values []string
+	Values []string
 }
 
 // Apply applies the filter.
 func (f *DOIFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.values {
+	for _, v := range f.Values {
 		if v == is.DOI {
 			return true
 		}
@@ -39,8 +39,8 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 		if err != nil {
 			return err
 		}
-		f.values = append(f.values, lines...)
+		f.Values = append(f.Values, lines...)
 	}
-	f.values = append(f.values, s.DOI.Values...)
+	f.Values = append(f.Values, s.DOI.Values...)
 	return nil
 }
