@@ -8,6 +8,7 @@ package main
 import (
 	"archive/zip"
 	"crypto/sha1"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -59,11 +60,16 @@ func main() {
 		}
 	}
 
+	// Keep an additional mapping to simplify reading later.
+	mapping := make(map[string]string)
+
 	for _, u := range uniq {
 		// Create a unique name.
 		h := sha1.New()
 		h.Write([]byte(u))
 		name := fmt.Sprintf("files/%x", h.Sum(nil))
+
+		mapping[u] = name
 
 		resp, err := http.Get(u)
 		if err != nil {
@@ -80,6 +86,14 @@ func main() {
 			log.Fatal(err)
 		}
 		log.Printf("%s -> %s", u, name)
+	}
+
+	f, err = w.Create("mapping.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := json.NewEncoder(f).Encode(mapping); err != nil {
+		log.Fatal(err)
 	}
 
 	if err := w.Close(); err != nil {
