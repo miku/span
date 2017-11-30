@@ -69,11 +69,11 @@ func main() {
 	}
 
 	if *freeze {
-		b, err := json.Marshal(tagger)
-		if err != nil {
+		enc := json.NewEncoder(os.Stdout)
+		if err := enc.Encode(tagger); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(string(b))
+		fmt.Println()
 		os.Exit(0)
 	}
 
