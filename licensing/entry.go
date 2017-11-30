@@ -122,7 +122,8 @@ type Entry struct {
 	OCLCNumber                         string `csv:"oclc_number"`                // "122938128"
 	Action                             string `csv:"ACTION"`                     // "raw"
 
-	// cache data, that needs to be parsed, for performance
+	// Cache data, that needs to be parsed, for performance. Should be
+	// lazily initualized by methods, that need them.
 	parsed struct {
 		FirstIssueDate time.Time
 		LastIssueDate  time.Time
