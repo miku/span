@@ -18,14 +18,20 @@ import (
 
 // A Decoder reads and decodes TSV rows from an input stream.
 type Decoder struct {
-	Header []string         // Column names.
-	r      *span.SkipReader // The underlying reader.
-	once   sync.Once
+	Header    []string         // Column names.
+	Separator string           // Field separator.
+	r         *span.SkipReader // The underlying reader.
+	once      sync.Once
 }
 
 // NewDecoder returns a new decoder.
 func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{r: span.NewSkipReader(bufio.NewReader(r))}
+	return &Decoder{r: span.NewSkipReader(bufio.NewReader(r)), Separator: "\t"}
+}
+
+// NewDecoderSeparator creates a new decoder with a given separator.
+func NewDecoderSeparator(r io.Reader, sep string) *Decoder {
+	return &Decoder{r: span.NewSkipReader(bufio.NewReader(r)), Separator: sep}
 }
 
 // readHeader attempts to read the first row and store the column names. If the
@@ -39,7 +45,7 @@ func (dec *Decoder) readHeader() (err error) {
 		if line, err = dec.r.ReadString('\n'); err != nil {
 			return
 		}
-		dec.Header = strings.Split(line, "\t")
+		dec.Header = strings.Split(line, dec.Separator)
 	})
 	return
 }
@@ -56,7 +62,7 @@ func (dec *Decoder) Decode(v interface{}) error {
 	if err == io.EOF {
 		return io.EOF
 	}
-	record := strings.Split(line, "\t")
+	record := strings.Split(line, dec.Separator)
 
 	s := structs.New(v)
 	for _, f := range s.Fields() {
