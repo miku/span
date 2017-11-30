@@ -1,3 +1,18 @@
+// XXX: Generalize. Only require fields that we need.
+//
+// Taggable document should expose (maybe via interfaces):
+//
+//    SerialNumbers() []string
+//    PublicationTitle() string
+//    Date() string
+//    Volume() string
+//    Issue() string
+//    DatabaseName() string
+//
+//    Tagger configuration, e.g. preferred method, failure tolerance.
+//
+//    tagger.Tag(v interface{}) []string { ... }
+//
 package filter
 
 import (
