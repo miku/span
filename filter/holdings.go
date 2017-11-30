@@ -72,7 +72,8 @@ var Cache = make(HoldingsCache)
 type HoldingsFilter struct {
 	Names          []string // Keep cache keys only (filename or URL of holdings document).
 	Verbose        bool
-	CompareByTitle bool // Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
+	CompareByTitle bool                   // Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
+	CachedValues   map[string]*CacheValue // Allow direct access to entries, might replace Names.
 }
 
 // count returns the number of entries loaded for this filter.
@@ -119,6 +120,13 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 	f.Verbose = s.Holdings.Verbose
 	f.CompareByTitle = s.Holdings.CompareByTitle
 
+	if f.CachedValues == nil {
+		f.CachedValues = make(map[string]*CacheValue)
+	}
+	for _, name := range f.Names {
+		item := Cache[name]
+		f.CachedValues[name] = &item
+	}
 	log.Printf("holdings: loaded: %d/%d", len(f.Names), f.count())
 	return nil
 }
