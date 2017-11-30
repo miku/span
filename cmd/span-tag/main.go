@@ -55,22 +55,6 @@ func main() {
 	// The configuration tree.
 	var tagger filter.Tagger
 
-	// At this points, we should have an in-memory representation of the free.
-	if *freeze != "" {
-		f, err := os.Create(*freeze)
-		if err != nil {
-			log.Fatal(err)
-		}
-		enc := json.NewEncoder(f)
-		if err := enc.Encode(tagger); err != nil {
-			log.Fatal(err)
-		}
-		if err := f.Close(); err != nil {
-			log.Fatal(err)
-		}
-		os.Exit(0)
-	}
-
 	// Unfreezing preferred. XXX(miku): Unfreeze holdings and cache.
 	if *unfreeze != "" {
 		f, err := os.Open(*unfreeze)
@@ -96,6 +80,22 @@ func main() {
 				log.Fatal(err)
 			}
 		}
+	}
+
+	// At this points, we should have an in-memory representation of the free.
+	if *freeze != "" {
+		f, err := os.Create(*freeze)
+		if err != nil {
+			log.Fatal(err)
+		}
+		enc := json.NewEncoder(f)
+		if err := enc.Encode(tagger); err != nil {
+			log.Fatal(err)
+		}
+		if err := f.Close(); err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
 	}
 
 	w := bufio.NewWriter(os.Stdout)
