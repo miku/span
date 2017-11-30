@@ -44,8 +44,9 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 	return int64(wc.Count()), nil
 }
 
-// SerialNumberMap creates a map from ISSN to associated licensing entries. This
-// is here for performance mostly, so we can access relevant licensing entry by ISSN.
+// SerialNumberMap creates a map from ISSN to associated licensing entries.
+// This is here for performance mostly, so we can access relevant licensing
+// entry by ISSN.  XXX: Do not replicate entries, just index into them.
 func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 	cache := make(map[string]map[licensing.Entry]bool)
 	for _, e := range *h {
@@ -107,7 +108,7 @@ func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
 			cache[db][e] = true
 		}
 	}
-	// Make unique.
+	// Make unique. XXX: Move this out.
 	result := make(map[string][]licensing.Entry)
 	for issn, entrymap := range cache {
 		for k := range entrymap {
