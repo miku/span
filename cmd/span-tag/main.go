@@ -69,6 +69,7 @@ func main() {
 	}
 
 	if *freeze {
+		// XXX: oom.
 		enc := json.NewEncoder(os.Stdout)
 		log.Printf("freezing tagger ...")
 		if err := enc.Encode(tagger); err != nil {
