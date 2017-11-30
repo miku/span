@@ -153,7 +153,7 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 	if err != nil {
 		return err
 	}
-	// XXX: Containment and embargo should be one thing.
+	// XXX: Containment and embargo should be one thing, maybe.
 	if err := entry.containsDateTime(t, g); err != nil {
 		return err
 	}
