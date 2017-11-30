@@ -24,7 +24,7 @@ func main() {
 	output := flag.String("o", "", "output file")
 	flag.Parse()
 
-	if *output != "" {
+	if *output == "" {
 		log.Fatal("output file required")
 	}
 
