@@ -41,7 +41,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *config == "" && *freeze == "" {
+	if *config == "" && *freeze == "" && *unfreeze == "" {
 		log.Fatal("config file required, or unfreeze")
 	}
 
