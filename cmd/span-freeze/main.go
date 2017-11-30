@@ -31,8 +31,12 @@ const (
 	NameDir     = "files"
 )
 
+var (
+	output     = flag.String("o", "", "output file")
+	bestEffort = flag.Bool("b", false, "report errors but do not stop")
+)
+
 func main() {
-	output := flag.String("o", "", "output file")
 	flag.Parse()
 
 	if *output == "" {
@@ -86,7 +90,12 @@ func main() {
 
 		resp, err := http.Get(u)
 		if err != nil {
-			log.Fatal(err)
+			if *bestEffort {
+				log.Printf("[%04d %u] %s", i, u, err)
+				continue
+			} else {
+				log.Fatal(err)
+			}
 		}
 		defer resp.Body.Close()
 
