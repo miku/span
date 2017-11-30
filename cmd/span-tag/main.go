@@ -29,6 +29,7 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	freeze := flag.Bool("freeze", false, "write frozen filter to stdout")
 
 	flag.Parse()
 
@@ -38,7 +39,7 @@ func main() {
 	}
 
 	if *config == "" {
-		log.Fatal("config file required, or unfreeze")
+		log.Fatal("config file required")
 	}
 
 	if *cpuprofile != "" {
@@ -65,6 +66,14 @@ func main() {
 		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
 			log.Fatal(err)
 		}
+	}
+
+	if *freeze {
+		b, err := json.Marshal(tagger)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(b))
 	}
 
 	w := bufio.NewWriter(os.Stdout)

@@ -14,9 +14,9 @@ import (
 
 // CacheValue groups holdings and cache for fast lookups.
 type CacheValue struct {
-	SerialNumberMap map[string][]licensing.Entry // key: ISSN
-	WisoDatabaseMap map[string][]licensing.Entry // key: WISO DB name
-	TitleMap        map[string][]licensing.Entry // key: publication title
+	SerialNumberMap map[string][]licensing.Entry `json:"s"` // key: ISSN
+	WisoDatabaseMap map[string][]licensing.Entry `json:"w"` // key: WISO DB name
+	TitleMap        map[string][]licensing.Entry `json:"t"` // key: publication title
 }
 
 // HoldingsCache caches items keyed by filename or url. A configuration might
@@ -70,10 +70,10 @@ var Cache = make(HoldingsCache)
 // the content once. This is done via a private cache. The holdings filter only
 // needs to remember the keys (filename or URL) to access entries at runtime.
 type HoldingsFilter struct {
-	Names          []string // Keep cache keys only (filename or URL of holdings document).
-	Verbose        bool
-	CompareByTitle bool                   // Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
-	CachedValues   map[string]*CacheValue // Allow direct access to entries, might replace Names.
+	Names          []string               `json:"-"` // Keep cache keys only (filename or URL of holdings document).
+	Verbose        bool                   `json:"verbose,omitempty"`
+	CompareByTitle bool                   `json:"compare-by-title,omitempty"` // Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
+	CachedValues   map[string]*CacheValue `json:"cache,omitempty"`            // Allow direct access to entries, might replace Names.
 }
 
 // count returns the number of entries loaded for this filter.
