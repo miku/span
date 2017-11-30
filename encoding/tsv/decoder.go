@@ -24,7 +24,7 @@ type Decoder struct {
 	once      sync.Once
 }
 
-// NewDecoder returns a new decoder.
+// NewDecoder returns a new decoder with tab as field separator.
 func NewDecoder(r io.Reader) *Decoder {
 	return &Decoder{r: span.NewSkipReader(bufio.NewReader(r)), Separator: "\t"}
 }
@@ -50,7 +50,7 @@ func (dec *Decoder) readHeader() (err error) {
 	return
 }
 
-// Decode a single entry, use csv struct tags.
+// Decode a single entry, reuse csv struct tags.
 func (dec *Decoder) Decode(v interface{}) error {
 	if err := dec.readHeader(); err != nil {
 		return err

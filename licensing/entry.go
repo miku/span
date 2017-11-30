@@ -40,14 +40,14 @@ var (
 	intPattern = regexp.MustCompile("[0-9]+")
 )
 
-// dateFormat groups layout and granularity.
-type dateFormat struct {
+// dateWithGranularity groups layout and granularity.
+type dateWithGranularity struct {
 	layout      string
 	granularity DateGranularity
 }
 
 // datePatterns are candidate patterns for parsing dates.
-var datePatterns = []dateFormat{
+var datePatterns = []dateWithGranularity{
 	{"2006-", GRANULARITY_YEAR},
 	{"2006-01-02", GRANULARITY_DAY},
 	{"2006-01-02T15:04:05Z", GRANULARITY_DAY},
@@ -130,73 +130,74 @@ type Entry struct {
 }
 
 // ISSNList returns a list of normalized ISSN from various fields.
-func (e *Entry) ISSNList() []string {
+func (entry *Entry) ISSNList() []string {
 	issns := container.NewStringSet()
-	for _, issn := range []string{e.PrintIdentifier, e.OnlineIdentifier} {
+	for _, issn := range []string{entry.PrintIdentifier, entry.OnlineIdentifier} {
 		s := NormalizeSerialNumber(issn)
 		if span.ISSNPattern.MatchString(s) {
 			issns.Add(s)
 		}
 	}
-	for _, issn := range FindSerialNumbers(e.AllSerialNumbers) {
+	for _, issn := range FindSerialNumbers(entry.AllSerialNumbers) {
 		issns.Add(issn)
 	}
 	return issns.SortedValues()
 }
 
-// Covers is a generic method to determine, whether a given date, volume or issue
-// is covered by this entry. It takes into account moving walls. If values are not
-// defined, we mostly assume they are not constrained.
-func (e *Entry) Covers(date, volume, issue string) error {
+// Covers is a generic method to determine, whether a given date, volume or
+// issue is covered by this entry. It takes into account moving walls. If
+// values are not defined, we mostly assume they are not constrained.
+func (entry *Entry) Covers(date, volume, issue string) error {
 	t, g, err := parseWithGranularity(date)
 	if err != nil {
 		return err
 	}
-	if err := e.containsDateTime(t, g); err != nil {
+	// XXX: Containment and embargo should be one thing.
+	if err := entry.containsDateTime(t, g); err != nil {
 		return err
 	}
-	if err := Embargo(e.Embargo).Compatible(t); err != nil {
+	if err := Embargo(entry.Embargo).Compatible(t); err != nil {
 		return err
 	}
 
-	if e.parsed.FirstIssueDate.Year() == t.Year() {
-		if e.FirstVolume != "" && volume != "" && findInt(volume) < findInt(e.FirstVolume) {
+	if entry.parsed.FirstIssueDate.Year() == t.Year() {
+		if entry.FirstVolume != "" && volume != "" && findInt(volume) < findInt(entry.FirstVolume) {
 			return ErrBeforeFirstVolume
 		}
-		if e.FirstIssue != "" && issue != "" && findInt(issue) < findInt(e.FirstIssue) {
+		if entry.FirstIssue != "" && issue != "" && findInt(issue) < findInt(entry.FirstIssue) {
 			return ErrBeforeFirstIssue
 		}
 	}
 
-	if e.parsed.LastIssueDate.Year() == t.Year() {
-		if e.LastVolume != "" && volume != "" && findInt(volume) > findInt(e.LastVolume) {
+	if entry.parsed.LastIssueDate.Year() == t.Year() {
+		if entry.LastVolume != "" && volume != "" && findInt(volume) > findInt(entry.LastVolume) {
 			return ErrAfterLastVolume
 		}
-		if e.LastIssue != "" && issue != "" && findInt(issue) > findInt(e.LastIssue) {
+		if entry.LastIssue != "" && issue != "" && findInt(issue) > findInt(entry.LastIssue) {
 			return ErrAfterLastIssue
 		}
 	}
 	return nil
 }
 
-// begin parses left boundary of license interval, returns a date far in the past
-// if it is not defined.
-func (e *Entry) begin() time.Time {
-	if e.parsed.FirstIssueDate.IsZero() {
-		e.parsed.FirstIssueDate = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
+// begin parses left boundary of license interval, returns a date far in the
+// past if it is not defined.
+func (entry *Entry) begin() time.Time {
+	if entry.parsed.FirstIssueDate.IsZero() {
+		entry.parsed.FirstIssueDate = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
 		for _, dfmt := range datePatterns {
-			if t, err := time.Parse(dfmt.layout, e.FirstIssueDate); err == nil {
-				e.parsed.FirstIssueDate = t
+			if t, err := time.Parse(dfmt.layout, entry.FirstIssueDate); err == nil {
+				entry.parsed.FirstIssueDate = t
 				break
 			}
 		}
 	}
-	return e.parsed.FirstIssueDate
+	return entry.parsed.FirstIssueDate
 }
 
 // beginGranularity returns the begin date with a given granularity.
-func (e *Entry) beginGranularity(g DateGranularity) time.Time {
-	t := e.begin()
+func (entry *Entry) beginGranularity(g DateGranularity) time.Time {
+	t := entry.begin()
 	switch g {
 	case GRANULARITY_YEAR:
 		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
@@ -209,22 +210,22 @@ func (e *Entry) beginGranularity(g DateGranularity) time.Time {
 
 // end parses right boundary of license interval, returns a date far in the future
 // if it is not defined.
-func (e *Entry) end() time.Time {
-	if e.parsed.LastIssueDate.IsZero() {
-		e.parsed.LastIssueDate = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
+func (entry *Entry) end() time.Time {
+	if entry.parsed.LastIssueDate.IsZero() {
+		entry.parsed.LastIssueDate = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
 		for _, dfmt := range datePatterns {
-			if t, err := time.Parse(dfmt.layout, e.LastIssueDate); err == nil {
-				e.parsed.LastIssueDate = t
+			if t, err := time.Parse(dfmt.layout, entry.LastIssueDate); err == nil {
+				entry.parsed.LastIssueDate = t
 				break
 			}
 		}
 	}
-	return e.parsed.LastIssueDate
+	return entry.parsed.LastIssueDate
 }
 
 // endGranularity returns the end date with a given granularity.
-func (e *Entry) endGranularity(g DateGranularity) time.Time {
-	t := e.end()
+func (entry *Entry) endGranularity(g DateGranularity) time.Time {
+	t := entry.end()
 	switch g {
 	case GRANULARITY_YEAR:
 		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
@@ -238,14 +239,15 @@ func (e *Entry) endGranularity(g DateGranularity) time.Time {
 // containsDateTime returns nil, if the given time lies between this entries
 // dates. If the given time is the zero value, it will be contained by any
 // interval.
-func (e *Entry) containsDateTime(t time.Time, g DateGranularity) error {
+func (entry *Entry) containsDateTime(t time.Time, g DateGranularity) error {
 	if t.IsZero() {
 		return nil
 	}
-	if t.Before(e.beginGranularity(g)) {
+	if t.Before(entry.beginGranularity(g)) {
+		// XXX: This has nothing to do with issue.
 		return ErrBeforeFirstIssueDate
 	}
-	if t.After(e.endGranularity(g)) {
+	if t.After(entry.endGranularity(g)) {
 		return ErrAfterLastIssueDate
 	}
 	return nil
@@ -254,7 +256,7 @@ func (e *Entry) containsDateTime(t time.Time, g DateGranularity) error {
 // containsDate return nil, if the given date (as string), lies between this
 // entries issue dates. The empty string is interpreted as being inside all
 // intervals.
-func (e *Entry) containsDate(s string) (err error) {
+func (entry *Entry) containsDate(s string) (err error) {
 	if s == "" {
 		return nil
 	}
@@ -262,13 +264,12 @@ func (e *Entry) containsDate(s string) (err error) {
 	if err != nil {
 		return err
 	}
-	return e.containsDateTime(t, g)
+	return entry.containsDateTime(t, g)
 }
 
 // NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
 func NormalizeSerialNumber(s string) string {
-	s = strings.TrimSpace(s)
-	s = strings.ToUpper(s)
+	s = strings.ToUpper(strings.TrimSpace(s))
 	if len(s) == 8 {
 		return fmt.Sprintf("%s-%s", s[:4], s[4:])
 	}
@@ -280,8 +281,9 @@ func FindSerialNumbers(s string) []string {
 	return span.ISSNPattern.FindAllString(s, -1)
 }
 
-// parseWithGranularity tries to parse a string into a time. If successful, also
-// return the granularity.
+// parseWithGranularity tries to parse a string into a time. If successful,
+// also return the granularity. Any value that is not recorgnized results in an
+// ErrInvalidDate.
 func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) {
 	if s == "" {
 		return time.Time{}, GRANULARITY_DAY, ErrInvalidDate
@@ -297,7 +299,8 @@ func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) 
 	return t, g, ErrInvalidDate
 }
 
-// getGranularity returns the granularity for given date layout.
+// getGranularity returns the granularity for given date layout, if nothing
+// matches assume the finest granualarity.
 func getGranularity(layout string) DateGranularity {
 	for _, dfmt := range datePatterns {
 		if dfmt.layout == layout {
