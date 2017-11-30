@@ -95,7 +95,7 @@ func main() {
 		log.Printf("[%04d %s] %s", i, name, u)
 	}
 
-	f, err = w.Create(NameMappings)
+	f, err = w.Create(NameMapping)
 	if err != nil {
 		log.Fatal(err)
 	}
