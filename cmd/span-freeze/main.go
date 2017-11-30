@@ -63,7 +63,7 @@ func main() {
 		// Create a unique name.
 		hash := sha1.New()
 		hash.Sum([]byte(u))
-		name := fmt.Sprintf("files/%x", hash)
+		name := fmt.Sprintf("files/%x", hash.Sum(nil))
 
 		resp, err := http.Get(u)
 		if err != nil {
