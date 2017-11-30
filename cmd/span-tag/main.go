@@ -8,6 +8,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/gob"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -55,13 +56,28 @@ func main() {
 	// The configuration tree.
 	var tagger filter.Tagger
 
+	// Register types to freeze.
+	gob.Register(filter.AndFilter{})
+	gob.Register(filter.AnyFilter{})
+	gob.Register(filter.CollectionFilter{})
+	gob.Register(filter.DOIFilter{})
+	gob.Register(filter.HoldingsFilter{})
+	gob.Register(filter.ISSNFilter{})
+	gob.Register(filter.NotFilter{})
+	gob.Register(filter.OrFilter{})
+	gob.Register(filter.PackageFilter{})
+	gob.Register(filter.SourceFilter{})
+	gob.Register(filter.SourceFilter{})
+	gob.Register(filter.SubjectFilter{})
+
 	// Unfreezing preferred. XXX(miku): Unfreeze holdings and cache.
 	if *unfreeze != "" {
 		f, err := os.Open(*unfreeze)
 		if err != nil {
 			log.Fatal(err)
 		}
-		dec := json.NewDecoder(f)
+
+		dec := gob.NewDecoder(f)
 		if err := dec.Decode(tagger); err != nil {
 			log.Fatal(err)
 		}
@@ -82,13 +98,13 @@ func main() {
 		}
 	}
 
-	// At this points, we should have an in-memory representation of the free.
+	// At this points, we should have an in-memory representation of the tree.
 	if *freeze != "" {
 		f, err := os.Create(*freeze)
 		if err != nil {
 			log.Fatal(err)
 		}
-		enc := json.NewEncoder(f)
+		enc := gob.NewEncoder(f)
 		if err := enc.Encode(tagger); err != nil {
 			log.Fatal(err)
 		}
