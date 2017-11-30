@@ -21,6 +21,8 @@ schema tools
 \fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x\fR \fIfile\fP] \-o \fIfile\fP \fIfile\fP
 .PP
 \fB\fCspan\-local\-data\fR < \fIfile\fP
+.PP
+\fB\fCspan\-freeze\fR \-o \fIfile\fP < \fIfile\fP
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -34,7 +36,7 @@ The intermediate schema is a normalization vehicle, spec:
 Input format. \fB\fCspan\-import\fR only.
 .TP
 \fB\fC\-o\fR \fIformat\fP
-Output format. \fB\fCspan\-export\fR only.
+Output format or file. \fB\fCspan\-export\fR, \fB\fCspan\-freeze\fR only..
 .TP
 \fB\fC\-c\fR \fIconfig\-string\fP or \fIconfig\-file\fP
 Configuration string or path to configuration file. \fB\fCspan\-tag\fR only. See
@@ -194,6 +196,30 @@ for deduplication.
 Example output:
 .IP
 \fB\fCai\-49\-aHR0cDovL2R4LmRva...    49    10.2307/3102818    DE\-15\-FID    DE\-Ch1    DE\-105\fR
+.SH Freezing a filterconfig
+.PP
+When given a single file containing a number of URLs, it is required to keep
+both the file and all URLs it contains for a given point in time. The
+\fB\fCspan\-freeze\fR tool is generic, in that it does not assume any format. It will
+create a zip file with the following layout:
+.PP
+.RS
+.nf
+/blob
+/mapping
+/files/<hash>
+/files/<hash>
+\&...
+.fi
+.RE
+.PP
+Where \fB\fCblob\fR is the original file containing URLs, \fB\fCmapping\fR is a JSON document
+containing a SHA1 to URL mapping and the \fB\fCfiles\fR directory contains all
+responses, with the filename being the SHA1 of the URL.
+.PP
+Example usage:
+.IP
+\fB\fCspan\-freeze \-o frozen.zip < filterconfig.json\fR
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To

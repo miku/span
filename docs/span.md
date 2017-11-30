@@ -27,6 +27,8 @@ SYNOPSIS
 
 `span-local-data` < *file*
 
+`span-freeze` -o *file* < *file*
+
 DESCRIPTION
 -----------
 
@@ -43,7 +45,7 @@ OPTIONS
   Input format. `span-import` only.
 
 `-o` *format*
-  Output format. `span-export` only.
+  Output format or file. `span-export`, `span-freeze` only..
 
 `-c` *config-string* or *config-file*
   Configuration string or path to configuration file. `span-tag` only. See
@@ -199,6 +201,28 @@ Given an intermediate schema file, extract record id, source id, doi and labels
 Example output:
 
   `ai-49-aHR0cDovL2R4LmRva...    49    10.2307/3102818    DE-15-FID    DE-Ch1    DE-105`
+
+Freezing a filterconfig
+-----------------------
+
+When given a single file containing a number of URLs, it is required to keep
+both the file and all URLs it contains for a given point in time. The
+`span-freeze` tool is generic, in that it does not assume any format. It will
+create a zip file with the following layout:
+
+    /blob
+    /mapping
+    /files/<hash>
+    /files/<hash>
+    ...
+
+Where `blob` is the original file containing URLs, `mapping` is a JSON document
+containing a SHA1 to URL mapping and the `files` directory contains all
+responses, with the filename being the SHA1 of the URL.
+
+Example usage:
+
+  `span-freeze -o frozen.zip < filterconfig.json`
 
 FILES
 -----
