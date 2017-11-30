@@ -211,7 +211,7 @@ both the file and all URLs it contains for a given point in time. The
 create a zip file with the following layout:
 
     /blob
-    /mapping
+    /mapping.json
     /files/<hash>
     /files/<hash>
     ...

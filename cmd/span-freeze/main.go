@@ -64,11 +64,11 @@ func main() {
 	urls := xurls.Strict().FindAllString(string(b), -1)
 
 	seen := make(map[string]bool)
-	var uniq []string
+	var unique []string
 
 	for _, u := range urls {
 		if _, ok := seen[u]; !ok {
-			uniq = append(uniq, strings.TrimSpace(u))
+			unique = append(unique, strings.TrimSpace(u))
 			seen[u] = true
 		}
 	}
@@ -76,12 +76,7 @@ func main() {
 	// Not necessary, but keep an additional mapping to simplify reading later.
 	mapping := make(map[string]string)
 
-	for i, u := range uniq {
-		// Do not break on mailto: and the like.
-		if !strings.HasPrefix(u, "http") {
-			log.Printf("ignoring %s", u)
-			continue
-		}
+	for i, u := range unique {
 		h := sha1.New()
 		h.Write([]byte(u))
 		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
