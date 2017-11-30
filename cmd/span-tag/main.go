@@ -69,7 +69,6 @@ func main() {
 	gob.Register(filter.OrFilter{})
 	gob.Register(filter.PackageFilter{})
 	gob.Register(filter.SourceFilter{})
-	gob.Register(filter.SourceFilter{})
 	gob.Register(filter.SubjectFilter{})
 
 	// Unfreezing preferred. XXX(miku): Unfreeze holdings and cache.
