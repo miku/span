@@ -112,6 +112,7 @@ func TestEmbargoAccessBeginsAtWall(t *testing.T) {
 		{Embargo("R1"), true},
 		{Embargo("R1D"), true},
 		{Embargo("R10M"), true},
+		{Embargo("P10M"), false},
 		{Embargo("?10M"), false},
 	}
 
