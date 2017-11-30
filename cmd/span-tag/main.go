@@ -29,7 +29,7 @@ func main() {
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	freeze := flag.Bool("freeze", false, "write frozen filter to stdout")
+	unfreeze := flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
 
 	flag.Parse()
 
@@ -38,7 +38,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *config == "" {
+	if *config == "" && *unfreeze == "" {
 		log.Fatal("config file required")
 	}
 
@@ -54,6 +54,10 @@ func main() {
 	// The configuration tree.
 	var tagger filter.Tagger
 
+	if *unfreeze != "" {
+		log.Fatal("unfreeze me")
+	}
+
 	// Test, if we are given JSON directly.
 	err := json.Unmarshal([]byte(*config), &tagger)
 	if err != nil {
@@ -66,17 +70,6 @@ func main() {
 		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
 			log.Fatal(err)
 		}
-	}
-
-	if *freeze {
-		// XXX: oom.
-		enc := json.NewEncoder(os.Stdout)
-		log.Printf("freezing tagger ...")
-		if err := enc.Encode(tagger); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println()
-		os.Exit(0)
 	}
 
 	w := bufio.NewWriter(os.Stdout)
