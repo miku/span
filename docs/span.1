@@ -2,7 +2,7 @@
 .SH NAME
 .PP
 span\-import, span\-tag, span\-check, span\-export, span\-oa\-filter,
-span\-update\-labels, span\-crossref\-snapshot, span\-local\-data \- intermediate
+span\-update\-labels, span\-crossref\-snapshot, span\-local\-data, span\-freeze \- intermediate
 schema tools
 .SH SYNOPSIS
 .PP
@@ -169,9 +169,9 @@ Export to Metafacture formeta:
 .IP
 \fB\fCspan\-export \-o formeta intermediate.file\fR
 .PP
-Set OA flag:
+Set OA flag (via KBART\-ish file):
 .IP
-\fB\fCecho '{"rft.issn": ["A"]}' | span\-oa\-filter \-f <(echo 'A')\fR
+\fB\fCecho '{"rft.issn": ["1234\-1234"], "rft.date": "2000\-01\-01"}' | span\-oa\-filter \-f <(echo $'online_identifier\\n1234\-1234')\fR
 .PP
 Update labels:
 .IP
@@ -206,7 +206,7 @@ create a zip file with the following layout:
 .RS
 .nf
 /blob
-/mapping
+/mapping.json
 /files/<hash>
 /files/<hash>
 \&...
@@ -221,9 +221,9 @@ Example usage:
 .IP
 \fB\fCspan\-freeze \-o frozen.zip < filterconfig.json\fR
 .PP
-Generic usage:
+Thaw:
 .IP
-\fB\fCspan\-freeze \-b \-o site.zip < <(curl \-sL http://www.ub.uni\-leipzig.de)\fR
+\fB\fCspan\-tag \-unfreeze frozen.zip < intermediate.file\fR
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To
