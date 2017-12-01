@@ -19,6 +19,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "prints current program version")
 	kbartFile := flag.String("f", "", "path to a single KBART file")
 	batchsize := flag.Int("b", 25000, "batch size")
+	verbose := flag.Bool("verbose", false, "debug output")
 
 	flag.Parse()
 
@@ -28,7 +29,7 @@ func main() {
 	}
 
 	// Create a small config, from which we can unmarshal a filter.
-	config := fmt.Sprintf(`{"holdings": {"file": %q}}`, *kbartFile)
+	config := fmt.Sprintf(`{"holdings": {"file": %q, "verbose": %v}}`, *kbartFile, *verbose)
 
 	// Create a holdings filter.
 	filter := filter.HoldingsFilter{}

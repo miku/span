@@ -176,9 +176,9 @@ Export to Metafacture formeta:
 
   `span-export -o formeta intermediate.file`
 
-Set OA flag:
+Set OA flag (via KBART-ish file):
 
-  `echo '{"rft.issn": ["A"]}' | span-oa-filter -f <(echo 'A')`
+  `echo '{"rft.issn": ["1234-1234"], "rft.date": "2000-01-01"}' | span-oa-filter -f <(echo $'online_identifier\n1234-1234')`
 
 Update labels:
 
@@ -224,9 +224,9 @@ Example usage:
 
   `span-freeze -o frozen.zip < filterconfig.json`
 
-Generic usage:
+Thaw:
 
-  `span-freeze -b -o site.zip < <(curl -sL http://www.ub.uni-leipzig.de)`
+  `span-tag -unfreeze frozen.zip < intermediate.file`
 
 FILES
 -----
