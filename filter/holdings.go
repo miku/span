@@ -45,9 +45,16 @@ func (c *HoldingsCache) register(key string, r io.Reader) error {
 	return nil
 }
 
-// putFile parses a holding file and adds it to the cache.
+// putFile parses a holding file and adds it to the cache. XXX: Allow zipped
+// files as well.
 func (c *HoldingsCache) putFile(filename string) error {
 	log.Printf("holdings: read: %s", filename)
+	zr := &span.ZipContentReader{Filename: filename}
+	if err := c.register(filename, zr); err == nil {
+		// Reading a zipfile succeeded.
+		return nil
+	}
+	log.Println("holdings: falling back to plain reader")
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
