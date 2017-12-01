@@ -67,8 +67,9 @@ func main() {
 	var unique []string
 
 	for _, u := range urls {
+		u = strings.TrimSpace(u)
 		if _, ok := seen[u]; !ok {
-			unique = append(unique, strings.TrimSpace(u))
+			unique = append(unique, u)
 			seen[u] = true
 		}
 	}
