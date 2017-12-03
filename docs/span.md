@@ -216,7 +216,7 @@ create a zip file with the following layout:
     /files/<hash>
     ...
 
-Where `blob` is the original file containing URLs, `mapping` is a JSON document
+Where `blob` is the original file containing URLs, `mapping.json` is a JSON document
 containing a SHA1 to URL mapping and the `files` directory contains all
 responses, with the filename being the SHA1 of the URL.
 
