@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"io"
 	"log"
@@ -30,7 +31,7 @@ type HoldingsCache map[string]CacheValue
 // key. If the given reader is also an io.Close, close it.
 func (c *HoldingsCache) register(key string, r io.Reader) error {
 	if _, ok := (*c)[key]; ok {
-		log.Printf("holdings: already cached %s", key)
+		log.Printf("[holdings] already cached: %s", key)
 		return nil
 	}
 	h := new(kbart.Holdings)
@@ -52,23 +53,23 @@ func (c *HoldingsCache) register(key string, r io.Reader) error {
 // putFile parses a holding file and adds it to the cache. XXX: Allow zipped
 // files as well.
 func (c *HoldingsCache) putFile(filename string) error {
-	log.Printf("holdings: read: %s", filename)
-	zr := &span.ZipContentReader{Filename: filename}
-	if err := c.register(filename, zr); err == nil {
-		// Reading a zipfile succeeded.
-		return nil
-	}
-	log.Println("holdings: falling back to plain reader")
-	file, err := os.Open(filename)
+	_, err := zip.OpenReader(filename)
 	if err != nil {
-		return err
+		file, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		log.Printf("[holdings] read: %s", filename)
+		return c.register(filename, file)
 	}
-	return c.register(filename, file)
+	r := &span.ZipContentReader{Filename: filename}
+	log.Printf("[holdings] read (ZIP): %s", filename)
+	return c.register(filename, r)
 }
 
 // putLink parses a holding file from a link and adds it to the cache.
 func (c *HoldingsCache) putLink(link string) error {
-	log.Printf("holdings: fetch: %s", link)
+	log.Printf("[holdings] fetch: %s", link)
 	return c.register(link, &span.ZipOrPlainLinkReader{Link: link})
 }
 
@@ -141,7 +142,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		item := Cache[name]
 		f.CachedValues[name] = &item
 	}
-	log.Printf("holdings: loaded: items=%d/entries=%d", len(f.Names), f.count())
+	log.Printf("[holdings] loaded %d files or links with %d entries", len(f.Names), f.count())
 	return nil
 }
 
