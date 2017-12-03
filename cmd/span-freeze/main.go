@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/miku/span"
 	"mvdan.cc/xurls"
 )
 
@@ -32,12 +33,18 @@ const (
 )
 
 var (
-	output     = flag.String("o", "", "output file")
-	bestEffort = flag.Bool("b", false, "report errors but do not stop")
+	output      = flag.String("o", "", "output file")
+	bestEffort  = flag.Bool("b", false, "report errors but do not stop")
+	showVersion = flag.Bool("v", false, "prints current program version")
 )
 
 func main() {
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(span.AppVersion)
+		os.Exit(0)
+	}
 
 	if *output == "" {
 		log.Fatal("output file required")
