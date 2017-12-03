@@ -141,7 +141,7 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		item := Cache[name]
 		f.CachedValues[name] = &item
 	}
-	log.Printf("holdings: loaded: %d/%d", len(f.Names), f.count())
+	log.Printf("holdings: loaded: items=%d/entries=%d", len(f.Names), f.count())
 	return nil
 }
 
