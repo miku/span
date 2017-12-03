@@ -26,7 +26,8 @@ type CacheValue struct {
 // (rows from KBART) by issn, wiso db name or title.
 type HoldingsCache map[string]CacheValue
 
-// register reads a holding file from a reader and caches it under the given key.
+// register reads a holding file from a reader and caches it under the given
+// key. If the given reader is also an io.Close, close it.
 func (c *HoldingsCache) register(key string, r io.Reader) error {
 	if _, ok := (*c)[key]; ok {
 		log.Printf("holdings: already cached %s", key)
@@ -41,6 +42,9 @@ func (c *HoldingsCache) register(key string, r io.Reader) error {
 		SerialNumberMap: h.SerialNumberMap(),
 		WisoDatabaseMap: h.WisoDatabaseMap(),
 		TitleMap:        h.TitleMap(),
+	}
+	if rc, ok := r.(io.Closer); ok {
+		return rc.Close()
 	}
 	return nil
 }
@@ -77,10 +81,13 @@ var Cache = make(HoldingsCache)
 // the content once. This is done via a private cache. The holdings filter only
 // needs to remember the keys (filename or URL) to access entries at runtime.
 type HoldingsFilter struct {
-	Names          []string               `json:"-"` // Keep cache keys only (filename or URL of holdings document).
-	Verbose        bool                   `json:"verbose,omitempty"`
-	CompareByTitle bool                   `json:"compare-by-title,omitempty"` // Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
-	CachedValues   map[string]*CacheValue `json:"cache,omitempty"`            // Allow direct access to entries, might replace Names.
+	// Keep cache keys only (filename or URL of holdings document).
+	Names   []string `json:"-"`
+	Verbose bool     `json:"verbose,omitempty"`
+	// Beside ISSN, also try to compare by title, this is fuzzy, so disabled by default.
+	CompareByTitle bool `json:"compare-by-title,omitempty"`
+	// Allow direct access to entries, might replace Names.
+	CachedValues map[string]*CacheValue `json:"cache,omitempty"`
 }
 
 // count returns the number of entries loaded for this filter.
