@@ -12,10 +12,10 @@ import (
 )
 
 // UnfreezeFilterConfig takes the name of a zipfile (from span-freeze) and
-// returns the path to the filterconfig. All URLs in the filterconfig have then
-// been replaced by absolute path on the file system. Assumes default values
-// for mapping.json and content file (blob). Cleanup of temporary directory is
-// responsibility of caller.
+// returns the path the thawed filterconfig (along with the temporary directory
+// and error). All URLs in the filterconfig have then been replaced by absolute
+// path on the file system. Assumes default values for mapping.json and content
+// file (blob). Cleanup of temporary directory is responsibility of caller.
 func UnfreezeFilterConfig(frozenfile string) (string, string, error) {
 	dir, err := ioutil.TempDir("", "span-tag-unfreeze-")
 	if err != nil {
@@ -64,7 +64,7 @@ func UnfreezeFilterConfig(frozenfile string) (string, string, error) {
 	}
 
 	for url, file := range mappings {
-		// Too ugly?
+		// XXX: Too ugly?
 		x := []byte(fmt.Sprintf(`"%s"`, url))
 		y := []byte(fmt.Sprintf(`"%s"`, filepath.Join(dir, file)))
 		b = bytes.Replace(b, x, y, -1)
