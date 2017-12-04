@@ -94,6 +94,7 @@ func (author *Author) String() string {
 type IntermediateSchema struct {
 	Format          string   `json:"finc.format,omitempty"`
 	MegaCollections []string `json:"finc.mega_collection,omitempty"`
+	ID              string   `json:"finc.id"`
 	RecordID        string   `json:"finc.record_id,omitempty"`
 	SourceID        string   `json:"finc.source_id,omitempty"`
 
