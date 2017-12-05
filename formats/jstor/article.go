@@ -68,8 +68,8 @@ func (article *Article) Identifiers() (jats.Identifiers, error) {
 	locator := article.Front.Article.SelfURI.Value
 
 	doi := DOIPattern.FindString(locator)
-	recordID := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
-	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
+	id := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
+	return jats.Identifiers{DOI: doi, URL: locator, ID: id}, nil
 }
 
 // Authors returns the authors as slice.
@@ -127,11 +127,12 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	}
 	output.DOI = ids.DOI
 
-	id := ids.RecordID
+	id := ids.ID
 	if len(id) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
 	}
-	output.RecordID = id
+	output.ID = id
+	output.RecordID = ids.DOI
 
 	output.URL = append(output.URL, ids.URL)
 
@@ -151,7 +152,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 
 	// refs #5686
 	if output.Date.IsZero() {
-		return output, span.Skip{Reason: fmt.Sprintf("zero date: %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("zero date: %s", output.ID)}
 	}
 
 	// refs #5686

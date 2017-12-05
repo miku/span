@@ -147,11 +147,11 @@ func (doc *Document) Authors() (authors []finc.Author) {
 	return authors
 }
 
-// RecordID is of the form <kind>-<source-id>-<id-base64-unpadded>
+// ID is of the form <kind>-<source-id>-<id-base64-unpadded>
 // We simple map any primary key of the source (preferably a URL)
 // to a safer alphabet. Since the base64 part is not meant to be decoded
 // we drop the padding. It is simple enough to recover the original value.
-func (doc *Document) RecordID() string {
+func (doc *Document) ID() string {
 	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.URL)))
 }
 
@@ -238,27 +238,27 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, errNoURL
 	}
 
-	output.RecordID = doc.RecordID()
-	if len(output.RecordID) > span.KeyLengthLimit {
-		return output, span.Skip{Reason: fmt.Sprintf("ID_TOO_LONG %s", output.RecordID)}
+	output.ID = doc.ID()
+	if len(output.ID) > span.KeyLengthLimit {
+		return output, span.Skip{Reason: fmt.Sprintf("ID_TOO_LONG %s", output.ID)}
 	}
 
 	if output.Date.After(Future) {
-		return output, span.Skip{Reason: fmt.Sprintf("TOO_FUTURISTIC %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("TOO_FUTURISTIC %s", output.ID)}
 	}
 
 	if doc.Type == "journal-issue" {
-		return output, span.Skip{Reason: fmt.Sprintf("JOURNAL_ISSUE %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("JOURNAL_ISSUE %s", output.ID)}
 	}
 
 	output.ArticleTitle = doc.CombinedTitle()
 	if len(output.ArticleTitle) == 0 {
-		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.ID)}
 	}
 
 	for _, title := range ArticleTitleBlocker {
 		if output.ArticleTitle == title {
-			return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.RecordID)}
+			return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.ID)}
 		}
 	}
 
@@ -268,7 +268,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	// refs. #8428
 	if len(output.ArticleTitle) > 32000 {
-		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.ID)}
 	}
 
 	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
@@ -288,7 +288,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = span.UnescapeTrim(doc.ContainerTitle[0])
 	} else {
-		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.RecordID)}
+		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.ID)}
 	}
 
 	// refs #10864
@@ -305,7 +305,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	// TODO(miku): do we need a config for these things?
 	// Maybe a generic filter (in js?) that will gather exclusion rules?
 	// if len(output.Authors) == 0 {
-	// 	return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.RecordID)}
+	// 	return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.ID)}
 	// }
 
 	pi := doc.PageInfo()
@@ -323,7 +323,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	for _, s := range publisherBlacklist {
 		if doc.Publisher == s {
-			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_COLLECTION %s", output.RecordID)}
+			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_COLLECTION %s", output.ID)}
 		}
 	}
 

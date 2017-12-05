@@ -250,8 +250,9 @@ func (r *MetsRecord) ToIntermediateSchema() (output *finc.IntermediateSchema, er
 	}
 
 	output.SourceID = "93"
-	output.RecordID = fmt.Sprintf("ai-%s-%s", output.SourceID,
+	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID,
 		base64.RawURLEncoding.EncodeToString([]byte(r.Header.Identifier)))
+	output.RecordID = r.Header.Identifier
 	output.MegaCollections = []string{"ZVDD"}
 	output.Genre = "document"
 	output.RefType = "EJOUR"

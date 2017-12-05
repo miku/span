@@ -30,7 +30,8 @@ func (data *Data) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = SourceIdentifier
 	for _, t := range doc.FindElements("//var/recordId") {
 		encoded := base64.RawURLEncoding.EncodeToString([]byte(t.Text()))
-		output.RecordID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encoded)
+		output.ID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encoded)
+		output.RecordID = t.Text()
 	}
 	for _, t := range doc.FindElements("//var[@name='Work Title']/string") {
 		output.ArticleTitle = t.Text()

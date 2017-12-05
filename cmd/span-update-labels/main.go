@@ -78,7 +78,7 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return nil, err
 		}
-		if v, ok := labelMap[is.RecordID]; ok {
+		if v, ok := labelMap[is.ID]; ok {
 			is.Labels = v
 		}
 		bb, err := json.Marshal(is)

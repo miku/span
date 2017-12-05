@@ -274,9 +274,9 @@ func (article *Article) DOI() (s string, err error) {
 
 // identifiers is a helper struct.
 type Identifiers struct {
-	DOI      string
-	URL      string
-	RecordID string
+	DOI string
+	URL string
+	ID  string
 }
 
 // identifiers returns the doi and the dependent url and recordID in a struct.

@@ -51,7 +51,8 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	encodedIdentifier := base64.RawURLEncoding.EncodeToString([]byte(r.Header.Identifier))
-	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encodedIdentifier)
+	output.ID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encodedIdentifier)
+	output.RecordID = r.Header.Identifier
 	output.SourceID = SourceIdentifier
 	output.Genre = Genre
 	output.Format = Format

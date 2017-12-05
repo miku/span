@@ -56,8 +56,8 @@ func (article *Article) Identifiers() (jats.Identifiers, error) {
 		return ids, err
 	}
 	locator := fmt.Sprintf("http://dx.doi.org/%s", doi)
-	recordID := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
-	return jats.Identifiers{DOI: doi, URL: locator, RecordID: recordID}, nil
+	id := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
+	return jats.Identifiers{DOI: doi, URL: locator, ID: id}, nil
 }
 
 // ToInternalSchema converts a jats article into an internal schema.
@@ -72,11 +72,12 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		return output, err
 	}
 
-	id := ids.RecordID
+	id := ids.ID
 	if len(id) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
 	}
-	output.RecordID = id
+	output.ID = id
+	output.RecordID = ids.DOI
 
 	output.DOI = ids.DOI
 	output.URL = append(output.URL, ids.URL)

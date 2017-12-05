@@ -200,7 +200,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Publishers = append(output.Publishers, publisher)
 	}
 
-	output.RecordID = id
+	output.RecordID = doc.DOI()
+	output.ID = id
 	output.SourceID = SourceIdentifier
 	output.Volume = doc.BibJSON.Journal.Volume
 

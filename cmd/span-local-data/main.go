@@ -16,7 +16,7 @@ import (
 
 // record is a subset of the intermediate schema fields.
 type record struct {
-	RecordID string   `json:"finc.record_id,omitempty"`
+	ID       string   `json:"finc.id,omitempty"`
 	SourceID string   `json:"finc.source_id,omitempty"`
 	DOI      string   `json:"doi,omitempty"`
 	Labels   []string `json:"x.labels,omitempty"`
@@ -40,7 +40,7 @@ func main() {
 			return nil, err
 		}
 		var buf bytes.Buffer
-		if _, err := WriteFields(&buf, append([]string{doc.RecordID, doc.SourceID, doc.DOI}, doc.Labels...)); err != nil {
+		if _, err := WriteFields(&buf, append([]string{doc.ID, doc.SourceID, doc.DOI}, doc.Labels...)); err != nil {
 			return nil, err
 		}
 		return buf.Bytes(), nil

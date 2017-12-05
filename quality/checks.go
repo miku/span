@@ -171,7 +171,7 @@ func TestFincStageThree(is finc.IntermediateSchema) error {
 
 // TestKeyLength checks the length of the record id. memcachedb limits is 250 bytes.
 func TestKeyLength(is finc.IntermediateSchema) error {
-	if len(is.RecordID) > span.KeyLengthLimit {
+	if len(is.ID) > span.KeyLengthLimit {
 		return Issue{Err: ErrKeyTooLong, Record: is}
 	}
 	return nil

@@ -33,6 +33,7 @@ type Solr5Vufind3 struct {
 	MegaCollections      []string `json:"mega_collection,omitempty"`
 	PublishDateSort      int      `json:"publishDateSort,omitempty"`
 	Publishers           []string `json:"publisher,omitempty"`
+	RecordID             string   `json:"record_id,omitempty"`
 	RecordType           string   `json:"recordtype,omitempty"`
 	Series               []string `json:"series,omitempty"`
 	SourceID             string   `json:"source_id,omitempty"`
@@ -84,9 +85,10 @@ func (s *Solr5Vufind3) Export(is IntermediateSchema, withFullrecord bool) ([]byt
 func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error {
 	s.Allfields = is.Allfields()
 	s.Formats = append(s.Formats, is.Format)
-	s.Fullrecord = "blob:" + is.RecordID
+	s.Fullrecord = "blob:" + is.ID
 	s.Fulltext = is.Fulltext
-	s.ID = is.RecordID
+	s.ID = is.ID
+	s.RecordID = is.RecordID
 	s.Imprint = is.Imprint()
 	s.ISSN = is.ISSNList()
 	s.ISBN = is.ISBNList()

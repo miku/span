@@ -56,7 +56,8 @@ func (r DublicCoreRecord) ToIntermediateSchema() (*finc.IntermediateSchema, erro
 	output.URL = append(output.URL, urnlink)
 
 	encodedIdentifier := base64.RawURLEncoding.EncodeToString([]byte(urn))
-	output.RecordID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encodedIdentifier)
+	output.ID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encodedIdentifier)
+	output.RecordID = urn
 	output.SourceID = SourceIdentifier
 	output.Genre = Genre
 	output.Format = Format

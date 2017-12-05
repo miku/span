@@ -91,7 +91,7 @@ func (doc Document) DOI() (string, error) {
 	return "", fmt.Errorf("no DOI found")
 }
 
-func (doc Document) RecordID() (string, error) {
+func (doc Document) FincID() (string, error) {
 	doi, err := doc.DOI()
 	if err != nil {
 		return "", err
@@ -128,11 +128,11 @@ func (doc Document) Date() (time.Time, error) {
 func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	id, err := doc.RecordID()
+	id, err := doc.FincID()
 	if err != nil {
 		return output, err
 	}
-	output.RecordID = id
+	output.ID = id
 	output.SourceID = SourceID
 	output.MegaCollections = []string{Collection}
 	output.Genre = Genre
@@ -143,6 +143,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, err
 	}
 	output.DOI = doi
+	output.RecordID = doi
 
 	date, err := doc.Date()
 	if err != nil {

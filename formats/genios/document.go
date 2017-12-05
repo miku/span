@@ -153,8 +153,8 @@ func (doc Document) ISSNList() []string {
 	return issns.Values()
 }
 
-// RecordID uses SourceAndID as starting point.
-func (doc Document) RecordID() string {
+// FincID uses SourceAndID as starting point.
+func (doc Document) FincID() string {
 	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.SourceAndID())))
 }
 
@@ -254,7 +254,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.MegaCollections = []string{fmt.Sprintf("Genios")}
 	}
 
-	id := doc.RecordID()
+	id := doc.FincID()
 	// 250 is a limit on memcached keys; offending key was:
 	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
 	// dTdGV1ZXJ1bmdzYmF1IMK3SW5kdXN0cmllLUVsZWt0cm9uaWsgwr\
@@ -264,7 +264,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(id) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
 	}
-	output.RecordID = id
+	output.ID = id
+	output.RecordID = doc.ID
 	output.SourceID = SourceID
 	output.Subjects = doc.Headings()
 
