@@ -14,7 +14,7 @@ schema tools
 .PP
 \fB\fCspan\-check\fR [\fB\fC\-verbose\fR] < \fIfile\fP
 .PP
-\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] < \fIfile\fP
+\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] [\fB\fC\-fc\fR \fIfile\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
 .PP
@@ -59,6 +59,9 @@ Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR, \fB\fCspan\-crossref\-snap
 .TP
 \fB\fC\-f\fR
 File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
+.TP
+\fB\fC\-fc\fR
+File in AMSL FreeContent API format about sources, collections and their OA status.
 .TP
 \fB\fC\-s\fR
 Field separator. \fB\fCspan\-update\-labels\fR only.
