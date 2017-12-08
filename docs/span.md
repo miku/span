@@ -19,7 +19,7 @@ SYNOPSIS
 
 `span-check` [`-verbose`] < *file*
 
-`span-oa-filter` [`-f` *file*] < *file*
+`span-oa-filter` [`-f` *file*] [`-fc` *file*] < *file*
 
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
@@ -68,6 +68,9 @@ OPTIONS
 
 `-f`
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
+
+`-fc`
+  File in AMSL FreeContent API format about sources, collections and their OA status.
 
 `-s`
   Field separator. `span-update-labels` only.

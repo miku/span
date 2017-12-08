@@ -31,6 +31,8 @@ type FreeContentLookup map[string]bool
 // createFreeContentLookup creates a map for fast lookups in loops. Filename
 // contains API response (2017-12-01).
 func createFreeContentLookup(filename string) (FreeContentLookup, error) {
+	lookup := make(FreeContentLookup)
+
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -41,7 +43,7 @@ func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 	if err := json.NewDecoder(f).Decode(&items); err != nil {
 		return nil, err
 	}
-	lookup := make(FreeContentLookup)
+
 	for _, item := range items {
 		key := fmt.Sprintf("%s:%s", item.Sid, item.MegaCollection)
 		switch strings.TrimSpace(strings.ToLower(item.FreeContent)) {
@@ -96,9 +98,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lookup, err := createFreeContentLookup(*freeContentFile)
-	if err != nil {
-		log.Fatal(err)
+	lookup := make(FreeContentLookup)
+	if *freeContentFile != "" {
+		lookup, err = createFreeContentLookup(*freeContentFile)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	w := bufio.NewWriter(os.Stdout)
