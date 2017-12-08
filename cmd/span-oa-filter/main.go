@@ -104,6 +104,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Printf("loaded free content map with %d entries", len(lookup))
 	}
 
 	w := bufio.NewWriter(os.Stdout)
