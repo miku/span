@@ -16,7 +16,7 @@ import (
 	"github.com/miku/span/parallel"
 )
 
-// FreeContentItem is a single item from the API response.
+// FreeContentItem is a single item from the API response (2017-12-01).
 type FreeContentItem struct {
 	FreeContent    string `json:"freeContent"`
 	MegaCollection string `json:"mega_collection"`
@@ -24,9 +24,13 @@ type FreeContentItem struct {
 	Sid            string `json:"sid"`
 }
 
-// freeContentResponseToFilterConfig turns bytes into a JSON string
-// representing a part of a filterconfig.
-func freeContentResponseToFilterConfig(filename string) (interface{}, error) {
+// FreeContentLookup maps a string of the form "Sid:MegaCollection" to a bool,
+// indicating free access (true) and uncertainty or closed access.
+type FreeContentLookup map[string]bool
+
+// createFreeContentLookup creates a map for fast lookups in loops. Filename
+// contains API response (2017-12-01).
+func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -37,25 +41,19 @@ func freeContentResponseToFilterConfig(filename string) (interface{}, error) {
 	if err := json.NewDecoder(f).Decode(&items); err != nil {
 		return nil, err
 	}
-	of := make(map[string][]interface{})
-	of["or"] = make([]interface{}, 0)
+	lookup := make(FreeContentLookup)
 	for _, item := range items {
-		if strings.ToLower(item.FreeContent) != "ja" {
-			continue
+		key := fmt.Sprintf("%s:%s", item.Sid, item.MegaCollection)
+		switch strings.TrimSpace(strings.ToLower(item.FreeContent)) {
+		case "ja", "yes", "ok", "1":
+			lookup[key] = true
+		case "nicht festgelegt":
+			lookup[key] = false
+		default:
+			lookup[key] = false
 		}
-		af := map[string][]map[string][]string{
-			"and": []map[string][]string{
-				map[string][]string{
-					"collection": []string{item.MegaCollection},
-				},
-				map[string][]string{
-					"source": []string{item.Sid},
-				},
-			},
-		}
-		of["or"] = append(of["or"], af)
 	}
-	return of, nil
+	return lookup, nil
 }
 
 func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
@@ -82,17 +80,12 @@ func main() {
 	}
 
 	// Prepare filterconfig.
-	kfc, err := kbartToFilterConfig(*kbartFile, *verbose)
+	fmap, err := kbartToFilterConfig(*kbartFile, *verbose)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fcfc, err := freeContentResponseToFilterConfig(*freeContentFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fc := map[string][]interface{}{"or": []interface{}{kfc, fcfc}}
 
-	config, err := json.Marshal(fc)
+	config, err := json.Marshal(fmap)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -100,6 +93,11 @@ func main() {
 	// Create a holdings filter, fail here, if files are broken.
 	filter := filter.HoldingsFilter{}
 	if err := filter.UnmarshalJSON(config); err != nil {
+		log.Fatal(err)
+	}
+
+	lookup, err := createFreeContentLookup(*freeContentFile)
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -111,9 +109,23 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return nil, err
 		}
+
+		// Set OA by KBART: various list (e.g. KBART in AMSL, OA GOLD list, maybe more in this format).
 		if filter.Apply(is) {
 			is.OpenAccess = true
 		}
+
+		// Additionally, compare free content API results.
+		for _, c := range is.MegaCollections {
+			key := fmt.Sprintf("%s:%s", is.SourceID, c)
+			if v, ok := lookup[key]; ok {
+				is.OpenAccess = v
+				if v {
+					break // In case of multiple collections, we keep the max.
+				}
+			}
+		}
+
 		bb, err := json.Marshal(is)
 		if err != nil {
 			return bb, err
