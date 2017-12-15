@@ -17,7 +17,7 @@ const (
 	Format           = "ElectronicArticle"
 	Genre            = "article"
 	DefaultRefType   = "EJOUR"
-	Collection       = "CEEOL"
+	Collection       = "CEEOL Central and Eastern European Online Library"
 )
 
 // Article from CEEOL, refs #9398.
