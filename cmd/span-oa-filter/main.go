@@ -25,11 +25,11 @@ type FreeContentItem struct {
 }
 
 // FreeContentLookup maps a string of the form "Sid:MegaCollection" to a bool,
-// indicating free access (true) and uncertainty or closed access.
+// indicating free access (true) and uncertainty or closed access (false).
 type FreeContentLookup map[string]bool
 
 // createFreeContentLookup creates a map for fast lookups in loops. Filename
-// contains API response (2017-12-01).
+// contains AMSL API response (2017-12-01).
 func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 	lookup := make(FreeContentLookup)
 
