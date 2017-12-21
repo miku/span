@@ -149,7 +149,7 @@ func TestCovers(t *testing.T) {
 			Entry{}, "", "", "", ErrInvalidDate},
 		{"an empty does not impose constraints",
 			Entry{}, "2000", "", "", nil},
-		{"record is not rejected, because there is no first issue date to start with, because the  #refs 12129",
+		{"record is not rejected, because there is no first issue date to start with, #refs 12129",
 			Entry{PrintIdentifier: "0028-3878", OnlineIdentifier: "1526-632X", FirstVolume: "1951", LastIssueDate: "1994"},
 			"1980-05-01T00:00:00Z", "30", "5", nil,
 		},
