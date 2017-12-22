@@ -24,6 +24,7 @@ import (
 	"github.com/miku/span/formats/elsevier"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/formats/genios"
+	"github.com/miku/span/formats/hhbd"
 	"github.com/miku/span/formats/highwire"
 	"github.com/miku/span/formats/ieee"
 	"github.com/miku/span/formats/imslp"
@@ -47,19 +48,20 @@ type Factory func() interface{}
 
 // FormatMap maps format name to pointer to format struct.
 var FormatMap = map[string]Factory{
-	"highwire":  func() interface{} { return new(highwire.Record) },
 	"ceeol":     func() interface{} { return new(ceeol.Article) },
-	"doaj":      func() interface{} { return new(doaj.Response) },
 	"crossref":  func() interface{} { return new(crossref.Document) },
-	"ieee":      func() interface{} { return new(ieee.Publication) },
-	"genios":    func() interface{} { return new(genios.Document) },
-	"jstor":     func() interface{} { return new(jstor.Article) },
 	"degruyter": func() interface{} { return new(degruyter.Article) },
-	"thieme-tm": func() interface{} { return new(thieme.Document) },
-	"imslp":     func() interface{} { return new(imslp.Data) },
-	"zvdd":      func() interface{} { return new(zvdd.DublicCoreRecord) },
-	"zvdd-mets": func() interface{} { return new(zvdd.MetsRecord) },
+	"doaj":      func() interface{} { return new(doaj.Response) },
 	"dummy":     func() interface{} { return new(dummy.Example) },
+	"genios":    func() interface{} { return new(genios.Document) },
+	"hhbd":      func() interface{} { return new(hhbd.Record) },
+	"highwire":  func() interface{} { return new(highwire.Record) },
+	"ieee":      func() interface{} { return new(ieee.Publication) },
+	"imslp":     func() interface{} { return new(imslp.Data) },
+	"jstor":     func() interface{} { return new(jstor.Article) },
+	"thieme-tm": func() interface{} { return new(thieme.Document) },
+	"zvdd-mets": func() interface{} { return new(zvdd.MetsRecord) },
+	"zvdd":      func() interface{} { return new(zvdd.DublicCoreRecord) },
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -207,7 +209,7 @@ func main() {
 	}
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets":
+	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets", "hhbd":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
