@@ -110,7 +110,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = "107"
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, base64.RawURLEncoding.EncodeToString([]byte(output.RecordID)))
 	output.ArticleTitle = record.Metadata.Dc.Title.Text
-	output.MegaCollections = []string{"Heidelberger Historische Bestände (Digital)"}
+	output.MegaCollections = []string{"Heidelberger Historische Bestände Digital"}
 
 	// Date.
 	date, err := record.date()
@@ -140,11 +140,19 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 		output.Subjects = append(output.Subjects, text)
 	}
-
-	// Ignore other potential container titles.
-	if len(record.Metadata.Dc.Ispartof) > 0 {
-		output.JournalTitle = record.Metadata.Dc.Ispartof[0].Text
+	for _, s := range record.Metadata.Dc.Temporal {
+		text := strings.TrimSpace(s.Text)
+		if text == "" {
+			continue
+		}
+		output.Subjects = append(output.Subjects, text)
 	}
+
+	for _, ipo := range record.Metadata.Dc.Ispartof {
+		output.MegaCollections = append(output.MegaCollections, fmt.Sprintf("HHBD: %s", ipo.Text))
+	}
+
+	output.Abstract = record.Metadata.Dc.Alternative.Text
 
 	// URLs.
 	for _, id := range record.Metadata.Dc.Identifier {
@@ -164,6 +172,10 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 			continue
 		}
 		output.Languages = append(output.Languages, tlc)
+	}
+
+	for _, p := range record.Metadata.Dc.Spatial {
+		output.Publishers = append(output.Publishers, p.Text)
 	}
 
 	return output, err
