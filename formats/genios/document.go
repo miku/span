@@ -25,6 +25,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -79,6 +80,8 @@ var (
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// dbmap maps a database name to one or more "package names"
 	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
+	// yearPattern matches YYYY
+	yearPattern = regexp.MustCompile(`[12][0-9][0-9][0-9]`)
 )
 
 // Headings returns subject headings.
@@ -99,8 +102,15 @@ func (doc Document) Headings() []string {
 	return headings
 }
 
-// Date returns the date as noted in the document.
+// Date returns the date as noted in the document. There might be two values:
+// Date and Year. Defaults to Year, fallback to Date, refs #12193.
 func (doc Document) Date() (time.Time, error) {
+	rawYear := strings.TrimSpace(rawDateReplacer.Replace(doc.Year))
+	if yearPattern.MatchString(rawYear) {
+		// Prefer Year, refs #12193.
+		return time.Parse("2006", rawYear)
+	}
+	// Fallback to Date, refs #12193.
 	raw := strings.TrimSpace(rawDateReplacer.Replace(doc.RawDate))
 	if len(raw) > 8 {
 		raw = raw[:8]
