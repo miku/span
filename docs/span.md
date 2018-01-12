@@ -4,7 +4,7 @@ SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
 NAME
 ----
 
-span-import, span-tag, span-check, span-export, span-oa-filter,
+span-import, span-tag, span-export, span-check, span-oa-filter,
 span-update-labels, span-crossref-snapshot, span-local-data, span-freeze - intermediate
 schema tools
 
