@@ -106,6 +106,7 @@ type Document struct {
 	Member         string    `json:"member"`
 	Page           string    `json:"page"`
 	Prefix         string    `json:"prefix"`
+	PublishedPrint DateField `json:"published-print"`
 	Publisher      string    `json:"publisher"`
 	ReferenceCount int       `json:"reference-count"`
 	Score          float64   `json:"score"`
@@ -226,7 +227,11 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
 	output := finc.NewIntermediateSchema()
 
-	output.Date, err = doc.Issued.Date()
+	output.Date, err = doc.PublishedPrint.Date()
+	if err != nil {
+		// Fallback to previous behaviour, refs #12321.
+		output.Date, err = doc.Issued.Date()
+	}
 
 	if err != nil {
 		return output, err
