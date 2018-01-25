@@ -4,6 +4,7 @@ package finc
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
@@ -15,6 +16,7 @@ type Solr5Vufind3 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
 	Authors              []string `json:"author,omitempty"`
+	AuthorSort           []string `json:"author_sort,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
 	Edition              string   `json:"edition,omitempty"`
@@ -171,6 +173,11 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	// refs #7092
 	if len(authors) > 0 {
 		s.Authors = authors
+	}
+
+	// gh #8, refs #12310
+	for _, au := range authors {
+		s.AuthorSort = append(s.AuthorSort, strings.ToLower(au))
 	}
 
 	s.AccessFacet = AIAccessFacet
