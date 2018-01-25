@@ -66,7 +66,7 @@ var (
 	}
 
 	// Future ends soon.
-	Future = time.Now().Add(time.Hour * 24 * 365 * 5)
+	Future = time.Now().Add(time.Hour * 24 * 365 * 2)
 )
 
 // BulkResponse for a bulk request containing multiple items.
