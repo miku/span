@@ -163,6 +163,18 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		if strings.HasPrefix(id.Text, "urn:nbn:") {
 			output.URL = append(output.URL, fmt.Sprintf("http://nbn-resolving.de/%s", id.Text))
 		}
+
+		// Guess IIIF Link.
+		// http://digi.ub.uni-heidelberg.de/diglit/zcak1856 =>
+		// https://digi.ub.uni-heidelberg.de/diglit/iiif/zcak1856/manifest.json
+		if strings.HasPrefix(id.Text, "http://digi.ub.uni-heidelberg.de/diglit") {
+			parts := strings.Split(id.Text, "/")
+			if len(parts) > 1 {
+				manifestURL := fmt.Sprintf("https://digi.ub.uni-heidelberg.de/diglit/iiif/%s/manifest.json",
+					parts[len(parts)-1])
+				output.URL = append(output.URL, manifestURL)
+			}
+		}
 	}
 
 	// Languages.
