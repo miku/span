@@ -119,7 +119,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	// refs. #8709
 	if is.DOI != "" {
-		s.URL = []string{fmt.Sprintf("http://doi.org/%s", is.DOI)}
+		// refs. GH #9
+		s.URL = []string{fmt.Sprintf("https://doi.org/%s", is.DOI)}
 	} else {
 		s.URL = is.URL
 	}
