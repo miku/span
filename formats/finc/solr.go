@@ -16,7 +16,7 @@ type Solr5Vufind3 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
 	Authors              []string `json:"author,omitempty"`
-	AuthorSort           []string `json:"author_sort,omitempty"`
+	AuthorSort           string   `json:"author_sort,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
 	Edition              string   `json:"edition,omitempty"`
@@ -171,14 +171,10 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
 	}
 
-	// refs #7092
+	// refs #7092, gh #8, refs #12310
 	if len(authors) > 0 {
 		s.Authors = authors
-	}
-
-	// gh #8, refs #12310
-	for _, au := range authors {
-		s.AuthorSort = append(s.AuthorSort, strings.ToLower(au))
+		s.AuthorSort = strings.ToLower(authors[0])
 	}
 
 	s.AccessFacet = AIAccessFacet
