@@ -48,20 +48,21 @@ type Factory func() interface{}
 
 // FormatMap maps format name to pointer to format struct.
 var FormatMap = map[string]Factory{
-	"ceeol":     func() interface{} { return new(ceeol.Article) },
-	"crossref":  func() interface{} { return new(crossref.Document) },
-	"degruyter": func() interface{} { return new(degruyter.Article) },
-	"doaj":      func() interface{} { return new(doaj.Response) },
-	"dummy":     func() interface{} { return new(dummy.Example) },
-	"genios":    func() interface{} { return new(genios.Document) },
-	"hhbd":      func() interface{} { return new(hhbd.Record) },
-	"highwire":  func() interface{} { return new(highwire.Record) },
-	"ieee":      func() interface{} { return new(ieee.Publication) },
-	"imslp":     func() interface{} { return new(imslp.Data) },
-	"jstor":     func() interface{} { return new(jstor.Article) },
-	"thieme-tm": func() interface{} { return new(thieme.Document) },
-	"zvdd-mets": func() interface{} { return new(zvdd.MetsRecord) },
-	"zvdd":      func() interface{} { return new(zvdd.DublicCoreRecord) },
+	"ceeol":      func() interface{} { return new(ceeol.Article) },
+	"crossref":   func() interface{} { return new(crossref.Document) },
+	"degruyter":  func() interface{} { return new(degruyter.Article) },
+	"doaj":       func() interface{} { return new(doaj.Response) },
+	"dummy":      func() interface{} { return new(dummy.Example) },
+	"genios":     func() interface{} { return new(genios.Document) },
+	"hhbd":       func() interface{} { return new(hhbd.Record) },
+	"highwire":   func() interface{} { return new(highwire.Record) },
+	"ieee":       func() interface{} { return new(ieee.Publication) },
+	"imslp":      func() interface{} { return new(imslp.Data) },
+	"jstor":      func() interface{} { return new(jstor.Article) },
+	"thieme-tm":  func() interface{} { return new(thieme.Document) },
+	"thieme-nlm": func() interface{} { return new(thieme.Record) },
+	"zvdd-mets":  func() interface{} { return new(zvdd.MetsRecord) },
+	"zvdd":       func() interface{} { return new(zvdd.DublicCoreRecord) },
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -70,8 +71,8 @@ type IntermediateSchemaer interface {
 }
 
 // processXML converts XML based formats, given a format name. It reads XML as
-// stream, finds records by given xml.Name and converts them to an intermediate
-// schema at the moment.
+// stream and converts record them to an intermediate // schema (at the
+// moment).
 func processXML(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)
@@ -209,7 +210,7 @@ func main() {
 	}
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets", "hhbd":
+	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
