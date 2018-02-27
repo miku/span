@@ -4,7 +4,7 @@
 // Intermediate nodes can be "or", "and" or "not" filters, leaf nodes contain
 // filters, that are matched against records (like "collection", "source" or "issn").
 //
-// A filter needs to implement is Apply. If the filter takes configuration
+// A filter needs to implement Apply. If the filter takes configuration
 // options, it needs to implement UnmarshalJSON as well. Each filter can define
 // arbitrary options, for example a HoldingsFilter can load KBART data from a single
 // file or a list of urls.
