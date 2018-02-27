@@ -3,7 +3,9 @@ package thieme
 import (
 	"encoding/xml"
 	"fmt"
+	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -139,11 +141,8 @@ type Record struct {
 						Text string `xml:",chardata"` // 667, 667, 669, 669, 674, ...
 					} `xml:"lpage"`
 					Abstract struct {
-						Text string `xml:",chardata"`
+						Text string `xml:",innerxml"`
 						Lang string `xml:"lang,attr"`
-						P    struct {
-							Text string `xml:",chardata"` // Weitere Beobachtungen üb...
-						} `xml:"p"`
 					} `xml:"abstract"`
 					TransAbstract struct {
 						Text string `xml:",chardata"`
@@ -171,13 +170,97 @@ type Record struct {
 	} `xml:"about"`
 }
 
+// Date returns the parsed publishing date.
+func (record Record) Date() (time.Time, error) {
+	if len(record.Metadata.Article) == 0 {
+		return time.Time{}, fmt.Errorf("empty record")
+	}
+	article := record.Metadata.Article[0]
+	pd := article.Front.ArticleMeta.PubDate
+
+	if pd.Month.Text == "0" {
+		pd.Month.Text = "01"
+	}
+
+	if pd.Day.Text == "0" {
+		pd.Day.Text = "01"
+	}
+
+	if pd.Year.Text != "" && pd.Month.Text != "" && pd.Day.Text != "" {
+		s := fmt.Sprintf("%s-%s-%s", leftPad(pd.Year.Text, "0", 4),
+			leftPad(pd.Month.Text, "0", 2),
+			leftPad(pd.Day.Text, "0", 2))
+		return time.Parse("2006-01-02", s)
+	}
+	if pd.Year.Text != "" && pd.Month.Text != "" {
+		s := fmt.Sprintf("%s-%s-01", leftPad(pd.Year.Text, "0", 4), leftPad(pd.Month.Text, "0", 2))
+		return time.Parse("2006-01-02", s)
+	}
+	if pd.Year.Text != "" {
+		s := fmt.Sprintf("%s-01-01", leftPad(pd.Year.Text, "0", 4))
+		return time.Parse("2006-01-02", s)
+	}
+	return time.Time{}, fmt.Errorf("invalid date")
+}
+
+// ToIntermediateSchema converts a single record.
 func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 	if len(record.Metadata.Article) == 0 {
-		return nil, fmt.Errorf("no article found")
+		return nil, span.Skip{Reason: "no article found"}
 	}
 	article := record.Metadata.Article[0]
 
+	date, err := record.Date()
+	if err != nil {
+		return output, span.Skip{Reason: err.Error()}
+	}
+	output.Date = date
+	output.RawDate = date.Format("2006-01-02")
+
+	output.SourceID = SourceID
+	output.Format = Format
+	output.MegaCollections = []string{Collection}
+	output.Genre = Genre
+	output.RefType = DefaultRefType
+
+	output.JournalTitle = article.Front.JournalMeta.JournalTitleGroup.JournalTitle.Text
 	output.ArticleTitle = article.Front.ArticleMeta.TitleGroup.ArticleTitle.Text
+	output.StartPage = article.Front.ArticleMeta.Fpage.Text
+	output.EndPage = article.Front.ArticleMeta.Lpage.Text
+	output.Volume = article.Front.ArticleMeta.Volume.Text
+	output.Issue = article.Front.ArticleMeta.Issue.Text
+
+	output.Abstract = article.Front.ArticleMeta.Abstract.Text
+	output.Publishers = append(output.Publishers, article.Front.JournalMeta.Publisher.PublisherName.Text)
+
+	for _, issn := range article.Front.JournalMeta.ISSN {
+		switch issn.PubType {
+		case "print":
+			output.ISSN = append(output.ISSN, issn.Text)
+		case "e-issn":
+			output.EISSN = append(output.EISSN, issn.Text)
+		default:
+			return output, fmt.Errorf("unhandled issn type: %s", issn.PubType)
+		}
+	}
+
+	if article.Front.ArticleMeta.ArticleID.PubIDType == "doi" {
+		output.DOI = article.Front.ArticleMeta.ArticleID.Text
+	} else {
+		return output, fmt.Errorf("unknown id type: %s", article.Front.ArticleMeta.ArticleID.PubIDType)
+	}
+
+	var authors []finc.Author
+	for _, contrib := range article.Front.ArticleMeta.ContribGroup.Contrib {
+		authors = append(authors, finc.Author{
+			FirstName: contrib.Name.GivenNames.Text,
+			LastName:  contrib.Name.Surname.Text,
+		})
+	}
+	output.Authors = authors
+	output.Subjects = append(output.Subjects,
+		article.Front.ArticleMeta.ArticleCategories.SubjGroup.Subject.Text)
+
 	return output, nil
 }
