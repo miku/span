@@ -1,6 +1,7 @@
 package thieme
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"time"
@@ -250,6 +251,8 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	} else {
 		return output, fmt.Errorf("unknown id type: %s", article.Front.ArticleMeta.ArticleID.PubIDType)
 	}
+
+	output.ID = fmt.Sprintf("ai-60-%s", base64.RawURLEncoding.EncodeToString([]byte(output.DOI)))
 
 	var authors []finc.Author
 	for _, contrib := range article.Front.ArticleMeta.ContribGroup.Contrib {
