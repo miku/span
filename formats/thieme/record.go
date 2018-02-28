@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 )
@@ -233,7 +234,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = article.Front.ArticleMeta.Volume.Text
 	output.Issue = article.Front.ArticleMeta.Issue.Text
 
-	output.Abstract = article.Front.ArticleMeta.Abstract.Text
+	output.Abstract = sanitize.HTML(article.Front.ArticleMeta.Abstract.Text)
 	output.Publishers = append(output.Publishers, article.Front.JournalMeta.Publisher.PublisherName.Text)
 
 	for _, issn := range article.Front.JournalMeta.ISSN {
