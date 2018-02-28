@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/miku/span"
@@ -262,8 +263,11 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		})
 	}
 	output.Authors = authors
-	output.Subjects = append(output.Subjects,
-		article.Front.ArticleMeta.ArticleCategories.SubjGroup.Subject.Text)
+
+	subject := strings.TrimSpace(article.Front.ArticleMeta.ArticleCategories.SubjGroup.Subject.Text)
+	if subject != "" {
+		output.Subjects = append(output.Subjects, subject)
+	}
 
 	return output, nil
 }
