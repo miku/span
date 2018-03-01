@@ -29,6 +29,7 @@ import (
 	"github.com/miku/span/formats/ieee"
 	"github.com/miku/span/formats/imslp"
 	"github.com/miku/span/formats/jstor"
+	"github.com/miku/span/formats/olms"
 	"github.com/miku/span/formats/thieme"
 	"github.com/miku/span/formats/zvdd"
 	"github.com/miku/span/parallel"
@@ -59,6 +60,7 @@ var FormatMap = map[string]Factory{
 	"ieee":       func() interface{} { return new(ieee.Publication) },
 	"imslp":      func() interface{} { return new(imslp.Data) },
 	"jstor":      func() interface{} { return new(jstor.Article) },
+	"olms":       func() interface{} { return new(olms.Record) },
 	"thieme-tm":  func() interface{} { return new(thieme.Document) },
 	"thieme-nlm": func() interface{} { return new(thieme.Record) },
 	"zvdd-mets":  func() interface{} { return new(zvdd.MetsRecord) },
@@ -210,7 +212,7 @@ func main() {
 	}
 
 	switch *name {
-	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm":
+	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm", "zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
