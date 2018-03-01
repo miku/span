@@ -78,7 +78,8 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(parts) != 2 {
 		return output, fmt.Errorf("cannot find identifier: %s", record.Header.Identifier.Text)
 	}
-	output.RecordID = fmt.Sprintf("ai-%s-%s", output.SourceID, parts[1])
+	output.RecordID = record.Header.Identifier.Text
+	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, parts[1])
 	output.MegaCollections = append(output.MegaCollections, "Olms")
 	output.Genre = "article"
 	output.RefType = "EJOUR"
@@ -98,8 +99,12 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if record.Metadata.Dc.Date.Text == "" {
 		return output, span.Skip{Reason: "empty date"}
 	}
+	if len(record.Metadata.Dc.Date.Text) < 4 {
+		return output, span.Skip{Reason: "short date"}
+	}
 	if record.Metadata.Dc.Date.Text != "" {
-		s := record.Metadata.Dc.Date.Text
+		// <dc:date>19787</dc:date> --
+		s := record.Metadata.Dc.Date.Text[:4]
 		date, err := time.Parse("2006", s)
 		if err != nil {
 			return output, err
