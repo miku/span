@@ -45,7 +45,7 @@ OPTIONS
   Input format. `span-import` only.
 
 `-o` *format*
-  Output format or file. `span-export`, `span-freeze` only..
+  Output format or file. `span-export`, `span-freeze`, `span-crossref-snapshot` only..
 
 `-c` *config-string* or *config-file*
   Configuration string or path to configuration file. `span-tag` only. See
