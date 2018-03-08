@@ -85,6 +85,10 @@ func main() {
 	mapping := make(map[string]string)
 
 	for i, u := range unique {
+		if !strings.HasPrefix("http", u) {
+			log.Printf("skip: %s", u)
+			continue
+		}
 		h := sha1.New()
 		h.Write([]byte(u))
 		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
