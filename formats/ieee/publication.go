@@ -112,6 +112,8 @@ type Publication struct {
 				Articlereferenceflag   string `xml:"articlereferenceflag"`
 				Articlepeerreviewflag  string `xml:"articlepeerreviewflag"`
 				Holdstatus             string `xml:"holdstatus"`
+				ArticleLicense         string `xml:"articlelicense"`
+				ArticleLicenseURI      string `xml:"article_license_uri"`
 				Articlecopyright       struct {
 					Holderisieee string `xml:"holderisieee,attr"`
 					Year         string `xml:"year,attr"`
