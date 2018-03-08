@@ -12,7 +12,7 @@ import (
 )
 
 // UnfreezeFilterConfig takes the name of a zipfile (from span-freeze) and
-// returns the path the thawed filterconfig (along with the temporary directory
+// returns of the path the thawed filterconfig (along with the temporary directory
 // and error). All URLs in the filterconfig have then been replaced by absolute
 // path on the file system. Assumes default values for mapping.json and content
 // file (blob). Cleanup of temporary directory is responsibility of caller.
