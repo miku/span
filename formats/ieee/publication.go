@@ -344,5 +344,10 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.Packages = append(is.Packages, p.Publicationinfo.Packagemembers...)
 
+	// https://supportcenter.ieee.org/app/answers/detail/a_id/1900/~/how-is-the-oapa-different-from-a-cc-by-license%3F
+	if p.Volume.Article.Articleinfo.ArticleLicense == "CCBY" {
+		is.OpenAccess = true
+	}
+
 	return is, nil
 }
