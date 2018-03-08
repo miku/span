@@ -3,7 +3,7 @@ Name:       span
 Version:    0.1.217
 Release:    0
 License:    GPL
-BuildArch:  x86_64
+ExclusiveArch:  x86_64
 BuildRoot:  %{_tmppath}/%{name}-build
 Group:      System/Base
 Vendor:     Leipzig University Library, https://www.ub.uni-leipzig.de
