@@ -85,7 +85,7 @@ func main() {
 	mapping := make(map[string]string)
 
 	for i, u := range unique {
-		if !strings.HasPrefix("http", u) {
+		if !strings.HasPrefix(u, "http") {
 			log.Printf("skip: %s", u)
 			continue
 		}
