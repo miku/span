@@ -278,6 +278,12 @@ func (record MetsRecord) ToIntermediateSchema() (*finc.IntermediateSchema, error
 
 	for i, sec := range record.Metadata.Mets.DmdSec {
 		log.Printf("%d, %s", i, sec.MdWrap.XmlData.Mods.TitleInfo.Title.Text)
+		log.Printf("%d, %s", i, sec.MdWrap.XmlData.Mods.Location.URL.Text)
+		log.Printf("%d, %s", i, sec.MdWrap.XmlData.Mods.RecordInfo.RecordIdentifier.Text)
+		for j, id := range sec.MdWrap.XmlData.Mods.Identifier {
+			log.Printf("%d-%d, %s (%s)", i, j, id.Text, id.Type)
+		}
+		log.Printf("----")
 	}
 	return output, nil
 }
