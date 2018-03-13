@@ -276,8 +276,8 @@ func (record MetsRecord) ToIntermediateSchema() (*finc.IntermediateSchema, error
 	output.Genre = "article"
 	output.RefType = "EJOUR"
 
-	for _, sec := range record.Metadata.Mets.DmdSec {
-		log.Println(sec.MdWrap.XmlData.Mods.TitleInfo.Title.Text)
+	for i, sec := range record.Metadata.Mets.DmdSec {
+		log.Printf("%d, %s", i, sec.MdWrap.XmlData.Mods.TitleInfo.Title.Text)
 	}
 	return output, nil
 }
