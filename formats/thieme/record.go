@@ -254,6 +254,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, fmt.Errorf("unknown id type: %s", article.Front.ArticleMeta.ArticleID.PubIDType)
 	}
 
+	output.RecordID = output.DOI
 	output.ID = fmt.Sprintf("ai-60-%s", base64.RawURLEncoding.EncodeToString([]byte(output.DOI)))
 
 	var authors []finc.Author
