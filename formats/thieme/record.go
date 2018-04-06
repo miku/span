@@ -236,7 +236,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.Abstract = sanitize.HTML(article.Front.ArticleMeta.Abstract.Text)
 
-	// Publisher name consolidation, https://git.io/vxSFX.
+	// Partial publisher name consolidation, https://git.io/vxSFX.
 	pmap := map[string]string{
 		"© Georg Thieme Verlag KG":       "Georg Thieme Verlag Stuttgart, New York",
 		"© Georg Thieme Verlag KG":       "Georg Thieme Verlag Stuttgart, New York",
@@ -256,7 +256,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 	if publisher == "" {
-		return output, span.Skip{Reason: "no publisher string"}
+		return output, span.Skip{Reason: "empty publisher string"}
 	}
 	output.Publishers = append(output.Publishers, publisher)
 
