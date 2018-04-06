@@ -235,7 +235,30 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Issue = article.Front.ArticleMeta.Issue.Text
 
 	output.Abstract = sanitize.HTML(article.Front.ArticleMeta.Abstract.Text)
-	output.Publishers = append(output.Publishers, article.Front.JournalMeta.Publisher.PublisherName.Text)
+
+	// Publisher name consolidation, https://git.io/vxSFX.
+	pmap := map[string]string{
+		"© Georg Thieme Verlag KG":       "Georg Thieme Verlag Stuttgart, New York",
+		"© Georg Thieme Verlag KG":       "Georg Thieme Verlag Stuttgart, New York",
+		"© Georg Thieme Verlag":          "Georg Thieme Verlag Stuttgart, New York",
+		"Georg Thieme Verlag KG":         "Georg Thieme Verlag Stuttgart, New York",
+		"Georg Thieme Verlag, Stuttgart": "Georg Thieme Verlag Stuttgart, New York",
+		"Thieme Publicações Ltda":        "Georg Thieme Verlag Stuttgart, New York",
+	}
+
+	// Clean publisher.
+	publisher := article.Front.JournalMeta.Publisher.PublisherName.Text
+	publisher = strings.Replace(publisher, "\n", " ", -1)
+
+	for k, v := range pmap {
+		if k == publisher {
+			publisher = v
+		}
+	}
+	if publisher == "" {
+		return output, span.Skip{Reason: "no publisher string"}
+	}
+	output.Publishers = append(output.Publishers, publisher)
 
 	for _, issn := range article.Front.JournalMeta.ISSN {
 		switch issn.PubType {
