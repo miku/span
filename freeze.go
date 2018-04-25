@@ -64,12 +64,9 @@ func UnfreezeFilterConfig(frozenfile string) (string, string, error) {
 	}
 
 	for url, file := range mappings {
-		// XXX: Too ugly?
+		// XXX: Too ugly? Does not work with pretty printed JSON.
 		x := []byte(fmt.Sprintf(`"%s"`, url))
-		y := []byte(fmt.Sprintf(`"%s"`, filepath.Join(dir, file)))
-		b = bytes.Replace(b, x, y, -1)
-		x = []byte(`{"holdings": {"urls":`)
-		y = []byte(`{"holdings": {"files":`)
+		y := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
 		b = bytes.Replace(b, x, y, -1)
 	}
 	if err := ioutil.WriteFile(blobfile, b, 0777); err != nil {
