@@ -56,7 +56,6 @@ func UnfreezeFilterConfig(frozenfile string) (string, string, error) {
 		}
 	}
 
-	// Assume dir/blob contains filterconfig with URLs.
 	blobfile := filepath.Join(dir, "blob")
 	b, err := ioutil.ReadFile(blobfile)
 	if err != nil {
@@ -64,10 +63,9 @@ func UnfreezeFilterConfig(frozenfile string) (string, string, error) {
 	}
 
 	for url, file := range mappings {
-		// XXX: Too ugly? Does not work with pretty printed JSON.
-		x := []byte(fmt.Sprintf(`"%s"`, url))
-		y := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
-		b = bytes.Replace(b, x, y, -1)
+		value := []byte(fmt.Sprintf(`%q`, url))
+		replacement := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
+		b = bytes.Replace(b, value, replacement, -1)
 	}
 	if err := ioutil.WriteFile(blobfile, b, 0777); err != nil {
 		return dir, "", err
