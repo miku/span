@@ -13,6 +13,8 @@ import (
 )
 
 var (
+	// $ sha1sum fixtures/kbart.txt
+	// d072bc9cef32ffbeaecc4c8c97562a1b9e47468c  fixtures/kbart.txt
 	fixture           = "../../fixtures/kbart.txt"
 	holdings          *Holdings
 	errFixtureMissing = errors.New("missing fixture")
@@ -49,8 +51,8 @@ func TestFilter(t *testing.T) {
 	entries := holdings.Filter(func(e licensing.Entry) bool {
 		return strings.Contains(strings.ToLower(e.TitleURL), "wiso")
 	})
-	if len(entries) != 702 {
-		t.Errorf("Filter: got %v, want %v", len(entries), 702)
+	if len(entries) != 593 {
+		t.Errorf("Filter: got %v, want %v", len(entries), 593)
 	}
 
 	// Test database name extraction.
@@ -63,16 +65,16 @@ func TestFilter(t *testing.T) {
 		}
 	}
 
-	if len(names.Values()) != 534 {
-		t.Errorf("Filter: got %v, want %v", len(names.Values()), 534)
+	if len(names.Values()) != 516 {
+		t.Errorf("Filter: got %v, want %v", len(names.Values()), 516)
 	}
 }
 
 func TestSerialNumberMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.SerialNumberMap()
-	if len(m) != 83721 {
-		t.Errorf("SerialNumberMap: got %v, want %v", len(m), 83721)
+	if len(m) != 37712 {
+		t.Errorf("SerialNumberMap: got %v, want %v", len(m), 37712)
 	}
 }
 
@@ -126,7 +128,7 @@ func BenchmarkLookupViaFilter(b *testing.B) {
 func TestWisoDatabaseMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.WisoDatabaseMap()
-	if len(m) != 534 {
-		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), 534)
+	if len(m) != 511 {
+		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), 511)
 	}
 }
