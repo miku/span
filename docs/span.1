@@ -36,7 +36,7 @@ The intermediate schema is a normalization vehicle, spec:
 Input format. \fB\fCspan\-import\fR only.
 .TP
 \fB\fC\-o\fR \fIformat\fP
-Output format or file. \fB\fCspan\-export\fR, \fB\fCspan\-freeze\fR, \fB\fCspan\-crossref\-snapshot\fR only..
+Output format or file. \fB\fCspan\-export\fR, \fB\fCspan\-freeze\fR, \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
 \fB\fC\-c\fR \fIconfig\-string\fP or \fIconfig\-file\fP
 Configuration string or path to configuration file. \fB\fCspan\-tag\fR only. See
@@ -61,7 +61,7 @@ Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR, \fB\fCspan\-crossref\-snap
 File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
 .TP
 \fB\fC\-fc\fR
-File in AMSL FreeContent API format about sources, collections and their OA status.
+File in AMSL FreeContent API format about sources, collections and their OA status, \fB\fCspan\-oa\-filter\fR only.
 .TP
 \fB\fC\-s\fR
 Field separator. \fB\fCspan\-update\-labels\fR only.
@@ -101,6 +101,9 @@ filters can be combined with: \fB\fCor\fR, \fB\fCand\fR and \fB\fCnot\fR\&. The 
 seen as an expression forest. The top level keys are the labels, that will be
 injected as \fB\fCx.labels\fR into the document, if the filter below the key evaluates
 to true.
+.PP
+The holdings filter configuration can include a list of URLs. As of 0.1.221 the
+the "urls" value supports the \fB\fCfile://\fR scheme as well.
 .PP
 More complex example for a configuration file:
 .PP
@@ -224,7 +227,9 @@ Example usage:
 .IP
 \fB\fCspan\-freeze \-o frozen.zip < filterconfig.json\fR
 .PP
-Thaw:
+Example for thawing a configuration. The zip file will be decompressed into a
+temporary location and the configuration is modified accordingly before tagging
+starts.
 .IP
 \fB\fCspan\-tag \-unfreeze frozen.zip < intermediate.file\fR
 .SH FILES

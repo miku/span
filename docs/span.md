@@ -45,7 +45,7 @@ OPTIONS
   Input format. `span-import` only.
 
 `-o` *format*
-  Output format or file. `span-export`, `span-freeze`, `span-crossref-snapshot` only..
+  Output format or file. `span-export`, `span-freeze`, `span-crossref-snapshot` only.
 
 `-c` *config-string* or *config-file*
   Configuration string or path to configuration file. `span-tag` only. See
@@ -70,7 +70,7 @@ OPTIONS
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
 
 `-fc`
-  File in AMSL FreeContent API format about sources, collections and their OA status.
+  File in AMSL FreeContent API format about sources, collections and their OA status, `span-oa-filter` only.
 
 `-s`
   Field separator. `span-update-labels` only.
@@ -112,6 +112,9 @@ filters can be combined with: `or`, `and` and `not`. The configuration can be
 seen as an expression forest. The top level keys are the labels, that will be
 injected as `x.labels` into the document, if the filter below the key evaluates
 to true.
+
+The holdings filter configuration can include a list of URLs. As of 0.1.221 the
+the "urls" value supports the `file://` scheme as well.
 
 More complex example for a configuration file:
 
@@ -227,7 +230,9 @@ Example usage:
 
   `span-freeze -o frozen.zip < filterconfig.json`
 
-Thaw:
+Example for thawing a configuration. The zip file will be decompressed into a
+temporary location and the configuration is modified accordingly before tagging
+starts.
 
   `span-tag -unfreeze frozen.zip < intermediate.file`
 
