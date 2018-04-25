@@ -242,6 +242,24 @@ func TestCovers(t *testing.T) {
 			"only issn, refs #11579, record has date",
 			Entry{OnlineIdentifier: "2477-5975"}, "1967-12-01T00:00:00Z", "", "", nil,
 		},
+		{
+			"refs #12775",
+			Entry{
+				PublicationTitle:      "Journal of the Acoustical Society of America / JASA Express Letters",
+				PrintIdentifier:       "0001-4966",
+				OnlineIdentifier:      "1520-8524",
+				FirstIssueDate:        "2006",
+				FirstVolume:           "119",
+				FirstIssue:            "2",
+				TitleURL:              "http://asa.scitation.org/journal/jel",
+				TitleID:               "235781",
+				CoverageDepth:         "Volltext",
+				PublisherName:         "Acoustical Society of America (ASA)",
+				InterlibraryRelevance: "Elektronischer Versand an Endnutzer",
+				AllSerialNumbers:      "0001-4966;1520-8524",
+				ZDBID:                 "1461063-2"},
+			"1939-07-01", "11", "1", ErrBeforeFirstIssueDate,
+		},
 	}
 	for _, c := range cases {
 		err := c.entry.Covers(c.date, c.volume, c.issue)
