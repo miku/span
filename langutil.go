@@ -3,18 +3,12 @@ package span
 import (
 	"strings"
 
-	"github.com/rainycape/cld2"
-	"golang.org/x/text/language"
+	"github.com/abadojack/whatlanggo"
 )
 
 // DetectLang3 returns the best guess 3-letter language code for a given text.
 func DetectLang3(text string) (string, error) {
-	c := cld2.Detect(text)
-	b, err := language.ParseBase(c)
-	if err != nil {
-		return "", err
-	}
-	return b.ISO3(), nil
+	return whatlanggo.LangToString(whatlanggo.Detect(text).Lang), nil
 }
 
 // LanguageIdentifier returns the three letter identifier from any string.
