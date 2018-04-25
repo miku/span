@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
@@ -126,10 +127,19 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		f.Names = append(f.Names, s.Holdings.Filename)
 	}
 	for _, link := range s.Holdings.Links {
-		if err := Cache.putLink(link); err != nil {
-			return err
+		// Allow files to appear in urls field (for unfreeze).
+		if strings.HasPrefix(link, "file://") {
+			filename := strings.Replace(link, "file://", "", 1)
+			if err := Cache.putFile(filename); err != nil {
+				return err
+			}
+			f.Names = append(f.Names, filename)
+		} else {
+			if err := Cache.putLink(link); err != nil {
+				return err
+			}
+			f.Names = append(f.Names, link)
 		}
-		f.Names = append(f.Names, link)
 	}
 
 	f.Verbose = s.Holdings.Verbose
