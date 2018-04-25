@@ -10,6 +10,7 @@ package licensing
 import (
 	"errors"
 	"fmt"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -149,6 +150,7 @@ func (entry *Entry) ISSNList() []string {
 // issue is covered by this entry. It takes into account moving walls. If
 // values are not defined, we mostly assume they are not constrained.
 func (entry *Entry) Covers(date, volume, issue string) error {
+	log.Printf("Covers (%s, %s, %s) for entry: %s", date, volume, issue, entry)
 	t, g, err := parseWithGranularity(date)
 	if err != nil {
 		return err
