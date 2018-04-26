@@ -1,5 +1,6 @@
 SHELL = /bin/bash
 TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze
+PKGNAME = span
 
 # find go-bindata executable on vm
 export PATH := /home/vagrant/bin:$(PATH)
@@ -43,72 +44,33 @@ $(TARGETS): %: cmd/%/main.go
 
 clean:
 	rm -f $(TARGETS)
-	rm -f span_*deb
-	rm -f span-*rpm
-	rm -rf ./packaging/deb/span/usr
+	rm -f $(PKGNAME)_*deb
+	rm -f $(PKGNAME)-*rpm
+	rm -rf ./packaging/deb/$(PKGNAME)/usr
 	rm -f assetutil/bindata.go
 
 deb: all
-	mkdir -p packaging/deb/span/usr/sbin
-	cp $(TARGETS) packaging/deb/span/usr/sbin
-	mkdir -p packaging/deb/span/usr/local/share/man/man1
-	cp docs/span.1 packaging/deb/span/usr/local/share/man/man1
-	cd packaging/deb && fakeroot dpkg-deb --build span .
-	mv packaging/deb/span_*.deb .
+	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
+	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/sbin
+	mkdir -p packaging/deb/$(PKGNAME)/usr/local/share/man/man1
+	cp docs/$(PKGNAME).1 packaging/deb/$(PKGNAME)/usr/local/share/man/man1
+	cd packaging/deb && fakeroot dpkg-deb --build $(PKGNAME) .
+	mv packaging/deb/$(PKGNAME)_*.deb .
 
 rpm: all
 	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
-	cp ./packaging/rpm/span.spec $(HOME)/rpmbuild/SPECS
+	cp ./packaging/rpm/$(PKGNAME).spec $(HOME)/rpmbuild/SPECS
 	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
-	cp docs/span.1 $(HOME)/rpmbuild/BUILD
-	./packaging/rpm/buildrpm.sh span
-	cp $(HOME)/rpmbuild/RPMS/x86_64/span*.rpm .
+	cp docs/$(PKGNAME).1 $(HOME)/rpmbuild/BUILD
+	./packaging/rpm/buildrpm.sh $(PKGNAME)
+	cp $(HOME)/rpmbuild/RPMS/x86_64/$(PKGNAME)*.rpm .
 
 cloc:
 	cloc --max-file-size 1 --exclude-dir vendor --exclude-dir assets --exclude-dir assetutil --exclude-dir tmp --exclude-dir fixtures .
 
-docs/span.1: docs/span.md
-	md2man-roff docs/span.md > docs/span.1
+docs/$(PKGNAME).1: docs/$(PKGNAME).md
+	md2man-roff docs/$(PKGNAME).md > docs/$(PKGNAME).1
 
 clean-docs:
-	rm -f docs/span.1
+	rm -f docs/$(PKGNAME).1
 
-# ==== vm-based packaging ====
-#
-# Required, if development and deployment OS have different versions of libc.
-# Examples: CentOS 6.5 has 2.12 (2010-08-03), Ubuntu 14.04 2.19 (2014-02-07).
-#
-# ----
-#
-# Initially, setup a CentOS 6.5 machine, install dependencies and git clone:
-#
-#     $ vagrant up
-#
-# To build an rpm, subsequently run:
-#
-#     $ make rpm-compatible
-#
-# If vagrant ssh runs on a port other than 2222, adjust (e.g. to port 2200):
-#
-#     $ make rpm-compatible PORT=2200
-#
-# A span-<version>-0.x86_64.rpm file should appear on your host machine, that
-# has been built againts CentOS' 6.5 libc.
-#
-# Cleanup VM:
-#
-#     $ vagrant destroy --force
-
-PORT = 2222
-SSHCMD = ssh -o StrictHostKeyChecking=no -i vagrant.key vagrant@127.0.0.1 -p $(PORT)
-SCPCMD = scp -o port=$(PORT) -o StrictHostKeyChecking=no -i vagrant.key
-
-# Helper to build RPM on a RHEL6 VM, to link against glibc 2.12
-vagrant.key:
-	curl -sL "https://raw.githubusercontent.com/mitchellh/vagrant/master/keys/vagrant" > vagrant.key
-	chmod 0600 vagrant.key
-
-rpm-compatible: vagrant.key
-	$(SSHCMD) "GOPATH=/home/vagrant go get -f -u github.com/jteeuwen/go-bindata/... golang.org/x/tools/cmd/goimports"
-	$(SSHCMD) "cd /home/vagrant/src/github.com/miku/span && git pull origin master && pwd && GOPATH=/home/vagrant make clean && GOPATH=/home/vagrant make all rpm"
-	$(SCPCMD) vagrant@127.0.0.1:/home/vagrant/src/github.com/miku/span/*rpm .
