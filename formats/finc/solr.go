@@ -50,9 +50,6 @@ type Solr5Vufind3 struct {
 	Physical             []string `json:"physical,omitempty"`
 	Description          string   `json:"description"`
 
-	VF1Author           string   `json:"vf1_author,omitempty"`
-	VF1SecondaryAuthors []string `json:"vf1_author2,omitempty"`
-
 	ContainerIssue     string `json:"container_issue,omitempty"`
 	ContainerStartPage string `json:"container_start_page,omitempty"`
 	ContainerTitle     string `json:"container_title,omitempty"`
@@ -161,13 +158,6 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 			continue
 		}
 		authors = append(authors, sanitized)
-
-		// first, random author goes into author field, others into secondary field, refs. #5778
-		if s.VF1Author == "" {
-			s.VF1Author = sanitized
-		} else {
-			s.VF1SecondaryAuthors = append(s.VF1SecondaryAuthors, sanitized)
-		}
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
 	}
 
