@@ -350,7 +350,7 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	// refs #12966, article title is too short for DetectLang3.
-	if p.Volume.Article.Articleinfo.Abstract == "" {
+	if p.Volume.Article.Articleinfo.Abstract || len(p.Volume.Article.Articleinfo.Abstract) < 100 == "" {
 		is.Languages = append(is.Languages, "eng")
 	} else {
 		// Ignore errors.
