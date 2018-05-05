@@ -349,13 +349,14 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		is.OpenAccess = true
 	}
 
-	// refs #12966
-	snippet := p.Volume.Article.Articleinfo.Abstract + " " + p.Volume.Article.Title
-	lang, err := span.DetectLang3(snippet)
-	if err != nil {
-		log.Printf("could not determine language: %s", err)
+	// refs #12966, article title is too short for DetectLang3.
+	if p.Volume.Article.Articleinfo.Abstract == "" {
+		is.Languages = append(is.Languages, "eng")
 	} else {
-		is.Languages = append(is.Languages, lang)
+		// Ignore errors.
+		if lang, err := span.DetectLang3(p.Volume.Article.Articleinfo.Abstract); err == nil {
+			is.Languages = append(is.Languages, lang)
+		}
 	}
 
 	return is, nil
