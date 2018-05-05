@@ -294,5 +294,10 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Subjects = append(output.Subjects, subject)
 	}
 
+	// refs #12965
+	if article.Lang != "" {
+		output.Languages = append(output.Languages, LanguageMap.LookupDefault(strings.ToUpper(article.Lang), "und"))
+	}
+
 	return output, nil
 }

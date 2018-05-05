@@ -349,5 +349,14 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		is.OpenAccess = true
 	}
 
+	// refs #12966
+	snippet := p.Volume.Article.Articleinfo.Abstract + " " + p.Volume.Article.Title
+	lang, err := span.DetectLang3(snippet)
+	if err != nil {
+		log.Printf("could not determine language: %s", err)
+	} else {
+		is.Languages = append(is.Languages, lang)
+	}
+
 	return is, nil
 }
