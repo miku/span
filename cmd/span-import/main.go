@@ -62,7 +62,6 @@ var FormatMap = map[string]Factory{
 	"jstor":      func() interface{} { return new(jstor.Article) },
 	"olms":       func() interface{} { return new(olms.Record) },
 	"olms-mets":  func() interface{} { return new(olms.MetsRecord) },
-	"thieme-tm":  func() interface{} { return new(thieme.Document) },
 	"thieme-nlm": func() interface{} { return new(thieme.Record) },
 	"zvdd-mets":  func() interface{} { return new(zvdd.MetsRecord) },
 	"zvdd":       func() interface{} { return new(zvdd.DublicCoreRecord) },

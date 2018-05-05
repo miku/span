@@ -9,8 +9,26 @@ import (
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 )
+
+const (
+	SourceID       = "60"
+	Format         = "ElectronicArticle"
+	Collection     = "Thieme E-Journals"
+	Genre          = "article"
+	DefaultRefType = "EJOUR"
+)
+
+func leftPad(s string, padStr string, overallLen int) string {
+	padCountInt := 1 + ((overallLen - len(padStr)) / len(padStr))
+	var retStr = strings.Repeat(padStr, padCountInt) + s
+	return retStr[(len(retStr) - overallLen):]
+}
+
+// LanguageMap maps two letter codes and full names to three letter codes.
+var LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
 
 // Record was generated 2018-02-15 13:37:41 by tir on hayiti.
 type Record struct {
