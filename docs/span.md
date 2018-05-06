@@ -66,22 +66,22 @@ OPTIONS
 `-cpuprofile` *pprof-file*
   Profiling. `span-import`, `span-tag`, `span-crossref-snapshot` only.
 
-`-f`
+`-f` *file*
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
 
-`-fc`
+`-fc` *file*
   File in AMSL FreeContent API format about sources, collections and their OA status, `span-oa-filter` only.
 
-`-s`
+`-s` *sep*
   Field separator. `span-update-labels` only.
 
 `-v`
   Show version.
 
-`-x`
+`-x` *file*
   Filename to DOI to exclude, one per line. `span-crossref-snapshot` only.
 
-`-xsid` *SID*
+`-xsid` *sid*
   Do not apply processing on a given source id. `span-oa-filter` only.
 
 `-z`
