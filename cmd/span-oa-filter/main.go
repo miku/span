@@ -30,6 +30,7 @@ type FreeContentLookup map[string]bool
 
 // createFreeContentLookup creates a map for fast lookups in loops. Filename
 // contains AMSL API response (2017-12-01).
+// XXX: This can take up significant memory (e.g. 40% of 16G).
 func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 	lookup := make(FreeContentLookup)
 
@@ -58,6 +59,7 @@ func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 	return lookup, nil
 }
 
+// kbartToFilterConfig creates map that can be serialized into a valid filterconfig JSON.
 func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
 	return map[string]map[string]interface{}{
 		"holdings": map[string]interface{}{
