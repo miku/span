@@ -12,6 +12,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"sort"
 
 	"bufio"
 
@@ -187,7 +188,12 @@ func main() {
 	}
 
 	if *list {
+		var keys []string
 		for k := range FormatMap {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
 			fmt.Println(k)
 		}
 		os.Exit(0)
