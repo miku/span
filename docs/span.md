@@ -19,7 +19,7 @@ SYNOPSIS
 
 `span-check` [`-verbose`] < *file*
 
-`span-oa-filter` [`-f` *file*] [`-fc` *file*] < *file*
+`span-oa-filter` [`-f` *file*] [`-fc` *file*] [`-xsid` *string*] < *file*
 
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
@@ -80,6 +80,9 @@ OPTIONS
 
 `-x`
   Filename to DOI to exclude, one per line. `span-crossref-snapshot` only.
+
+`-xsid` *SID*
+  Do not apply processing on a given source id. `span-oa-filter` only.
 
 `-z`
   Input is gzip compressed. `span-crossref-snapshot` only.
