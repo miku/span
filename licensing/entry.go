@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/miku/span"
 	"github.com/miku/span/container"
 )
 
@@ -37,7 +36,8 @@ var (
 	ErrAfterLastIssue       = errors.New("after last issue")
 	ErrInvalidDate          = errors.New("invalid date")
 
-	intPattern = regexp.MustCompile("[0-9]+")
+	intPattern  = regexp.MustCompile("[0-9]+")
+	issnPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9xX]`)
 )
 
 // dateWithGranularity groups layout and granularity.
@@ -123,19 +123,19 @@ type Entry struct {
 	Action                             string `csv:"ACTION"`                     // "raw"
 
 	// Cache data, that needs to be parsed, for performance. Should be
-	// lazily initualized by methods, that need them.
+	// initialized by methods, that need them.
 	parsed struct {
 		FirstIssueDate time.Time
 		LastIssueDate  time.Time
 	}
 }
 
-// ISSNList returns a list of normalized ISSN from various fields.
+// ISSNList returns a list of unique normalized ISSN (1234-567X) from various fields.
 func (entry *Entry) ISSNList() []string {
 	issns := container.NewStringSet()
 	for _, issn := range []string{entry.PrintIdentifier, entry.OnlineIdentifier} {
 		s := NormalizeSerialNumber(issn)
-		if span.ISSNPattern.MatchString(s) {
+		if issnPattern.MatchString(s) {
 			issns.Add(s)
 		}
 	}
@@ -147,7 +147,8 @@ func (entry *Entry) ISSNList() []string {
 
 // Covers is a generic method to determine, whether a given date, volume or
 // issue is covered by this entry. It takes into account moving walls. If
-// values are not defined, we mostly assume they are not constrained.
+// values are not defined, we assume they are not constrained. It is an error,
+// if the given date string cannot be parsed by one of the deposited layouts.
 func (entry *Entry) Covers(date, volume, issue string) error {
 	t, g, err := parseWithGranularity(date)
 	if err != nil {
@@ -279,12 +280,12 @@ func NormalizeSerialNumber(s string) string {
 
 // FindSerialNumbers returns ISSN in standard form in a given string.
 func FindSerialNumbers(s string) []string {
-	return span.ISSNPattern.FindAllString(s, -1)
+	return issnPattern.FindAllString(s, -1)
 }
 
-// parseWithGranularity tries to parse a string into a time. If successful,
-// also return the granularity. Any value that is not recorgnized results in an
-// ErrInvalidDate.
+// parseWithGranularity tries to parse a string without explicit layout into a
+// date. If successful, also return the granularity. Any value that is not
+// recorgnized results in an ErrInvalidDate.
 func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) {
 	if s == "" {
 		return time.Time{}, GRANULARITY_DAY, ErrInvalidDate
@@ -301,7 +302,7 @@ func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) 
 }
 
 // getGranularity returns the granularity for given date layout, if nothing
-// matches assume the finest granualarity.
+// matches assume the finest granularity.
 func getGranularity(layout string) DateGranularity {
 	for _, dfmt := range datePatterns {
 		if dfmt.layout == layout {

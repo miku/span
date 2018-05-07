@@ -1,4 +1,6 @@
-// redact intermediate schema
+// Redact intermediate schema, that is set fulltext field to the empty string.
+// This can be done with `jq` and `del` as well, but span-redact is a bit
+// faster, as it can work in parallel.
 package main
 
 import (
@@ -71,5 +73,4 @@ func main() {
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
-
 }

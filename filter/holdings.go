@@ -25,7 +25,7 @@ type CacheValue struct {
 // refer to the same holding file hundreds or thousands of times, but we only
 // want to store the content once. This map serves as a private singleton that
 // holds licensing entries and precomputed shortcuts to find relevant entries
-// (rows from KBART) by issn, wiso db name or title.
+// (rows from KBART) by ISSN, wiso database name or title.
 type HoldingsCache map[string]CacheValue
 
 // register reads a holding file from a reader and caches it under the given
@@ -51,8 +51,7 @@ func (c *HoldingsCache) register(key string, r io.Reader) error {
 	return nil
 }
 
-// putFile parses a holding file and adds it to the cache. XXX: Allow zipped
-// files as well.
+// putFile parses a holding file and adds it to the cache.
 func (c *HoldingsCache) putFile(filename string) error {
 	_, err := zip.OpenReader(filename)
 	if err != nil {
@@ -64,7 +63,7 @@ func (c *HoldingsCache) putFile(filename string) error {
 		return c.register(filename, file)
 	}
 	r := &span.ZipContentReader{Filename: filename}
-	log.Printf("[holdings] read (ZIP): %s", filename)
+	log.Printf("[holdings] read (zip): %s", filename)
 	return c.register(filename, r)
 }
 

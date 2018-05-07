@@ -25,8 +25,8 @@ import (
 // methods.
 type Holdings []licensing.Entry
 
-// ReadFrom create holdings struct from a reader. Expects a tab separated CSV with
-// a single header line.
+// ReadFrom create holdings struct from a reader. Expects tab separated content with
+// a single header row.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 	var wc span.WriteCounter
 	dec := tsv.NewDecoder(io.TeeReader(r, &wc))

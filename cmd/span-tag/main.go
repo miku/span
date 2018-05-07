@@ -51,7 +51,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	// The configuration tree.
+	// The configuration forest.
 	var tagger filter.Tagger
 
 	if *unfreeze != "" {

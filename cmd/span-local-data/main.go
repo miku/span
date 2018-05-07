@@ -1,3 +1,5 @@
+// The span-local-data extracts data from a JSON file - something `jq` can do
+// just as well, albeit a bit slower.
 package main
 
 import (
@@ -45,6 +47,7 @@ func main() {
 		}
 		return buf.Bytes(), nil
 	})
+
 	p.BatchSize = *batchsize
 	if err := p.Run(); err != nil {
 		log.Fatal(err)

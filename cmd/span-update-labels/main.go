@@ -1,5 +1,6 @@
-// span-update-labels takes a TSV of an IDs and ISILs and updates an intermediate
-// schema record x.labels field accordingly.
+// span-update-labels takes a TSV of an IDs and ISILs and updates an
+// intermediate schema record x.labels field accordingly. The mapping is kept
+// in memory, so there is limit to the number of lines in the input file.
 package main
 
 import (
@@ -54,7 +55,7 @@ func main() {
 
 	br := bufio.NewReader(f)
 
-	// Map record ids to a list of labels (ISIL).
+	// Map record ids to a list of labels (ISIL). This is a memory bottleneck.
 	labelMap := make(map[string][]string)
 
 	for {
