@@ -12,8 +12,6 @@ import (
 	"github.com/miku/span/formats/marc"
 )
 
-const SourceID = "13"
-
 type Record struct {
 	marc.Record
 }
@@ -49,9 +47,11 @@ func (r Record) FindYear() string {
 
 func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
-	output.SourceID = SourceID
+	output.SourceID = "13"
 	output.RecordID = r.MustGetControlField("001")
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, output.RecordID)
+	output.Format = "ElectronicThesis"
+	output.Genre = "book"
 
 	output.Languages = r.MustGetDataFields("041.a")
 	output.URL = r.MustGetDataFields("856.u")
@@ -85,6 +85,18 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Date = t
 
 	for _, v := range r.MustGetDataFields("650.a") {
+		for _, w := range strings.Split(v, ",") {
+			w = strings.TrimSpace(w)
+			output.Subjects = append(output.Subjects, w)
+		}
+	}
+	for _, v := range r.MustGetDataFields("653.a") {
+		for _, w := range strings.Split(v, ",") {
+			w = strings.TrimSpace(w)
+			output.Subjects = append(output.Subjects, w)
+		}
+	}
+	for _, v := range r.MustGetDataFields("689.a") {
 		for _, w := range strings.Split(v, ",") {
 			w = strings.TrimSpace(w)
 			output.Subjects = append(output.Subjects, w)
