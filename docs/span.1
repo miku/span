@@ -8,7 +8,7 @@ schema tools
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP] < \fIfile\fP
+\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP, \fB\fC\-unfreeze\fR \fIfile\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] < \fIfile\fP
 .PP
@@ -65,6 +65,9 @@ File in AMSL FreeContent API format about sources, collections and their OA stat
 .TP
 \fB\fC\-s\fR \fIsep\fP
 Field separator. \fB\fCspan\-update\-labels\fR only.
+.TP
+\fB\fC\-unfreeze\fR \fIfile\fP
+Take a file created with \fB\fCspan\-freeze\fR and use it instead of a filterconfig. \fB\fCspan\-tag\fR only.
 .TP
 \fB\fC\-v\fR
 Show version.

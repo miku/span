@@ -13,7 +13,7 @@ SYNOPSIS
 
 `span-import` [`-i` *input-format*] < *file*
 
-`span-tag` [`-c` *config*] < *file*
+`span-tag` [`-c` *config*, `-unfreeze` *file*] < *file*
 
 `span-export` [`-o` *output-format*] < *file*
 
@@ -74,6 +74,9 @@ OPTIONS
 
 `-s` *sep*
   Field separator. `span-update-labels` only.
+
+`-unfreeze` *file*
+  Take a file created with `span-freeze` and use it instead of a filterconfig. `span-tag` only.
 
 `-v`
   Show version.
