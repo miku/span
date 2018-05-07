@@ -56,6 +56,23 @@ type Record struct {
 	} `xml:"about"`
 }
 
+func (r Record) MustGetControlField(tag string) string {
+	v, err := r.GetControlField(tag)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (r Record) GetControlField(tag string) (string, error) {
+	for _, f := range r.Metadata.Record.Controlfield {
+		if f.Tag == tag {
+			return f.Text, nil
+		}
+	}
+	return "", fmt.Errorf("undefined tag: %s", tag)
+}
+
 func (r Record) MustGetFirstDataField(spec string) string {
 	value, err := r.GetFirstDataField(spec)
 	if err != nil {

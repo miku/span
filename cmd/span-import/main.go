@@ -20,6 +20,7 @@ import (
 	"github.com/miku/span/formats/ceeol"
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/formats/degruyter"
+	"github.com/miku/span/formats/disson"
 	"github.com/miku/span/formats/doaj"
 	"github.com/miku/span/formats/dummy"
 	"github.com/miku/span/formats/elsevier"
@@ -54,6 +55,7 @@ var FormatMap = map[string]Factory{
 	"ceeol":      func() interface{} { return new(ceeol.Article) },
 	"crossref":   func() interface{} { return new(crossref.Document) },
 	"degruyter":  func() interface{} { return new(degruyter.Article) },
+	"disson":     func() interface{} { return new(disson.Record) },
 	"doaj":       func() interface{} { return new(doaj.Response) },
 	"dummy":      func() interface{} { return new(dummy.Example) },
 	"genios":     func() interface{} { return new(genios.Document) },
@@ -221,7 +223,9 @@ func main() {
 
 	switch *name {
 	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm",
-		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms", "olms-mets", "ssoar":
+		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms",
+		"olms-mets", "ssoar", "disson":
+		// XXX: Configure this in one place.
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}

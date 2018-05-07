@@ -17,51 +17,6 @@ type Record struct {
 	marc.Record
 }
 
-func (r Record) MustGetFirstDataField(spec string) string {
-	value, err := r.GetFirstDataField(spec)
-	if err != nil {
-		panic(err)
-	}
-	return value
-}
-
-func (r Record) GetFirstDataField(spec string) (string, error) {
-	values, err := r.GetDataFields(spec)
-	if err != nil {
-		return "", err
-	}
-	if len(values) == 0 {
-		return "", nil
-	}
-	return values[0], nil
-}
-
-func (r Record) MustGetDataFields(spec string) []string {
-	result, err := r.GetDataFields(spec)
-	if err != nil {
-		panic(err)
-	}
-	return result
-}
-
-func (r Record) GetDataFields(spec string) (result []string, err error) {
-	parts := strings.Split(spec, ".")
-	if len(parts) != 2 {
-		return result, fmt.Errorf("spec must be of the form tag.subfield, like 245.a")
-	}
-	tag, subfield := parts[0], parts[1]
-	for _, f := range r.Metadata.Record.Datafield {
-		if f.Tag == tag {
-			for _, sf := range f.Subfield {
-				if sf.Code == subfield {
-					result = append(result, sf.Text)
-				}
-			}
-		}
-	}
-	return result, nil
-}
-
 func (r Record) Title() string {
 	result := r.MustGetFirstDataField("245.a")
 	subtitle := strings.TrimSpace(r.MustGetFirstDataField("245.b"))
