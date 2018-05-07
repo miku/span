@@ -52,6 +52,7 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, output.RecordID)
 	output.Format = "ElectronicThesis"
 	output.Genre = "book"
+	output.MegaCollections = []string{"Diss online"}
 
 	output.Languages = r.MustGetDataFields("041.a")
 	output.URL = r.MustGetDataFields("856.u")
