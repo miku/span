@@ -25,6 +25,7 @@ import (
 	"github.com/miku/span/formats/dummy"
 	"github.com/miku/span/formats/elsevier"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/formats/genderopen"
 	"github.com/miku/span/formats/genios"
 	"github.com/miku/span/formats/hhbd"
 	"github.com/miku/span/formats/highwire"
@@ -58,6 +59,7 @@ var FormatMap = map[string]Factory{
 	"disson":     func() interface{} { return new(disson.Record) },
 	"doaj":       func() interface{} { return new(doaj.Response) },
 	"dummy":      func() interface{} { return new(dummy.Example) },
+	"genderopen": func() interface{} { return new(genderopen.Record) },
 	"genios":     func() interface{} { return new(genios.Document) },
 	"hhbd":       func() interface{} { return new(hhbd.Record) },
 	"highwire":   func() interface{} { return new(highwire.Record) },
@@ -222,10 +224,10 @@ func main() {
 	}
 
 	switch *name {
+	// XXX: Configure this in one place.
 	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm",
 		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms",
-		"olms-mets", "ssoar", "disson":
-		// XXX: Configure this in one place.
+		"olms-mets", "ssoar", "disson", "genderopen":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
