@@ -123,7 +123,6 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	for _, p := range record.Metadata.Dc.Publisher {
-
 		output.Publishers = append(output.Publishers, p.Text)
 	}
 	if record.Metadata.Dc.Date.Text == "" {
