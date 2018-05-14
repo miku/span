@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dchest/safefile"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
@@ -52,10 +53,11 @@ func main() {
 		log.Fatal("output file required")
 	}
 
-	file, err := os.Create(*output)
+	file, err := safefile.Create(*output, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
 
 	w := zip.NewWriter(file)
 
@@ -131,6 +133,9 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := w.Close(); err != nil {
+		log.Fatal(err)
+	}
+	if err := file.Commit(); err != nil {
 		log.Fatal(err)
 	}
 }
