@@ -3,11 +3,12 @@ package ssoar
 // Records was generated 2018-05-06 21:37:04 by tir on hayiti.
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/formats/marc"

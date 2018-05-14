@@ -9,11 +9,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/formats/finc"

@@ -8,11 +8,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"sort"
+
+	log "github.com/sirupsen/logrus"
 
 	"bufio"
 
