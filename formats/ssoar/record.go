@@ -107,7 +107,8 @@ func (r Record) FindFormat() string {
 	}
 }
 
-// stringDifference returns the numeric value of a-b of strings a and b as string.
+// stringDifference returns the numeric value of a-b of strings a and b as
+// string, an empty string if something goes wrong.
 func stringDifference(a, b string) string {
 	i, err := strconv.Atoi(a)
 	if err != nil {
