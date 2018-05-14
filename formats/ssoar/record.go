@@ -190,5 +190,13 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Series = r.MustGetFirstDataField("490.a")
 	output.ISBN = r.MustGetDataFields("020.a")
 
+	for _, place := range r.MustGetDataFields("264.a") {
+		if place != "" {
+			output.Places = append(output.Places, place)
+		}
+	}
+	if pub := r.MustGetFirstDataField("264.b"); pub != "" {
+		output.Publishers = append(output.Publishers, pub)
+	}
 	return output, nil
 }
