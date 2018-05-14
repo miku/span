@@ -63,7 +63,7 @@ func main() {
 	outputFile := flag.String("o", "", "output file")
 	compressed := flag.Bool("z", false, "input is gzip compressed")
 	batchsize := flag.Int("b", 40000, "batch size")
-	cpuprofile := flag.String("cpuprofile", "", "write cpuprofile to file")
+	cpuProfile := flag.String("cpuprofile", "", "write cpuprofile to file")
 	verbose := flag.Bool("verbose", false, "be verbose")
 
 	flag.Parse()
@@ -72,8 +72,8 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
+	if *cpuProfile != "" {
+		f, err := os.Create(*cpuProfile)
 		if err != nil {
 			log.Fatal(err)
 		}

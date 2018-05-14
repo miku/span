@@ -46,7 +46,7 @@ var (
 	list        = flag.Bool("list", false, "list input formats")
 	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
 	showVersion = flag.Bool("v", false, "prints current program version")
-	cpuprofile  = flag.String("cpuprofile", "", "write cpu profile to file")
+	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to file")
 )
 
 // Factory creates things.
@@ -185,8 +185,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
+	if *cpuProfile != "" {
+		f, err := os.Create(*cpuProfile)
 		if err != nil {
 			log.Fatal(err)
 		}

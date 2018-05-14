@@ -29,7 +29,7 @@ func main() {
 	version := flag.Bool("v", false, "show version")
 	size := flag.Int("b", 20000, "batch size")
 	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	cpuProfile := flag.String("cpuprofile", "", "write cpu profile to file")
 	unfreeze := flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
 
 	flag.Parse()
@@ -43,8 +43,8 @@ func main() {
 		log.Fatal("config file required")
 	}
 
-	if *cpuprofile != "" {
-		file, err := os.Create(*cpuprofile)
+	if *cpuProfile != "" {
+		file, err := os.Create(*cpuProfile)
 		if err != nil {
 			log.Fatal(err)
 		}
