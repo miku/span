@@ -12,10 +12,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
 	"github.com/miku/span/filter"

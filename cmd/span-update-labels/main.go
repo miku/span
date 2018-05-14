@@ -8,10 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"runtime"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"bufio"
 

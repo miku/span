@@ -24,11 +24,12 @@ package genios
 import (
 	"encoding/base64"
 	"fmt"
-	"log"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
 	"github.com/miku/span/assetutil"

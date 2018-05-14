@@ -2,8 +2,9 @@ package filter
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"

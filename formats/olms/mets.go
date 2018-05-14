@@ -3,8 +3,9 @@ package olms
 import (
 	"encoding/xml"
 	"fmt"
-	"log"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span/formats/finc"
 )

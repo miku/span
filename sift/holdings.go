@@ -3,9 +3,10 @@ package sift
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"os"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
 	"github.com/miku/span/licensing"

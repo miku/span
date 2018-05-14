@@ -37,10 +37,11 @@ import (
 	"encoding/json"
 	"flag"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/olebedev/config"
 )
