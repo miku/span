@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -57,6 +58,11 @@ func main() {
 	}
 
 	w := zip.NewWriter(file)
+
+	comment := fmt.Sprintf(`Freeze-Date: %s`, time.Now().Format(time.RFC3339))
+	if err := w.SetComment(comment); err != nil {
+		log.Fatal(err)
+	}
 
 	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
