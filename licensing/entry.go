@@ -73,9 +73,9 @@ var datePatterns = []dateWithGranularity{
 	{"20060102", GRANULARITY_DAY},
 }
 
-// Entry contains fields about a licensed or available journal, book, article or
-// other resource. First 14 columns are quite stardardized. Further columns may
-// contain custom information:
+// Entry contains fields about a licensed or available journal, book, article
+// or other resource. First 14 columns are quite standardized. Further columns
+// may contain custom information:
 //
 // EZB style: own_anchor, package:collection, il_relevance, il_nationwide,
 // il_electronic_transmission, il_comment, all_issns, zdb_id
