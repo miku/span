@@ -1,4 +1,4 @@
-// Given as single file with crossref works API message, create a potentially
+// Given as single file with crossref works API messages, create a potentially
 // smaller file, which contains only the most recent version of each document.
 //
 // Works in a three stage, two pass fashion: (1) extract, (2) identify, (3) extract.
