@@ -52,6 +52,7 @@ const (
 	textAsAbstractCutoff = 2000
 	// maxAuthorLength example: document/BOND__b0604160052
 	maxAuthorLength = 200
+	minAuthorLength = 4
 	maxTitleLength  = 4096
 )
 
@@ -135,6 +136,16 @@ func isNomenNescio(s string) bool {
 	return t == "n.n." || t == ""
 }
 
+// stringContainsAny returns true, if string contains any of the strings given.
+func stringContainsAny(s string, needles []string) bool {
+	for _, n := range needles {
+		if strings.Contains(s, n) {
+			return true
+		}
+	}
+	return false
+}
+
 // Authors returns a list of authors. Formatting is not cleaned up, so you'll
 // get any combination of surname and given names.
 func (doc Document) Authors() (authors []finc.Author) {
@@ -152,6 +163,17 @@ func (doc Document) Authors() (authors []finc.Author) {
 				continue
 			}
 			name := strings.TrimSpace(f)
+			// Author field sometime contains things like, &quot,
+			// www.website.com, N.Y., and more weird things, skip these cases.
+			if len(name) < minAuthorLength {
+				continue
+			}
+			// Author substrings to filter out, this is just the tip of the iceberg.
+			clues := []string{"www.", "http:", "&quot", "part 1 of", "part 2 of",
+				"Copyright", "(c)", "All rights reserved", "he said"}
+			if stringContainsAny(name, clues) {
+				continue
+			}
 			if len(name) < maxAuthorLength {
 				authors = append(authors, finc.Author{Name: name})
 			}
