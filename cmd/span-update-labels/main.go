@@ -1,4 +1,4 @@
-// span-update-labels takes a TSV of an IDs and ISILs and updates an
+// span-update-labels takes a TSV of IDs and ISILs and updates an
 // intermediate schema record x.labels field accordingly. The mapping is kept
 // in memory, so there is limit to the number of lines in the input file.
 package main
