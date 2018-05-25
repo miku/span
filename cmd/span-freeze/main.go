@@ -1,5 +1,5 @@
 // Freeze file containing urls along with the content of all urls. Frozen file
-// will be a zip file, containing (by default):
+// will be a zip file, containing something like:
 //
 //     /blob
 //     /mapping.json
@@ -7,6 +7,7 @@
 //     /files/<sha1 of url>
 //     /files/...
 //
+//     $ curl -s https://queue.acm.org/ | span-freeze -b -o acm.zip
 package main
 
 import (
