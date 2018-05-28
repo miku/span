@@ -8,8 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/goodsign/monday"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/formats/marc"
 )
@@ -107,6 +109,36 @@ func (r Record) FindFormat() string {
 	}
 }
 
+// HasEmbargo looks for a fixed string in 500.a and tries to find out, whether
+// the embargo holds. Current text (mixing English and German date formats):
+// "Der Volltext unterliegt einer Embargofrist bis zum 18. Okt. 2018."
+func (r Record) HasEmbargo() (time.Time, bool) {
+	loc, _ := time.LoadLocation("Europe/Berlin")
+
+	// Possibly mixed locale renderings.
+	locs := []monday.Locale{monday.LocaleDeDE, monday.LocaleEnUS}
+
+	// Possibly different strings.
+	templates := []string{
+		`Der Volltext unterliegt einer Embargofrist bis zum 02. Jan. 2006.`,
+		`Der Volltext unterliegt einer Embargofrist bis zum 02. Jan 2006.`,
+	}
+
+	for _, f := range r.MustGetDataFields("500.a") {
+		for _, l := range locs {
+			for _, tmpl := range templates {
+				t, err := monday.ParseInLocation(tmpl, f, loc, l)
+				if err == nil {
+					if t.After(time.Now()) {
+						return t, true
+					}
+				}
+			}
+		}
+	}
+	return time.Time{}, false
+}
+
 // stringDifference returns the numeric value of a-b of strings a and b as
 // string, an empty string if something goes wrong.
 func stringDifference(a, b string) string {
@@ -154,6 +186,13 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err != nil {
 		return output, err
 	}
+
+	if t, ok := r.HasEmbargo(); ok {
+		msg := fmt.Sprintf("embargo restriction for %s", id)
+		log.Printf("embargo for %s expires on %s", id, t.Format("2006-01-02"))
+		return output, span.Skip{Reason: msg}
+	}
+
 	output.RecordID = id
 	output.SourceID = "30"
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, output.RecordID)
