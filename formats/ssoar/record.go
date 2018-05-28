@@ -109,16 +109,13 @@ func (r Record) FindFormat() string {
 	}
 }
 
-// HasEmbargo looks for a fixed string in 500.a and tries to find out, whether
-// the embargo holds. Current text (mixing English and German date formats):
-// "Der Volltext unterliegt einer Embargofrist bis zum 18. Okt. 2018."
+// HasEmbargo looks for a fixed string in the MARC record and tries to find
+// out, whether the embargo holds. Some example text (mixed date formats): "Der
+// Volltext unterliegt einer Embargofrist bis zum 18. Okt. 2018."
 func (r Record) HasEmbargo() (time.Time, bool) {
 	loc, _ := time.LoadLocation("Europe/Berlin")
 
-	// Possibly mixed locale renderings.
 	locs := []monday.Locale{monday.LocaleDeDE, monday.LocaleEnUS}
-
-	// Possibly different strings.
 	templates := []string{
 		`Der Volltext unterliegt einer Embargofrist bis zum 02. Jan. 2006.`,
 		`Der Volltext unterliegt einer Embargofrist bis zum 02. Jan 2006.`,
