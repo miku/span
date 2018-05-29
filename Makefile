@@ -2,9 +2,6 @@ SHELL = /bin/bash
 TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze
 PKGNAME = span
 
-# find go-bindata executable on vm
-export PATH := /home/vagrant/bin:$(PATH)
-
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test: assets deps
 	go get github.com/kylelemons/godebug/pretty
@@ -33,9 +30,6 @@ vet:
 
 cover:
 	go test -cover ./...
-
-generate:
-	go generate
 
 all: assets deps $(TARGETS)
 
