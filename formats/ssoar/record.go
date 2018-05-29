@@ -1,6 +1,5 @@
 package ssoar
 
-// Records was generated 2018-05-06 21:37:04 by tir on hayiti.
 import (
 	"fmt"
 	"regexp"
@@ -20,6 +19,7 @@ type Record struct {
 	marc.Record
 }
 
+// Title returns the a record title.
 func (r Record) Title() string {
 	result := r.MustGetFirstDataField("245.a")
 	subtitle := strings.TrimSpace(r.MustGetFirstDataField("245.b"))
@@ -29,9 +29,12 @@ func (r Record) Title() string {
 	return result
 }
 
+// JournalTitle tries to parse out a journal title.
 func (r Record) JournalTitle() string {
 	// In: Journal of Social Work Practice ; 19 (2005) 1 ; 87-101
-	// In: Balzer, Wolfgang (Hg.), Pearce, David A. (Hg.), Schmidt, Heinz-Jürgen (Hg.): Reduction in science : structure, examples, philosophical problems. 1984. S. 331-357. ISBN 90-277-1811-3
+	// In: Balzer, Wolfgang (Hg.), Pearce, David A. (Hg.), Schmidt,
+	// Heinz-Jürgen (Hg.): Reduction in science : structure, examples,
+	// philosophical problems. 1984. S. 331-357. ISBN 90-277-1811-3
 	for _, s := range r.MustGetDataFields("500.a") {
 		if !strings.HasPrefix(s, "In:") {
 			continue
@@ -67,6 +70,7 @@ func (r Record) JournalTitle() string {
 	return ""
 }
 
+// ID returns an identifier.
 func (r Record) ID() (string, error) {
 	parts := strings.Split(r.Header.Identifier.Text, "/")
 	if len(parts) != 2 {
@@ -77,6 +81,7 @@ func (r Record) ID() (string, error) {
 	return "", fmt.Errorf("no identifier found: %s", r.Header.Identifier.Text)
 }
 
+// FindYear tries to find a year.
 func (r Record) FindYear() string {
 	date := strings.TrimSpace(r.MustGetFirstDataField("264.c"))
 	if len(date) == 4 {
@@ -96,6 +101,7 @@ func (r Record) FindYear() string {
 	return "1970-01-01"
 }
 
+// FindFormat tries to parse a format.
 func (r Record) FindFormat() string {
 	leader := string(r.Metadata.Record.Leader.Text)
 	llen := len(string(leader))
@@ -150,6 +156,7 @@ func stringDifference(a, b string) string {
 	return fmt.Sprintf("%d", i-j)
 }
 
+// FindPages returns start, end and page count as string.
 func (r Record) FindPages() (string, string, string) {
 	v := r.MustGetFirstDataField("300.a")
 	p := regexp.MustCompile(`([1-9][0-9]*)`)
