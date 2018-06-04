@@ -178,8 +178,6 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 			output.Subjects = append(output.Subjects, ss)
 		}
 	}
-	output.Subjects = uniqueStrings(output.Subjects)
-
 	for _, s := range record.Metadata.Dc.Temporal {
 		text := strings.TrimSpace(s.Text)
 		if text == "" {
@@ -187,6 +185,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 		output.Subjects = append(output.Subjects, text)
 	}
+	output.Subjects = uniqueStrings(output.Subjects)
 
 	for _, ipo := range record.Metadata.Dc.Ispartof {
 		output.MegaCollections = append(output.MegaCollections, fmt.Sprintf("HHBD: %s", ipo.Text))
