@@ -15,6 +15,17 @@ import (
 
 var datePattern = regexp.MustCompile(`[012][0-9][0-9][0-9]`)
 
+func uniqueStrings(s []string) (result []string) {
+	m := make(map[string]bool)
+	for _, v := range s {
+		m[v] = true
+	}
+	for k := range m {
+		result = append(result, k)
+	}
+	return
+}
+
 // Record was generated 2017-12-22 16:25:34 by tir on apollo.
 type Record struct {
 	XMLName xml.Name `xml:"Record"`
@@ -112,6 +123,11 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ArticleTitle = record.Metadata.Dc.Title.Text
 	output.MegaCollections = []string{"Heidelberger Historische Bestände Digital"}
 
+	// XXX: Guess.
+	output.Format = "Manuscript"
+	output.Genre = "MANSCPT"
+	output.RefType = "GEN"
+
 	// Date.
 	date, err := record.date()
 	if err != nil {
@@ -129,6 +145,25 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		if len(creator) == 0 {
 			continue
 		}
+		// Remove artifacts like [Hrsg.] ...
+		// 32352 [Hrsg.]
+		//  1281 [Adr.]
+		//  1176 [Bearb.]
+		//   436 [Ill.]
+		//   373 [Übers.]
+		//    54 [Vorr.]
+		//    52 [Mitarb.]
+		//    50 [Red.]
+		//    38 [Komm.]
+		//    22 [Samml.]
+		//    13 [Komment.]
+		//     9 [Korres.]
+		//     8 [Begr.]
+		//     3 [Verstorb.]
+		//     2 [Vorredn.]
+		//     1 [Komp.]
+		r := strings.NewReplacer("[Hrsg.]", "", "[Adr.]", "", "[Bearb.]", "", "[Ill.]", "", "[Übers.]", "", "[Vorr.]", "", "[Mitarb.]", "", "[Red.]", "", "[Komm.]", "", "[Samml.]", "", "[Komment.]", "", "[Korres.]", "", "[Begr.]", "", "[Verstorb.]", "", "[Vorredn.]", "", "[Komp.]", "")
+		creator = r.Replace(creator)
 		output.Authors = append(output.Authors, finc.Author{Name: creator})
 	}
 
@@ -138,8 +173,13 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		if text == "" {
 			continue
 		}
-		output.Subjects = append(output.Subjects, text)
+		for _, ss := range strings.Split(text, ";") {
+			ss = strings.TrimSpace(ss)
+			output.Subjects = append(output.Subjects, ss)
+		}
 	}
+	output.Subjects = uniqueStrings(output.Subjects)
+
 	for _, s := range record.Metadata.Dc.Temporal {
 		text := strings.TrimSpace(s.Text)
 		if text == "" {
