@@ -146,23 +146,11 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 			continue
 		}
 		// Remove artifacts like [Hrsg.] ...
-		// 32352 [Hrsg.]
-		//  1281 [Adr.]
-		//  1176 [Bearb.]
-		//   436 [Ill.]
-		//   373 [Übers.]
-		//    54 [Vorr.]
-		//    52 [Mitarb.]
-		//    50 [Red.]
-		//    38 [Komm.]
-		//    22 [Samml.]
-		//    13 [Komment.]
-		//     9 [Korres.]
-		//     8 [Begr.]
-		//     3 [Verstorb.]
-		//     2 [Vorredn.]
-		//     1 [Komp.]
-		r := strings.NewReplacer("[Hrsg.]", "", "[Adr.]", "", "[Bearb.]", "", "[Ill.]", "", "[Übers.]", "", "[Vorr.]", "", "[Mitarb.]", "", "[Red.]", "", "[Komm.]", "", "[Samml.]", "", "[Komment.]", "", "[Korres.]", "", "[Begr.]", "", "[Verstorb.]", "", "[Vorredn.]", "", "[Komp.]", "")
+		r := strings.NewReplacer("[Hrsg.]", "", "[Adr.]", "", "[Bearb.]", "",
+			"[Ill.]", "", "[Übers.]", "", "[Vorr.]", "", "[Mitarb.]", "",
+			"[Red.]", "", "[Komm.]", "", "[Samml.]", "", "[Komment.]", "",
+			"[Korres.]", "", "[Begr.]", "", "[Verstorb.]", "", "[Vorredn.]", "",
+			"[Komp.]", "")
 		creator = r.Replace(creator)
 		output.Authors = append(output.Authors, finc.Author{Name: creator})
 	}
@@ -225,6 +213,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Languages = append(output.Languages, tlc)
 	}
 
+	// Publishers.
 	for _, p := range record.Metadata.Dc.Spatial {
 		output.Publishers = append(output.Publishers, p.Text)
 	}
