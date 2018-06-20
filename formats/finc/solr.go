@@ -114,12 +114,21 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.TitleSort = is.SortableTitle()
 	s.Topics = is.Subjects
 
+	// refs. #12127
+	s.URL = is.URL
+
 	// refs. #8709
 	if is.DOI != "" {
-		// refs. GH #9
-		s.URL = []string{fmt.Sprintf("https://doi.org/%s", is.DOI)}
-	} else {
-		s.URL = is.URL
+		containsDOI := false
+		for _, u := range s.URL {
+			if strings.Contains(u, "doi") {
+				containsDOI = true
+			}
+		}
+		if !containsDOI {
+			// refs. GH #9
+			s.URL = append(s.URL, fmt.Sprintf("https://doi.org/%s", is.DOI))
+		}
 	}
 
 	classes := container.NewStringSet()
