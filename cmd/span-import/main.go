@@ -256,6 +256,9 @@ func main() {
 			}
 		}
 	default:
+		if *name == "" {
+			log.Fatalf("input format required", *name)
+		}
 		log.Fatalf("unknown format: %s", *name)
 	}
 }
