@@ -6,22 +6,29 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+)
 
-	log "github.com/sirupsen/logrus"
+const (
+	Check = "✓"
+	Cross = "❌"
 )
 
 var (
-	server = flag.String("server", "http://localhost:8983/solr/biblio", "location of SOLR server")
+	server  = flag.String("server", "http://localhost:8983/solr/biblio", "location of SOLR server")
+	textile = flag.Bool("t", false, "emit a textile table")
 )
 
 // FacetValues maps a facet value to frequency.
 type FacetMap map[string]int
 
-// AllowedOnly returns an error if facets values contain non-zero values not
-// specified.
+// AllowedOnly returns an error if facets values contain non-zero values that
+// are not explicitly allowed.
 func (f FacetMap) AllowedKeys(allowed ...string) error {
 	var keys []string
 	for k := range f {
@@ -35,6 +42,24 @@ func (f FacetMap) AllowedKeys(allowed ...string) error {
 		if _, ok := s[k]; !ok && f[k] > 0 {
 			return fmt.Errorf("facet value not allowed: %s (%d)", k, f[k])
 		}
+	}
+	return nil
+}
+
+// EqualSizeNonZero all keys should have equal number of values.
+func (f FacetMap) EqualSizeNonZero(keys ...string) error {
+	var prev int
+	for i, k := range keys {
+		size, ok := f[k]
+		if !ok {
+			return fmt.Errorf("facet key not found: %s", k)
+		}
+		if i > 0 {
+			if prev != size {
+				return fmt.Errorf("facet counts differ: %d vs %d", prev, size)
+			}
+		}
+		prev = size
 	}
 	return nil
 }
@@ -168,55 +193,411 @@ func (ix Index) FacetLink(query, facetField string) string {
 	return fmt.Sprintf("%s/select?%s", ix.Server, vals.Encode())
 }
 
-// Select runs a select query.
-func (ix Index) Select(query string) (*SelectResponse, error) {
-	link := ix.SelectLink(query)
+// decodeLink fetches a link and unmarshal the response into a given value.
+func decodeLink(link string, val interface{}) error {
 	resp, err := http.Get(link)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("select failed with HTTP %s at %s", resp.StatusCode, link)
+		return fmt.Errorf("select failed with HTTP %d at %s", resp.StatusCode, link)
 	}
 	defer resp.Body.Close()
-	var r SelectResponse
-	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
-		return nil, err
-	}
-	return &r, nil
+	return json.NewDecoder(resp.Body).Decode(&val)
+}
+
+// Select runs a select query.
+func (ix Index) Select(query string) (r *SelectResponse, err error) {
+	r = new(SelectResponse)
+	err = decodeLink(ix.SelectLink(query), r)
+	return
 }
 
 // Facet runs a facet query.
-func (ix Index) Facet(query, facetField string) (*FacetResponse, error) {
-	link := ix.FacetLink(query, facetField)
-	resp, err := http.Get(link)
+func (ix Index) Facet(query, facetField string) (r *FacetResponse, err error) {
+	r = new(FacetResponse)
+	err = decodeLink(ix.FacetLink(query, facetField), r)
+	return
+}
+
+// AllowedKeys checks for a query and facet field, whether the values contain
+// only allowed values.
+func (ix Index) AllowedKeys(query, field string, values ...string) error {
+	r, err := ix.Facet(query, field)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("facet failed with HTTP %s at %s", resp.StatusCode, link)
+	facets, err := r.Facets()
+	if err != nil {
+		return err
 	}
-	defer resp.Body.Close()
-	var r FacetResponse
-	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
-		return nil, err
+	err = facets.AllowedKeys(values...)
+	if err != nil {
+		return fmt.Errorf("%s [%s]: %s", query, field, err)
 	}
-	return &r, nil
+	return nil
+}
+
+// EqualSizeNonZero checks, if given facet field values have the same size.
+func (ix Index) EqualSizeNonZero(query, field string, values ...string) error {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return err
+	}
+	facets, err := r.Facets()
+	if err != nil {
+		return err
+	}
+	err = facets.EqualSizeNonZero(values...)
+	if err != nil {
+		return fmt.Errorf("%s [%s]: %s", query, field, err)
+	}
+	return nil
+}
+
+// EqualSizeTotal checks, if given facet field values have the same size as the
+// total number of records.
+func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return err
+	}
+	total := r.Response.NumFound
+	facets, err := r.Facets()
+	if err != nil {
+		return err
+	}
+	err = facets.EqualSizeNonZero(values...)
+	if err != nil {
+		return fmt.Errorf("%s [%s]: %s", query, field, err)
+	}
+	if len(values) > 0 {
+		if int64(facets[values[0]]) != total {
+			return fmt.Errorf("%s [%s]: size mismatch, got %d, want %d", query, field, facets[values[0]], total)
+		}
+	}
+	return nil
+}
+
+// MinRatioPct fails, if the number of records matching a value undercuts a given
+// ratio of all records matching the query. The ratio ranges from 0 to 100.
+func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) error {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return err
+	}
+	total := r.Response.NumFound
+	facets, err := r.Facets()
+	size, ok := facets[value]
+	if !ok {
+		return fmt.Errorf("field not found: %s", field)
+	}
+	ratio := (float64(size) / float64(total)) * 100
+	if ratio < minRatioPct {
+		return fmt.Errorf("%s [%s=%s]: ratio undercut, got %0.2f%%, want %0.2f%%",
+			query, field, value, ratio, minRatioPct)
+	}
+	return nil
+}
+
+// MinCount fails, if the number of records matching a value undercuts a given size.
+func (ix Index) MinCount(query, field, value string, minCount int) error {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return err
+	}
+	facets, err := r.Facets()
+	size, ok := facets[value]
+	if !ok {
+		return fmt.Errorf("field not found: %s", field)
+	}
+	if size < minCount {
+		return fmt.Errorf("%s [%s=%s]: undercut, got %d, want at least %d",
+			query, field, value, size, minCount)
+	}
+	return nil
+}
+
+// Result groups queries.
+type Result struct {
+	SourceIdentifier string
+	Link             string
+	SolrField        string
+	FixedResult      bool
+	Passed           bool
+	Comment          string
+}
+
+type TextileTableWriter struct {
+	w io.Writer
+}
+
+func NewTextileTableWriter(w io.Writer) *TextileTableWriter {
+	return &TextileTableWriter{w: w}
+}
+
+func (w *TextileTableWriter) WriteHeader() (int, error) {
+	return io.WriteString(w.w,
+		"| *Source ID, Field* | *Fixed* | *Passed* | *Comment* |\n")
+}
+
+func (w *TextileTableWriter) WriteResult(r Result) (int, error) {
+	f, p := Check, Check
+	if !r.FixedResult {
+		f = Cross
+	}
+	if !r.Passed {
+		p = Cross
+	}
+	return fmt.Fprintf(w.w, "| \"%s %s\":%s | %v | %v | %v |\n", r.SourceIdentifier, r.SolrField, r.Link, f, p, r.Comment)
+}
+
+func (w *TextileTableWriter) Write(rs []Result) (int, error) {
+	bw := 0
+	if n, err := w.WriteHeader(); err != nil {
+		return 0, err
+	} else {
+		bw += n
+	}
+	for _, r := range rs {
+		if n, err := w.WriteResult(r); err != nil {
+			return 0, err
+		} else {
+			bw += n
+		}
+	}
+	return bw, nil
 }
 
 func main() {
 	flag.Parse()
 
 	index := Index{Server: prependSchema(*server)}
-	r, err := index.Facet("source_id:49", "format")
-	if err != nil {
-		log.Fatal(err)
+	var results []Result
+
+	// Cases like "access_facet:"Electronic Resources" für alle Records". Multiple values are alternatives.
+	allowedKeyCases := [][]string{
+		[]string{"source_id:30", "format", "eBook", "ElectronicArticle"},
+		[]string{"source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"},
+		[]string{"source_id:48", "language", "German", "English"},
+		[]string{"source_id:49", "facet_avail", "Online", "Free"},
+		[]string{"source_id:55", "facet_avail", "Online", "Free"},
 	}
-	facets, err := r.Facets()
-	if err != nil {
-		log.Fatal(err)
+	for _, c := range allowedKeyCases {
+		if len(c) < 3 {
+			log.Fatal("too few fields in test case")
+		}
+		err := index.AllowedKeys(c[0], c[1], c[2:]...)
+		if err != nil {
+			log.Println(err)
+		}
+
+		parts := strings.Split(c[0], ":")
+		if len(parts) != 2 {
+			log.Fatalf("failed to parse source id query: %s", c[0])
+		}
+		var comment = strings.Join(c, ", ")
+		if err != nil {
+			comment = fmt.Sprintf("%v", err)
+		}
+		results = append(results, Result{
+			SourceIdentifier: parts[1],
+			Link:             index.FacetLink(c[0], c[1]),
+			SolrField:        c[1],
+			FixedResult:      true,
+			Passed:           err == nil,
+			Comment:          comment,
+		})
+
 	}
-	if err := facets.AllowedKeys("ElectronicArticle"); err != nil {
-		log.Fatal(err)
+
+	// Cases like "facet_avail:Online UND facet_avail:Free für alle Records". All records must have one or more facet values.
+	allRecordsCases := [][]string{
+		[]string{"source_id:28", "format", "ElectronicArticle"},
+		[]string{"source_id:28", "format_de15", "Article, E-Article"},
+		[]string{"source_id:28", "facet_avail", "Online", "Free"},
+		[]string{"source_id:28", "access_facet", "Electronic Resources"},
+		[]string{"source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"},
+		[]string{"source_id:28", "finc_class_facet", "not assigned"},
+
+		[]string{"source_id:30", "facet_avail", "Online", "Free"},
+		[]string{"source_id:30", "access_facet", "Electronic Resources"},
+		[]string{"source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"},
+
+		[]string{"source_id:34", "format", "ElectronicThesis"},
+		[]string{"source_id:34", "format_de15", "Thesis"},
+		[]string{"source_id:34", "facet_avail", "Online", "Free"},
+		[]string{"source_id:34", "access_facet", "Electronic Resources"},
+		[]string{"source_id:34", "mega_collection", "PQDT Open"},
+
+		[]string{"source_id:48", "format", "ElectronicArticle"},
+		[]string{"source_id:48", "format_de15", "Article, E-Article"},
+		[]string{"source_id:48", "facet_avail", "Online"},
+		[]string{"source_id:48", "access_facet", "Electronic Resources"},
+
+		[]string{"source_id:49", "facet_avail", "Online"},
+		[]string{"source_id:49", "access_facet", "Electronic Resources"},
+		[]string{"source_id:49", "language", "English"},
+
+		[]string{"source_id:50", "format", "ElectronicArticle"},
+		[]string{"source_id:50", "format_de15", "Article, E-Article"},
+		[]string{"source_id:50", "facet_avail", "Online"},
+		[]string{"source_id:50", "access_facet", "Electronic Resources"},
+		[]string{"source_id:50", "mega_collection", "DeGruyter SSH"},
+
+		[]string{"source_id:53", "format", "ElectronicArticle"},
+		[]string{"source_id:53", "format_de15", "Article, E-Article"},
+		[]string{"source_id:53", "facet_avail", "Online"},
+		[]string{"source_id:53", "access_facet", "Electronic Resources"},
+		[]string{"source_id:53", "mega_collection", "CEEOL Central and Eastern European Online Library"},
+
+		[]string{"source_id:55", "format", "ElectronicArticle"},
+		[]string{"source_id:55", "format_de15", "Article, E-Article"},
+		[]string{"source_id:55", "facet_avail", "Online"},
+		[]string{"source_id:55", "access_facet", "Electronic Resources"},
+
+		[]string{"source_id:60", "format", "ElectronicArticle"},
+		[]string{"source_id:60", "format_de15", "Article, E-Article"},
+		[]string{"source_id:60", "facet_avail", "Online"},
+		[]string{"source_id:60", "access_facet", "Electronic Resources"},
+		[]string{"source_id:60", "mega_collection", "Thieme E-Journals"},
+		[]string{"source_id:60", "facet_avail", "Online"},
+
+		[]string{"source_id:85", "format", "ElectronicArticle"},
+		[]string{"source_id:85", "format_de15", "Article, E-Article"},
+		[]string{"source_id:85", "facet_avail", "Online"},
+		[]string{"source_id:85", "access_facet", "Electronic Resources"},
+		[]string{"source_id:85", "language", "English"},
+		[]string{"source_id:85", "mega_collection", "Elsevier Journals"},
+
+		[]string{"source_id:87", "format", "ElectronicArticle"},
+		[]string{"source_id:87", "format_de15", "Article, E-Article"},
+		[]string{"source_id:87", "facet_avail", "Online", "Free"},
+		[]string{"source_id:87", "access_facet", "Electronic Resources"},
+		[]string{"source_id:87", "language", "English"},
+		[]string{"source_id:87", "mega_collection", "International Journal of Communication"},
+
+		[]string{"source_id:89", "format", "ElectronicArticle"},
+		[]string{"source_id:89", "format_de15", "Article, E-Article"},
+		[]string{"source_id:89", "facet_avail", "Online"},
+		[]string{"source_id:89", "access_facet", "Electronic Resources"},
+		[]string{"source_id:89", "language", "English"},
+		[]string{"source_id:89", "mega_collection", "IEEE Xplore Library"},
+
+		[]string{"source_id:101", "format", "ElectronicArticle"},
+		[]string{"source_id:101", "format_de15", "Article, E-Article"},
+		[]string{"source_id:101", "facet_avail", "Online"},
+		[]string{"source_id:101", "access_facet", "Electronic Resources"},
+		[]string{"source_id:101", "mega_collection", "Kieler Beiträge zur Filmmusikforschung"},
+		[]string{"source_id:101", "finc_class_facet", "not assigned"},
+
+		[]string{"source_id:105", "format", "ElectronicArticle"},
+		[]string{"source_id:105", "format_de15", "Article, E-Article"},
+		[]string{"source_id:105", "facet_avail", "Online"},
+		[]string{"source_id:105", "access_facet", "Electronic Resources"},
+		[]string{"source_id:105", "mega_collection", "Springer Journals"},
+		[]string{"source_id:105", "finc_class_facet", "not assigned"},
+	}
+	for _, c := range allRecordsCases {
+		if len(c) < 3 {
+			log.Fatal("too few fields in test case")
+		}
+		err := index.EqualSizeTotal(c[0], c[1], c[2:]...)
+		if err != nil {
+			log.Println(err)
+		}
+
+		parts := strings.Split(c[0], ":")
+		if len(parts) != 2 {
+			log.Fatalf("failed to parse source id query: %s", c[0])
+		}
+		var comment = strings.Join(c[2:], ", ")
+		if err != nil {
+			comment = fmt.Sprintf("%v", err)
+		}
+		results = append(results, Result{
+			SourceIdentifier: parts[1],
+			Link:             index.FacetLink(c[0], c[1]),
+			SolrField:        c[1],
+			FixedResult:      true,
+			Passed:           err == nil,
+			Comment:          comment,
+		})
+	}
+
+	// Cases like "facet_avail:Free für mindestens 0,5% aller Records".
+	ratioCases := []struct {
+		Query    string
+		Field    string
+		Value    string
+		MinRatio float64
+	}{
+		{"source_id:49", "facet_avail", "Free", 0.8},
+		{"source_id:55", "facet_avail", "Free", 2.2},
+		{"source_id:105", "facet_avail", "Free", 0.5},
+	}
+	for _, c := range ratioCases {
+		err := index.MinRatioPct(c.Query, c.Field, c.Value, c.MinRatio)
+
+		if err != nil {
+			log.Println(err)
+		}
+
+		parts := strings.Split(c.Query, ":")
+		if len(parts) != 2 {
+			log.Fatalf("failed to parse source id query: %s", c.Query)
+		}
+		var comment = fmt.Sprintf("%s %s %s %0.4f", c.Query, c.Field, c.Value, c.MinRatio)
+		if err != nil {
+			comment = fmt.Sprintf("%v", err)
+		}
+		results = append(results, Result{
+			SourceIdentifier: parts[1],
+			Link:             index.FacetLink(c.Query, c.Field),
+			SolrField:        c.Field,
+			FixedResult:      true,
+			Passed:           err == nil,
+			Comment:          comment,
+		})
+	}
+
+	// Cases like "facet_avail:Free für mindestens 50 Records".
+	minCountCases := []struct {
+		Query    string
+		Field    string
+		Value    string
+		MinCount int
+	}{
+		{"source_id:89", "facet_avail", "Free", 50},
+	}
+	for _, c := range minCountCases {
+		err := index.MinCount(c.Query, c.Field, c.Value, c.MinCount)
+		if err != nil {
+			log.Println(err)
+		}
+
+		parts := strings.Split(c.Query, ":")
+		if len(parts) != 2 {
+			log.Fatalf("failed to parse source id query: %s", c.Query)
+		}
+		var comment = fmt.Sprintf("%s %s %s %s", c.Query, c.Field, c.Value, c.MinCount)
+		if err != nil {
+			comment = fmt.Sprintf("%v", err)
+		}
+		results = append(results, Result{
+			SourceIdentifier: parts[1],
+			Link:             index.FacetLink(c.Query, c.Field),
+			SolrField:        c.Field,
+			FixedResult:      true,
+			Passed:           err == nil,
+			Comment:          comment,
+		})
+	}
+
+	if *textile {
+		tw := NewTextileTableWriter(os.Stdout)
+		if _, err := tw.Write(results); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
