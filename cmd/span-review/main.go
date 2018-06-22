@@ -13,6 +13,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/fatih/color"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -616,13 +617,14 @@ func main() {
 	}
 
 	if *ascii {
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.AlignRight)
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
+		red, green := color.New(color.FgRed), color.New(color.FgGreen)
 		for i, r := range results {
-			passed := "ok"
+			passed := green.Sprintf("ok")
 			if !r.Passed {
-				passed = "x"
+				passed = red.Sprintf("x")
 			}
-			fmt.Fprintf(w, "%d\t%s\t%s\t%v%s\n", i, r.SourceIdentifier, r.SolrField, passed, r.Comment)
+			fmt.Fprintf(w, "%d\t%s\t%s\t%v\t%s\t\n", i, r.SourceIdentifier, r.SolrField, passed, r.Comment)
 		}
 		w.Flush()
 		os.Exit(0)
