@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	Check = "✓"
-	Cross = "❌"
+	Check = "\u2713"
+	Cross = "\u274C"
 )
 
 var (
@@ -24,7 +24,8 @@ var (
 	textile = flag.Bool("t", false, "emit a textile table")
 )
 
-// FacetValues maps a facet value to frequency.
+// FacetValues maps a facet value to frequency. Solr uses pairs put into a
+// list, which is a bit awkward to work with.
 type FacetMap map[string]int
 
 // AllowedOnly returns an error if facets values contain non-zero values that
@@ -46,7 +47,7 @@ func (f FacetMap) AllowedKeys(allowed ...string) error {
 	return nil
 }
 
-// EqualSizeNonZero all keys should have equal number of values.
+// EqualSizeNonZero checks if all facet keys have an equal size.
 func (f FacetMap) EqualSizeNonZero(keys ...string) error {
 	var prev int
 	for i, k := range keys {
@@ -64,15 +65,15 @@ func (f FacetMap) EqualSizeNonZero(keys ...string) error {
 	return nil
 }
 
-// prependSchema prepends http, if necessary.
-func prependSchema(s string) string {
+// prependHTTP prepends http, if necessary.
+func prependHTTP(s string) string {
 	if !strings.HasPrefix(s, "http") {
 		return fmt.Sprintf("http://%s", s)
 	}
 	return s
 }
 
-// SelectResponse wraps a select response.
+// SelectResponse wraps a select response, adjusted from JSONGen.
 type SelectResponse struct {
 	Response struct {
 		Docs     []interface{} `json:"docs"`
@@ -90,7 +91,7 @@ type SelectResponse struct {
 	} `json:"responseHeader"`
 }
 
-// FacetResponse wraps a facet response.
+// FacetResponse wraps a facet response, adjusted from JSONGen output.
 type FacetResponse struct {
 	FacetCounts struct {
 		FacetDates struct {
@@ -124,7 +125,7 @@ type FacetResponse struct {
 	} `json:"responseHeader"`
 }
 
-// Facets unwraps the facet_fields.
+// Facets unwraps the facet_fields list into a FacetMap.
 func (fr FacetResponse) Facets() (FacetMap, error) {
 	unwrap := make(map[string]interface{})
 	if err := json.Unmarshal(fr.FacetCounts.FacetFields, &unwrap); err != nil {
@@ -187,13 +188,14 @@ func (ix Index) FacetLink(query, facetField string) string {
 	vals.Add("q", query)
 	vals.Add("facet", "true")
 	vals.Add("facet.field", facetField)
+	vals.Add("facet.limit", "1000")
 	vals.Add("rows", "0")
 	vals.Add("wt", "json")
 
 	return fmt.Sprintf("%s/select?%s", ix.Server, vals.Encode())
 }
 
-// decodeLink fetches a link and unmarshal the response into a given value.
+// decodeLink fetches a link and unmarshals the response into a given value.
 func decodeLink(link string, val interface{}) error {
 	resp, err := http.Get(link)
 	if err != nil {
@@ -203,7 +205,7 @@ func decodeLink(link string, val interface{}) error {
 		return fmt.Errorf("select failed with HTTP %d at %s", resp.StatusCode, link)
 	}
 	defer resp.Body.Close()
-	return json.NewDecoder(resp.Body).Decode(&val)
+	return json.NewDecoder(resp.Body).Decode(val)
 }
 
 // Select runs a select query.
@@ -220,14 +222,19 @@ func (ix Index) Facet(query, facetField string) (r *FacetResponse, err error) {
 	return
 }
 
+// facets returns a facet map for a query and field.
+func (ix Index) facets(query, field string) (FacetMap, error) {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return nil, err
+	}
+	return r.Facets()
+}
+
 // AllowedKeys checks for a query and facet field, whether the values contain
 // only allowed values.
 func (ix Index) AllowedKeys(query, field string, values ...string) error {
-	r, err := ix.Facet(query, field)
-	if err != nil {
-		return err
-	}
-	facets, err := r.Facets()
+	facets, err := ix.facets(query, field)
 	if err != nil {
 		return err
 	}
@@ -240,11 +247,7 @@ func (ix Index) AllowedKeys(query, field string, values ...string) error {
 
 // EqualSizeNonZero checks, if given facet field values have the same size.
 func (ix Index) EqualSizeNonZero(query, field string, values ...string) error {
-	r, err := ix.Facet(query, field)
-	if err != nil {
-		return err
-	}
-	facets, err := r.Facets()
+	facets, err := ix.facets(query, field)
 	if err != nil {
 		return err
 	}
@@ -288,6 +291,9 @@ func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) err
 	}
 	total := r.Response.NumFound
 	facets, err := r.Facets()
+	if err != nil {
+		return err
+	}
 	size, ok := facets[value]
 	if !ok {
 		return fmt.Errorf("field not found: %s", field)
@@ -302,11 +308,10 @@ func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) err
 
 // MinCount fails, if the number of records matching a value undercuts a given size.
 func (ix Index) MinCount(query, field, value string, minCount int) error {
-	r, err := ix.Facet(query, field)
+	facets, err := ix.facets(query, field)
 	if err != nil {
 		return err
 	}
-	facets, err := r.Facets()
 	size, ok := facets[value]
 	if !ok {
 		return fmt.Errorf("field not found: %s", field)
@@ -318,7 +323,7 @@ func (ix Index) MinCount(query, field, value string, minCount int) error {
 	return nil
 }
 
-// Result groups queries.
+// Result represents a single result row.
 type Result struct {
 	SourceIdentifier string
 	Link             string
@@ -328,20 +333,24 @@ type Result struct {
 	Comment          string
 }
 
-type TextileTableWriter struct {
+// TextileResultWriter converts Results to Textile markup.
+type TextileResultWriter struct {
 	w io.Writer
 }
 
-func NewTextileTableWriter(w io.Writer) *TextileTableWriter {
-	return &TextileTableWriter{w: w}
+// NewTextileTableWriter creates a new markup writer.
+func NewTextileTableWriter(w io.Writer) *TextileResultWriter {
+	return &TextileResultWriter{w: w}
 }
 
-func (w *TextileTableWriter) WriteHeader() (int, error) {
+// WriteHeader writes a header.
+func (w *TextileResultWriter) WriteHeader() (int, error) {
 	return io.WriteString(w.w,
 		"| *Source ID, Field* | *Fixed* | *Passed* | *Comment* |\n")
 }
 
-func (w *TextileTableWriter) WriteResult(r Result) (int, error) {
+// WriteResult writes a single Result.
+func (w *TextileResultWriter) WriteResult(r Result) (int, error) {
 	f, p := Check, Check
 	if !r.FixedResult {
 		f = Cross
@@ -349,10 +358,11 @@ func (w *TextileTableWriter) WriteResult(r Result) (int, error) {
 	if !r.Passed {
 		p = Cross
 	}
-	return fmt.Fprintf(w.w, "| \"%s %s\":%s | %v | %v | %v |\n", r.SourceIdentifier, r.SolrField, r.Link, f, p, r.Comment)
+	return fmt.Fprintf(w.w, "| \"%s %s\":%s | %v | %v | %v |\n",
+		r.SourceIdentifier, r.SolrField, r.Link, f, p, r.Comment)
 }
 
-func (w *TextileTableWriter) Write(rs []Result) (int, error) {
+func (w *TextileResultWriter) WriteResults(rs []Result) (int, error) {
 	bw := 0
 	if n, err := w.WriteHeader(); err != nil {
 		return 0, err
@@ -372,7 +382,7 @@ func (w *TextileTableWriter) Write(rs []Result) (int, error) {
 func main() {
 	flag.Parse()
 
-	index := Index{Server: prependSchema(*server)}
+	index := Index{Server: prependHTTP(*server)}
 	var results []Result
 
 	// Cases like "access_facet:"Electronic Resources" für alle Records". Multiple values are alternatives.
@@ -596,7 +606,7 @@ func main() {
 
 	if *textile {
 		tw := NewTextileTableWriter(os.Stdout)
-		if _, err := tw.Write(results); err != nil {
+		if _, err := tw.WriteResults(results); err != nil {
 			log.Fatal(err)
 		}
 	}
