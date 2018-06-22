@@ -7,11 +7,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"text/tabwriter"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -22,6 +24,7 @@ const (
 var (
 	server  = flag.String("server", "http://localhost:8983/solr/biblio", "location of SOLR server")
 	textile = flag.Bool("t", false, "emit a textile table")
+	ascii   = flag.Bool("a", false, "emit ascii table")
 )
 
 // FacetValues maps a facet value to frequency. Solr uses pairs put into a
@@ -590,7 +593,7 @@ func main() {
 		if len(parts) != 2 {
 			log.Fatalf("failed to parse source id query: %s", c.Query)
 		}
-		var comment = fmt.Sprintf("%s %s %s %s", c.Query, c.Field, c.Value, c.MinCount)
+		var comment = fmt.Sprintf("%s %s %s %d", c.Query, c.Field, c.Value, c.MinCount)
 		if err != nil {
 			comment = fmt.Sprintf("%v", err)
 		}
@@ -609,5 +612,19 @@ func main() {
 		if _, err := tw.WriteResults(results); err != nil {
 			log.Fatal(err)
 		}
+		os.Exit(0)
+	}
+
+	if *ascii {
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', tabwriter.AlignRight)
+		for i, r := range results {
+			passed := "ok"
+			if !r.Passed {
+				passed = "x"
+			}
+			fmt.Fprintf(w, "%d\t%s\t%s\t%v%s\n", i, r.SourceIdentifier, r.SolrField, passed, r.Comment)
+		}
+		w.Flush()
+		os.Exit(0)
 	}
 }
