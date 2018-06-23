@@ -383,11 +383,30 @@ func (w *TextileResultWriter) WriteResults(rs []Result) (int, error) {
 	return bw, nil
 }
 
+// Given a query string, parse out the source identifier, panic currently, if
+// query is not of the form source_id:23.
+func MustParseSourceIdentifier(s string) string {
+	parts := strings.Split(s, ":")
+	if len(parts) != 2 {
+		panic(fmt.Sprintf("failed to parse source id query: %s", s))
+	}
+	return parts[1]
+}
+
+// ErrorOrComment returns error or message if error is nil.
+func ErrorOrComment(err error, message string) string {
+	if err != nil {
+		return fmt.Sprintf("%v", err)
+	}
+	return message
+}
+
 func main() {
 	flag.Parse()
 
 	index := Index{Server: prependHTTP(*server)}
 	var results []Result
+	var err error
 
 	// Cases like "access_facet:"Electronic Resources" für alle Records". Multiple values are alternatives.
 	allowedKeyCases := [][]string{
@@ -401,26 +420,16 @@ func main() {
 		if len(c) < 3 {
 			log.Fatal("too few fields in test case")
 		}
-		err := index.AllowedKeys(c[0], c[1], c[2:]...)
-		if err != nil {
+		if err = index.AllowedKeys(c[0], c[1], c[2:]...); err != nil {
 			log.Println(err)
 		}
-
-		parts := strings.Split(c[0], ":")
-		if len(parts) != 2 {
-			log.Fatalf("failed to parse source id query: %s", c[0])
-		}
-		var comment = strings.Join(c, ", ")
-		if err != nil {
-			comment = fmt.Sprintf("%v", err)
-		}
 		results = append(results, Result{
-			SourceIdentifier: parts[1],
+			SourceIdentifier: MustParseSourceIdentifier(c[0]),
 			Link:             index.FacetLink(c[0], c[1]),
 			SolrField:        c[1],
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          comment,
+			Comment:          ErrorOrComment(err, strings.Join(c, ", ")),
 		})
 
 	}
@@ -516,26 +525,16 @@ func main() {
 		if len(c) < 3 {
 			log.Fatal("too few fields in test case")
 		}
-		err := index.EqualSizeTotal(c[0], c[1], c[2:]...)
-		if err != nil {
+		if err = index.EqualSizeTotal(c[0], c[1], c[2:]...); err != nil {
 			log.Println(err)
 		}
-
-		parts := strings.Split(c[0], ":")
-		if len(parts) != 2 {
-			log.Fatalf("failed to parse source id query: %s", c[0])
-		}
-		var comment = strings.Join(c[2:], ", ")
-		if err != nil {
-			comment = fmt.Sprintf("%v", err)
-		}
 		results = append(results, Result{
-			SourceIdentifier: parts[1],
+			SourceIdentifier: MustParseSourceIdentifier(c[0]),
 			Link:             index.FacetLink(c[0], c[1]),
 			SolrField:        c[1],
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          comment,
+			Comment:          ErrorOrComment(err, strings.Join(c[2:], ", ")),
 		})
 	}
 
@@ -551,27 +550,16 @@ func main() {
 		{"source_id:105", "facet_avail", "Free", 0.5},
 	}
 	for _, c := range ratioCases {
-		err := index.MinRatioPct(c.Query, c.Field, c.Value, c.MinRatio)
-
-		if err != nil {
+		if err = index.MinRatioPct(c.Query, c.Field, c.Value, c.MinRatio); err != nil {
 			log.Println(err)
 		}
-
-		parts := strings.Split(c.Query, ":")
-		if len(parts) != 2 {
-			log.Fatalf("failed to parse source id query: %s", c.Query)
-		}
-		var comment = fmt.Sprintf("%s %s %s %0.4f", c.Query, c.Field, c.Value, c.MinRatio)
-		if err != nil {
-			comment = fmt.Sprintf("%v", err)
-		}
 		results = append(results, Result{
-			SourceIdentifier: parts[1],
+			SourceIdentifier: MustParseSourceIdentifier(c.Query),
 			Link:             index.FacetLink(c.Query, c.Field),
 			SolrField:        c.Field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          comment,
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s %0.4f", c.Query, c.Field, c.Value, c.MinRatio)),
 		})
 	}
 
@@ -585,26 +573,16 @@ func main() {
 		{"source_id:89", "facet_avail", "Free", 50},
 	}
 	for _, c := range minCountCases {
-		err := index.MinCount(c.Query, c.Field, c.Value, c.MinCount)
-		if err != nil {
+		if err = index.MinCount(c.Query, c.Field, c.Value, c.MinCount); err != nil {
 			log.Println(err)
 		}
-
-		parts := strings.Split(c.Query, ":")
-		if len(parts) != 2 {
-			log.Fatalf("failed to parse source id query: %s", c.Query)
-		}
-		var comment = fmt.Sprintf("%s %s %s %d", c.Query, c.Field, c.Value, c.MinCount)
-		if err != nil {
-			comment = fmt.Sprintf("%v", err)
-		}
 		results = append(results, Result{
-			SourceIdentifier: parts[1],
+			SourceIdentifier: MustParseSourceIdentifier(c.Query),
 			Link:             index.FacetLink(c.Query, c.Field),
 			SolrField:        c.Field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          comment,
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s %d", c.Query, c.Field, c.Value, c.MinCount)),
 		})
 	}
 
@@ -622,7 +600,7 @@ func main() {
 		for i, r := range results {
 			passed := green.Sprintf("ok")
 			if !r.Passed {
-				passed = red.Sprintf("x")
+				passed = red.Sprintf("X")
 			}
 			fmt.Fprintf(w, "%d\t%s\t%s\t%v\t%s\t\n", i, r.SourceIdentifier, r.SolrField, passed, r.Comment)
 		}
