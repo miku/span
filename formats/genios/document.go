@@ -74,6 +74,7 @@ type Document struct {
 	Abstract         string   `xml:"Abstract"`
 	Descriptors      string   `xml:"Descriptors>Descriptor"`
 	Text             string   `xml:"Text"`
+	Modules          []string `xml:"Modules>Module"`
 }
 
 var (
@@ -284,6 +285,10 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	// Note DB name as well as package name (Wiwi, Sowi, Recht, etc.) as well
 	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
 	output.Packages = append([]string{doc.DB}, prefixedPackageNames...)
+
+	// 2018-06-01, Modules are added, (1) add them in addition to existing
+	// package names, later XXX: (2) remove own tags.
+	output.Packages = append(output.Packages, doc.Modules...)
 
 	if len(prefixedPackageNames) > 0 {
 		output.MegaCollections = []string{prefixedPackageNames[0]}
