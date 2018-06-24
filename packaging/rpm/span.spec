@@ -1,6 +1,6 @@
 Summary:    Library data conversions.
 Name:       span
-Version:    0.1.231
+Version:    0.1.232
 Release:    0
 License:    GPL
 ExclusiveArch:  x86_64
@@ -30,6 +30,8 @@ install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/sbin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-review $RPM_BUILD_ROOT/usr/local/sbin
+install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/sbin
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
@@ -53,6 +55,8 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/sbin/span-tag
 /usr/local/sbin/span-update-labels
 /usr/local/sbin/span-freeze
+/usr/local/sbin/span-review
+/usr/local/sbin/span-compare
 /usr/local/share/man/man1/span.1
 
 %changelog
