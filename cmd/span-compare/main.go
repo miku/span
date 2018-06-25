@@ -2,18 +2,62 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
 var (
 	server = flag.String("server", "http://localhost:8983/solr/biblio", "server location")
+	sids   = flag.String("sids", "https://raw.githubusercontent.com/miku/siskin/master/docs/sids.tsv", "URL or path to list of sids")
 )
+
+func createSidMap(link string) (map[string]string, error) {
+	var r io.Reader
+	if strings.HasPrefix(link, "http") {
+		resp, err := http.Get(link)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			return nil, fmt.Errorf("incorrect response: %d", resp.StatusCode)
+		}
+		r = resp.Body
+	} else {
+		f, err := os.Open(link)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		r = f
+	}
+	result := make(map[string]string)
+	br := bufio.NewReader(r)
+	for {
+		line, err := br.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		fields := strings.Split(line, "\t")
+		if len(fields) != 3 {
+			log.Printf("invalid line: %s", line)
+		}
+		result[fields[0]] = strings.TrimSpace(fields[2])
+	}
+	return result, nil
+}
 
 // prependHTTP prepends http, if necessary.
 func prependHTTP(s string) string {
@@ -206,5 +250,13 @@ func main() {
 		for _, c := range cs {
 			fmt.Printf("%v\t%s\n", v, c)
 		}
+	}
+
+	m, err := createSidMap(*sids)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for k, v := range m {
+		log.Printf("%v => %v", k, v)
 	}
 }
