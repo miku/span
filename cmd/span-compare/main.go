@@ -69,7 +69,8 @@ func prependHTTP(s string) string {
 
 // Solr index type implementing various query types and operations.
 type Index struct {
-	Server string
+	Server     string
+	FacetLimit int
 }
 
 // FacetValues maps a facet value to frequency. Solr uses pairs put into a
@@ -147,11 +148,9 @@ func (fr FacetResponse) Facets() (FacetMap, error) {
 	return result, nil
 }
 
-// Institutions returns a list of International Standard Identifier for
-// Libraries and Related Organisations (ISIL), ISO 15511 identifiers.
-func (ix Index) Institutions() (result []string, err error) {
-	r, err := ix.Facet("*:*", "institution")
-	if err != nil {
+func (ix Index) FacetKeys(query, field string) (result []string, err error) {
+	var r FacetResponse
+	if err := ix.Facet(query, field, &r); err != nil {
 		return result, err
 	}
 	fmap, err := r.Facets()
@@ -164,25 +163,10 @@ func (ix Index) Institutions() (result []string, err error) {
 	return result, nil
 }
 
-func (ix Index) SourceIdentifiers() (result []string, err error) {
-	r, err := ix.Facet("*:*", "source_id")
-	if err != nil {
-		return result, err
-	}
-	fmap, err := r.Facets()
-	if err != nil {
-		return result, err
-	}
-	for k := range fmap {
-		result = append(result, k)
-	}
-	return result, nil
-}
-
-// SourceCollections returns the collections for a given source identifier.
-func (ix Index) SourceCollections(sid string) (result []string, err error) {
-	r, err := ix.Facet("source_id:"+sid, "mega_collection")
-	if err != nil {
+// FacetKeysFunc returns all facet keys, that pass a filter, given as function.
+func (ix Index) FacetKeysFunc(query, field string, f func(string, int) bool) (result []string, err error) {
+	var r FacetResponse
+	if err := ix.Facet(query, field, &r); err != nil {
 		return result, err
 	}
 	fmap, err := r.Facets()
@@ -190,12 +174,26 @@ func (ix Index) SourceCollections(sid string) (result []string, err error) {
 		return result, err
 	}
 	for k, v := range fmap {
-		if v == 0 {
-			continue
+		if f(k, v) {
+			result = append(result, k)
 		}
-		result = append(result, k)
 	}
 	return result, nil
+}
+
+// Institutions returns a list of International Standard Identifier for
+// Libraries and Related Organisations (ISIL), ISO 15511 identifiers.
+func (ix Index) Institutions() (result []string, err error) {
+	return ix.FacetKeys("*:*", "institution")
+}
+
+func (ix Index) SourceIdentifiers() (result []string, err error) {
+	return ix.FacetKeys("*:*", "source_id")
+}
+
+// SourceCollections returns the collections for a given source identifier.
+func (ix Index) SourceCollections(sid string) (result []string, err error) {
+	return ix.FacetKeysFunc("source_id:"+sid, "mega_collection", func(_ string, v int) bool { return v > 0 })
 }
 
 // FacetLink constructs a link to a JSON response.
@@ -204,10 +202,13 @@ func (ix Index) FacetLink(query, facetField string) string {
 	if query == "" {
 		query = "*:*"
 	}
+	if ix.FacetLimit == 0 {
+		ix.FacetLimit = 100000
+	}
 	vals.Add("q", query)
 	vals.Add("facet", "true")
 	vals.Add("facet.field", facetField)
-	vals.Add("facet.limit", "100000")
+	vals.Add("facet.limit", fmt.Sprintf("%d", ix.FacetLimit))
 	vals.Add("rows", "0")
 	vals.Add("wt", "json")
 
@@ -215,13 +216,11 @@ func (ix Index) FacetLink(query, facetField string) string {
 }
 
 // Facet runs a facet query.
-func (ix Index) Facet(query, facetField string) (r *FacetResponse, err error) {
-	r = new(FacetResponse)
-	err = decodeLink(ix.FacetLink(query, facetField), r)
-	return
+func (ix Index) Facet(query, facetField string, r *FacetResponse) error {
+	return decodeLink(ix.FacetLink(query, facetField), r)
 }
 
-// decodeLink fetches a link and unmarshals the response into a given value.
+// decodeLink fetches a link and unmarshals the JSON response into a given value.
 func decodeLink(link string, val interface{}) error {
 	resp, err := http.Get(link)
 	if err != nil {
