@@ -414,133 +414,137 @@ func main() {
 	// Cases like "access_facet:"Electronic Resources" für alle Records".
 	// Multiple values are alternatives. Source id, field and one or more
 	// values.
-	allowedKeyCases := [][]string{
-		[]string{"source_id:30", "format", "eBook", "ElectronicArticle"},
-		[]string{"source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"},
-		[]string{"source_id:48", "language", "German", "English"},
-		[]string{"source_id:49", "facet_avail", "Online", "Free"},
-		[]string{"source_id:55", "facet_avail", "Online", "Free"},
+	allowedKeyCases := []struct {
+		Query  string
+		Field  string
+		Values []string
+	}{
+		{"source_id:30", "format", []string{"eBook", "ElectronicArticle"}},
+		{"source_id:30", "format_de15", []string{"Book, E-Book", "Article, E-Article"}},
+		{"source_id:48", "language", []string{"German", "English"}},
+		{"source_id:49", "facet_avail", []string{"Online", "Free"}},
+		{"source_id:55", "facet_avail", []string{"Online", "Free"}},
 	}
+
 	for _, c := range allowedKeyCases {
-		if len(c) < 3 {
-			log.Fatal("too few fields in test case")
-		}
-		if err = index.AllowedKeys(c[0], c[1], c[2:]...); err != nil {
+		if err = index.AllowedKeys(c.Query, c.Field, c.Values...); err != nil {
 			log.Println(err)
 		}
 		results = append(results, Result{
-			SourceIdentifier: MustParseSourceIdentifier(c[0]),
-			Link:             index.FacetLink(c[0], c[1]),
-			SolrField:        c[1],
+			SourceIdentifier: MustParseSourceIdentifier(c.Query),
+			Link:             index.FacetLink(c.Query, c.Field),
+			SolrField:        c.Field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          ErrorOrComment(err, strings.Join(c, ", ")),
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s %s", c.Query, c.Field, c.Values)),
 		})
 
 	}
 
 	// Cases like "facet_avail:Online UND facet_avail:Free für alle Records".
 	// All records must have one or more facet values.
-	allRecordsCases := [][]string{
-		[]string{"source_id:28", "format", "ElectronicArticle"},
-		[]string{"source_id:28", "format_de15", "Article, E-Article"},
-		[]string{"source_id:28", "facet_avail", "Online", "Free"},
-		[]string{"source_id:28", "access_facet", "Electronic Resources"},
-		[]string{"source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"},
-		[]string{"source_id:28", "finc_class_facet", "not assigned"},
+	allRecordsCases := []struct {
+		Query  string
+		Field  string
+		Values []string
+	}{
+		{"source_id:28", "format", []string{"ElectronicArticle"}},
+		{"source_id:28", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:28", "facet_avail", []string{"Online", "Free"}},
+		{"source_id:28", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:28", "mega_collection", []string{"DOAJ Directory of Open Access Journals"}},
+		{"source_id:28", "finc_class_facet", []string{"not assigned"}},
 
-		[]string{"source_id:30", "facet_avail", "Online", "Free"},
-		[]string{"source_id:30", "access_facet", "Electronic Resources"},
-		[]string{"source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"},
+		{"source_id:30", "facet_avail", []string{"Online", "Free"}},
+		{"source_id:30", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:30", "mega_collection", []string{"SSOAR Social Science Open Access Repository"}},
 
-		[]string{"source_id:34", "format", "ElectronicThesis"},
-		[]string{"source_id:34", "format_de15", "Thesis"},
-		[]string{"source_id:34", "facet_avail", "Online", "Free"},
-		[]string{"source_id:34", "access_facet", "Electronic Resources"},
-		[]string{"source_id:34", "mega_collection", "PQDT Open"},
+		{"source_id:34", "format", []string{"ElectronicThesis"}},
+		{"source_id:34", "format_de15", []string{"Thesis"}},
+		{"source_id:34", "facet_avail", []string{"Online", "Free"}},
+		{"source_id:34", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:34", "mega_collection", []string{"PQDT Open"}},
 
-		[]string{"source_id:48", "format", "ElectronicArticle"},
-		[]string{"source_id:48", "format_de15", "Article, E-Article"},
-		[]string{"source_id:48", "facet_avail", "Online"},
-		[]string{"source_id:48", "access_facet", "Electronic Resources"},
+		{"source_id:48", "format", []string{"ElectronicArticle"}},
+		{"source_id:48", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:48", "facet_avail", []string{"Online"}},
+		{"source_id:48", "access_facet", []string{"Electronic Resources"}},
 
-		[]string{"source_id:49", "facet_avail", "Online"},
-		[]string{"source_id:49", "access_facet", "Electronic Resources"},
-		[]string{"source_id:49", "language", "English"},
+		{"source_id:49", "facet_avail", []string{"Online"}},
+		{"source_id:49", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:49", "language", []string{"English"}},
 
-		[]string{"source_id:50", "format", "ElectronicArticle"},
-		[]string{"source_id:50", "format_de15", "Article, E-Article"},
-		[]string{"source_id:50", "facet_avail", "Online"},
-		[]string{"source_id:50", "access_facet", "Electronic Resources"},
-		[]string{"source_id:50", "mega_collection", "DeGruyter SSH"},
+		{"source_id:50", "format", []string{"ElectronicArticle"}},
+		{"source_id:50", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:50", "facet_avail", []string{"Online"}},
+		{"source_id:50", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:50", "mega_collection", []string{"DeGruyter SSH"}},
 
-		[]string{"source_id:53", "format", "ElectronicArticle"},
-		[]string{"source_id:53", "format_de15", "Article, E-Article"},
-		[]string{"source_id:53", "facet_avail", "Online"},
-		[]string{"source_id:53", "access_facet", "Electronic Resources"},
-		[]string{"source_id:53", "mega_collection", "CEEOL Central and Eastern European Online Library"},
+		{"source_id:53", "format", []string{"ElectronicArticle"}},
+		{"source_id:53", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:53", "facet_avail", []string{"Online"}},
+		{"source_id:53", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:53", "mega_collection", []string{"CEEOL Central and Eastern European Online Library"}},
 
-		[]string{"source_id:55", "format", "ElectronicArticle"},
-		[]string{"source_id:55", "format_de15", "Article, E-Article"},
-		[]string{"source_id:55", "facet_avail", "Online"},
-		[]string{"source_id:55", "access_facet", "Electronic Resources"},
+		{"source_id:55", "format", []string{"ElectronicArticle"}},
+		{"source_id:55", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:55", "facet_avail", []string{"Online"}},
+		{"source_id:55", "access_facet", []string{"Electronic Resources"}},
 
-		[]string{"source_id:60", "format", "ElectronicArticle"},
-		[]string{"source_id:60", "format_de15", "Article, E-Article"},
-		[]string{"source_id:60", "facet_avail", "Online"},
-		[]string{"source_id:60", "access_facet", "Electronic Resources"},
-		[]string{"source_id:60", "mega_collection", "Thieme E-Journals"},
-		[]string{"source_id:60", "facet_avail", "Online"},
+		{"source_id:60", "format", []string{"ElectronicArticle"}},
+		{"source_id:60", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:60", "facet_avail", []string{"Online"}},
+		{"source_id:60", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:60", "mega_collection", []string{"Thieme E-Journals"}},
+		{"source_id:60", "facet_avail", []string{"Online"}},
 
-		[]string{"source_id:85", "format", "ElectronicArticle"},
-		[]string{"source_id:85", "format_de15", "Article, E-Article"},
-		[]string{"source_id:85", "facet_avail", "Online"},
-		[]string{"source_id:85", "access_facet", "Electronic Resources"},
-		[]string{"source_id:85", "language", "English"},
-		[]string{"source_id:85", "mega_collection", "Elsevier Journals"},
+		{"source_id:85", "format", []string{"ElectronicArticle"}},
+		{"source_id:85", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:85", "facet_avail", []string{"Online"}},
+		{"source_id:85", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:85", "language", []string{"English"}},
+		{"source_id:85", "mega_collection", []string{"Elsevier Journals"}},
 
-		[]string{"source_id:87", "format", "ElectronicArticle"},
-		[]string{"source_id:87", "format_de15", "Article, E-Article"},
-		[]string{"source_id:87", "facet_avail", "Online", "Free"},
-		[]string{"source_id:87", "access_facet", "Electronic Resources"},
-		[]string{"source_id:87", "language", "English"},
-		[]string{"source_id:87", "mega_collection", "International Journal of Communication"},
+		{"source_id:87", "format", []string{"ElectronicArticle"}},
+		{"source_id:87", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:87", "facet_avail", []string{"Online", "Free"}},
+		{"source_id:87", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:87", "language", []string{"English"}},
+		{"source_id:87", "mega_collection", []string{"International Journal of Communication"}},
 
-		[]string{"source_id:89", "format", "ElectronicArticle"},
-		[]string{"source_id:89", "format_de15", "Article, E-Article"},
-		[]string{"source_id:89", "facet_avail", "Online"},
-		[]string{"source_id:89", "access_facet", "Electronic Resources"},
-		[]string{"source_id:89", "language", "English"},
-		[]string{"source_id:89", "mega_collection", "IEEE Xplore Library"},
+		{"source_id:89", "format", []string{"ElectronicArticle"}},
+		{"source_id:89", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:89", "facet_avail", []string{"Online"}},
+		{"source_id:89", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:89", "language", []string{"English"}},
+		{"source_id:89", "mega_collection", []string{"IEEE Xplore Library"}},
 
-		[]string{"source_id:101", "format", "ElectronicArticle"},
-		[]string{"source_id:101", "format_de15", "Article, E-Article"},
-		[]string{"source_id:101", "facet_avail", "Online"},
-		[]string{"source_id:101", "access_facet", "Electronic Resources"},
-		[]string{"source_id:101", "mega_collection", "Kieler Beiträge zur Filmmusikforschung"},
-		[]string{"source_id:101", "finc_class_facet", "not assigned"},
+		{"source_id:101", "format", []string{"ElectronicArticle"}},
+		{"source_id:101", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:101", "facet_avail", []string{"Online"}},
+		{"source_id:101", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:101", "mega_collection", []string{"Kieler Beiträge zur Filmmusikforschung"}},
+		{"source_id:101", "finc_class_facet", []string{"not assigned"}},
 
-		[]string{"source_id:105", "format", "ElectronicArticle"},
-		[]string{"source_id:105", "format_de15", "Article, E-Article"},
-		[]string{"source_id:105", "facet_avail", "Online"},
-		[]string{"source_id:105", "access_facet", "Electronic Resources"},
-		[]string{"source_id:105", "mega_collection", "Springer Journals"},
-		[]string{"source_id:105", "finc_class_facet", "not assigned"},
+		{"source_id:105", "format", []string{"ElectronicArticle"}},
+		{"source_id:105", "format_de15", []string{"Article, E-Article"}},
+		{"source_id:105", "facet_avail", []string{"Online"}},
+		{"source_id:105", "access_facet", []string{"Electronic Resources"}},
+		{"source_id:105", "mega_collection", []string{"Springer Journals"}},
+		{"source_id:105", "finc_class_facet", []string{"not assigned"}},
 	}
+
 	for _, c := range allRecordsCases {
-		if len(c) < 3 {
-			log.Fatal("too few fields in test case")
-		}
-		if err = index.EqualSizeTotal(c[0], c[1], c[2:]...); err != nil {
+		if err = index.EqualSizeTotal(c.Query, c.Field, c.Values...); err != nil {
 			log.Println(err)
 		}
 		results = append(results, Result{
-			SourceIdentifier: MustParseSourceIdentifier(c[0]),
-			Link:             index.FacetLink(c[0], c[1]),
-			SolrField:        c[1],
+			SourceIdentifier: MustParseSourceIdentifier(c.Query),
+			Link:             index.FacetLink(c.Query, c.Field),
+			SolrField:        c.Field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          ErrorOrComment(err, strings.Join(c[2:], ", ")),
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s %s", c.Query, c.Field, c.Values)),
 		})
 	}
 
