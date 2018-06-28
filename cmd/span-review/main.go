@@ -28,7 +28,7 @@ var (
 	ascii   = flag.Bool("a", false, "emit ascii table")
 )
 
-// FacetValues maps a facet value to frequency. Solr uses pairs put into a
+// FacetMap maps a facet value to its frequency. Solr uses pairs put into a
 // list, which is a bit awkward to work with.
 type FacetMap map[string]int
 
@@ -51,7 +51,8 @@ func (f FacetMap) AllowedKeys(allowed ...string) error {
 	return nil
 }
 
-// EqualSizeNonZero checks if all facet keys have an equal size.
+// EqualSizeNonZero checks if frequencies of the given keys are the same and
+// non-zero.
 func (f FacetMap) EqualSizeNonZero(keys ...string) error {
 	var prev int
 	for i, k := range keys {
@@ -280,7 +281,8 @@ func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
 	}
 	if len(values) > 0 {
 		if int64(facets[values[0]]) != total {
-			return fmt.Errorf("%s [%s]: size mismatch, got %d, want %d", query, field, facets[values[0]], total)
+			return fmt.Errorf("%s [%s]: size mismatch, got %d, want %d",
+				query, field, facets[values[0]], total)
 		}
 	}
 	return nil
@@ -366,6 +368,7 @@ func (w *TextileResultWriter) WriteResult(r Result) (int, error) {
 		r.SourceIdentifier, r.SolrField, r.Link, f, p, r.Comment)
 }
 
+// WriteResults writes a batch of results.
 func (w *TextileResultWriter) WriteResults(rs []Result) (int, error) {
 	bw := 0
 	if n, err := w.WriteHeader(); err != nil {
@@ -383,7 +386,7 @@ func (w *TextileResultWriter) WriteResults(rs []Result) (int, error) {
 	return bw, nil
 }
 
-// Given a query string, parse out the source identifier, panic currently, if
+// Given a query string, parse out the source identifier, panics currently, if
 // query is not of the form source_id:23.
 func MustParseSourceIdentifier(s string) string {
 	parts := strings.Split(s, ":")
@@ -408,7 +411,9 @@ func main() {
 	var results []Result
 	var err error
 
-	// Cases like "access_facet:"Electronic Resources" für alle Records". Multiple values are alternatives.
+	// Cases like "access_facet:"Electronic Resources" für alle Records".
+	// Multiple values are alternatives. Source id, field and one or more
+	// values.
 	allowedKeyCases := [][]string{
 		[]string{"source_id:30", "format", "eBook", "ElectronicArticle"},
 		[]string{"source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"},
@@ -434,7 +439,8 @@ func main() {
 
 	}
 
-	// Cases like "facet_avail:Online UND facet_avail:Free für alle Records". All records must have one or more facet values.
+	// Cases like "facet_avail:Online UND facet_avail:Free für alle Records".
+	// All records must have one or more facet values.
 	allRecordsCases := [][]string{
 		[]string{"source_id:28", "format", "ElectronicArticle"},
 		[]string{"source_id:28", "format_de15", "Article, E-Article"},
@@ -604,7 +610,8 @@ func main() {
 			if !r.Passed {
 				passed = red.Sprintf("X")
 			}
-			fmt.Fprintf(w, "%d\t%s\t%s\t%v\t%s\t\n", i, r.SourceIdentifier, r.SolrField, passed, r.Comment)
+			fmt.Fprintf(w, "%d\t%s\t%s\t%v\t%s\t\n", i,
+				r.SourceIdentifier, r.SolrField, passed, r.Comment)
 		}
 		w.Flush()
 		os.Exit(0)
