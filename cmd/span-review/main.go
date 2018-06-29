@@ -141,7 +141,7 @@ func main() {
 			SolrField:        c.Field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s %s", c.Query, c.Field, c.Values)),
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", c.Query, c.Field, c.Values)),
 		})
 	}
 
@@ -248,7 +248,7 @@ func main() {
 			SolrField:        c.Field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s %s", c.Query, c.Field, c.Values)),
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", c.Query, c.Field, c.Values)),
 		})
 	}
 
