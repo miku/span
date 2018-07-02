@@ -161,10 +161,11 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		if text == "" {
 			continue
 		}
-		for _, ss := range strings.Split(text, ";") {
-			ss = strings.TrimSpace(ss)
-			output.Subjects = append(output.Subjects, ss)
+		if strings.Contains(text, ";") {
+			// Ignore subject heading chains.
+			continue
 		}
+		output.Subjects = append(output.Subjects, text)
 	}
 	for _, s := range record.Metadata.Dc.Temporal {
 		text := strings.TrimSpace(s.Text)
