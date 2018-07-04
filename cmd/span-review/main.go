@@ -1,5 +1,12 @@
 // span-review runs plausibility queries against a SOLR server, mostly facet
 // queries, refs #12756.
+//
+// TODO:
+//
+// * configurable
+// * fetch from gitlab
+// * run
+// * post to gitlab or redmine
 package main
 
 import (
