@@ -306,3 +306,64 @@ func (ix Index) MinCount(query, field, value string, minCount int) error {
 	}
 	return nil
 }
+
+// FacetKeysFunc returns all facet keys, that pass a filter, given as function
+// of facet value and frequency.
+func (ix Index) FacetKeysFunc(query, field string, f func(string, int) bool) (result []string, err error) {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return result, err
+	}
+	fmap, err := r.Facets()
+	if err != nil {
+		return result, err
+	}
+	for k, v := range fmap {
+		if f(k, v) {
+			result = append(result, k)
+		}
+	}
+	return result, nil
+}
+
+// FacetKeys returns the values of a facet as a string slice.
+func (ix Index) FacetKeys(query, field string) (result []string, err error) {
+	r, err := ix.Facet(query, field)
+	if err != nil {
+		return result, err
+	}
+	fmap, err := r.Facets()
+	if err != nil {
+		return result, err
+	}
+	for k := range fmap {
+		result = append(result, k)
+	}
+	return result, nil
+}
+
+// Institutions returns a list of International Standard Identifier for
+// Libraries and Related Organisations (ISIL), ISO 15511 identifiers.
+func (ix Index) Institutions() (result []string, err error) {
+	return ix.FacetKeys("*:*", "institution")
+}
+
+// SourceIdentifiers returns a list of source identifiers.
+func (ix Index) SourceIdentifiers() (result []string, err error) {
+	return ix.FacetKeys("*:*", "source_id")
+}
+
+// SourceCollections returns the collections for a given source identifier.
+func (ix Index) SourceCollections(sid string) (result []string, err error) {
+	return ix.FacetKeysFunc("source_id:"+sid, "mega_collection",
+		func(_ string, v int) bool { return v > 0 })
+}
+
+// NumFound returns the size of the result set for a query.
+func (ix Index) NumFound(query string) (int64, error) {
+	r, err := ix.Select(query)
+	if err != nil {
+		return 0, err
+	}
+	return r.Response.NumFound, nil
+}
