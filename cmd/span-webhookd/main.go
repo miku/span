@@ -166,6 +166,127 @@ type MergeRequestPayload struct {
 	} `json:"user"`
 }
 
+// PushPayload delivered on push and edits with Web IDE.
+type PushPayload struct {
+	After       string `json:"after"`
+	Before      string `json:"before"`
+	CheckoutSha string `json:"checkout_sha"`
+	Commits     []struct {
+		Added  []interface{} `json:"added"`
+		Author struct {
+			Email string `json:"email"`
+			Name  string `json:"name"`
+		} `json:"author"`
+		Id        string        `json:"id"`
+		Message   string        `json:"message"`
+		Modified  []string      `json:"modified"`
+		Removed   []interface{} `json:"removed"`
+		Timestamp string        `json:"timestamp"`
+		Url       string        `json:"url"`
+	} `json:"commits"`
+	EventName  string      `json:"event_name"`
+	Message    interface{} `json:"message"`
+	ObjectKind string      `json:"object_kind"`
+	Project    struct {
+		AvatarUrl         interface{} `json:"avatar_url"`
+		CiConfigPath      interface{} `json:"ci_config_path"`
+		DefaultBranch     string      `json:"default_branch"`
+		Description       string      `json:"description"`
+		GitHttpUrl        string      `json:"git_http_url"`
+		GitSshUrl         string      `json:"git_ssh_url"`
+		Homepage          string      `json:"homepage"`
+		HttpUrl           string      `json:"http_url"`
+		Id                int64       `json:"id"`
+		Name              string      `json:"name"`
+		Namespace         string      `json:"namespace"`
+		PathWithNamespace string      `json:"path_with_namespace"`
+		SshUrl            string      `json:"ssh_url"`
+		Url               string      `json:"url"`
+		VisibilityLevel   int64       `json:"visibility_level"`
+		WebUrl            string      `json:"web_url"`
+	} `json:"project"`
+	ProjectId  int64  `json:"project_id"`
+	Ref        string `json:"ref"`
+	Repository struct {
+		Description     string `json:"description"`
+		GitHttpUrl      string `json:"git_http_url"`
+		GitSshUrl       string `json:"git_ssh_url"`
+		Homepage        string `json:"homepage"`
+		Name            string `json:"name"`
+		Url             string `json:"url"`
+		VisibilityLevel int64  `json:"visibility_level"`
+	} `json:"repository"`
+	TotalCommitsCount int64  `json:"total_commits_count"`
+	UserAvatar        string `json:"user_avatar"`
+	UserEmail         string `json:"user_email"`
+	UserId            int64  `json:"user_id"`
+	UserName          string `json:"user_name"`
+	UserUsername      string `json:"user_username"`
+}
+
+// Example push payload.
+//
+// {
+//   "object_kind": "push",
+//   "event_name": "push",
+//   "before": "f5fcd387688fe62cbbd6952ff8e2e8d539f16da6",
+//   "after": "4f2274ab095010b68d0debbee27213ef12f489a1",
+//   "ref": "refs/heads/master",
+//   "checkout_sha": "4f2274ab095010b68d0debbee27213ef12f489a1",
+//   "message": null,
+//   "user_id": 15,
+//   "user_name": "Martin Czygan",
+//   "user_username": "miku",
+//   "user_email": "martin.czygan@uni-leipzig.de",
+//   "user_avatar": "https://git.sc.uni-leipzig.de/uploads/-/system/user/avatar/15/avatar.png",
+//   "project_id": 46,
+//   "project": {
+//     "id": 46,
+//     "name": "span",
+//     "description": "Mirror of span.",
+//     "web_url": "https://git.sc.uni-leipzig.de/miku/span",
+//     "avatar_url": null,
+//     "git_ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
+//     "git_http_url": "https://git.sc.uni-leipzig.de/miku/span.git",
+//     "namespace": "miku",
+//     "visibility_level": 10,
+//     "path_with_namespace": "miku/span",
+//     "default_branch": "master",
+//     "ci_config_path": null,
+//     "homepage": "https://git.sc.uni-leipzig.de/miku/span",
+//     "url": "git@git.sc.uni-leipzig.de:miku/span.git",
+//     "ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
+//     "http_url": "https://git.sc.uni-leipzig.de/miku/span.git"
+//   },
+//   "commits": [
+//     {
+//       "id": "4f2274ab095010b68d0debbee27213ef12f489a1",
+//       "message": "Update main.go",
+//       "timestamp": "2018-07-06T12:18:36+02:00",
+//       "url": "https://git.sc.uni-leipzig.de/miku/span/commit/4f2274ab095010b68d0debbee27213ef12f489a1",
+//       "author": {
+//         "name": "Martin Czygan",
+//         "email": "martin.czygan@uni-leipzig.de"
+//       },
+//       "added": [],
+//       "modified": [
+//         "cmd/span-webhookd/main.go"
+//       ],
+//       "removed": []
+//     }
+//   ],
+//   "total_commits_count": 1,
+//   "repository": {
+//     "name": "span",
+//     "url": "git@git.sc.uni-leipzig.de:miku/span.git",
+//     "description": "Mirror of span.",
+//     "homepage": "https://git.sc.uni-leipzig.de/miku/span",
+//     "git_http_url": "https://git.sc.uni-leipzig.de/miku/span.git",
+//     "git_ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
+//     "visibility_level": 10
+//   }
+// }
+
 func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 	known := map[string]bool{
 		"Push Hook":     true, // Push hook.
