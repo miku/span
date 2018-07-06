@@ -185,7 +185,7 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	default:
-		log.Println("TODO")
+		log.Printf("TODO (kind=%s)", kind)
 	}
 }
 
