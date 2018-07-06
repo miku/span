@@ -8,12 +8,19 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
+)
+
+var (
+	addr = flag.String("addr", ":8080", "hostport to listen on")
 )
 
 // MergeRequestPayload is sent by gitlab on merge request events.
@@ -189,9 +196,39 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func parsePort(addr string) (int, error) {
+	parts := strings.Split(addr, ":")
+	if len(parts) != 2 {
+		return 0, fmt.Errorf("cannot parse port")
+	}
+	return strconv.Atoi(parts[1])
+}
+
 func main() {
+	flag.Parse()
+
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
 	r.HandleFunc("/trigger", MergeRequestHandler)
 	http.Handle("/", r)
+
+	log.Printf("starting server on %s", *addr)
+
+	port, err := parsePort(*addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("GitLab settings/integrations links")
+	for _, address := range addrs {
+		if ipnet, ok := address.(*net.IPNet); ok {
+			log.Printf("http://%s:%d/trigger", ipnet.IP.String(), port)
+		}
+	}
+
+	log.Fatal(http.ListenAndServe(*addr, r))
 }
