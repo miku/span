@@ -10,18 +10,25 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
-	addr = flag.String("addr", ":8080", "hostport to listen on")
+	addr   = flag.String("addr", ":8080", "hostport to listen on")
+	banner = `
+                         888       888                        888   _         888
+Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
+ Y88b  d8b  /  d888  88b 888  888b 888  888 d888   i d888   i 888d8b    d888  888
+  Y888/Y88b/   8888__888 888  8888 888  888 8888   | 8888   | 888Y88b   8888  888
+   Y8/  Y8/    Y888    , 888  888P 888  888 Y888   ' Y888   ' 888 Y88b  Y888  888
+    Y    Y      "88___/  888-_88"  888  888  "88_-~   "88_-~  888  Y88b  "88_/888
+`
 )
 
 // MergeRequestPayload is sent by gitlab on merge request events.
@@ -307,12 +314,12 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case kind == "Push Hook":
-		b, err := ioutil.ReadAll(r.Body)
-		if err != nil {
+		var payload PushPayload
+		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Println(string(b))
+		log.Println(payload)
 	default:
 		log.Printf("TODO (kind=%s)", kind)
 	}
@@ -341,7 +348,8 @@ func main() {
 	r.HandleFunc("/trigger", MergeRequestHandler)
 	http.Handle("/", r)
 
-	log.Printf("starting server on %s", *addr)
+	log.Println(banner)
+	log.Printf("starting GitLab webhook receiver on %s ... (settings/integrations)", *addr)
 
 	port, err := parsePort(*addr)
 	if err != nil {
@@ -352,7 +360,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println("GitLab settings/integrations links")
 	for _, address := range addrs {
 		if ipnet, ok := address.(*net.IPNet); ok {
 			log.Printf("http://%s:%d/trigger", ipnet.IP.String(), port)
