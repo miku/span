@@ -121,7 +121,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.SourceID = "107"
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, base64.RawURLEncoding.EncodeToString([]byte(output.RecordID)))
 	output.ArticleTitle = record.Metadata.Dc.Title.Text
-	output.MegaCollections = []string{"Heidelberger Historische Bestände Digital"}
+	output.MegaCollections = []string{"sid-107-col-heidelberg"}
 
 	// XXX: Guess.
 	output.Format = "Manuscript"
@@ -175,11 +175,6 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Subjects = append(output.Subjects, text)
 	}
 	output.Subjects = uniqueStrings(output.Subjects)
-
-	for _, ipo := range record.Metadata.Dc.Ispartof {
-		output.MegaCollections = append(output.MegaCollections, fmt.Sprintf("HHBD: %s", ipo.Text))
-	}
-
 	output.Abstract = record.Metadata.Dc.Alternative.Text
 
 	// URLs.
