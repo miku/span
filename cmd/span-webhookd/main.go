@@ -1,4 +1,4 @@
-// span-webhookd can serve as a webhook receiver[1] for gitlab.
+// span-webhookd can serve as a webhook receiver[1] for gitlab, refs #13499
 //
 // We listen for merge requests[2] to trigger index reviews.
 //
