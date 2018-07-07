@@ -26,10 +26,10 @@ import (
 
 var (
 	addr      = flag.String("addr", ":8080", "hostport to listen on")
-	token     = flag.String("token", "", "gitlab auth token, if empty try ~/.config/span/gitlab.token")
+	token     = flag.String("token", "", "gitlab auth token, if empty try -token-file")
 	tokenFile = flag.String("token-file", path.Join(UserHomeDir(), ".config/span/gitlab.token"), "fallback file, if token is missing")
 	repoDir   = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone")
-	repoURL   = flag.String("repo-url", "https://git.sc.uni-leipzig.de/miku/span.git", "Remote git clone URL")
+	repoURL   = flag.String("repo-url", "https://git.sc.uni-leipzig.de/miku/span.git", "remote git clone URL")
 	banner    = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
@@ -38,8 +38,6 @@ Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\88
    Y8/  Y8/    Y888    , 888  888P 888  888 Y888   ' Y888   ' 888 Y88b  Y888  888
     Y    Y      "88___/  888-_88"  888  888  "88_-~   "88_-~  888  Y88b  "88_/888
 `
-
-	cloneInto = path.Join(os.TempDir(), "span-webhookd", "span")
 )
 
 // Repo points to a local copy of the repository containing the configuration
@@ -51,7 +49,7 @@ type Repo struct {
 
 // Update just runs a git pull, as per strong convention, this will always be a
 // fast forward. If repo does not exist yet, clone.
-func (r *Repo) Update() error {
+func (r Repo) Update() error {
 	if _, err := os.Stat(path.Dir(r.Dir)); os.IsNotExist(err) {
 		if err := os.MkdirAll(path.Dir(r.Dir), 0755); err != nil {
 			return err
@@ -70,7 +68,7 @@ func (r *Repo) Update() error {
 }
 
 // ReadFile reads a file from the repo.
-func (r *Repo) ReadFile(filename string) ([]byte, error) {
+func (r Repo) ReadFile(filename string) ([]byte, error) {
 	return nil, nil
 }
 
