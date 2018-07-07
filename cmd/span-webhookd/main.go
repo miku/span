@@ -283,6 +283,26 @@ type PushPayload struct {
 	UserUsername      string `json:"user_username"`
 }
 
+// ModifiedFiles returns all modified files across all commits in this payload.
+func (p PushPayload) ModifiedFiles() (filenames []string) {
+	for _, commit := range p.Commits {
+		for _, modified := range commit.Modified {
+			filenames = append(filenames, modified)
+		}
+	}
+	return
+}
+
+// IsFileModified returns true, if given file has been modified.
+func (p PushPayload) IsFileModified(filename string) bool {
+	for _, modified := range p.ModifiedFiles() {
+		if modified == filename {
+			return true
+		}
+	}
+	return false
+}
+
 // Example push payload.
 //
 // {
@@ -372,7 +392,13 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Printf("gitlab sent: %s", payload)
+		log.Printf("gitlab payload: %s", payload)
+		log.Printf("modified files: %s", strings.Join(payload.ModifiedFiles(), ", "))
+
+		if !payload.IsFileModified("docs/review.yaml") {
+			log.Println("review.yaml not modified, hook done")
+			return
+		}
 
 		// XXX: gitlab wants hooks to return quickly, we might run the following concurrently ...
 		repo := Repo{URL: *repoURL, Dir: *repoDir, Token: *token}
@@ -385,13 +411,14 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 		// XXX: exit code handling
 		log.Printf("successfully updated repo at %s", repo.Dir)
 
-		b, err := repo.ReadFile("docs/review.yaml")
+		_, err := repo.ReadFile("docs/review.yaml")
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Println(string(b))
+		// XXX: Config docs/review.yaml is up to date and available, run tests.
+		log.Println("XXX: starting tests ...")
 	default:
 		log.Printf("TODO (kind=%s)", kind)
 	}
