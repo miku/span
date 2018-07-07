@@ -43,8 +43,13 @@ Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\88
 // Repo points to a local copy of the repository containing the configuration
 // we want.
 type Repo struct {
-	URL string
-	Dir string
+	URL   string
+	Dir   string
+	Token string
+}
+
+func (r Repo) AuthURL() string {
+	return strings.Replace(r.URL, "https://", fmt.Sprintf("https://oauth2:%s@", r.Token), 1)
 }
 
 // Update just runs a git pull, as per strong convention, this will always be a
@@ -60,9 +65,9 @@ func (r Repo) Update() error {
 	var args []string
 
 	if _, err := os.Stat(r.Dir); os.IsNotExist(err) {
-		cmd, args = "git", []string{"clone", r.URL, r.Dir}
+		cmd, args = "git", []string{"clone", r.AuthURL(), r.Dir}
 	} else {
-		cmd, args = "git", []string{"pull", "origin", "master"}
+		cmd, args = "git", []string{"-C", r.Dir, "pull", "origin", "master"}
 	}
 	return exec.Command(cmd, args...).Run()
 }
