@@ -52,9 +52,14 @@ func (r Repo) AuthURL() string {
 	return strings.Replace(r.URL, "https://", fmt.Sprintf("https://oauth2:%s@", r.Token), 1)
 }
 
+func (r Repo) String() string {
+	return fmt.Sprintf("clone from %s at %s", r.URL, r.Dir)
+}
+
 // Update just runs a git pull, as per strong convention, this will always be a
 // fast forward. If repo does not exist yet, clone.
 func (r Repo) Update() error {
+	log.Printf("updating %s", r)
 	if _, err := os.Stat(path.Dir(r.Dir)); os.IsNotExist(err) {
 		if err := os.MkdirAll(path.Dir(r.Dir), 0755); err != nil {
 			return err
@@ -69,6 +74,7 @@ func (r Repo) Update() error {
 	} else {
 		cmd, args = "git", []string{"-C", r.Dir, "pull", "origin", "master"}
 	}
+	log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
 	return exec.Command(cmd, args...).Run()
 }
 
@@ -366,12 +372,12 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Println(payload)
-		repo := Repo{URL: *repoURL, Dir: *repoDir}
+		repo := Repo{URL: *repoURL, Dir: *repoDir, Token: *token}
 		if err := repo.Update(); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
-		log.Println("successfully updated repo at %s", repo.Dir)
+		log.Printf("successfully updated repo at %s", repo.Dir)
 		// XXX: Update repo, show changed file.
 	default:
 		log.Printf("TODO (kind=%s)", kind)
