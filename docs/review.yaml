@@ -102,5 +102,4 @@ ratio:
 mincount:
     # Query, Facet-Field, Value, Min Count.
     - ["source_id:89", "facet_avail", "Free", 50]
-    - ["source_id:89", "facet_avail", "Free", 50]
 
