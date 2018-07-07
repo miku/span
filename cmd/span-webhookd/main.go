@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -57,6 +58,8 @@ func Worker(done chan bool) {
 	for rr := range IndexReviewQueue {
 		log.Printf("worker received review request: %s", rr)
 		log.Println("XXX: running review")
+		time.Sleep(5 * time.Second) // Dummy.
+		log.Println("XXX: dummy done")
 	}
 	log.Println("worker shutdown")
 	done <- true
@@ -326,16 +329,20 @@ func (p PushPayload) IsFileModified(filename string) bool {
 }
 
 func HookHandler(w http.ResponseWriter, r *http.Request) {
+	started := time.Now()
+
 	known := map[string]bool{
 		"Push Hook":     true, // Push hook.
 		"Issue Hook":    true, // Issue hook.
 		"Note Hook":     true, // Comment, issue, comment on code, merge hook.
 		"Tag Push Hook": true, // Tag push hook.
 	}
+
 	kind := strings.TrimSpace(r.Header.Get("X-Gitlab-Event"))
 	if _, ok := known[kind]; !ok {
 		log.Printf("unknown event type: %s", kind)
 	}
+
 	switch kind {
 	case "Note Hook":
 		var payload MergeRequestPayload
@@ -389,6 +396,7 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		log.Printf("unregistered event kind: %s", kind)
 	}
+	log.Printf("request completed after %s", time.Since(started))
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
