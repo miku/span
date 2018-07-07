@@ -1,0 +1,61 @@
+{
+  "object_kind": "push",
+  "event_name": "push",
+  "before": "f5fcd387688fe62cbbd6952ff8e2e8d539f16da6",
+  "after": "4f2274ab095010b68d0debbee27213ef12f489a1",
+  "ref": "refs/heads/master",
+  "checkout_sha": "4f2274ab095010b68d0debbee27213ef12f489a1",
+  "message": null,
+  "user_id": 15,
+  "user_name": "Martin Czygan",
+  "user_username": "miku",
+  "user_email": "martin.czygan@uni-leipzig.de",
+  "user_avatar": "https://git.sc.uni-leipzig.de/uploads/-/system/user/avatar/15/avatar.png",
+  "project_id": 46,
+  "project": {
+    "id": 46,
+    "name": "span",
+    "description": "Mirror of span.",
+    "web_url": "https://git.sc.uni-leipzig.de/miku/span",
+    "avatar_url": null,
+    "git_ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
+    "git_http_url": "https://git.sc.uni-leipzig.de/miku/span.git",
+    "namespace": "miku",
+    "visibility_level": 10,
+    "path_with_namespace": "miku/span",
+    "default_branch": "master",
+    "ci_config_path": null,
+    "homepage": "https://git.sc.uni-leipzig.de/miku/span",
+    "url": "git@git.sc.uni-leipzig.de:miku/span.git",
+    "ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
+    "http_url": "https://git.sc.uni-leipzig.de/miku/span.git"
+  },
+  "commits": [
+    {
+      "id": "4f2274ab095010b68d0debbee27213ef12f489a1",
+      "message": "Update main.go",
+      "timestamp": "2018-07-06T12:18:36+02:00",
+      "url": "https://git.sc.uni-leipzig.de/miku/span/commit/4f2274ab095010b68d0debbee27213ef12f489a1",
+      "author": {
+        "name": "Martin Czygan",
+        "email": "martin.czygan@uni-leipzig.de"
+      },
+      "added": [],
+      "modified": [
+        "cmd/span-webhookd/main.go"
+      ],
+      "removed": []
+    }
+  ],
+  "total_commits_count": 1,
+  "repository": {
+    "name": "span",
+    "url": "git@git.sc.uni-leipzig.de:miku/span.git",
+    "description": "Mirror of span.",
+    "homepage": "https://git.sc.uni-leipzig.de/miku/span",
+    "git_http_url": "https://git.sc.uni-leipzig.de/miku/span.git",
+    "git_ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
+    "visibility_level": 10
+  }
+}
+
