@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path"
 	"runtime"
 	"strconv"
@@ -27,9 +28,8 @@ import (
 var (
 	addr      = flag.String("addr", ":8080", "hostport to listen on")
 	token     = flag.String("token", "", "gitlab auth token, if empty try -token-file")
-	tokenFile = flag.String("token-file", path.Join(UserHomeDir(), ".config/span/gitlab.token"), "fallback file, if token is missing")
-	repoDir   = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone")
-	repoURL   = flag.String("repo-url", "https://git.sc.uni-leipzig.de/miku/span.git", "remote git clone URL")
+	tokenFile = flag.String("token-file", path.Join(UserHomeDir(), ".config/span/gitlab.token"), "fallback file for token")
+	repoDir   = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	banner    = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
@@ -39,6 +39,27 @@ Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\88
     Y    Y      "88___/  888-_88"  888  888  "88_-~   "88_-~  888  Y88b  "88_/888
 `
 )
+
+// IndexReviewRequest contains information for run an index review.
+type IndexReviewRequest struct {
+	SolrServer       string
+	ReviewConfigFile string
+}
+
+// IndexReviewQueue takes requests for index reviews.
+var IndexReviewQueue = make(chan IndexReviewRequest, 100)
+var done = make(chan bool)
+
+// Worker hangs in there, checks for any new review requests every second and
+// starts to run the review, if required
+func Worker(done chan bool) {
+	for rr := range IndexReviewQueue {
+		log.Printf("worker received review request: %s", rr)
+		log.Println("XXX: running review")
+	}
+	log.Println("worker shutdown")
+	done <- true
+}
 
 // Repo points to a local copy of the repository containing the configuration
 // we want.
@@ -303,70 +324,7 @@ func (p PushPayload) IsFileModified(filename string) bool {
 	return false
 }
 
-// Example push payload.
-//
-// {
-//   "object_kind": "push",
-//   "event_name": "push",
-//   "before": "f5fcd387688fe62cbbd6952ff8e2e8d539f16da6",
-//   "after": "4f2274ab095010b68d0debbee27213ef12f489a1",
-//   "ref": "refs/heads/master",
-//   "checkout_sha": "4f2274ab095010b68d0debbee27213ef12f489a1",
-//   "message": null,
-//   "user_id": 15,
-//   "user_name": "Martin Czygan",
-//   "user_username": "miku",
-//   "user_email": "martin.czygan@uni-leipzig.de",
-//   "user_avatar": "https://git.sc.uni-leipzig.de/uploads/-/system/user/avatar/15/avatar.png",
-//   "project_id": 46,
-//   "project": {
-//     "id": 46,
-//     "name": "span",
-//     "description": "Mirror of span.",
-//     "web_url": "https://git.sc.uni-leipzig.de/miku/span",
-//     "avatar_url": null,
-//     "git_ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
-//     "git_http_url": "https://git.sc.uni-leipzig.de/miku/span.git",
-//     "namespace": "miku",
-//     "visibility_level": 10,
-//     "path_with_namespace": "miku/span",
-//     "default_branch": "master",
-//     "ci_config_path": null,
-//     "homepage": "https://git.sc.uni-leipzig.de/miku/span",
-//     "url": "git@git.sc.uni-leipzig.de:miku/span.git",
-//     "ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
-//     "http_url": "https://git.sc.uni-leipzig.de/miku/span.git"
-//   },
-//   "commits": [
-//     {
-//       "id": "4f2274ab095010b68d0debbee27213ef12f489a1",
-//       "message": "Update main.go",
-//       "timestamp": "2018-07-06T12:18:36+02:00",
-//       "url": "https://git.sc.uni-leipzig.de/miku/span/commit/4f2274ab095010b68d0debbee27213ef12f489a1",
-//       "author": {
-//         "name": "Martin Czygan",
-//         "email": "martin.czygan@uni-leipzig.de"
-//       },
-//       "added": [],
-//       "modified": [
-//         "cmd/span-webhookd/main.go"
-//       ],
-//       "removed": []
-//     }
-//   ],
-//   "total_commits_count": 1,
-//   "repository": {
-//     "name": "span",
-//     "url": "git@git.sc.uni-leipzig.de:miku/span.git",
-//     "description": "Mirror of span.",
-//     "homepage": "https://git.sc.uni-leipzig.de/miku/span",
-//     "git_http_url": "https://git.sc.uni-leipzig.de/miku/span.git",
-//     "git_ssh_url": "git@git.sc.uni-leipzig.de:miku/span.git",
-//     "visibility_level": 10
-//   }
-// }
-
-func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
+func HookHandler(w http.ResponseWriter, r *http.Request) {
 	known := map[string]bool{
 		"Push Hook":     true, // Push hook.
 		"Issue Hook":    true, // Issue hook.
@@ -377,15 +335,15 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 	if _, ok := known[kind]; !ok {
 		log.Printf("unknown event type: %s", kind)
 	}
-	switch {
-	case kind == "Note Hook":
+	switch kind {
+	case "Note Hook":
 		var payload MergeRequestPayload
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-	case kind == "Push Hook":
+	case "Push Hook":
 		var payload PushPayload
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -400,15 +358,19 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// XXX: gitlab wants hooks to return quickly, we might run the following concurrently ...
-		repo := Repo{URL: *repoURL, Dir: *repoDir, Token: *token}
+		// XXX: gitlab wants hooks to return quickly, we might run the following concurrently.
+		repo := Repo{
+			URL:   payload.Project.GitHttpUrl,
+			Dir:   *repoDir,
+			Token: *token,
+		}
 		if err := repo.Update(); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		// XXX: exit code handling
+		// XXX: exit code handling, non-portable.
 		log.Printf("successfully updated repo at %s", repo.Dir)
 
 		_, err := repo.ReadFile("docs/review.yaml")
@@ -419,8 +381,12 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// XXX: Config docs/review.yaml is up to date and available, run tests.
 		log.Println("XXX: starting tests ...")
+
+		rr := IndexReviewRequest{SolrServer: "dummy", ReviewConfigFile: "sample"}
+		IndexReviewQueue <- rr
+		log.Println("index review request sent")
 	default:
-		log.Printf("TODO (kind=%s)", kind)
+		log.Printf("unregistered event kind: %s", kind)
 	}
 }
 
@@ -467,7 +433,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/trigger", MergeRequestHandler)
+	r.HandleFunc("/trigger", HookHandler)
 	http.Handle("/", r)
 
 	log.Println(banner)
@@ -487,6 +453,19 @@ func main() {
 			log.Printf("http://%s:%d/trigger", ipnet.IP.String(), port)
 		}
 	}
+
+	log.Println("use CTRL-C to gracefully stop server")
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		// XXX: Use some timeout here.
+		for range c {
+			close(IndexReviewQueue)
+			<-done
+			os.Exit(0)
+		}
+	}()
 
 	log.Fatal(http.ListenAndServe(*addr, r))
 }
