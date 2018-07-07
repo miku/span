@@ -80,7 +80,7 @@ func (r Repo) Update() error {
 
 // ReadFile reads a file from the repo.
 func (r Repo) ReadFile(filename string) ([]byte, error) {
-	return nil, nil
+	return ioutil.ReadFile(path.Join(r.Dir, filename))
 }
 
 // MergeRequestPayload is sent by gitlab on merge request events.
@@ -371,14 +371,27 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Println(payload)
+
+		log.Printf("gitlab sent: %s", payload)
+
+		// XXX: gitlab wants hooks to return quickly, we might run the following concurrently ...
 		repo := Repo{URL: *repoURL, Dir: *repoDir, Token: *token}
 		if err := repo.Update(); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
+
+		// XXX: exit code handling
 		log.Printf("successfully updated repo at %s", repo.Dir)
-		// XXX: Update repo, show changed file.
+
+		b, err := repo.ReadFile("docs/review.yaml")
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		log.Println(string(b))
 	default:
 		log.Printf("TODO (kind=%s)", kind)
 	}
