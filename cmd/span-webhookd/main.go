@@ -74,7 +74,7 @@ func (r Repo) Update() error {
 	} else {
 		cmd, args = "git", []string{"-C", r.Dir, "pull", "origin", "master"}
 	}
-	log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
+	log.Printf("[cmd] %s %s", cmd, strings.Replace(strings.Join(args, " "), r.Token, "xxxxxxxx", -1))
 	return exec.Command(cmd, args...).Run()
 }
 
