@@ -10,8 +10,13 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
+	"os/exec"
+	"path"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -20,8 +25,12 @@ import (
 )
 
 var (
-	addr   = flag.String("addr", ":8080", "hostport to listen on")
-	banner = `
+	addr      = flag.String("addr", ":8080", "hostport to listen on")
+	token     = flag.String("token", "", "gitlab auth token, if empty try ~/.config/span/gitlab.token")
+	tokenFile = flag.String("token-file", path.Join(UserHomeDir(), ".config/span/gitlab.token"), "fallback file, if token is missing")
+	repoDir   = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone")
+	repoURL   = flag.String("repo-url", "https://git.sc.uni-leipzig.de/miku/span.git", "Remote git clone URL")
+	banner    = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
  Y88b  d8b  /  d888  88b 888  888b 888  888 d888   i d888   i 888d8b    d888  888
@@ -29,7 +38,41 @@ Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\88
    Y8/  Y8/    Y888    , 888  888P 888  888 Y888   ' Y888   ' 888 Y88b  Y888  888
     Y    Y      "88___/  888-_88"  888  888  "88_-~   "88_-~  888  Y88b  "88_/888
 `
+
+	cloneInto = path.Join(os.TempDir(), "span-webhookd", "span")
 )
+
+// Repo points to a local copy of the repository containing the configuration
+// we want.
+type Repo struct {
+	URL string
+	Dir string
+}
+
+// Update just runs a git pull, as per strong convention, this will always be a
+// fast forward. If repo does not exist yet, clone.
+func (r *Repo) Update() error {
+	if _, err := os.Stat(path.Dir(r.Dir)); os.IsNotExist(err) {
+		if err := os.MkdirAll(path.Dir(r.Dir), 0755); err != nil {
+			return err
+		}
+	}
+
+	var cmd string
+	var args []string
+
+	if _, err := os.Stat(r.Dir); os.IsNotExist(err) {
+		cmd, args = "git", []string{"clone", r.URL, r.Dir}
+	} else {
+		cmd, args = "git", []string{"pull", "origin", "master"}
+	}
+	return exec.Command(cmd, args...).Run()
+}
+
+// ReadFile reads a file from the repo.
+func (r *Repo) ReadFile(filename string) ([]byte, error) {
+	return nil, nil
+}
 
 // MergeRequestPayload is sent by gitlab on merge request events.
 type MergeRequestPayload struct {
@@ -320,6 +363,13 @@ func MergeRequestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Println(payload)
+		repo := Repo{URL: *repoURL, Dir: *repoDir}
+		if err := repo.Update(); err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		log.Println("successfully updated repo at %s", repo.Dir)
+		// XXX: Update repo, show changed file.
 	default:
 		log.Printf("TODO (kind=%s)", kind)
 	}
@@ -332,6 +382,18 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UserHomeDir returns the home directory of the user.
+func UserHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
+}
+
 func parsePort(addr string) (int, error) {
 	parts := strings.Split(addr, ":")
 	if len(parts) != 2 {
@@ -342,6 +404,17 @@ func parsePort(addr string) (int, error) {
 
 func main() {
 	flag.Parse()
+
+	if *token == "" {
+		b, err := ioutil.ReadFile(*tokenFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		*token = strings.TrimSpace(string(b))
+	}
+	if len(*token) < 10 {
+		log.Fatal("auth token too short: %d", len(*token))
+	}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
