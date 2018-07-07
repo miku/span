@@ -53,6 +53,7 @@ var done = make(chan bool)
 // Worker hangs in there, checks for any new review requests every second and
 // starts to run the review, if required
 func Worker(done chan bool) {
+	log.Println("worker started")
 	for rr := range IndexReviewQueue {
 		log.Printf("worker received review request: %s", rr)
 		log.Println("XXX: running review")
@@ -454,6 +455,7 @@ func main() {
 		}
 	}
 
+	go Worker(done)
 	log.Println("use CTRL-C to gracefully stop server")
 
 	c := make(chan os.Signal, 1)
