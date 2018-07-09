@@ -111,5 +111,5 @@ min-ratio:
 # MinCount: Query, Facet-Field, Value, Min Count. Checks, if the given value
 # appears at least a fixed number of times.
 min-count:
-    - ["source_id:89", "facet_avail", "Free", 50] # TESTCOMMIT-IGNORE
+    - ["source_id:89", "facet_avail", "Free", 100] # TESTCOMMIT-IGNORE
 
