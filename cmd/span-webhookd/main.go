@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/miku/span"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -294,7 +295,7 @@ func main() {
 	http.Handle("/", r)
 
 	log.Println(banner)
-	log.Printf("starting GitLab webhook receiver on %s ... (settings/integrations)", *addr)
+	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)", span.AppVersion, *addr)
 
 	port, err := parsePort(*addr)
 	if err != nil {
