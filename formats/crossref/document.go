@@ -92,7 +92,8 @@ type DateField struct {
 
 // Document is a example 'works' API response - message part only.
 type Document struct {
-	Author []struct {
+	Abstract string `json:"abstract"`
+	Author   []struct {
 		Family string `json:"family"`
 		Given  string `json:"given"`
 	} `json:"author"`
@@ -338,6 +339,9 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		publisher := span.UnescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
 		output.MegaCollections = []string{fmt.Sprintf("%s (CrossRef)", publisher)}
 	}
+
+	// refs. #13613
+	output.Abstract = doc.Abstract
 
 	return output, nil
 }
