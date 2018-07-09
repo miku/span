@@ -10,10 +10,16 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"path"
+	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -148,7 +154,7 @@ const (
 )
 
 var (
-	server     = flag.String("server", "http://localhost:8983/solr/biblio", "location of SOLR server")
+	server     = flag.String("server", "", "location of SOLR server, overrides review.yaml")
 	textile    = flag.Bool("t", false, "emit a textile table")
 	ascii      = flag.Bool("a", false, "emit ascii table")
 	configFile = flag.String("c", "", "path to review.yaml config file")
@@ -247,15 +253,56 @@ func ErrorOrComment(err error, message string) string {
 	return message
 }
 
+// UserHomeDir returns the home directory of the user.
+func UserHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
+}
+
+// findTestingSolrServer tries to find the URL of the current testing solr.
+// There might be different way to retrieve a useable URL (configuration,
+// probes). For now we use a separate configuration file, that contains the URL
+// to the nginx snippet.
+func findTestingSolrServer() (string, error) {
+	f, err := os.Open(path.Join(UserHomeDir(), ".config/span/span.json"))
+	if err != nil {
+		return "", err
+	}
+	var conf struct {
+		WhatIsLiveURL string `json:"whatislive.url"`
+	}
+	if err := json.NewDecoder(f).Decode(&conf); err != nil {
+		return "", err
+	}
+	resp, err := http.Get(conf.WhatIsLiveURL)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	// Find hostport in nginx snippet: upstream solr_nonlive { server 10.1.1.10:8080; }.
+	p := `(?m)upstream[\s]*solr_nonlive[\s]*{[\s]*server[\s]*([0-9:.]*)[\s]*;[\s]*}`
+	matches := regexp.MustCompile(p).FindSubmatch(b)
+	if matches == nil || len(matches) != 2 {
+		return "", fmt.Errorf("cannot find solr server URL in nginx snippet: %s", string(b))
+	}
+	solrServer := string(matches[1])
+	return solrServer, nil
+}
+
 func main() {
 	flag.Parse()
 
-	// XXX: Create index after reading review conf.
-	index := solrutil.Index{Server: prependHTTP(*server)}
-
-	var results []Result
-	var err error
-
+	// Read review configuration.
 	var configReader io.Reader
 	if *configFile == "" {
 		log.Println("using default config, similar to https://git.io/fNfSk")
@@ -268,12 +315,30 @@ func main() {
 		defer f.Close()
 		configReader = f
 	}
-
-	// Grab config.
 	var config ReviewConfig
-	if yaml.NewDecoder(configReader).Decode(&config) != nil {
+	if err := yaml.NewDecoder(configReader).Decode(&config); err != nil {
 		log.Fatal(err)
 	}
+
+	// Find suitable server from config, "nginx snippet" or flag.
+	var solrServer string
+	var err error
+
+	if strings.ToLower(config.SolrServer) == "auto" {
+		solrServer, err = findTestingSolrServer()
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		solrServer = config.SolrServer
+	}
+	if *server != "" {
+		solrServer = *server
+	}
+	index := solrutil.Index{Server: prependHTTP(solrServer)}
+
+	// Collect review results.
+	var results []Result
 
 	// Cases like "access_facet:"Electronic Resources" für alle Records".
 	// Multiple values are alternatives.
@@ -363,6 +428,7 @@ func main() {
 		})
 	}
 
+	// Serialize.
 	if *textile {
 		tw := NewTextileTableWriter(os.Stdout)
 		if _, err := tw.WriteResults(results); err != nil {
@@ -370,7 +436,6 @@ func main() {
 		}
 		os.Exit(0)
 	}
-
 	if *ascii {
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
 		red, green := color.New(color.FgRed), color.New(color.FgGreen)
