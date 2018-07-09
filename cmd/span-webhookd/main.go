@@ -67,7 +67,7 @@ func Worker(done chan bool) {
 			continue
 		}
 
-		log.Println(string(out)) // XXX: Post into ticket.
+		log.Println(string(out)) // XXX: Post into ticket, refs #13622.
 		log.Println("completed review")
 	}
 	log.Println("worker shutdown")

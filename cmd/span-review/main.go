@@ -10,6 +10,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -25,6 +26,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/fatih/color"
+	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
 	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
@@ -158,6 +160,7 @@ var (
 	textile    = flag.Bool("t", false, "emit a textile table")
 	ascii      = flag.Bool("a", false, "emit ascii table")
 	configFile = flag.String("c", "", "path to review.yaml config file")
+	ticket     = flag.String("ticket", "", "post result to ticket, overrides review.yaml, required redmine.baseurl and redmine.apitoken configured")
 )
 
 // prependHTTP prepends http, if necessary.
@@ -347,6 +350,9 @@ func main() {
 		solrServer = *server
 	}
 	log.Printf("using solr at %s", solrServer)
+	if *ticket != "" {
+		log.Printf("attempt to update ticket %s", *ticket)
+	}
 	index := solrutil.Index{Server: prependHTTP(solrServer)}
 
 	// Collect review results.
@@ -440,7 +446,7 @@ func main() {
 		})
 	}
 
-	// Serialize.
+	// Serialization options.
 	if *textile {
 		tw := NewTextileTableWriter(os.Stdout)
 		if _, err := tw.WriteResults(results); err != nil {
@@ -461,5 +467,57 @@ func main() {
 		}
 		w.Flush()
 		os.Exit(0)
+	}
+
+	if *ticket != "" {
+		config.Ticket = *ticket
+	}
+	if config.Ticket != "" {
+		if _, err := strconv.Atoi(config.Ticket); err != nil {
+			log.Printf("ignoring ticket update for non-numeric ticket id: %s", *ticket)
+			os.Exit(0)
+		}
+
+		// This is span config, not review config. XXX: separate better.
+		configFile := path.Join(UserHomeDir(), ".config/span/span.json")
+		f, err := os.Open(configFile)
+		if err != nil {
+			log.Printf("failed to open span config: %s", err)
+		}
+		var conf struct {
+			BaseURL string `json:"redmine.baseurl"`
+			Token   string `json:"redmine.apitoken"`
+		}
+		if err := json.NewDecoder(f).Decode(&conf); err != nil {
+			log.Fatal(err)
+		}
+
+		// http://www.redmine.org/projects/redmine/wiki/Rest_Issues#Updating-an-issue
+		link := fmt.Sprintf("%s/issues/%s.json", conf.BaseURL, config.Ticket)
+		body, err := json.Marshal(map[string]interface{}{
+			"issue": map[string]interface{}{
+				"notes": fmt.Sprintf("span-review %s", span.AppVersion),
+			},
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		req, err := http.NewRequest("PUT", link, bytes.NewReader(body))
+		if err != nil {
+			log.Fatal(err)
+		}
+		req.Header.Add("X-Redmine-API-Key", conf.Token)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode >= 400 {
+			log.Fatalf("ticket update resulted in a %d", resp.StatusCode)
+		}
+		if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("updated %s/issues/%s", conf.BaseURL, config.Ticket)
 	}
 }
