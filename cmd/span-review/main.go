@@ -236,6 +236,7 @@ func main() {
 
 	var configReader io.Reader
 	if *configFile == "" {
+		log.Println("using default config, similar to https://git.io/fNfSk")
 		configReader = strings.NewReader(defaultConfig)
 	} else {
 		f, err := os.Open(*configFile)
