@@ -270,7 +270,18 @@ func UserHomeDir() string {
 // probes). For now we use a separate configuration file, that contains the URL
 // to the nginx snippet.
 func findTestingSolrServer() (string, error) {
-	f, err := os.Open(path.Join(UserHomeDir(), ".config/span/span.json"))
+	configFile := path.Join(UserHomeDir(), ".config/span/span.json")
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		if err := os.MkdirAll(path.Dir(configFile), 0755); err != nil {
+			return "", err
+		}
+		data := []byte(`{"gitlab.token": "xxx", "whatislive.url": "xxx"}`)
+		if err := ioutil.WriteFile(configFile, data, 600); err != nil {
+			return "", err
+		}
+		return "", fmt.Errorf("created new config file, please adjust: %s", configFile)
+	}
+	f, err := os.Open(configFile)
 	if err != nil {
 		return "", err
 	}
