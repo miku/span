@@ -316,7 +316,7 @@ func main() {
 	// Read review configuration.
 	var configReader io.Reader
 	if *configFile == "" {
-		log.Println("using default config, similar to https://git.io/fNfSk")
+		log.Println("using default config")
 		configReader = strings.NewReader(defaultConfig)
 	} else {
 		f, err := os.Open(*configFile)
@@ -340,6 +340,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Printf("found test solr at %s", solrServer)
 	} else {
 		solrServer = config.SolrServer
 	}
