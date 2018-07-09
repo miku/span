@@ -58,8 +58,18 @@ func Worker(done chan bool) {
 	for rr := range IndexReviewQueue {
 		log.Printf("worker received review request: %s", rr)
 		log.Println("XXX: running review")
-		time.Sleep(5 * time.Second) // Dummy.
-		log.Println("XXX: dummy done")
+
+		cmd := "span-review"
+		args := []string{"-a", "-server", rr.SolrServer}
+		out, err := exec.Command(cmd, args...).Output()
+
+		if err != nil {
+			log.Println("%s failed: %s", cmd, err)
+			continue
+		}
+
+		log.Println(out) // XXX: Post into ticket.
+		log.Println("successfully completed review")
 	}
 	log.Println("worker shutdown")
 	done <- true
