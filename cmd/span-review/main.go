@@ -493,11 +493,17 @@ func main() {
 			log.Fatal(err)
 		}
 
+		var buf bytes.Buffer
+		tw := NewTextileTableWriter(&buf)
+		if _, err := tw.WriteResults(results); err != nil {
+			log.Fatal(err)
+		}
+
 		// http://www.redmine.org/projects/redmine/wiki/Rest_Issues#Updating-an-issue
 		link := fmt.Sprintf("%s/issues/%s.json", conf.BaseURL, config.Ticket)
 		body, err := json.Marshal(map[string]interface{}{
 			"issue": map[string]interface{}{
-				"notes": fmt.Sprintf("span-review %s", span.AppVersion),
+				"notes": fmt.Sprintf("span-review %s\n\n%s", span.AppVersion, buf.String()),
 			},
 		})
 		if err != nil {
