@@ -1,9 +1,18 @@
-// span-webhookd can serve as a webhook receiver[1] for gitlab, refs #13499
+// span-webhookd can serve as a webhook receiver[1] for gitlab, refs #13499.
 //
-// We listen for merge requests[2] to trigger index reviews.
+// We listen for push hooks to trigger index reviews.
 //
 // [1] https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#example-webhook-receiver
-// [2] https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#merge-request-events
+//
+// Configuration (Redmine, Gitlab, Index) is expected in ~/.config/span/span.json.
+//
+// {
+//    "gitlab.token": "g0d8gf0LKJWg89dsf8gd0gf9-YU",
+//    "whatislive.url": "http://example.com/whatislive",
+//    "redmine.baseurl": "https://projects.example.com",
+//    "redmine.apitoken": "badfb87ab7987daafbd9db"
+// }
+
 package main
 
 import (
@@ -29,7 +38,7 @@ import (
 
 var (
 	addr    = flag.String("addr", ":8080", "hostport to listen on")
-	token   = flag.String("token", "", "gitlab auth token, if empty try will use ~/.config/span/span.json")
+	token   = flag.String("token", "", "gitlab auth token, if empty will use ~/.config/span/span.json")
 	repoDir = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	banner  = `
                          888       888                        888   _         888
