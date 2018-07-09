@@ -26,6 +26,25 @@ import (
 
 // defaultConfig as baseline and documentation.
 var defaultConfig = `
+# Review configuration, refs #12756.
+#
+# Proposed workflow:
+#
+# 1. Edit this file via GitLab at
+# https://git.sc.uni-leipzig.de/miku/span/blob/master/docs/review.yaml. Add,
+# edit or remove rules, update ticket number. If done, commit.
+# 2. A trigger will run an index review based on these rules.
+# 3. Find the results in your ticket, in case the ticket number was valid.
+
+# The solr server to query, including scheme, port and collection, e.g.
+# "http://localhost:8983/solr/biblio". If "auto", then the current testing solr
+# server will be figured out automatically.
+solr: "auto"
+
+# The ticket number of update. Set this to "NA" or anything non-numeric to
+# suppress ticket updates.
+ticket: "NA"
+
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
 allowed-keys:
@@ -145,6 +164,8 @@ func prependHTTP(s string) string {
 
 // ReviewConfig contains various index review cases.
 type ReviewConfig struct {
+	SolrServer  string     `yaml:"solr"`
+	Ticket      string     `yaml:"ticket"`
 	AllowedKeys [][]string `yaml:"allowed-keys"`
 	AllRecords  [][]string `yaml:"all-records"`
 	MinRatio    [][]string `yaml:"min-ratio"`
@@ -229,6 +250,7 @@ func ErrorOrComment(err error, message string) string {
 func main() {
 	flag.Parse()
 
+	// XXX: Create index after reading review conf.
 	index := solrutil.Index{Server: prependHTTP(*server)}
 
 	var results []Result
