@@ -44,7 +44,6 @@ Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\88
 
 // IndexReviewRequest contains information for run an index review.
 type IndexReviewRequest struct {
-	SolrServer       string
 	ReviewConfigFile string
 }
 
@@ -58,11 +57,11 @@ func Worker(done chan bool) {
 	log.Println("worker started")
 	for rr := range IndexReviewQueue {
 		log.Printf("worker received review request: %s", rr)
-		log.Println("XXX: running review")
+		log.Println("running review ...")
 
 		cmd := "span-review"
-		args := []string{"-a", "-server", rr.SolrServer}
-		out, err := exec.Command(cmd, args...).Output()
+		args := []string{"-t", "-c", rr.ReviewConfigFile}
+		out, err := exec.Command(cmd, args...).Output() // XXX: Pick off exit code.
 
 		if err != nil {
 			log.Println("%s failed: %s", cmd, err)
@@ -70,7 +69,7 @@ func Worker(done chan bool) {
 		}
 
 		log.Println(string(out)) // XXX: Post into ticket.
-		log.Println("successfully completed review")
+		log.Println("completed review")
 	}
 	log.Println("worker shutdown")
 	done <- true
@@ -232,16 +231,10 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		// XXX: exit code handling, non-portable.
 		log.Printf("successfully updated repo at %s", repo.Dir)
 
-		_, err := repo.ReadFile("docs/review.yaml")
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+		rr := IndexReviewRequest{
+			ReviewConfigFile: path.Join(repo.Dir, "docs/review.yaml"),
 		}
-
-		rr := IndexReviewRequest{SolrServer: "dummy", ReviewConfigFile: "sample"}
 		IndexReviewQueue <- rr
-		log.Println("index review request sent")
 	default:
 		log.Printf("unregistered or invalid event kind: %s", gitlabEvent)
 	}
