@@ -1,105 +1,108 @@
+# Review configuration, refs #12756.
+#
+# Proposed workflow:
+#
+# 1. Edit this file via GitLab at
+# https://git.sc.uni-leipzig.de/miku/span/blob/master/docs/review.yaml. Add,
+# edit or remove rules, update ticket number.
+# 2. A trigger will run an index review based on these rules on every commit.
+# 3. Find the results in your ticket, in case the ticket number was valid.
+
+ticket: "NA"
+
+# Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
+# contain only given values.
 allowed-keys:
-    # Query, Facet-Field, Value or Values.
-    - ["source_id:30", "format", ["eBook", "ElectronicArticle"]]
-    - ["source_id:30", "format_de15", ["Book, eBook", "Article, E-Article"]]
-    - ["source_id:48", "language", ["German", "English"]]
-    - ["source_id:49", "facet_avail", ["Online", "Free"]]
-    - ["source_id:55", "facet_avail", ["Online", "Free"]]
+    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+    - ["source_id:30", "format_de15", "Book, eBook", "Article, E-Article"]
+    - ["source_id:48", "language", "German", "English"]
+    - ["source_id:49", "facet_avail", "Online", "Free"]
+    - ["source_id:55", "facet_avail", "Online", "Free"]
 
+# All records: [Query, Facet-Field, Value, ...] checks if all record contain
+# only the given values.
 all-records:
-    # Query, Facet-Field, Value or Values.
-    - ["source_id:28", "format", ["ElectronicArticle"]]
-    - ["source_id:28", "format_de15", ["Article, E-Article"]]
-    - ["source_id:28", "facet_avail", ["Online", "Free"]]
-    - ["source_id:28", "access_facet", ["Electronic Resources"]]
-    - ["source_id:28", "mega_collection", ["DOAJ Directory of Open Access Journals"]]
-    - ["source_id:28", "finc_class_facet", ["not assigned"]]
-    - 
-    - ["source_id:30", "facet_avail", ["Online", "Free"]]
-    - ["source_id:30", "access_facet", ["Electronic Resources"]]
-    - ["source_id:30", "mega_collection", ["SSOAR Social Science Open Access Repository"]]
-    - 
-    - ["source_id:34", "format", ["ElectronicThesis"]]
-    - ["source_id:34", "format_de15", ["Thesis"]]
-    - ["source_id:34", "facet_avail", ["Online", "Free"]]
-    - ["source_id:34", "access_facet", ["Electronic Resources"]]
-    - ["source_id:34", "mega_collection", ["PQDT Open"]]
-    - 
-    - ["source_id:48", "format", ["ElectronicArticle"]]
-    - ["source_id:48", "format_de15", ["Article, E-Article"]]
-    - ["source_id:48", "facet_avail", ["Online"]]
-    - ["source_id:48", "access_facet", ["Electronic Resources"]]
-    - 
-    - ["source_id:49", "facet_avail", ["Online"]]
-    - ["source_id:49", "access_facet", ["Electronic Resources"]]
-    - ["source_id:49", "language", ["English"]]
-    - 
-    - ["source_id:50", "format", ["ElectronicArticle"]]
-    - ["source_id:50", "format_de15", ["Article, E-Article"]]
-    - ["source_id:50", "facet_avail", ["Online"]]
-    - ["source_id:50", "access_facet", ["Electronic Resources"]]
-    - ["source_id:50", "mega_collection", ["DeGruyter SSH"]]
-    - 
-    - ["source_id:53", "format", ["ElectronicArticle"]]
-    - ["source_id:53", "format_de15", ["Article, E-Article"]]
-    - ["source_id:53", "facet_avail", ["Online"]]
-    - ["source_id:53", "access_facet", ["Electronic Resources"]]
-    - ["source_id:53", "mega_collection", ["CEEOL Central and Eastern European Online Library"]]
-    - 
-    - ["source_id:55", "format", ["ElectronicArticle"]]
-    - ["source_id:55", "format_de15", ["Article, E-Article"]]
-    - ["source_id:55", "facet_avail", ["Online"]]
-    - ["source_id:55", "access_facet", ["Electronic Resources"]]
-    - 
-    - ["source_id:60", "format", ["ElectronicArticle"]]
-    - ["source_id:60", "format_de15", ["Article, E-Article"]]
-    - ["source_id:60", "facet_avail", ["Online"]]
-    - ["source_id:60", "access_facet", ["Electronic Resources"]]
-    - ["source_id:60", "mega_collection", ["Thieme E-Journals"]]
-    - ["source_id:60", "facet_avail", ["Online"]]
-    - 
-    - ["source_id:85", "format", ["ElectronicArticle"]]
-    - ["source_id:85", "format_de15", ["Article, E-Article"]]
-    - ["source_id:85", "facet_avail", ["Online"]]
-    - ["source_id:85", "access_facet", ["Electronic Resources"]]
-    - ["source_id:85", "language", ["English"]]
-    - ["source_id:85", "mega_collection", ["Elsevier Journals"]]
-    - 
-    - ["source_id:87", "format", ["ElectronicArticle"]]
-    - ["source_id:87", "format_de15", ["Article, E-Article"]]
-    - ["source_id:87", "facet_avail", ["Online", "Free"]]
-    - ["source_id:87", "access_facet", ["Electronic Resources"]]
-    - ["source_id:87", "language", ["English"]]
-    - ["source_id:87", "mega_collection", ["International Journal of Communication"]]
-    - 
-    - ["source_id:89", "format", ["ElectronicArticle"]]
-    - ["source_id:89", "format_de15", ["Article, E-Article"]]
-    - ["source_id:89", "facet_avail", ["Online"]]
-    - ["source_id:89", "access_facet", ["Electronic Resources"]]
-    - ["source_id:89", "language", ["English"]]
-    - ["source_id:89", "mega_collection", ["IEEE Xplore Library"]]
-    - 
-    - ["source_id:101", "format", ["ElectronicArticle"]]
-    - ["source_id:101", "format_de15", ["Article, E-Article"]]
-    - ["source_id:101", "facet_avail", ["Online"]]
-    - ["source_id:101", "access_facet", ["Electronic Resources"]]
-    - ["source_id:101", "mega_collection", ["Kieler Beiträge zur Filmmusikforschung"]]
-    - ["source_id:101", "finc_class_facet", ["not assigned"]]
-    - 
-    - ["source_id:105", "format", ["ElectronicArticle"]]
-    - ["source_id:105", "format_de15", ["Article, E-Article"]]
-    - ["source_id:105", "facet_avail", ["Online"]]
-    - ["source_id:105", "access_facet", ["Electronic Resources"]]
-    - ["source_id:105", "mega_collection", ["Springer Journals"]]
-    - ["source_id:105", "finc_class_facet", ["not assigned"]]
+    - ["source_id:28", "format", "ElectronicArticle"]
+    - ["source_id:28", "format_de15", "Article, E-Article"]
+    - ["source_id:28", "facet_avail", "Online", "Free"]
+    - ["source_id:28", "access_facet", "Electronic Resources"]
+    - ["source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"]
+    - ["source_id:28", "finc_class_facet", "not assigned"]
+    - ["source_id:30", "facet_avail", "Online", "Free"]
+    - ["source_id:30", "access_facet", "Electronic Resources"]
+    - ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
+    - ["source_id:34", "format", "ElectronicThesis"]
+    - ["source_id:34", "format_de15", "Thesis"]
+    - ["source_id:34", "facet_avail", "Online", "Free"]
+    - ["source_id:34", "access_facet", "Electronic Resources"]
+    - ["source_id:34", "mega_collection", "PQDT Open"]
+    - ["source_id:48", "format", "ElectronicArticle"]
+    - ["source_id:48", "format_de15", "Article, E-Article"]
+    - ["source_id:48", "facet_avail", "Online"]
+    - ["source_id:48", "access_facet", "Electronic Resources"]
+    - ["source_id:49", "facet_avail", "Online"]
+    - ["source_id:49", "access_facet", "Electronic Resources"]
+    - ["source_id:49", "language", "English"]
+    - ["source_id:50", "format", "ElectronicArticle"]
+    - ["source_id:50", "format_de15", "Article, E-Article"]
+    - ["source_id:50", "facet_avail", "Online"]
+    - ["source_id:50", "access_facet", "Electronic Resources"]
+    - ["source_id:50", "mega_collection", "DeGruyter SSH"]
+    - ["source_id:53", "format", "ElectronicArticle"]
+    - ["source_id:53", "format_de15", "Article, E-Article"]
+    - ["source_id:53", "facet_avail", "Online"]
+    - ["source_id:53", "access_facet", "Electronic Resources"]
+    - ["source_id:53", "mega_collection", "CEEOL Central and Eastern European Online Library"]
+    - ["source_id:55", "format", "ElectronicArticle"]
+    - ["source_id:55", "format_de15", "Article, E-Article"]
+    - ["source_id:55", "facet_avail", "Online"]
+    - ["source_id:55", "access_facet", "Electronic Resources"]
+    - ["source_id:60", "format", "ElectronicArticle"]
+    - ["source_id:60", "format_de15", "Article, E-Article"]
+    - ["source_id:60", "facet_avail", "Online"]
+    - ["source_id:60", "access_facet", "Electronic Resources"]
+    - ["source_id:60", "mega_collection", "Thieme E-Journals"]
+    - ["source_id:60", "facet_avail", "Online"]
+    - ["source_id:85", "format", "ElectronicArticle"]
+    - ["source_id:85", "format_de15", "Article, E-Article"]
+    - ["source_id:85", "facet_avail", "Online"]
+    - ["source_id:85", "access_facet", "Electronic Resources"]
+    - ["source_id:85", "language", "English"]
+    - ["source_id:85", "mega_collection", "Elsevier Journals"]
+    - ["source_id:87", "format", "ElectronicArticle"]
+    - ["source_id:87", "format_de15", "Article, E-Article"]
+    - ["source_id:87", "facet_avail", "Online", "Free"]
+    - ["source_id:87", "access_facet", "Electronic Resources"]
+    - ["source_id:87", "language", "English"]
+    - ["source_id:87", "mega_collection", "International Journal of Communication"]
+    - ["source_id:89", "format", "ElectronicArticle"]
+    - ["source_id:89", "format_de15", "Article, E-Article"]
+    - ["source_id:89", "facet_avail", "Online"]
+    - ["source_id:89", "access_facet", "Electronic Resources"]
+    - ["source_id:89", "language", "English"]
+    - ["source_id:89", "mega_collection", "IEEE Xplore Library"]
+    - ["source_id:101", "format", "ElectronicArticle"]
+    - ["source_id:101", "format_de15", "Article, E-Article"]
+    - ["source_id:101", "facet_avail", "Online"]
+    - ["source_id:101", "access_facet", "Electronic Resources"]
+    - ["source_id:101", "mega_collection", "Kieler Beiträge zur Filmmusikforschung"]
+    - ["source_id:101", "finc_class_facet", "not assigned"]
+    - ["source_id:105", "format", "ElectronicArticle"]
+    - ["source_id:105", "format_de15", "Article, E-Article"]
+    - ["source_id:105", "facet_avail", "Online"]
+    - ["source_id:105", "access_facet", "Electronic Resources"]
+    - ["source_id:105", "mega_collection", "Springer Journals"]
+    - ["source_id:105", "finc_class_facet", "not assigned"]
 
-ratio:
-    # Query, Facet-Field, Value, Ratio (Percent).
+# MinRatio: Query, Facet-Field, Value, Ratio (Percent), checks if the given
+# value appears in a given percentage of documents.
+min-ratio:
     - ["source_id:49", "facet_avail", "Free", 0.8]
     - ["source_id:55", "facet_avail", "Free", 2.2]
     - ["source_id:105", "facet_avail", "Free", 0.5]
 
-mincount:
-    # Query, Facet-Field, Value, Min Count.
+# MinCount: Query, Facet-Field, Value, Min Count. Checks, if the given value
+# appears at least a fixed number of times.
+min-count:
     - ["source_id:89", "facet_avail", "Free", 50]
 
