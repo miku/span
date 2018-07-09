@@ -306,7 +306,7 @@ func findTestingSolrServer() (string, error) {
 	if matches == nil || len(matches) != 2 {
 		return "", fmt.Errorf("cannot find solr server URL in nginx snippet: %s", string(b))
 	}
-	solrServer := string(matches[1])
+	solrServer := fmt.Sprintf("%s/solr/biblio", string(matches[1]))
 	return solrServer, nil
 }
 
