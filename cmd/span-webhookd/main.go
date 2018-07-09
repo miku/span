@@ -51,8 +51,8 @@ type IndexReviewRequest struct {
 var IndexReviewQueue = make(chan IndexReviewRequest, 100)
 var done = make(chan bool)
 
-// Worker hangs in there, checks for any new review requests every second and
-// starts to run the review, if required
+// Worker hangs in there, checks for any new review requests and starts to run
+// the review, if required..
 func Worker(done chan bool) {
 	log.Println("worker started")
 	for rr := range IndexReviewQueue {
@@ -106,148 +106,6 @@ func (r Repo) Update() error {
 // ReadFile reads a file from the repo.
 func (r Repo) ReadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(path.Join(r.Dir, filename))
-}
-
-// MergeRequestPayload is sent by gitlab on merge request events.
-type MergeRequestPayload struct {
-	Changes struct {
-		Labels struct {
-			Current []struct {
-				Color       string `json:"color"`
-				CreatedAt   string `json:"created_at"`
-				Description string `json:"description"`
-				GroupId     int64  `json:"group_id"`
-				Id          int64  `json:"id"`
-				ProjectId   int64  `json:"project_id"`
-				Template    bool   `json:"template"`
-				Title       string `json:"title"`
-				Type        string `json:"type"`
-				UpdatedAt   string `json:"updated_at"`
-			} `json:"current"`
-			Previous []struct {
-				Color       string `json:"color"`
-				CreatedAt   string `json:"created_at"`
-				Description string `json:"description"`
-				GroupId     int64  `json:"group_id"`
-				Id          int64  `json:"id"`
-				ProjectId   int64  `json:"project_id"`
-				Template    bool   `json:"template"`
-				Title       string `json:"title"`
-				Type        string `json:"type"`
-				UpdatedAt   string `json:"updated_at"`
-			} `json:"previous"`
-		} `json:"labels"`
-		UpdatedAt   []string      `json:"updated_at"`
-		UpdatedById []interface{} `json:"updated_by_id"`
-	} `json:"changes"`
-	Labels []struct {
-		Color       string `json:"color"`
-		CreatedAt   string `json:"created_at"`
-		Description string `json:"description"`
-		GroupId     int64  `json:"group_id"`
-		Id          int64  `json:"id"`
-		ProjectId   int64  `json:"project_id"`
-		Template    bool   `json:"template"`
-		Title       string `json:"title"`
-		Type        string `json:"type"`
-		UpdatedAt   string `json:"updated_at"`
-	} `json:"labels"`
-	ObjectAttributes struct {
-		Action   string `json:"action"`
-		Assignee struct {
-			AvatarUrl string `json:"avatar_url"`
-			Name      string `json:"name"`
-			Username  string `json:"username"`
-		} `json:"assignee"`
-		AssigneeId  int64  `json:"assignee_id"`
-		AuthorId    int64  `json:"author_id"`
-		CreatedAt   string `json:"created_at"`
-		Description string `json:"description"`
-		Id          int64  `json:"id"`
-		Iid         int64  `json:"iid"`
-		LastCommit  struct {
-			Author struct {
-				Email string `json:"email"`
-				Name  string `json:"name"`
-			} `json:"author"`
-			Id        string `json:"id"`
-			Message   string `json:"message"`
-			Timestamp string `json:"timestamp"`
-			Url       string `json:"url"`
-		} `json:"last_commit"`
-		MergeStatus string      `json:"merge_status"`
-		MilestoneId interface{} `json:"milestone_id"`
-		Source      struct {
-			AvatarUrl         interface{} `json:"avatar_url"`
-			DefaultBranch     string      `json:"default_branch"`
-			Description       string      `json:"description"`
-			GitHttpUrl        string      `json:"git_http_url"`
-			GitSshUrl         string      `json:"git_ssh_url"`
-			Homepage          string      `json:"homepage"`
-			HttpUrl           string      `json:"http_url"`
-			Name              string      `json:"name"`
-			Namespace         string      `json:"namespace"`
-			PathWithNamespace string      `json:"path_with_namespace"`
-			SshUrl            string      `json:"ssh_url"`
-			Url               string      `json:"url"`
-			VisibilityLevel   int64       `json:"visibility_level"`
-			WebUrl            string      `json:"web_url"`
-		} `json:"source"`
-		SourceBranch    string `json:"source_branch"`
-		SourceProjectId int64  `json:"source_project_id"`
-		State           string `json:"state"`
-		Target          struct {
-			AvatarUrl         interface{} `json:"avatar_url"`
-			DefaultBranch     string      `json:"default_branch"`
-			Description       string      `json:"description"`
-			GitHttpUrl        string      `json:"git_http_url"`
-			GitSshUrl         string      `json:"git_ssh_url"`
-			Homepage          string      `json:"homepage"`
-			HttpUrl           string      `json:"http_url"`
-			Name              string      `json:"name"`
-			Namespace         string      `json:"namespace"`
-			PathWithNamespace string      `json:"path_with_namespace"`
-			SshUrl            string      `json:"ssh_url"`
-			Url               string      `json:"url"`
-			VisibilityLevel   int64       `json:"visibility_level"`
-			WebUrl            string      `json:"web_url"`
-		} `json:"target"`
-		TargetBranch    string `json:"target_branch"`
-		TargetProjectId int64  `json:"target_project_id"`
-		Title           string `json:"title"`
-		UpdatedAt       string `json:"updated_at"`
-		Url             string `json:"url"`
-		WorkInProgress  bool   `json:"work_in_progress"`
-	} `json:"object_attributes"`
-	ObjectKind string `json:"object_kind"`
-	Project    struct {
-		AvatarUrl         interface{} `json:"avatar_url"`
-		DefaultBranch     string      `json:"default_branch"`
-		Description       string      `json:"description"`
-		GitHttpUrl        string      `json:"git_http_url"`
-		GitSshUrl         string      `json:"git_ssh_url"`
-		Homepage          string      `json:"homepage"`
-		HttpUrl           string      `json:"http_url"`
-		Id                int64       `json:"id"`
-		Name              string      `json:"name"`
-		Namespace         string      `json:"namespace"`
-		PathWithNamespace string      `json:"path_with_namespace"`
-		SshUrl            string      `json:"ssh_url"`
-		Url               string      `json:"url"`
-		VisibilityLevel   int64       `json:"visibility_level"`
-		WebUrl            string      `json:"web_url"`
-	} `json:"project"`
-	Repository struct {
-		Description string `json:"description"`
-		Homepage    string `json:"homepage"`
-		Name        string `json:"name"`
-		Url         string `json:"url"`
-	} `json:"repository"`
-	User struct {
-		AvatarUrl string `json:"avatar_url"`
-		Name      string `json:"name"`
-		Username  string `json:"username"`
-	} `json:"user"`
 }
 
 // PushPayload delivered on push and edits with Web IDE.
@@ -328,29 +186,12 @@ func (p PushPayload) IsFileModified(filename string) bool {
 	return false
 }
 
+// HookHandler can act as webhook receiver. The hook we use at the moment is
+// the Push Hook. Other types are Issue, Note or Tag Push Hook.
 func HookHandler(w http.ResponseWriter, r *http.Request) {
 	started := time.Now()
-
-	known := map[string]bool{
-		"Push Hook":     true, // Push hook.
-		"Issue Hook":    true, // Issue hook.
-		"Note Hook":     true, // Comment, issue, comment on code, merge hook.
-		"Tag Push Hook": true, // Tag push hook.
-	}
-
-	kind := strings.TrimSpace(r.Header.Get("X-Gitlab-Event"))
-	if _, ok := known[kind]; !ok {
-		log.Printf("unknown event type: %s", kind)
-	}
-
-	switch kind {
-	case "Note Hook":
-		var payload MergeRequestPayload
-		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
+	gitlabEvent := strings.TrimSpace(r.Header.Get("X-Gitlab-Event"))
+	switch gitlabEvent {
 	case "Push Hook":
 		var payload PushPayload
 		if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
@@ -366,7 +207,6 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// XXX: gitlab wants hooks to return quickly, we might run the following concurrently.
 		repo := Repo{
 			URL:   payload.Project.GitHttpUrl,
 			Dir:   *repoDir,
@@ -387,14 +227,12 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		// XXX: Config docs/review.yaml is up to date and available, run tests.
-		log.Println("XXX: starting tests ...")
 
 		rr := IndexReviewRequest{SolrServer: "dummy", ReviewConfigFile: "sample"}
 		IndexReviewQueue <- rr
 		log.Println("index review request sent")
 	default:
-		log.Printf("unregistered event kind: %s", kind)
+		log.Printf("unregistered or invalid event kind: %s", gitlabEvent)
 	}
 	log.Printf("request completed after %s", time.Since(started))
 }
