@@ -316,7 +316,7 @@ func main() {
 	// Read review configuration.
 	var configReader io.Reader
 	if *configFile == "" {
-		log.Println("using default config")
+		log.Println("no file given, using default review config")
 		configReader = strings.NewReader(defaultConfig)
 	} else {
 		f, err := os.Open(*configFile)
@@ -340,13 +340,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("found test solr at %s", solrServer)
 	} else {
 		solrServer = config.SolrServer
 	}
 	if *server != "" {
 		solrServer = *server
 	}
+	log.Printf("using solr at %s", solrServer)
 	index := solrutil.Index{Server: prependHTTP(solrServer)}
 
 	// Collect review results.
