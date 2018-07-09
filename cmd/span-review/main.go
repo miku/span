@@ -276,7 +276,7 @@ func findTestingSolrServer() (string, error) {
 			return "", err
 		}
 		data := []byte(`{"gitlab.token": "xxx", "whatislive.url": "xxx"}`)
-		if err := ioutil.WriteFile(configFile, data, 600); err != nil {
+		if err := ioutil.WriteFile(configFile, data, 0600); err != nil {
 			return "", err
 		}
 		return "", fmt.Errorf("created new config file, please adjust: %s", configFile)
