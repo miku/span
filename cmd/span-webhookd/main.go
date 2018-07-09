@@ -28,11 +28,10 @@ import (
 )
 
 var (
-	addr      = flag.String("addr", ":8080", "hostport to listen on")
-	token     = flag.String("token", "", "gitlab auth token, if empty try -token-file")
-	tokenFile = flag.String("token-file", path.Join(UserHomeDir(), ".config/span/gitlab.token"), "fallback file for token")
-	repoDir   = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
-	banner    = `
+	addr    = flag.String("addr", ":8080", "hostport to listen on")
+	token   = flag.String("token", "", "gitlab auth token, if empty try will use ~/.config/span/span.json")
+	repoDir = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
+	banner  = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
  Y88b  d8b  /  d888  88b 888  888b 888  888 d888   i d888   i 888d8b    d888  888
@@ -248,7 +247,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// UserHomeDir returns the home directory of the user.
+// UserHomeDir returns the home directory of the user. XXX: Factor this out.
 func UserHomeDir() string {
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
@@ -268,18 +267,39 @@ func parsePort(addr string) (int, error) {
 	return strconv.Atoi(parts[1])
 }
 
+// findGitlabToken returns the GitLab auth token, if configured.
+func findGitlabToken() (string, error) {
+	configFile := path.Join(UserHomeDir(), ".config/span/span.json")
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		if err := os.MkdirAll(path.Dir(configFile), 0755); err != nil {
+			return "", err
+		}
+		data := []byte(`{"gitlab.token": "xxx", "whatislive.url": "xxx"}`)
+		if err := ioutil.WriteFile(configFile, data, 0600); err != nil {
+			return "", err
+		}
+		return "", fmt.Errorf("created new config file, please adjust: %s", configFile)
+	}
+	f, err := os.Open(configFile)
+	if err != nil {
+		return "", err
+	}
+	var conf struct {
+		Token string `json:"gitlab.token"`
+	}
+	if err := json.NewDecoder(f).Decode(&conf); err != nil {
+		return "", err
+	}
+	return conf.Token, nil
+}
+
 func main() {
 	flag.Parse()
 
+	var err error
+
 	if *token == "" {
-		b, err := ioutil.ReadFile(*tokenFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		*token = strings.TrimSpace(string(b))
-	}
-	if len(*token) < 10 {
-		log.Fatal("auth token too short: %d", len(*token))
+		*token, err = findGitlabToken()
 	}
 
 	r := mux.NewRouter()
@@ -288,7 +308,8 @@ func main() {
 	http.Handle("/", r)
 
 	log.Println(banner)
-	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)", span.AppVersion, *addr)
+	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
+		span.AppVersion, *addr)
 
 	port, err := parsePort(*addr)
 	if err != nil {
