@@ -59,7 +59,7 @@ func Worker(done chan bool) {
 		log.Println("running review ...")
 
 		cmd := "span-review"
-		args := []string{"-t", "-c", rr.ReviewConfigFile}
+		args := []string{"-c", rr.ReviewConfigFile}
 		out, err := exec.Command(cmd, args...).Output() // XXX: Pick off exit code.
 
 		if err != nil {
