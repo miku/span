@@ -14,13 +14,114 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
 	"github.com/fatih/color"
 	"github.com/miku/span/solrutil"
 	log "github.com/sirupsen/logrus"
+	yaml "gopkg.in/yaml.v2"
 )
+
+// defaultConfig as baseline and documentation.
+var defaultConfig = `
+# Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
+# contain only given values.
+allowed-keys:
+    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+    - ["source_id:30", "format_de15", "Book, eBook", "Article, E-Article"]
+    - ["source_id:48", "language", "German", "English"]
+    - ["source_id:49", "facet_avail", "Online", "Free"]
+    - ["source_id:55", "facet_avail", "Online", "Free"]
+
+# All records: [Query, Facet-Field, Value, ...] checks if all record contain
+# only the given values.
+all-records:
+    - ["source_id:28", "format", "ElectronicArticle"]
+    - ["source_id:28", "format_de15", "Article, E-Article"]
+    - ["source_id:28", "facet_avail", "Online", "Free"]
+    - ["source_id:28", "access_facet", "Electronic Resources"]
+    - ["source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"]
+    - ["source_id:28", "finc_class_facet", "not assigned"]
+    - ["source_id:30", "facet_avail", "Online", "Free"]
+    - ["source_id:30", "access_facet", "Electronic Resources"]
+    - ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
+    - ["source_id:34", "format", "ElectronicThesis"]
+    - ["source_id:34", "format_de15", "Thesis"]
+    - ["source_id:34", "facet_avail", "Online", "Free"]
+    - ["source_id:34", "access_facet", "Electronic Resources"]
+    - ["source_id:34", "mega_collection", "PQDT Open"]
+    - ["source_id:48", "format", "ElectronicArticle"]
+    - ["source_id:48", "format_de15", "Article, E-Article"]
+    - ["source_id:48", "facet_avail", "Online"]
+    - ["source_id:48", "access_facet", "Electronic Resources"]
+    - ["source_id:49", "facet_avail", "Online"]
+    - ["source_id:49", "access_facet", "Electronic Resources"]
+    - ["source_id:49", "language", "English"]
+    - ["source_id:50", "format", "ElectronicArticle"]
+    - ["source_id:50", "format_de15", "Article, E-Article"]
+    - ["source_id:50", "facet_avail", "Online"]
+    - ["source_id:50", "access_facet", "Electronic Resources"]
+    - ["source_id:50", "mega_collection", "DeGruyter SSH"]
+    - ["source_id:53", "format", "ElectronicArticle"]
+    - ["source_id:53", "format_de15", "Article, E-Article"]
+    - ["source_id:53", "facet_avail", "Online"]
+    - ["source_id:53", "access_facet", "Electronic Resources"]
+    - ["source_id:53", "mega_collection", "CEEOL Central and Eastern European Online Library"]
+    - ["source_id:55", "format", "ElectronicArticle"]
+    - ["source_id:55", "format_de15", "Article, E-Article"]
+    - ["source_id:55", "facet_avail", "Online"]
+    - ["source_id:55", "access_facet", "Electronic Resources"]
+    - ["source_id:60", "format", "ElectronicArticle"]
+    - ["source_id:60", "format_de15", "Article, E-Article"]
+    - ["source_id:60", "facet_avail", "Online"]
+    - ["source_id:60", "access_facet", "Electronic Resources"]
+    - ["source_id:60", "mega_collection", "Thieme E-Journals"]
+    - ["source_id:60", "facet_avail", "Online"]
+    - ["source_id:85", "format", "ElectronicArticle"]
+    - ["source_id:85", "format_de15", "Article, E-Article"]
+    - ["source_id:85", "facet_avail", "Online"]
+    - ["source_id:85", "access_facet", "Electronic Resources"]
+    - ["source_id:85", "language", "English"]
+    - ["source_id:85", "mega_collection", "Elsevier Journals"]
+    - ["source_id:87", "format", "ElectronicArticle"]
+    - ["source_id:87", "format_de15", "Article, E-Article"]
+    - ["source_id:87", "facet_avail", "Online", "Free"]
+    - ["source_id:87", "access_facet", "Electronic Resources"]
+    - ["source_id:87", "language", "English"]
+    - ["source_id:87", "mega_collection", "International Journal of Communication"]
+    - ["source_id:89", "format", "ElectronicArticle"]
+    - ["source_id:89", "format_de15", "Article, E-Article"]
+    - ["source_id:89", "facet_avail", "Online"]
+    - ["source_id:89", "access_facet", "Electronic Resources"]
+    - ["source_id:89", "language", "English"]
+    - ["source_id:89", "mega_collection", "IEEE Xplore Library"]
+    - ["source_id:101", "format", "ElectronicArticle"]
+    - ["source_id:101", "format_de15", "Article, E-Article"]
+    - ["source_id:101", "facet_avail", "Online"]
+    - ["source_id:101", "access_facet", "Electronic Resources"]
+    - ["source_id:101", "mega_collection", "Kieler Beiträge zur Filmmusikforschung"]
+    - ["source_id:101", "finc_class_facet", "not assigned"]
+    - ["source_id:105", "format", "ElectronicArticle"]
+    - ["source_id:105", "format_de15", "Article, E-Article"]
+    - ["source_id:105", "facet_avail", "Online"]
+    - ["source_id:105", "access_facet", "Electronic Resources"]
+    - ["source_id:105", "mega_collection", "Springer Journals"]
+    - ["source_id:105", "finc_class_facet", "not assigned"]
+
+# MinRatio: Query, Facet-Field, Value, Ratio (Percent), checks if the given
+# value appears in a given percentage of documents.
+min-ratio:
+    - ["source_id:49", "facet_avail", "Free", 0.8]
+    - ["source_id:55", "facet_avail", "Free", 2.2]
+    - ["source_id:105", "facet_avail", "Free", 0.5]
+
+# MinCount: Query, Facet-Field, Value, Min Count. Checks, if the given value
+# appears at least a fixed number of times.
+min-count:
+    - ["source_id:89", "facet_avail", "Free", 50]
+`
 
 const (
 	Check = "\u2713"
@@ -28,9 +129,10 @@ const (
 )
 
 var (
-	server  = flag.String("server", "http://localhost:8983/solr/biblio", "location of SOLR server")
-	textile = flag.Bool("t", false, "emit a textile table")
-	ascii   = flag.Bool("a", false, "emit ascii table")
+	server     = flag.String("server", "http://localhost:8983/solr/biblio", "location of SOLR server")
+	textile    = flag.Bool("t", false, "emit a textile table")
+	ascii      = flag.Bool("a", false, "emit ascii table")
+	configFile = flag.String("c", "", "path to review.yaml config file")
 )
 
 // prependHTTP prepends http, if necessary.
@@ -39,6 +141,14 @@ func prependHTTP(s string) string {
 		return fmt.Sprintf("http://%s", s)
 	}
 	return s
+}
+
+// ReviewConfig contains various index review cases.
+type ReviewConfig struct {
+	AllowedKeys [][]string `yaml:"allowed-keys"`
+	AllRecords  [][]string `yaml:"all-records"`
+	MinRatio    [][]string `yaml:"min-ratio"`
+	MinCount    [][]string `yaml:"min-count"`
 }
 
 // Result represents a single result row.
@@ -124,188 +234,109 @@ func main() {
 	var results []Result
 	var err error
 
-	// Cases like "access_facet:"Electronic Resources" für alle Records".
-	// Multiple values are alternatives.
-	allowedKeyCases := []struct {
-		Query  string
-		Field  string
-		Values []string
-	}{
-		{"source_id:30", "format", []string{"eBook", "ElectronicArticle"}},
-		{"source_id:30", "format_de15", []string{"Book, E-Book", "Article, E-Article"}},
-		{"source_id:48", "language", []string{"German", "English"}},
-		{"source_id:49", "facet_avail", []string{"Online", "Free"}},
-		{"source_id:55", "facet_avail", []string{"Online", "Free"}},
+	var configReader io.Reader
+	if *configFile == "" {
+		configReader = strings.NewReader(defaultConfig)
+	} else {
+		f, err := os.Open(*configFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		configReader = f
 	}
 
-	for _, c := range allowedKeyCases {
-		if err = index.AllowedKeys(c.Query, c.Field, c.Values...); err != nil {
+	// Grab config.
+	var config ReviewConfig
+	if yaml.NewDecoder(configReader).Decode(&config) != nil {
+		log.Fatal(err)
+	}
+
+	// Cases like "access_facet:"Electronic Resources" für alle Records".
+	// Multiple values are alternatives.
+	for _, c := range config.AllowedKeys {
+		if len(c) < 3 {
+			log.Fatal("invalid test case, too few fields: %s", c)
+		}
+		query, field, values := c[0], c[1], c[2:]
+		if err = index.AllowedKeys(query, field, values...); err != nil {
 			log.Println(err)
 		}
 		results = append(results, Result{
-			SourceIdentifier: MustParseSourceIdentifier(c.Query),
-			Link:             index.FacetLink(c.Query, c.Field),
-			SolrField:        c.Field,
+			SourceIdentifier: MustParseSourceIdentifier(query),
+			Link:             index.FacetLink(query, field),
+			SolrField:        field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", c.Query, c.Field, c.Values)),
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", query, field, values)),
 		})
 	}
 
 	// Cases like "facet_avail:Online UND facet_avail:Free für alle Records".
 	// All records must have one or more facet values.
-	allRecordsCases := []struct {
-		Query  string
-		Field  string
-		Values []string
-	}{
-		{"source_id:28", "format", []string{"ElectronicArticle"}},
-		{"source_id:28", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:28", "facet_avail", []string{"Online", "Free"}},
-		{"source_id:28", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:28", "mega_collection", []string{"DOAJ Directory of Open Access Journals"}},
-		{"source_id:28", "finc_class_facet", []string{"not assigned"}},
-
-		{"source_id:30", "facet_avail", []string{"Online", "Free"}},
-		{"source_id:30", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:30", "mega_collection", []string{"SSOAR Social Science Open Access Repository"}},
-
-		{"source_id:34", "format", []string{"ElectronicThesis"}},
-		{"source_id:34", "format_de15", []string{"Thesis"}},
-		{"source_id:34", "facet_avail", []string{"Online", "Free"}},
-		{"source_id:34", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:34", "mega_collection", []string{"PQDT Open"}},
-
-		{"source_id:48", "format", []string{"ElectronicArticle"}},
-		{"source_id:48", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:48", "facet_avail", []string{"Online"}},
-		{"source_id:48", "access_facet", []string{"Electronic Resources"}},
-
-		{"source_id:49", "facet_avail", []string{"Online"}},
-		{"source_id:49", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:49", "language", []string{"English"}},
-
-		{"source_id:50", "format", []string{"ElectronicArticle"}},
-		{"source_id:50", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:50", "facet_avail", []string{"Online"}},
-		{"source_id:50", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:50", "mega_collection", []string{"DeGruyter SSH"}},
-
-		{"source_id:53", "format", []string{"ElectronicArticle"}},
-		{"source_id:53", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:53", "facet_avail", []string{"Online"}},
-		{"source_id:53", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:53", "mega_collection", []string{"CEEOL Central and Eastern European Online Library"}},
-
-		{"source_id:55", "format", []string{"ElectronicArticle"}},
-		{"source_id:55", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:55", "facet_avail", []string{"Online"}},
-		{"source_id:55", "access_facet", []string{"Electronic Resources"}},
-
-		{"source_id:60", "format", []string{"ElectronicArticle"}},
-		{"source_id:60", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:60", "facet_avail", []string{"Online"}},
-		{"source_id:60", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:60", "mega_collection", []string{"Thieme E-Journals"}},
-		{"source_id:60", "facet_avail", []string{"Online"}},
-
-		{"source_id:85", "format", []string{"ElectronicArticle"}},
-		{"source_id:85", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:85", "facet_avail", []string{"Online"}},
-		{"source_id:85", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:85", "language", []string{"English"}},
-		{"source_id:85", "mega_collection", []string{"Elsevier Journals"}},
-
-		{"source_id:87", "format", []string{"ElectronicArticle"}},
-		{"source_id:87", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:87", "facet_avail", []string{"Online", "Free"}},
-		{"source_id:87", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:87", "language", []string{"English"}},
-		{"source_id:87", "mega_collection", []string{"International Journal of Communication"}},
-
-		{"source_id:89", "format", []string{"ElectronicArticle"}},
-		{"source_id:89", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:89", "facet_avail", []string{"Online"}},
-		{"source_id:89", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:89", "language", []string{"English"}},
-		{"source_id:89", "mega_collection", []string{"IEEE Xplore Library"}},
-
-		{"source_id:101", "format", []string{"ElectronicArticle"}},
-		{"source_id:101", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:101", "facet_avail", []string{"Online"}},
-		{"source_id:101", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:101", "mega_collection", []string{"Kieler Beiträge zur Filmmusikforschung"}},
-		{"source_id:101", "finc_class_facet", []string{"not assigned"}},
-
-		{"source_id:105", "format", []string{"ElectronicArticle"}},
-		{"source_id:105", "format_de15", []string{"Article, E-Article"}},
-		{"source_id:105", "facet_avail", []string{"Online"}},
-		{"source_id:105", "access_facet", []string{"Electronic Resources"}},
-		{"source_id:105", "mega_collection", []string{"Springer Journals"}},
-		{"source_id:105", "finc_class_facet", []string{"not assigned"}},
-	}
-
-	for _, c := range allRecordsCases {
-		if err = index.EqualSizeTotal(c.Query, c.Field, c.Values...); err != nil {
+	for _, c := range config.AllRecords {
+		if len(c) < 3 {
+			log.Fatal("invalid test case, too few fields: %s", c)
+		}
+		query, field, values := c[0], c[1], c[2:]
+		if err = index.EqualSizeTotal(query, field, values...); err != nil {
 			log.Println(err)
 		}
 		results = append(results, Result{
-			SourceIdentifier: MustParseSourceIdentifier(c.Query),
-			Link:             index.FacetLink(c.Query, c.Field),
-			SolrField:        c.Field,
+			SourceIdentifier: MustParseSourceIdentifier(query),
+			Link:             index.FacetLink(query, field),
+			SolrField:        field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", c.Query, c.Field, c.Values)),
+			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", query, field, values)),
 		})
 	}
 
 	// Cases like "facet_avail:Free für mindestens 0,5% aller Records".
-	ratioCases := []struct {
-		Query    string
-		Field    string
-		Value    string
-		MinRatio float64
-	}{
-		{"source_id:49", "facet_avail", "Free", 0.8},
-		{"source_id:55", "facet_avail", "Free", 2.2},
-		{"source_id:105", "facet_avail", "Free", 0.5},
-	}
-	for _, c := range ratioCases {
-		if err = index.MinRatioPct(c.Query, c.Field, c.Value, c.MinRatio); err != nil {
+	for _, c := range config.MinRatio {
+		if len(c) != 4 {
+			log.Fatal("invalid test case, expected four fields: %s", c)
+		}
+		query, field, value := c[0], c[1], c[2]
+		minRatioPct, err := strconv.ParseFloat(c[3], 64)
+		if err != nil {
+			log.Fatal("minRatio is not a float: %s", err)
+		}
+		if err = index.MinRatioPct(query, field, value, minRatioPct); err != nil {
 			log.Println(err)
 		}
 		results = append(results, Result{
-			SourceIdentifier: MustParseSourceIdentifier(c.Query),
-			Link:             index.FacetLink(c.Query, c.Field),
-			SolrField:        c.Field,
+			SourceIdentifier: MustParseSourceIdentifier(query),
+			Link:             index.FacetLink(query, field),
+			SolrField:        field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment: ErrorOrComment(err,
-				fmt.Sprintf("%s %s %s %0.4f", c.Query, c.Field, c.Value, c.MinRatio)),
+			Comment: ErrorOrComment(err, fmt.Sprintf("%s %s %s %0.4f",
+				query, field, value, minRatioPct)),
 		})
 	}
 
 	// Cases like "facet_avail:Free für mindestens 50 Records".
-	minCountCases := []struct {
-		Query    string
-		Field    string
-		Value    string
-		MinCount int
-	}{
-		{"source_id:89", "facet_avail", "Free", 50},
-	}
-	for _, c := range minCountCases {
-		if err = index.MinCount(c.Query, c.Field, c.Value, c.MinCount); err != nil {
+	for _, c := range config.MinCount {
+		if len(c) != 4 {
+			log.Fatal("invalid test case, expected four fields: %s", c)
+		}
+		query, field, value := c[0], c[1], c[2]
+		minCount, err := strconv.Atoi(c[3])
+		if err != nil {
+			log.Fatal("minCount is not an int: %s", err)
+		}
+		if err = index.MinCount(query, field, value, minCount); err != nil {
 			log.Println(err)
 		}
 		results = append(results, Result{
-			SourceIdentifier: MustParseSourceIdentifier(c.Query),
-			Link:             index.FacetLink(c.Query, c.Field),
-			SolrField:        c.Field,
+			SourceIdentifier: MustParseSourceIdentifier(query),
+			Link:             index.FacetLink(query, field),
+			SolrField:        field,
 			FixedResult:      true,
 			Passed:           err == nil,
-			Comment: ErrorOrComment(err,
-				fmt.Sprintf("%s %s %s %d", c.Query, c.Field, c.Value, c.MinCount)),
+			Comment: ErrorOrComment(err, fmt.Sprintf("%s %s %s %d",
+				query, field, value, minCount)),
 		})
 	}
 
