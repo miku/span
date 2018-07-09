@@ -469,6 +469,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	// Ticket handling.
 	if *ticket != "" {
 		config.Ticket = *ticket
 	}
@@ -502,10 +503,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		// Update Issue.
 		req, err := http.NewRequest("PUT", link, bytes.NewReader(body))
 		if err != nil {
 			log.Fatal(err)
 		}
+		req.Header.Add("Content-Type", "application/json")
 		req.Header.Add("X-Redmine-API-Key", conf.Token)
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
@@ -515,9 +519,11 @@ func main() {
 		if resp.StatusCode >= 400 {
 			log.Fatalf("ticket update resulted in a %d", resp.StatusCode)
 		}
-		if _, err := io.Copy(os.Stdout, resp.Body); err != nil {
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
 			log.Fatal(err)
 		}
+		log.Printf("redmine response [%d]: (%db) %s", resp.StatusCode, len(b), string(b))
 		log.Printf("updated %s/issues/%s", conf.BaseURL, config.Ticket)
 	}
 }
