@@ -64,41 +64,37 @@ var done = make(chan bool)
 func Worker(done chan bool) {
 	log.Println("worker started")
 	for rr := range IndexReviewQueue {
-		log.Printf("worker received review request: %s", rr)
-		log.Println("running review ...")
+		log.Printf("worker received review request: %s, running review ...", rr)
 
-		cmd := "span-review"
-		args := []string{"-c", rr.ReviewConfigFile}
+		cmd, args := "span-review", []string{"-c", rr.ReviewConfigFile}
 		log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
-		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code.
 
+		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code.
 		if err != nil {
-			log.Printf("%s failed: %s", cmd, err)
-			log.Printf("combined output: %s", out)
+			log.Printf("%s failed: %s, combined output", cmd, err, out)
 			continue
 		}
-
-		log.Println(string(out)) // XXX: Post into ticket, refs #13622.
 		log.Println("completed review")
 	}
 	log.Println("worker shutdown")
 	done <- true
 }
 
-// Repo points to a local copy of the repository containing the configuration
-// we want.
+// Repo points to a local clone containing the configuration we want.
 type Repo struct {
 	URL   string
 	Dir   string
 	Token string
 }
 
+// AuthURL returns an authenticated repository URL.
 func (r Repo) AuthURL() string {
 	return strings.Replace(r.URL, "https://", fmt.Sprintf("https://oauth2:%s@", r.Token), 1)
 }
 
+// String representation.
 func (r Repo) String() string {
-	return fmt.Sprintf("clone from %s at %s", r.URL, r.Dir)
+	return fmt.Sprintf("Repo from %s at %s", r.URL, r.Dir)
 }
 
 // Update just runs a git pull, as per strong convention, this will always be a
@@ -123,12 +119,7 @@ func (r Repo) Update() error {
 	return exec.Command(cmd, args...).Run()
 }
 
-// ReadFile reads a file from the repo.
-func (r Repo) ReadFile(filename string) ([]byte, error) {
-	return ioutil.ReadFile(path.Join(r.Dir, filename))
-}
-
-// PushPayload delivered on push and edits with Web IDE.
+// PushPayload delivered on push and web edits.
 type PushPayload struct {
 	After       string `json:"after"`
 	Before      string `json:"before"`
@@ -223,7 +214,7 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Printf("gitlab payload: %s", payload)
+		log.Printf("gitlab payload: %v", payload)
 		log.Printf("modified files: %s", strings.Join(payload.ModifiedFiles(), ", "))
 		if !payload.IsFileModified("docs/review.yaml") {
 			log.Println("review.yaml not modified, hook done")
@@ -254,8 +245,10 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HomeHandler says hello.
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	if _, err := fmt.Fprintf(w, "This is span-webhookd, a webhook receiver for gitlab (#12756).\n"); err != nil {
+	s := fmt.Sprintf("This is span-webhookd %s, a webhook receiver for gitlab (#12756).", span.AppVersion)
+	if _, err := fmt.Fprintln(w, s); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -288,7 +281,7 @@ func findGitlabToken() (string, error) {
 		if err := os.MkdirAll(path.Dir(configFile), 0755); err != nil {
 			return "", err
 		}
-		data := []byte(`{"gitlab.token": "xxx", "whatislive.url": "xxx"}`)
+		data := []byte(`{"gitlab.token": "xxx"}`)
 		if err := ioutil.WriteFile(configFile, data, 0600); err != nil {
 			return "", err
 		}
