@@ -208,6 +208,11 @@ func (p PushPayload) IsFileModified(filename string) bool {
 // the Push Hook. Other types are Issue, Note or Tag Push Hook.
 func HookHandler(w http.ResponseWriter, r *http.Request) {
 	started := time.Now()
+	defer func() {
+		// We care a bit, because gitlab wants us to return ASAP.
+		log.Printf("request completed after %s", time.Since(started))
+	}()
+
 	gitlabEvent := strings.TrimSpace(r.Header.Get("X-Gitlab-Event"))
 	switch gitlabEvent {
 	case "Push Hook":
@@ -216,15 +221,12 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
 		log.Printf("gitlab payload: %s", payload)
 		log.Printf("modified files: %s", strings.Join(payload.ModifiedFiles(), ", "))
-
 		if !payload.IsFileModified("docs/review.yaml") {
 			log.Println("review.yaml not modified, hook done")
 			return
 		}
-
 		repo := Repo{
 			URL:   payload.Project.GitHttpUrl,
 			Dir:   *repoDir,
@@ -245,12 +247,13 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		IndexReviewQueue <- rr
 	default:
 		log.Printf("unregistered or invalid event kind: %s", gitlabEvent)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
-	log.Printf("request completed after %s", time.Since(started))
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	if _, err := fmt.Fprintf(w, "This is span-webhookd, a webhook receiver for gitlab.\n"); err != nil {
+	if _, err := fmt.Fprintf(w, "This is span-webhookd, a webhook receiver for gitlab (#12756).\n"); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
