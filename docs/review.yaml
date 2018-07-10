@@ -86,7 +86,6 @@ all-records:
     - ["source_id:89", "format_de15", "Article, E-Article"]
     - ["source_id:89", "facet_avail", "Online"]
     - ["source_id:89", "access_facet", "Electronic Resources"]
-    - ["source_id:89", "language", "English"]
     - ["source_id:89", "mega_collection", "IEEE Xplore Library"]
     - ["source_id:101", "format", "ElectronicArticle"]
     - ["source_id:101", "format_de15", "Article, E-Article"]
