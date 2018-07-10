@@ -15,7 +15,7 @@ solr: "auto"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "NA"
+ticket: "xxx"
 
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
