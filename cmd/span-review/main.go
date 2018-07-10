@@ -475,7 +475,7 @@ func main() {
 	}
 	if config.Ticket != "" {
 		if _, err := strconv.Atoi(config.Ticket); err != nil {
-			log.Printf("ignoring ticket update for non-numeric ticket id: %s", *ticket)
+			log.Printf("ignoring ticket update for non-numeric ticket id: %s", config.Ticket)
 			os.Exit(0)
 		}
 
