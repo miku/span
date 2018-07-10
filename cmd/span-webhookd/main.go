@@ -73,7 +73,7 @@ func Worker(done chan bool) {
 
 		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code.
 		if err != nil {
-			log.Printf("%s failed: %s, combined output", cmd, err, out)
+			log.Printf("%s failed: %s, combined output: %s", cmd, err, string(out))
 			continue
 		}
 		log.Printf("[output] %s", out)
