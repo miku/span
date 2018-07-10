@@ -69,10 +69,12 @@ func Worker(done chan bool) {
 
 		cmd := "span-review"
 		args := []string{"-c", rr.ReviewConfigFile}
+		log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
 		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code.
 
 		if err != nil {
-			log.Println("%s failed: %s", cmd, err)
+			log.Printf("%s failed: %s", cmd, err)
+			log.Printf("combined output: %s", out)
 			continue
 		}
 
