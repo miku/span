@@ -160,7 +160,7 @@ var (
 	textile    = flag.Bool("t", false, "emit a textile table")
 	ascii      = flag.Bool("a", false, "emit ascii table")
 	configFile = flag.String("c", "", "path to review.yaml config file")
-	ticket     = flag.String("ticket", "", "post result to ticket, overrides review.yaml, required redmine.baseurl and redmine.apitoken configured")
+	ticket     = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in ~/.config/span/span.json")
 )
 
 // prependHTTP prepends http, if necessary.
@@ -278,7 +278,7 @@ func findTestingSolrServer() (string, error) {
 		if err := os.MkdirAll(path.Dir(configFile), 0755); err != nil {
 			return "", err
 		}
-		data := []byte(`{"gitlab.token": "xxx", "whatislive.url": "xxx"}`)
+		data := []byte(`{"whatislive.url": "xxx"}`)
 		if err := ioutil.WriteFile(configFile, data, 0600); err != nil {
 			return "", err
 		}
@@ -319,7 +319,7 @@ func main() {
 	// Read review configuration.
 	var configReader io.Reader
 	if *configFile == "" {
-		log.Println("no file given, using default review config")
+		log.Println("no file given, using default review config (https://git.io/fNUD4)")
 		configReader = strings.NewReader(defaultConfig)
 	} else {
 		f, err := os.Open(*configFile)
