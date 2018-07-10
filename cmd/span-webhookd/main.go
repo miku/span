@@ -40,6 +40,7 @@ var (
 	addr    = flag.String("addr", ":8080", "hostport to listen on")
 	token   = flag.String("token", "", "gitlab auth token, if empty will use ~/.config/span/span.json")
 	repoDir = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
+	logfile = flag.String("logfile", "", "log to file")
 	banner  = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
@@ -303,6 +304,15 @@ func findGitlabToken() (string, error) {
 
 func main() {
 	flag.Parse()
+
+	if *logfile != "" {
+		f, err := os.OpenFile(*logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
+	}
 
 	var err error
 
