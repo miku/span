@@ -284,6 +284,7 @@ func findTestingSolrServer() (string, error) {
 		}
 		return "", fmt.Errorf("created new config file, please adjust: %s", *spanConfigFile)
 	}
+	log.Printf("using span config at %s", *spanConfigFile)
 	f, err := os.Open(*spanConfigFile)
 	if err != nil {
 		return "", err
@@ -294,7 +295,7 @@ func findTestingSolrServer() (string, error) {
 	if err := json.NewDecoder(f).Decode(&conf); err != nil {
 		return "", err
 	}
-	log.Printf("querying %s for solr location", conf.WhatIsLiveURL)
+	log.Printf("querying [%s] for solr location", conf.WhatIsLiveURL)
 	resp, err := http.Get(conf.WhatIsLiveURL)
 	if err != nil {
 		return "", err
