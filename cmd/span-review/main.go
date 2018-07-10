@@ -294,6 +294,7 @@ func findTestingSolrServer() (string, error) {
 	if err := json.NewDecoder(f).Decode(&conf); err != nil {
 		return "", err
 	}
+	log.Printf("querying %s for solr location", conf.WhatIsLiveURL)
 	resp, err := http.Get(conf.WhatIsLiveURL)
 	if err != nil {
 		return "", err
@@ -518,6 +519,7 @@ func main() {
 		}
 
 		// Update Issue.
+		log.Printf("prepare to PUT to %s", link)
 		req, err := http.NewRequest("PUT", link, bytes.NewReader(body))
 		if err != nil {
 			log.Fatal(err)
@@ -526,7 +528,7 @@ func main() {
 		req.Header.Add("X-Redmine-API-Key", conf.Token)
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("could not update ticket: %s", err)
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode >= 400 {
