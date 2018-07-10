@@ -74,7 +74,8 @@ func Worker(done chan bool) {
 			log.Printf("%s failed: %s, combined output", cmd, err, out)
 			continue
 		}
-		log.Println("completed review")
+		log.Printf("[output] %s", out)
+		log.Println("review completed")
 	}
 	log.Println("worker shutdown")
 	done <- true
