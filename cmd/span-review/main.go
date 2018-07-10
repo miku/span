@@ -494,6 +494,15 @@ func main() {
 		}
 
 		var buf bytes.Buffer
+
+		hostname, err := os.Hostname()
+		if err != nil {
+			hostname = "an unidentified host"
+		}
+
+		fmt.Fprintf(&buf, "* tested SOLR at %s\n", index.Server)
+		fmt.Fprintf(&buf, "* ran span-review %s on %s\n\n", span.AppVersion, hostname)
+
 		tw := NewTextileTableWriter(&buf)
 		if _, err := tw.WriteResults(results); err != nil {
 			log.Fatal(err)
@@ -503,7 +512,7 @@ func main() {
 		link := fmt.Sprintf("%s/issues/%s.json", conf.BaseURL, config.Ticket)
 		body, err := json.Marshal(map[string]interface{}{
 			"issue": map[string]interface{}{
-				"notes": fmt.Sprintf("span-review %s\n\n%s", span.AppVersion, buf.String()),
+				"notes": fmt.Sprintf("index review results\n\n%s", buf.String()),
 			},
 		})
 		if err != nil {
