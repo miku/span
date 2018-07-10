@@ -37,11 +37,12 @@ import (
 )
 
 var (
-	addr    = flag.String("addr", ":8080", "hostport to listen on")
-	token   = flag.String("token", "", "gitlab auth token, if empty will use ~/.config/span/span.json")
-	repoDir = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
-	logfile = flag.String("logfile", "", "log to file")
-	banner  = `
+	addr           = flag.String("addr", ":8080", "hostport to listen on")
+	token          = flag.String("token", "", "gitlab auth token, if empty will use span-config")
+	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
+	logfile        = flag.String("logfile", "", "log to file")
+	spanConfigFile = flag.String("span-config", path.Join(UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	banner         = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
  Y88b  d8b  /  d888  88b 888  888b 888  888 d888   i d888   i 888d8b    d888  888
@@ -278,18 +279,17 @@ func parsePort(addr string) (int, error) {
 
 // findGitlabToken returns the GitLab auth token, if configured.
 func findGitlabToken() (string, error) {
-	configFile := path.Join(UserHomeDir(), ".config/span/span.json")
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		if err := os.MkdirAll(path.Dir(configFile), 0755); err != nil {
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		if err := os.MkdirAll(path.Dir(*spanConfigFile), 0755); err != nil {
 			return "", err
 		}
 		data := []byte(`{"gitlab.token": "xxx"}`)
-		if err := ioutil.WriteFile(configFile, data, 0600); err != nil {
+		if err := ioutil.WriteFile(*spanConfigFile, data, 0600); err != nil {
 			return "", err
 		}
-		return "", fmt.Errorf("created new config file, please adjust: %s", configFile)
+		return "", fmt.Errorf("created new config file, please adjust: %s", *spanConfigFile)
 	}
-	f, err := os.Open(configFile)
+	f, err := os.Open(*spanConfigFile)
 	if err != nil {
 		return "", err
 	}

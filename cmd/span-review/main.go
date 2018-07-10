@@ -156,11 +156,12 @@ const (
 )
 
 var (
-	server     = flag.String("server", "", "location of SOLR server, overrides review.yaml")
-	textile    = flag.Bool("t", false, "emit a textile table")
-	ascii      = flag.Bool("a", false, "emit ascii table")
-	configFile = flag.String("c", "", "path to review.yaml config file")
-	ticket     = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in ~/.config/span/span.json")
+	server         = flag.String("server", "", "location of SOLR server, overrides review.yaml")
+	textile        = flag.Bool("t", false, "emit a textile table to stdout")
+	ascii          = flag.Bool("a", false, "emit ascii table to stdout")
+	configFile     = flag.String("c", "", "path to review.yaml config file")
+	spanConfigFile = flag.String("span-config", path.Join(UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
 )
 
 // prependHTTP prepends http, if necessary.
@@ -273,18 +274,17 @@ func UserHomeDir() string {
 // probes). For now we use a separate configuration file, that contains the URL
 // to the nginx snippet.
 func findTestingSolrServer() (string, error) {
-	configFile := path.Join(UserHomeDir(), ".config/span/span.json")
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		if err := os.MkdirAll(path.Dir(configFile), 0755); err != nil {
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		if err := os.MkdirAll(path.Dir(*spanConfigFile), 0755); err != nil {
 			return "", err
 		}
 		data := []byte(`{"whatislive.url": "xxx"}`)
-		if err := ioutil.WriteFile(configFile, data, 0600); err != nil {
+		if err := ioutil.WriteFile(*spanConfigFile, data, 0600); err != nil {
 			return "", err
 		}
-		return "", fmt.Errorf("created new config file, please adjust: %s", configFile)
+		return "", fmt.Errorf("created new config file, please adjust: %s", *spanConfigFile)
 	}
-	f, err := os.Open(configFile)
+	f, err := os.Open(*spanConfigFile)
 	if err != nil {
 		return "", err
 	}
@@ -479,9 +479,7 @@ func main() {
 			os.Exit(0)
 		}
 
-		// This is span config, not review config. XXX: separate better.
-		configFile := path.Join(UserHomeDir(), ".config/span/span.json")
-		f, err := os.Open(configFile)
+		f, err := os.Open(*spanConfigFile)
 		if err != nil {
 			log.Printf("failed to open span config: %s", err)
 		}
@@ -538,7 +536,11 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("redmine response [%d]: (%db) %s", resp.StatusCode, len(b), string(b))
+		if len(b) == 0 {
+			log.Printf("got empty response from redmine [%d]")
+		} else {
+			log.Printf("redmine response [%d] (%db): %s", resp.StatusCode, len(b), string(b))
+		}
 		log.Printf("updated %s/issues/%s", conf.BaseURL, config.Ticket)
 	}
 }
