@@ -20,19 +20,19 @@ Library data tools.
 %pre
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-check $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-export $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-freeze $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-import $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-local-data $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-review $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/sbin
-install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/local/sbin
+mkdir -p $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-check $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-compare $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-freeze $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-import $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-local-data $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-redact $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/sbin
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
@@ -50,18 +50,18 @@ rm -rf %{_topdir}/BUILD/%{name}
 %files
 %defattr(-,root,root)
 
-/usr/local/sbin/span-check
-/usr/local/sbin/span-compare
-/usr/local/sbin/span-export
-/usr/local/sbin/span-freeze
-/usr/local/sbin/span-import
-/usr/local/sbin/span-local-data
-/usr/local/sbin/span-oa-filter
-/usr/local/sbin/span-redact
-/usr/local/sbin/span-review
-/usr/local/sbin/span-tag
-/usr/local/sbin/span-update-labels
-/usr/local/sbin/span-webhookd
+/usr/sbin/span-check
+/usr/sbin/span-compare
+/usr/sbin/span-export
+/usr/sbin/span-freeze
+/usr/sbin/span-import
+/usr/sbin/span-local-data
+/usr/sbin/span-oa-filter
+/usr/sbin/span-redact
+/usr/sbin/span-review
+/usr/sbin/span-tag
+/usr/sbin/span-update-labels
+/usr/sbin/span-webhookd
 /usr/local/share/man/man1/span.1
 /usr/lib/systemd/system/span-webhookd.service
 

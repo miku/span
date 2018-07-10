@@ -7,6 +7,6 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/root
-ExecStart=/usr/local/sbin/span-webhookd -logfile=/var/log/span-webhookd.log
+ExecStart=/usr/sbin/span-webhookd -addr :8080 -logfile=/var/log/span-webhookd.log
 Restart=on-failure
 
