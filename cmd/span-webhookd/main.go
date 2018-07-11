@@ -36,8 +36,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const DefaultPort = 8080
+
 var (
-	addr           = flag.String("addr", ":8080", "hostport to listen on")
+	addr           = flag.String("addr", fmt.Sprintf(":%d", findConfiguredPort()), "hostport to listen on")
 	token          = flag.String("token", "", "gitlab auth token, if empty will use span-config")
 	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	logfile        = flag.String("logfile", "", "log to file")
@@ -302,6 +304,27 @@ func findGitlabToken() (string, error) {
 		return "", err
 	}
 	return conf.Token, nil
+}
+
+// findConfiguredPort returns a configured port number or 8080 if none is specified.
+func findConfiguredPort() int {
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		return DefaultPort
+	}
+	f, err := os.Open(*spanConfigFile)
+	if err != nil {
+		return DefaultPort
+	}
+	var conf struct {
+		Port int `json:"port"`
+	}
+	if err := json.NewDecoder(f).Decode(&conf); err != nil {
+		return DefaultPort
+	}
+	if conf.Port == 0 {
+		conf.Port = DefaultPort
+	}
+	return conf.Port
 }
 
 func main() {
