@@ -2,10 +2,22 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/abadojack/whatlanggo"
+  packages = ["."]
+  revision = "8ba3f9b6a99644f9bbb6b953810a10f799528d20"
+
+[[projects]]
   name = "github.com/beevik/etree"
   packages = ["."]
-  revision = "abae5fc32af8862e420d52e686a7e6ec14111685"
-  version = "v0"
+  revision = "9d7e8feddccb4ed1b8afb54e368bd323d2ff652c"
+  version = "v1.0.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/dchest/safefile"
+  packages = ["."]
+  revision = "855e8d98f1852d48dde521e0522408d1fe7e836a"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -20,6 +32,24 @@
   revision = "7e5a8eef611ee84dd359503f3969f80df4c50723"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/goodsign/monday"
+  packages = ["."]
+  revision = "3fc5586a72f766fe51b1d7343ce2a246f0cde544"
+
+[[projects]]
+  name = "github.com/gorilla/context"
+  packages = ["."]
+  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
+  version = "v1.1.1"
+
+[[projects]]
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
+  version = "v1.6.2"
+
+[[projects]]
   name = "github.com/hoisie/mustache"
   packages = ["."]
   revision = "6dfe7cd5e765063d31ecdfcda4c6568d7cdd39b6"
@@ -28,8 +58,32 @@
 [[projects]]
   name = "github.com/kennygrant/sanitize"
   packages = ["."]
-  revision = "6a0bfdde8629a3a3a7418a7eae45c54154692514"
-  version = "v1.2"
+  revision = "2e6820834a1f36c626bf19a253b7d3cc060e9b8b"
+  version = "v1.2.3"
+
+[[projects]]
+  name = "github.com/klauspost/compress"
+  packages = ["flate"]
+  revision = "b939724e787a27c0005cabe3f78e7ed7987ac74f"
+  version = "v1.4.0"
+
+[[projects]]
+  name = "github.com/klauspost/cpuid"
+  packages = ["."]
+  revision = "ae7887de9fa5d2db4eaa8174a7eff2c1ac00f2da"
+  version = "v1.1"
+
+[[projects]]
+  name = "github.com/klauspost/crc32"
+  packages = ["."]
+  revision = "cb6bfca970f6908083f26f39a79009d608efd5cd"
+  version = "v1.1"
+
+[[projects]]
+  name = "github.com/klauspost/pgzip"
+  packages = ["."]
+  revision = "0bf5dcad4ada2814c3c00f996a982270bb81a506"
+  version = "v1.1"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -57,21 +111,27 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/rainycape/cld2"
+  name = "github.com/olebedev/config"
   packages = ["."]
-  revision = "08654a83284e4ca708214e8afef6a1e0fd55d334"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/reusee/mmh3"
-  packages = ["."]
-  revision = "64b85163255bbb6af4f0d0eab61ecdda7ea7cd96"
+  revision = "ed90d2035b8114c30b9cb65e7d52e10a7148f8c6"
 
 [[projects]]
   branch = "master"
   name = "github.com/shantanubhadoria/go-roman"
   packages = ["roman"]
   revision = "3deecbc03f4d887ed2716a1c346fea357c5e8054"
+
+[[projects]]
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  revision = "c155da19408a8799da419ed3eeb0cb5db0ad5dbc"
+  version = "v1.0.5"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
 
 [[projects]]
   branch = "master"
@@ -82,7 +142,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
+  packages = ["unix","windows"]
   revision = "7a4fde3fda8ef580a89dbae8138c26041be14299"
 
 [[projects]]
@@ -91,9 +151,27 @@
   packages = ["internal/gen","internal/tag","language","unicode/cldr"]
   revision = "836efe42bb4aa16aaa17b9c155d8813d336ed720"
 
+[[projects]]
+  name = "gopkg.in/fatih/set.v0"
+  packages = ["."]
+  revision = "57907de300222151a123d29255ed17f5ed43fad3"
+  version = "v0.1.0"
+
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
+[[projects]]
+  name = "mvdan.cc/xurls"
+  packages = ["."]
+  revision = "d315b61cf6727664f310fa87b3197e9faf2a8513"
+  version = "v1.1.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "67f414a74b8395b94b385f1f804f0880329f76d238ca281eda60aa03b07e389a"
+  inputs-digest = "d1e3fc244c3a1ef5dca9fb20ca2aab3bb83ffb3dbc21331b9b72499180f61d38"
   solver-name = "gps-cdcl"
   solver-version = 1
