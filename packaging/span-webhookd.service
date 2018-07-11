@@ -1,12 +1,12 @@
 [Unit]
 Description=GitLab webhook receiver for span SOLR index reviews.
-Documentation=man:span(1) http://www.github.com/miku/span Config at ~/.config/span/span.json
+Documentation=man:span(1) http://www.github.com/miku/span ~/.config/span/span.json
 After=network.target
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/root
+User=daemon
+WorkingDirectory=/tmp
 ExecStart=/usr/sbin/span-webhookd -logfile=/var/log/span-webhookd.log
 Restart=on-failure
 
