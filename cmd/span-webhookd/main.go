@@ -241,10 +241,12 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			ReviewConfigFile: path.Join(repo.Dir, "docs/review.yaml"),
 		}
 		IndexReviewQueue <- rr
+	case "":
+		log.Printf("X-Gitlab-Event not given or empty")
+		w.WriteHeader(http.StatusBadRequest)
 	default:
 		log.Printf("unregistered or invalid event kind: %s", gitlabEvent)
 		w.WriteHeader(http.StatusBadRequest)
-		return
 	}
 }
 
