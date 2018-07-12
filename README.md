@@ -6,6 +6,8 @@ tagging and quality assurance.
 
 The intermediate schema is a normalization vehicle, spec: https://github.com/ubleipzig/intermediateschema
 
+[![goodtables.io](https://goodtables.io/badge/github/miku/span.svg)](https://goodtables.io/github/miku/span)
+
 ----
 
 Install with
