@@ -32,7 +32,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// defaultConfig as baseline and documentation.
+// defaultConfig as baseline and documentation. Consider switching to
+// https://github.com/elastic/go-ucfg.
 var defaultConfig = `
 # Review configuration, refs #12756.
 #
