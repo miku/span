@@ -32,11 +32,11 @@ Pop records and apply ad-hoc fixes.
 
 Attach a label:
 
-  `soctl set -label DE-15 -q "issn:1234-5678"
+  `soctl attach -label DE-15 -q "issn:1234-5678"
 
 Detach labels from a record:
 
-  `soctl unset -label DE-* -q "source_id:123"
+  `soctl detach -label DE-* -q "source_id:123"
 
 
 
