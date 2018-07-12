@@ -1,18 +1,28 @@
 // span-webhookd can serve as a webhook receiver[1] for gitlab, refs #13499.
 //
-// We listen for push hooks to trigger index reviews.
+// We listen for push hooks to trigger index reviews via span-review.
 //
 // [1] https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#example-webhook-receiver
 //
-// Configuration (Redmine, Gitlab, Index) is expected in ~/.config/span/span.json.
+// Configuration (Redmine, Gitlab, Index), by default in
+// ~/.config/span/span.json. This config file is used both by span-webhookd and
+// span-review.
 //
 // {
 //    "gitlab.token": "g0d8gf0LKJWg89dsf8gd0gf9-YU",
 //    "whatislive.url": "http://example.com/whatislive",
 //    "redmine.baseurl": "https://projects.example.com",
-//    "redmine.apitoken": "badfb87ab7987daafbd9db"
+//    "redmine.apitoken": "badfb87ab7987daafbd9db",
+//    "port": 8080
 // }
-
+//
+// Some limitations:
+//
+// * By default, the server will listen on all interfaces, only the port number
+//   is configurable.
+// * There is no error reporting except in the logs.
+// * Exit code from spawned span-review is ignored.
+//
 package main
 
 import (
