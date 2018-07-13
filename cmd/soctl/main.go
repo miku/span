@@ -11,10 +11,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
+	"sync"
+	"time"
 
 	"github.com/miku/span/solrutil"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -24,12 +26,39 @@ var (
 	statusCommand = flag.NewFlagSet("status", flag.ExitOnError)
 	statusVerbose = statusCommand.Bool("v", false, "more verbose output")
 	statusServer  = statusCommand.String("server", "http://127.0.0.1:8983/solr/biblio", "solr server URL")
+	numWorkers    = statusCommand.Int("w", 16, "number of parallel queries")
 )
 
-// type QueryResult struct {
-// 	Response []byte
-// 	Err      error
-// }
+// Query parameters.
+type Query struct {
+	SourceID    string
+	Institution string
+}
+
+// Result of a query operation.
+type Result struct {
+	Query    Query
+	NumFound int64
+	Error    error
+}
+
+// queryWorkers runs queries against a given server, for now, just collect the number of results.
+func queryWorker(server string, queue chan Query, results chan Result, wg *sync.WaitGroup) {
+	defer wg.Done()
+	index := solrutil.Index{Server: server}
+	for query := range queue {
+		numFound, err := index.NumFound(fmt.Sprintf(`source_id:"%s" AND institution:"%s"`,
+			query.SourceID, query.Institution))
+		result := Result{
+			Query:    query,
+			NumFound: numFound,
+		}
+		if err != nil {
+			result.Error = err
+		}
+		results <- result
+	}
+}
 
 func main() {
 	if len(os.Args) == 1 {
@@ -65,6 +94,62 @@ func main() {
 				fmt.Printf("% 10s % 10s % 12d\n", isil, sid, numFound)
 			}
 		}
+	case "fs":
+		start := time.Now()
+
+		statusCommand.Parse(os.Args[2:])
+		index := solrutil.Index{Server: *statusServer}
+
+		queue := make(chan Query)
+		results := make(chan Result)
+		done := make(chan bool)
+
+		var wg sync.WaitGroup
+
+		f := func() {
+			for r := range results {
+				if r.Error != nil {
+					log.Fatal(r.Error)
+				}
+				if r.NumFound == 0 {
+					continue
+				}
+				fmt.Printf("% 20s % 10s % 12d\n", r.Query.Institution, r.Query.SourceID, r.NumFound)
+			}
+			done <- true
+		}
+
+		go f()
+
+		for i := 0; i < *numWorkers; i++ {
+			wg.Add(1)
+			go queryWorker(*statusServer, queue, results, &wg)
+		}
+
+		isils, err := index.Institutions()
+		if err != nil {
+			log.Fatal(err)
+		}
+		sids, err := index.SourceIdentifiers()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var counter = 2
+
+		for _, isil := range isils {
+			for _, sid := range sids {
+				queue <- Query{SourceID: sid, Institution: isil}
+				counter++
+			}
+		}
+
+		close(queue)
+		wg.Wait()
+		close(results)
+		<-done
+		qps := float64(counter) / time.Since(start).Seconds()
+		log.Printf("%d queries in %s with %0.2f qps", counter, time.Since(start), qps)
 	default:
 		log.Fatal("invalid subcommand")
 	}
