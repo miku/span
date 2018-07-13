@@ -10,6 +10,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -17,11 +18,18 @@ import (
 )
 
 var (
-	addCommand    = flag.NewFlagSet("add", flag.ExitOnError)
-	server        = addCommand.String("server", "http://127.0.0.1:8983/solr/biblio", "solr server URL")
+	addCommand = flag.NewFlagSet("add", flag.ExitOnError)
+	addServer  = addCommand.String("server", "http://127.0.0.1:8983/solr/biblio", "solr server URL")
+
 	statusCommand = flag.NewFlagSet("status", flag.ExitOnError)
 	statusVerbose = statusCommand.Bool("v", false, "more verbose output")
+	statusServer  = statusCommand.String("server", "http://127.0.0.1:8983/solr/biblio", "solr server URL")
 )
+
+// type QueryResult struct {
+// 	Response []byte
+// 	Err      error
+// }
 
 func main() {
 	if len(os.Args) == 1 {
@@ -30,10 +38,33 @@ func main() {
 	switch os.Args[1] {
 	case "add":
 		addCommand.Parse(os.Args[2:])
-		index := solrutil.Index{Server: *server}
+		index := solrutil.Index{Server: *addServer}
 		log.Println(index)
 	case "status", "st":
-		log.Println("index status")
+		statusCommand.Parse(os.Args[2:])
+		index := solrutil.Index{Server: *statusServer}
+
+		isils, err := index.Institutions()
+		if err != nil {
+			log.Fatal(err)
+		}
+		sids, err := index.SourceIdentifiers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, isil := range isils {
+			for _, sid := range sids {
+				numFound, err := index.NumFound(fmt.Sprintf(`source_id:"%s" AND institution:"%s"`, sid, isil))
+				if err != nil {
+					log.Fatal(err)
+				}
+				if numFound == 0 {
+					continue
+				}
+				// Use tabwriter.
+				fmt.Printf("% 10s % 10s % 12d\n", isil, sid, numFound)
+			}
+		}
 	default:
 		log.Fatal("invalid subcommand")
 	}
