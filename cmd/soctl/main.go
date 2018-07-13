@@ -83,7 +83,8 @@ func main() {
 		}
 		for _, isil := range isils {
 			for _, sid := range sids {
-				numFound, err := index.NumFound(fmt.Sprintf(`source_id:"%s" AND institution:"%s"`, sid, isil))
+				// https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
+				numFound, err := index.NumFound(fmt.Sprintf(`(source_id:"%s")^=1 AND (institution:"%s")^=1`, sid, isil))
 				if err != nil {
 					log.Fatal(err)
 				}
