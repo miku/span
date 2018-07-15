@@ -23,8 +23,6 @@ import (
 	"strings"
 
 	gzip "github.com/klauspost/pgzip"
-	"github.com/sirupsen/logrus"
-
 	"github.com/miku/clam"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/crossref"
@@ -120,7 +118,7 @@ func main() {
 		log.Debugf("excludes: %d", len(excludes))
 	}
 
-	log.WithFields(logrus.Fields{
+	log.WithFields(log.Fields{
 		"prefix":       "stage 1",
 		"input":        f.Name(),
 		"excludesFile": *excludeFile,
@@ -157,7 +155,7 @@ func main() {
 
 	p.BatchSize = *batchsize
 
-	log.WithFields(logrus.Fields{
+	log.WithFields(log.Fields{
 		"prefix":    "stage 1",
 		"batchsize": *batchsize,
 	}).Info("starting extraction")
@@ -178,7 +176,7 @@ func main() {
 	fastsort := `LC_ALL=C sort -S20%`
 	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
 
-	log.WithFields(logrus.Fields{
+	log.WithFields(log.Fields{
 		"prefix":    "stage 2",
 		"batchsize": *batchsize,
 	}).Info("identifying relevant records")
@@ -215,7 +213,7 @@ func main() {
 		filterline = tf.Name()
 	}
 
-	log.WithFields(logrus.Fields{
+	log.WithFields(log.Fields{
 		"prefix":     "stage 3",
 		"comp":       comp,
 		"decomp":     decomp,
