@@ -5,8 +5,8 @@ NAME
 ----
 
 span-import, span-tag, span-export, span-check, span-oa-filter,
-span-update-labels, span-crossref-snapshot, span-local-data, span-freeze - intermediate
-schema tools
+span-update-labels, span-crossref-snapshot, span-local-data, span-freeze,
+span-review, span-webhookd - intermediate schema and integration tools
 
 SYNOPSIS
 --------
@@ -29,6 +29,10 @@ SYNOPSIS
 
 `span-freeze` -o *file* < *file*
 
+`span-review` [`-server` *url*] [`-span-config` *file*] [`-c` *file*] [`-a`] [`-t`] [`-ticket` *number*]
+
+`span-webhookd` [`-addr` *hostport*] [`-logfile` *file*] [`repo-dir` *path*] [`-span-config` *file*] [`-token` *token*]
+
 DESCRIPTION
 -----------
 
@@ -48,8 +52,8 @@ OPTIONS
   Output format or file. `span-export`, `span-freeze`, `span-crossref-snapshot` only.
 
 `-c` *config-string* or *config-file*
-  Configuration string or path to configuration file. `span-tag` only. See
-  EXAMPLE for a CONFIGURATION FILE.
+  Configuration string or path to configuration file. `span-tag` example in
+  EXAMPLE for a CONFIGURATION FILE. `span-review` details in INDEX REVIEW.
 
 `-list`
   List support formats. `span-import`, `span-export` only.
@@ -89,6 +93,34 @@ OPTIONS
 
 `-z`
   Input is gzip compressed. `span-crossref-snapshot` only.
+
+`-addr` *hostport*
+  Hostport to listen on. `span-webhookd` only.
+
+`-logfile` *file*
+  Logfile to log to. `span-webhookd` only.
+
+`-repo-dir` *path*
+  Local repo clone. `span-webhookd` only.
+
+`-span-config` *path*
+  Path to span config. `span-review`, `span-webhookd` only.
+
+`-token` *token*
+  GitLab API token. `span-webhookd` only.
+
+`-a`
+  Emit ascii table. `span-review` only.
+
+`-t`
+  Emit textile table for redmine. `span-review` only.
+
+`-server` *url*
+  Location of SOLR, including scheme, host, port and core. `span-review` only.
+
+
+`-ticket` *id*
+  Post review results into a Redmine ticket. `span-review` only.
 
 `-h`
   Show usage.
@@ -241,6 +273,103 @@ temporary location and the configuration is modified accordingly before tagging
 starts.
 
   `span-tag -unfreeze frozen.zip < intermediate.file`
+
+INDEX REVIEWS
+-------------
+
+Since 0.1.241 it is possible to run slightly automated SOLR index reviews. The
+two tools are `span-review` for reviews and `span-webhookd` for automatically
+running a review on commits in GitLab. These tools are experimental and might
+change in the future.
+
+Start the webhook receiver:
+
+  `span-webhookd`
+
+Or use the service shipped with the distribution packages.
+
+  `servicectl span-webhookd start`
+
+The service requires `/var/log/span-webhhokd.log` to be writeable by `daemon`.
+
+The default port is 8080 (change this in SPAN CONFIG). The server listens on
+all interfaces. The default URL is: `http://0.0.0.0:8080/trigger`. Enter this
+URL in GitLab *settings/integrations*.
+
+The review file location is hardcoded at the moment, `docs/review.yaml`.
+Example config file:
+
+```
+# Review configuration, refs #12756.
+#
+# Proposed workflow:
+#
+# 1. Edit this file via GitLab at
+# https://git.sc.uni-leipzig.de/miku/span/blob/master/docs/review.yaml. Add,
+# edit or remove rules, update ticket number. If done, commit.
+# 2. A trigger will run an index review based on these rules.
+# 3. Find the results in your ticket, in case the ticket number was valid.
+
+# The solr server to query, including scheme, port and collection, e.g.
+# "http://localhost:8983/solr/biblio". If "auto", then the current testing solr
+# server will be figured out automatically.
+solr: "auto"
+
+# The ticket number of update. Set this to "NA" or anything non-numeric to
+# suppress ticket updates.
+ticket: "NA"
+
+# Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
+# contain only given values.
+allowed-keys:
+    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+    - ["source_id:30", "format_de15", "Book, eBook", "Article, E-Article"]
+    - ["source_id:48", "language", "German", "English"]
+    - ["source_id:49", "facet_avail", "Online", "Free"]
+    - ["source_id:55", "facet_avail", "Online", "Free"]
+
+# All records: [Query, Facet-Field, Value, ...] checks if all record contain
+# only the given values.
+all-records:
+    - ["source_id:28", "format", "ElectronicArticle"]
+    - ["source_id:28", "format_de15", "Article, E-Article"]
+    - ["source_id:28", "facet_avail", "Online", "Free"]
+    - ["source_id:28", "access_facet", "Electronic Resources"]
+    - ["source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"]
+    - ["source_id:28", "finc_class_facet", "not assigned"]
+    - ["source_id:30", "facet_avail", "Online", "Free"]
+    - ["source_id:30", "access_facet", "Electronic Resources"]
+    - ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
+
+# MinRatio: Query, Facet-Field, Value, Ratio (Percent), checks if the given
+# value appears in a given percentage of documents.
+min-ratio:
+    - ["source_id:49", "facet_avail", "Free", 0.8]
+    - ["source_id:55", "facet_avail", "Free", 2.2]
+    - ["source_id:105", "facet_avail", "Free", 0.5]
+
+# MinCount: Query, Facet-Field, Value, Min Count. Checks, if the given value
+# appears at least a fixed number of times.
+min-count:
+    - ["source_id:89", "facet_avail", "Free", 50]
+```
+
+SPAN CONFIG
+-----------
+
+The span config file is used by `span-review` and `span-webhookd`, since they
+access various external systems: SOLR, Redmine, GitLab, Nginx. Default location
+is `~/.config/span/span.json`.
+
+```
+{
+  "gitlab.token": "adszuDZZ778sdsiuDsd-R4",
+  "whatislive.url": "http://example.com/whatislive",
+  "redmine.baseurl": "https://projects.example.com",
+  "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e",
+  "port": 8080
+}
+```
 
 FILES
 -----
