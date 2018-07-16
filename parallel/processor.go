@@ -1,4 +1,26 @@
-// Package parallel implements helpers for fast processing of line oriented inputs.
+// Package parallel implements helpers for fast processing of line oriented
+// inputs. Basic usage example:
+//
+//     r := strings.NewReader("1\n2\n3\n")
+//     f := func(ln int, b []byte) ([]byte, error) {
+//         result := fmt.Sprintf("#%d %s", ln, string(b))
+//         return []byte(result), nil
+//     }
+//
+//     p := parallel.NewProcessor(r, os.Stdout, f)
+//     if err := p.Run(); err != nil {
+//         log.Fatal(err)
+//     }
+//
+// This would print out:
+//
+//     #0 1
+//     #1 2
+//     #2 3
+//
+// Note that the order of the input is not guaranteed to be preserved. If you
+// care about the exact position, utilize the originating line number passed
+// into the transforming function.
 package parallel
 
 import (
@@ -8,9 +30,6 @@ import (
 	"runtime"
 	"sync"
 )
-
-// Version of library.
-const Version = "0.1.0"
 
 // Record groups a value and a corresponding line number.
 type Record struct {
@@ -72,7 +91,8 @@ type Processor struct {
 	f               TransformerFunc
 }
 
-// NewProcessor creates a new line processor.
+// NewProcessor creates a new line processor, which reads lines from a reader,
+// applies a function and writes results back to a writer.
 func NewProcessor(r io.Reader, w io.Writer, f TransformerFunc) *Processor {
 	return &Processor{
 		BatchSize:       10000,
@@ -100,7 +120,7 @@ func (p *Processor) Run() error {
 	// about synchronisation.
 	var wErr error
 
-	// worker takes []byte batches from a channel queue, executes f and sends the result to the out channel.
+	// The worker fetches items from a queue, executes f and sends the result to the out channel.
 	worker := func(queue chan []Record, out chan []byte, f TransformerFunc, wg *sync.WaitGroup) {
 		defer wg.Done()
 		for batch := range queue {
@@ -114,7 +134,7 @@ func (p *Processor) Run() error {
 		}
 	}
 
-	// writer buffers writes.
+	// The writer collects and buffers writes.
 	writer := func(w io.Writer, bc chan []byte, done chan bool) {
 		bw := bufio.NewWriter(w)
 		for b := range bc {
