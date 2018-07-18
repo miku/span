@@ -116,6 +116,9 @@ func (r Repo) String() string {
 // fast forward. If repo does not exist yet, clone.
 func (r Repo) Update() error {
 	log.Printf("updating %s", r)
+	if r.Token == "" {
+		log.Println("warning: not gitlab.token found, checkout might fail")
+	}
 	if _, err := os.Stat(path.Dir(r.Dir)); os.IsNotExist(err) {
 		if err := os.MkdirAll(path.Dir(r.Dir), 0755); err != nil {
 			return err
@@ -130,7 +133,8 @@ func (r Repo) Update() error {
 	} else {
 		cmd, args = "git", []string{"-C", r.Dir, "pull", "origin", "master"}
 	}
-	log.Printf("[cmd] %s %s", cmd, strings.Replace(strings.Join(args, " "), r.Token, "xxxxxxxx", -1))
+	// XXX: black out token.
+	log.Printf("[cmd] %s %s", cmd, args)
 	return exec.Command(cmd, args...).Run()
 }
 
