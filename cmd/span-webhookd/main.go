@@ -344,6 +344,10 @@ func findConfiguredPort() int {
 func main() {
 	flag.Parse()
 
+	log.Println(banner)
+	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
+		span.AppVersion, *addr)
+
 	if *logfile != "" {
 		f, err := os.OpenFile(*logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
@@ -372,10 +376,6 @@ func main() {
 	r.HandleFunc("/", HomeHandler)
 	r.HandleFunc("/trigger", HookHandler)
 	http.Handle("/", r)
-
-	log.Println(banner)
-	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
-		span.AppVersion, *addr)
 
 	port, err := parsePort(*addr)
 	if err != nil {
