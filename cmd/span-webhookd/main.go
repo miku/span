@@ -134,7 +134,7 @@ func (r Repo) Update() error {
 		cmd, args = "git", []string{"-C", r.Dir, "pull", "origin", "master"}
 	}
 	// XXX: black out token.
-	log.Printf("[cmd] %s %s", cmd, args)
+	log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
 	return exec.Command(cmd, args...).Run()
 }
 
