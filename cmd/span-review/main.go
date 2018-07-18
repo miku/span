@@ -488,6 +488,14 @@ func main() {
 			os.Exit(0)
 		}
 
+		// Fallback configuration, since daemon home is /usr/sbin.
+		if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+			*spanConfigFile = "/etc/span/span.json"
+		}
+		if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+			log.Printf("warning: no span config file found, thing might break")
+		}
+
 		f, err := os.Open(*spanConfigFile)
 		if err != nil {
 			log.Printf("failed to open span config: %s", err)
