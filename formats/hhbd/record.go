@@ -209,6 +209,8 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Languages = append(output.Languages, tlc)
 	}
 
+	output.OpenAccess = true
+
 	// Publishers.
 	for _, p := range record.Metadata.Dc.Spatial {
 		output.Publishers = append(output.Publishers, p.Text)
