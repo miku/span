@@ -117,7 +117,7 @@ func (r Repo) String() string {
 func (r Repo) Update() error {
 	log.Printf("updating %s", r)
 	if r.Token == "" {
-		log.Println("warning: not gitlab.token found, checkout might fail")
+		log.Printf("warning: not gitlab.token found, checkout might fail (%s)", *spanConfigFile)
 	}
 	if _, err := os.Stat(path.Dir(r.Dir)); os.IsNotExist(err) {
 		if err := os.MkdirAll(path.Dir(r.Dir), 0755); err != nil {
@@ -353,6 +353,15 @@ func main() {
 		log.SetOutput(f)
 	}
 
+	// Fallback configuration, since daemon home is /usr/sbin.
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		*spanConfigFile = "/etc/span/span.json"
+	}
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		log.Fatal("no configuration found, put one into /etc/span/span.json")
+	}
+	log.Printf("using fallback configuration from %s", *spanConfigFile)
+
 	var err error
 
 	if *token == "" {
@@ -367,12 +376,6 @@ func main() {
 	log.Println(banner)
 	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
 		span.AppVersion, *addr)
-
-	// Fallback configuration, since daemon home is /usr/sbin.
-	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		*spanConfigFile = "/etc/span/span.json"
-	}
-	log.Printf("using configuration from %s", *spanConfigFile)
 
 	port, err := parsePort(*addr)
 	if err != nil {
