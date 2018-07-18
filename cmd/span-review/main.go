@@ -347,6 +347,12 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
+		// Be a bit more flexible and handle the default admin interface URL,
+		// e.g. http://example.com/solr/#/biblio, as well.
+		if strings.Contains(config.SolrServer, "/#/") {
+			log.Printf("adjusting SOLR admin URL %s", config.SolrServer)
+			config.SolrServer = strings.Replace(config.SolrServer, "/#", "", -1)
+		}
 		solrServer = config.SolrServer
 	}
 	if *server != "" {

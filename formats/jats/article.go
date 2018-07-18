@@ -466,6 +466,13 @@ func (article *Article) Languages() []string {
 	return set.Values()
 }
 
+func clipString(s string, length int) string {
+	if len(s) < length {
+		return s
+	}
+	return s[:length] + "..."
+}
+
 // ToInternalSchema converts a jats article into an internal schema.
 // This is a basic implementation, different source might implement their own.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
@@ -474,10 +481,13 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Date = article.Date()
 	output.RawDate = output.Date.Format("2006-01-02")
 
-	output.Abstract = string(article.Front.Article.Abstract.Value)
+	output.Abstract = strings.TrimSpace(string(article.Front.Article.Abstract.Value))
 	output.ArticleTitle = article.CombinedTitle()
 	output.Authors = article.Authors()
-	output.Fulltext = article.Body.Section.Value
+	output.Fulltext = strings.TrimSpace(article.Body.Section.Value)
+	if output.Abstract == "" && output.Fulltext != "" {
+		output.Abstract = clipString(output.Fulltext, 200)
+	}
 	output.Genre = "article"
 	output.RefType = "EJOUR"
 	output.Headings = article.Headings()
