@@ -345,8 +345,6 @@ func main() {
 	flag.Parse()
 
 	log.Println(banner)
-	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
-		span.AppVersion, *addr)
 
 	if *logfile != "" {
 		f, err := os.OpenFile(*logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -356,6 +354,9 @@ func main() {
 		defer f.Close()
 		log.SetOutput(f)
 	}
+
+	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
+		span.AppVersion, *addr)
 
 	// Fallback configuration, since daemon home is /usr/sbin.
 	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
