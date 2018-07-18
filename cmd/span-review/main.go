@@ -555,7 +555,7 @@ func main() {
 			log.Fatal(err)
 		}
 		if len(b) == 0 {
-			log.Printf("got empty response from redmine [%d]")
+			log.Printf("got empty response from redmine [%d]", resp.StatusCode)
 		} else {
 			log.Printf("redmine response [%d] (%db): %s", resp.StatusCode, len(b), string(b))
 		}
