@@ -223,7 +223,8 @@ func (doc *Document) ShortTitle() (s string) {
 	return
 }
 
-// ToIntermediateSchema converts a crossref document into IS.
+// ToIntermediateSchema converts a crossref document into IS. XXX: Use a
+// canonical publisher, based on doi prefix, /cc @ad.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
 	output := finc.NewIntermediateSchema()
