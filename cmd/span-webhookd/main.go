@@ -368,6 +368,12 @@ func main() {
 	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
 		span.AppVersion, *addr)
 
+	// Fallback configuration, since daemon home is /usr/sbin.
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		*spanConfigFile = "/etc/span/span.json"
+	}
+	log.Printf("using configuration from %s", *spanConfigFile)
+
 	port, err := parsePort(*addr)
 	if err != nil {
 		log.Fatal(err)
