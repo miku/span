@@ -5,8 +5,8 @@
 // [1] https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#example-webhook-receiver
 //
 // Configuration (Redmine, Gitlab, Index), by default in
-// ~/.config/span/span.json. This config file is used both by span-webhookd and
-// span-review.
+// ~/.config/span/span.json, fallback at /etc/span/span.json. This config file
+// is used both by span-webhookd and span-review.
 //
 // {
 //    "gitlab.token": "g0d8gf0LKJWg89dsf8gd0gf9-YU",
