@@ -353,7 +353,8 @@ min\-count:
 .PP
 The span config file is used by \fB\fCspan\-review\fR and \fB\fCspan\-webhookd\fR, since they
 access various external systems: SOLR, Redmine, GitLab, Nginx. Default location
-is \fB\fC~/.config/span/span.json\fR\&.
+is \fB\fC~/.config/span/span.json\fR, with \fB\fC/etc/span/span.json\fR as fallback. The
+\fB\fCspan\-webhookd\fR service will not start, if no config file can be found.
 .PP
 .RS
 .nf

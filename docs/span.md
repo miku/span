@@ -118,7 +118,6 @@ OPTIONS
 `-server` *url*
   Location of SOLR, including scheme, host, port and core. `span-review` only.
 
-
 `-ticket` *id*
   Post review results into a Redmine ticket. `span-review` only.
 
@@ -359,7 +358,8 @@ SPAN CONFIG
 
 The span config file is used by `span-review` and `span-webhookd`, since they
 access various external systems: SOLR, Redmine, GitLab, Nginx. Default location
-is `~/.config/span/span.json`.
+is `~/.config/span/span.json`, with `/etc/span/span.json` as fallback. The
+`span-webhookd` service will not start, if no config file can be found.
 
 ```
 {
