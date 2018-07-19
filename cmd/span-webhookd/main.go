@@ -225,6 +225,8 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("request completed after %s", time.Since(started))
 	}()
 
+	log.Printf("request from %s (X-FF: %s)", r.RemoteAddr, r.Header.Get("X-FORWARDED-FOR"))
+
 	gitlabEvent := strings.TrimSpace(r.Header.Get("X-Gitlab-Event"))
 	switch gitlabEvent {
 	case "Push Hook":
