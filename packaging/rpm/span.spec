@@ -9,8 +9,6 @@ Group:      System/Base
 Vendor:     Leipzig University Library, https://www.ub.uni-leipzig.de
 URL:        https://github.com/miku/span
 
-%_buildshell /bin/bash
-
 %description
 
 Library data tools.
@@ -45,7 +43,6 @@ install -m 644 span-webhookd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/span
 
 mkdir -p $RPM_BUILD_ROOT/var/log
 touch $RPM_BUILD_ROOT/var/log/span-webhookd.log
-[[ $(id -u daemon) ]] && chown daemon.daemon $RPM_BUILD_ROOT/var/log/span-webhookd.log
 
 %post
 
@@ -71,6 +68,8 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-webhookd
 /usr/local/share/man/man1/span.1
 /usr/lib/systemd/system/span-webhookd.service
+
+%attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
 %changelog
 

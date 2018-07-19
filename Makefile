@@ -34,7 +34,7 @@ cover:
 all: assets deps $(TARGETS)
 
 $(TARGETS): %: cmd/%/main.go
-	go build -o $@ $<
+	go build -ldflags=-linkmode=external -o $@ $<
 
 clean:
 	rm -f $(TARGETS)
