@@ -207,6 +207,7 @@ var (
 	whatIsLive       = flag.Bool("e", false, "use whatislive.url to determine live and non live servers")
 	liveLinkTemplate = flag.String("tl", "https://katalog.ub.uni-leipzig.de/Search/Results?lookfor=source_id:{{.}}",
 		"live link template for source (for focus institution)")
+	// XXX: Probably shard not configured?
 	nonliveLinkTemplate = flag.String("tn", "https://staging.finc.info/vufind2/de_15/Search/Results?lookfor=source_id:{{.}}&shard[]=ai-nonlive",
 		"nonlive link template for source (for focus institution)")
 	spanConfigFile   = flag.String("span-config", defaultConfigPath, "for whatislive.url")
