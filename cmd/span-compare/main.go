@@ -205,10 +205,10 @@ var (
 	liveServer       = flag.String("a", "http://localhost:8983/solr/biblio", "live server location")
 	nonliveServer    = flag.String("b", "http://localhost:8983/solr/biblio", "non-live server location")
 	whatIsLive       = flag.Bool("e", false, "use whatislive.url to determine live and non live servers")
-	liveLinkTemplate = flag.String("tl", "https://katalog.ub.uni-leipzig.de/Search/Results?lookfor=source_id:{{.}}",
+	liveLinkTemplate = flag.String("tl", "https://katalog.ub.uni-leipzig.de/Search/Results?lookfor=source_id:{{ .SourceID }}",
 		"live link template for source (for focus institution)")
 	// XXX: Probably shard not configured?
-	nonliveLinkTemplate = flag.String("tn", "https://staging.finc.info/vufind2/de_15/Search/Results?lookfor=source_id:{{.}}&shard[]=ai-nonlive",
+	nonliveLinkTemplate = flag.String("tn", "https://alpha.finc.info/vufind2/de_15/12441/Search/Results?lookfor=source_id:{{ .SourceID }}+AND+institution:{{ .Institution }}&shard[]=ai-nonlive",
 		"nonlive link template for source (for focus institution)")
 	spanConfigFile   = flag.String("span-config", defaultConfigPath, "for whatislive.url")
 	textile          = flag.Bool("t", false, "emit textile")
@@ -303,13 +303,13 @@ func prependHTTP(s string) string {
 }
 
 // renderSourceLink renders a textile link to a source, with the given link text.
-func renderSourceLink(tmpl, sourceIdentifier, text string) (string, error) {
+func renderSourceLink(tmpl string, data interface{}, text string) (string, error) {
 	t, err := template.New("t").Parse(tmpl)
 	if err != nil {
 		return "", err
 	}
 	var buf bytes.Buffer
-	if err := t.Execute(&buf, sourceIdentifier); err != nil {
+	if err := t.Execute(&buf, data); err != nil {
 		return "", err
 	}
 	return fmt.Sprintf(`"%s":%s`, text, buf.String()), nil
@@ -398,12 +398,27 @@ func main() {
 			var liveField = fmt.Sprintf("%d", numLive)
 			var nonliveField = fmt.Sprintf("%d", numNonlive)
 
-			if *textile && institution == *focusInstitution {
-				liveField, err = renderSourceLink(*liveLinkTemplate, sid, fmt.Sprintf("%d", numLive))
-				if err != nil {
-					log.Fatal(err)
+			if *textile {
+				data := struct {
+					SourceID    string
+					Institution string
+				}{
+					sid,
+					institution,
 				}
-				nonliveField, err = renderSourceLink(*nonliveLinkTemplate, sid, fmt.Sprintf("%d", numNonlive))
+				// XXX: Put all live link templates into a configaration file (or scrape from wiki).
+				if institution == *focusInstitution {
+					liveField, err = renderSourceLink(*liveLinkTemplate, data, fmt.Sprintf("%d", numLive))
+					if err != nil {
+						log.Fatal(err)
+					}
+				} else {
+					liveField, err = renderSourceLink(*nonliveLinkTemplate, data, fmt.Sprintf("%d", numLive))
+					if err != nil {
+						log.Fatal(err)
+					}
+				}
+				nonliveField, err = renderSourceLink(*nonliveLinkTemplate, data, fmt.Sprintf("%d", numNonlive))
 				if err != nil {
 					log.Fatal(err)
 				}
