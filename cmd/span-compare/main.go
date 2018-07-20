@@ -20,7 +20,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 	"sort"
@@ -29,6 +28,8 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // SourceNames generated from wiki via https://git.io/f4Qyi.
