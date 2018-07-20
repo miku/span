@@ -12,12 +12,12 @@
 # The solr server to query, including scheme, port and core/collection, e.g.
 # "http://localhost:8983/solr/biblio". If "auto", then the current testing "ai" solr
 # server will be figured out automatically.
-# solr: "auto"
-solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
+solr: "auto"
+# solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "13622"
+ticket: "13684"
 
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
