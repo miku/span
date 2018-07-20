@@ -19,8 +19,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"path"
 	"strings"
 
+	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
 )
 
@@ -196,6 +199,10 @@ var (
 		"live server location")
 	nonliveServer = flag.String("b", "http://localhost:8983/solr/biblio",
 		"non-live server location")
+	whatIsLive = flag.Bool("e", false,
+		"use whatislive.url from config to determine live and non live servers")
+	spanConfigFile = flag.String("span-config",
+		path.Join(span.UserHomeDir(), ".config/span/span.json"), "whatislive location")
 )
 
 // prependHTTP prepends http, if necessary.
@@ -208,6 +215,28 @@ func prependHTTP(s string) string {
 
 func main() {
 	flag.Parse()
+
+	if *whatIsLive {
+		// Fallback configuration.
+		if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+			*spanConfigFile = "/etc/span/span.json"
+		}
+		if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+			log.Fatal(err)
+		}
+
+		var err error
+
+		*liveServer, err = solrutil.FindLiveSolrServer(*spanConfigFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		*nonliveServer, err = solrutil.FindNonliveSolrServer(*spanConfigFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("live=%s, nonlive=%s", *liveServer, *nonliveServer)
+	}
 
 	live := solrutil.Index{Server: prependHTTP(*liveServer)}
 	nonlive := solrutil.Index{Server: prependHTTP(*nonliveServer)}

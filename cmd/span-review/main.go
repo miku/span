@@ -20,7 +20,6 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -161,7 +160,7 @@ var (
 	textile        = flag.Bool("t", false, "emit a textile table to stdout")
 	ascii          = flag.Bool("a", false, "emit ascii table to stdout")
 	configFile     = flag.String("c", "", "path to review.yaml config file")
-	spanConfigFile = flag.String("span-config", path.Join(UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
 )
 
@@ -258,18 +257,6 @@ func ErrorOrComment(err error, message string) string {
 	return message
 }
 
-// UserHomeDir returns the home directory of the user.
-func UserHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
-}
-
 // findTestingSolrServer tries to find the URL of the current testing solr.
 // There might be different way to retrieve a useable URL (configuration,
 // probes). For now we use a separate configuration file, that contains the URL
@@ -342,7 +329,7 @@ func main() {
 	var err error
 
 	if strings.ToLower(config.SolrServer) == "auto" {
-		solrServer, err = findTestingSolrServer()
+		solrServer, err = solrutil.FindNonliveSolrServer(*spanConfigFile)
 		if err != nil {
 			log.Fatal(err)
 		}

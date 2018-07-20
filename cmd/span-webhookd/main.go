@@ -36,7 +36,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"path"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -53,7 +52,7 @@ var (
 	token          = flag.String("token", "", "gitlab auth token, if empty will use span-config")
 	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	logfile        = flag.String("logfile", "", "log to file")
-	spanConfigFile = flag.String("span-config", path.Join(UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	banner         = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
@@ -278,18 +277,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-}
-
-// UserHomeDir returns the home directory of the user. XXX: Factor this out.
-func UserHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
 }
 
 func parsePort(addr string) (int, error) {
