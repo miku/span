@@ -17,7 +17,7 @@ solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "13622"
+ticket: "13684"
 
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
