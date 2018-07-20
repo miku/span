@@ -29,7 +29,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -290,14 +289,11 @@ func parsePort(addr string) (int, error) {
 // findGitlabToken returns the GitLab auth token, if configured.
 func findGitlabToken() (string, error) {
 	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		if err := os.MkdirAll(path.Dir(*spanConfigFile), 0755); err != nil {
+		// XXX: Use a real config framework, not these hacks.
+		*spanConfigFile = "/etc/span/span.json"
+		if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
 			return "", err
 		}
-		data := []byte(`{"gitlab.token": "xxx"}`)
-		if err := ioutil.WriteFile(*spanConfigFile, data, 0600); err != nil {
-			return "", err
-		}
-		return "", fmt.Errorf("created new config file, please adjust: %s", *spanConfigFile)
 	}
 	f, err := os.Open(*spanConfigFile)
 	if err != nil {
@@ -354,6 +350,7 @@ func main() {
 	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
 		*spanConfigFile = "/etc/span/span.json"
 	}
+	// XXX: Use a real framework like go-ucfg or globalconf.
 	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
 		log.Fatal("no configuration found, put one into /etc/span/span.json")
 	}
