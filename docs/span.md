@@ -318,6 +318,10 @@ solr: "auto"
 # suppress ticket updates.
 ticket: "NA"
 
+# If set to "fail" an empty result set will be marked as failure.
+# Otherwise a empty result set will - most of the time - not be considered a violoation.
+zero-results-policy: "fail"
+
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
 allowed-keys:
@@ -382,6 +386,8 @@ DIAGNOSTICS
 -----------
 
 Any error (like faulty JSON, IO errors, ...) will lead to an immediate halt.
+The packages might contain executables in test, that are not mentioned at all
+in this man page.
 
 To debug a holdings filter, set `verbose` to `true` to see rejected records and rejection reason:
 
