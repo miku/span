@@ -10,3 +10,6 @@ WorkingDirectory=/tmp
 ExecStart=/usr/sbin/span-webhookd -logfile=/var/log/span-webhookd.log
 Restart=on-failure
 
+[Install]
+WantedBy=multi-user.target
+
