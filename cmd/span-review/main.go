@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"regexp"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -257,54 +256,17 @@ func ErrorOrComment(err error, message string) string {
 	return message
 }
 
-// findTestingSolrServer tries to find the URL of the current testing solr.
-// There might be different way to retrieve a useable URL (configuration,
-// probes). For now we use a separate configuration file, that contains the URL
-// to the nginx snippet.
-func findTestingSolrServer() (string, error) {
-	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		if err := os.MkdirAll(path.Dir(*spanConfigFile), 0755); err != nil {
-			return "", err
-		}
-		data := []byte(`{"whatislive.url": "xxx"}`)
-		if err := ioutil.WriteFile(*spanConfigFile, data, 0600); err != nil {
-			return "", err
-		}
-		return "", fmt.Errorf("created new config file, please adjust: %s", *spanConfigFile)
-	}
-	log.Printf("using span config at %s", *spanConfigFile)
-	f, err := os.Open(*spanConfigFile)
-	if err != nil {
-		return "", err
-	}
-	var conf struct {
-		WhatIsLiveURL string `json:"whatislive.url"`
-	}
-	if err := json.NewDecoder(f).Decode(&conf); err != nil {
-		return "", err
-	}
-	log.Printf("querying [%s] for solr location", conf.WhatIsLiveURL)
-	resp, err := http.Get(conf.WhatIsLiveURL)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	// Find hostport in nginx snippet: upstream solr_nonlive { server 10.1.1.10:8080; }.
-	p := `(?m)upstream[\s]*solr_nonlive[\s]*{[\s]*server[\s]*([0-9:.]*)[\s]*;[\s]*}`
-	matches := regexp.MustCompile(p).FindSubmatch(b)
-	if matches == nil || len(matches) != 2 {
-		return "", fmt.Errorf("cannot find solr server URL in nginx snippet: %s", string(b))
-	}
-	solrServer := fmt.Sprintf("%s/solr/biblio", string(matches[1]))
-	return solrServer, nil
-}
-
 func main() {
 	flag.Parse()
+
+	// Fallback configuration, since daemon home is /usr/sbin.
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		*spanConfigFile = "/etc/span/span.json"
+	}
+	// XXX: Use a real framework like go-ucfg or globalconf.
+	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
+		log.Fatal("no configuration found, put one into /etc/span/span.json")
+	}
 
 	// Read review configuration.
 	var configReader io.Reader
