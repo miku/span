@@ -22,6 +22,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/miku/span"
@@ -204,7 +205,8 @@ var (
 		"use whatislive.url from config to determine live and non live servers")
 	spanConfigFile = flag.String("span-config",
 		path.Join(span.UserHomeDir(), ".config/span/span.json"), "whatislive location")
-	textile = flag.Bool("t", false, "emit textile")
+	textile              = flag.Bool("t", false, "emit textile")
+	emphasizeInstitution = flag.String("emph", "DE-15", "emphasize institution in textile output")
 )
 
 // ResultWriter for report generator.
@@ -326,10 +328,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	sort.Strings(sids)
+
 	institutions, err := nonlive.Institutions()
 	if err != nil {
 		log.Fatal(err)
 	}
+	sort.Strings(institutions)
 
 	var rw ResultWriter
 	switch {
@@ -363,7 +368,12 @@ func main() {
 			if !ok {
 				name = "XXX: missing source name"
 			}
-			rw.WriteFields(institution, sid, name, numLive, numNonlive, numNonlive-numLive, "")
+
+			var inst = institution
+			if *textile && *emphasizeInstitution == institution {
+				inst = fmt.Sprintf("*%s*", institution)
+			}
+			rw.WriteFields(inst, sid, name, numLive, numNonlive, numNonlive-numLive, "")
 			if rw.Err() != nil {
 				log.Fatal(rw.Err())
 			}
