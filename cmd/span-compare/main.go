@@ -16,6 +16,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -24,6 +25,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
@@ -196,17 +198,19 @@ var SourceNames = map[string]string{
 	"200": "finc TEST",
 }
 
+var defaultConfigPath = path.Join(span.UserHomeDir(), ".config/span/span.json")
+
 var (
-	liveServer = flag.String("a", "http://localhost:8983/solr/biblio",
-		"live server location")
-	nonliveServer = flag.String("b", "http://localhost:8983/solr/biblio",
-		"non-live server location")
-	whatIsLive = flag.Bool("e", false,
-		"use whatislive.url from config to determine live and non live servers")
-	spanConfigFile = flag.String("span-config",
-		path.Join(span.UserHomeDir(), ".config/span/span.json"), "whatislive location")
-	textile              = flag.Bool("t", false, "emit textile")
-	emphasizeInstitution = flag.String("emph", "DE-15", "emphasize institution in textile output")
+	liveServer       = flag.String("a", "http://localhost:8983/solr/biblio", "live server location")
+	nonliveServer    = flag.String("b", "http://localhost:8983/solr/biblio", "non-live server location")
+	whatIsLive       = flag.Bool("e", false, "use whatislive.url to determine live and non live servers")
+	liveLinkTemplate = flag.String("tl", "https://katalog.ub.uni-leipzig.de/Search/Results?lookfor=source_id:{{.}}",
+		"live link template for source (for focus institution)")
+	nonliveLinkTemplate = flag.String("tn", "https://staging.finc.info/vufind2/de_15/Search/Results?lookfor=source_id:{{.}}&shard[]=ai-nonlive",
+		"nonlive link template for source (for focus institution)")
+	spanConfigFile   = flag.String("span-config", defaultConfigPath, "for whatislive.url")
+	textile          = flag.Bool("t", false, "emit textile")
+	focusInstitution = flag.String("emph", "DE-15", "emphasize institution in textile output")
 )
 
 // ResultWriter for report generator.
@@ -296,6 +300,19 @@ func prependHTTP(s string) string {
 	return s
 }
 
+// renderSourceLink renders a textile link to a source, with the given link text.
+func renderSourceLink(tmpl, sourceIdentifier, text string) (string, error) {
+	t, err := template.New("t").Parse(tmpl)
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, sourceIdentifier); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf(`"%s":%s`, text, buf.String()), nil
+}
+
 func main() {
 	flag.Parse()
 
@@ -369,11 +386,28 @@ func main() {
 				name = "XXX: missing source name"
 			}
 
-			var inst = institution
-			if *textile && *emphasizeInstitution == institution {
-				inst = fmt.Sprintf("*%s*", institution)
+			// Emphasize focussed institution.
+			var renderInstitution = institution
+			if *textile && institution == *focusInstitution {
+				renderInstitution = fmt.Sprintf("*%s*", institution)
 			}
-			rw.WriteFields(inst, sid, name, numLive, numNonlive, numNonlive-numLive, "")
+
+			// Fields with links.
+			var liveField = fmt.Sprintf("%d", numLive)
+			var nonliveField = fmt.Sprintf("%d", numNonlive)
+
+			if *textile && institution == *focusInstitution {
+				liveField, err = renderSourceLink(*liveLinkTemplate, sid, fmt.Sprintf("%d", numLive))
+				if err != nil {
+					log.Fatal(err)
+				}
+				nonliveField, err = renderSourceLink(*nonliveLinkTemplate, sid, fmt.Sprintf("%d", numNonlive))
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
+			rw.WriteFields(renderInstitution, sid, name, liveField, nonliveField, numNonlive-numLive, "")
 			if rw.Err() != nil {
 				log.Fatal(rw.Err())
 			}
