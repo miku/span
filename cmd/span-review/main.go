@@ -173,12 +173,13 @@ func prependHTTP(s string) string {
 
 // ReviewConfig contains various index review cases.
 type ReviewConfig struct {
-	SolrServer  string     `yaml:"solr"`
-	Ticket      string     `yaml:"ticket"`
-	AllowedKeys [][]string `yaml:"allowed-keys"`
-	AllRecords  [][]string `yaml:"all-records"`
-	MinRatio    [][]string `yaml:"min-ratio"`
-	MinCount    [][]string `yaml:"min-count"`
+	SolrServer        string     `yaml:"solr"`
+	Ticket            string     `yaml:"ticket"`
+	ZeroResultsPolicy string     `yaml:"zero-results-policy"`
+	AllowedKeys       [][]string `yaml:"allowed-keys"`
+	AllRecords        [][]string `yaml:"all-records"`
+	MinRatio          [][]string `yaml:"min-ratio"`
+	MinCount          [][]string `yaml:"min-count"`
 }
 
 // Result represents a single result row.
@@ -326,12 +327,20 @@ func main() {
 		if err = index.AllowedKeys(query, field, values...); err != nil {
 			log.Println(err)
 		}
+		numFound, err := index.NumFound(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+		passed := err == nil
+		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
+			passed = false
+		}
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
 			SolrField:        field,
 			FixedResult:      true,
-			Passed:           err == nil,
+			Passed:           passed,
 			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", query, field, values)),
 		})
 	}
@@ -346,12 +355,20 @@ func main() {
 		if err = index.EqualSizeTotal(query, field, values...); err != nil {
 			log.Println(err)
 		}
+		numFound, err := index.NumFound(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+		passed := err == nil
+		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
+			passed = false
+		}
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
 			SolrField:        field,
 			FixedResult:      true,
-			Passed:           err == nil,
+			Passed:           passed,
 			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", query, field, values)),
 		})
 	}
@@ -369,12 +386,20 @@ func main() {
 		if err = index.MinRatioPct(query, field, value, minRatioPct); err != nil {
 			log.Println(err)
 		}
+		numFound, err := index.NumFound(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+		passed := err == nil
+		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
+			passed = false
+		}
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
 			SolrField:        field,
 			FixedResult:      true,
-			Passed:           err == nil,
+			Passed:           passed,
 			Comment: ErrorOrComment(err, fmt.Sprintf("%s %s %s %0.4f",
 				query, field, value, minRatioPct)),
 		})
@@ -393,12 +418,20 @@ func main() {
 		if err = index.MinCount(query, field, value, minCount); err != nil {
 			log.Println(err)
 		}
+		numFound, err := index.NumFound(query)
+		if err != nil {
+			log.Fatal(err)
+		}
+		passed := err == nil
+		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
+			passed = false
+		}
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
 			SolrField:        field,
 			FixedResult:      true,
-			Passed:           err == nil,
+			Passed:           passed,
 			Comment: ErrorOrComment(err, fmt.Sprintf("%s %s %s %d",
 				query, field, value, minCount)),
 		})
