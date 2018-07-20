@@ -18,6 +18,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -203,7 +204,87 @@ var (
 		"use whatislive.url from config to determine live and non live servers")
 	spanConfigFile = flag.String("span-config",
 		path.Join(span.UserHomeDir(), ".config/span/span.json"), "whatislive location")
+	textile = flag.Bool("t", false, "emit textile")
 )
+
+// ResultWriter for report generator.
+type ResultWriter interface {
+	WriteHeader(...string)
+	WriteFields(...interface{})
+	Err() error
+}
+
+// TabWriter is the simplest writer.
+type TabWriter struct {
+	w   io.Writer
+	err error
+}
+
+func (w *TabWriter) WriteHeader(header ...string) {}
+func (w *TabWriter) WriteFields(fields ...interface{}) {
+	var s []string
+	for _, f := range fields {
+		s = append(s, fmt.Sprintf("%s", f))
+	}
+	_, w.err = fmt.Fprintf(w.w, "%s\n", strings.Join(s, "\t"))
+}
+func (w *TabWriter) Err() error {
+	return w.err
+}
+
+// TextileWriter allows to writer textile tables.
+type TextileWriter struct {
+	w       io.Writer
+	columns int
+	err     error
+}
+
+// Err returns any error that happened.
+func (w *TextileWriter) Err() error {
+	return w.err
+}
+
+// WriteHeader write a header and fixes the number of columns.
+func (w *TextileWriter) WriteHeader(header ...string) {
+	if w.columns > 0 || w.err != nil {
+		return
+	}
+	w.columns = len(header)
+	var decorated []string
+	for _, h := range header {
+		decorated = append(decorated, fmt.Sprintf("*%s*", h))
+	}
+	_, w.err = fmt.Fprintf(w.w, "| %s |\n", strings.Join(decorated, " | "))
+}
+
+// WriteFields writes fields.
+func (w *TextileWriter) WriteFields(fields ...interface{}) {
+	if w.err != nil {
+		return
+	}
+	if len(fields) != w.columns {
+		w.err = fmt.Errorf("got %d fields, want %d", len(fields), w.columns)
+		return
+	}
+	var s []string
+	for _, f := range fields {
+		var v string
+		switch t := f.(type) {
+		case string:
+			v = t
+		case fmt.Stringer:
+			v = t.String()
+		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+			v = fmt.Sprintf("%d", t)
+		case float32, float64:
+			v = fmt.Sprintf("%0.4f", t)
+		default:
+			v = fmt.Sprintf("%s", t)
+		}
+		s = append(s, v)
+	}
+	_, w.err = fmt.Fprintf(w.w, fmt.Sprintf("| %s |\n", strings.Join(s, " | ")))
+}
 
 // prependHTTP prepends http, if necessary.
 func prependHTTP(s string) string {
@@ -250,7 +331,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var rw ResultWriter
+	switch {
+	case *textile:
+		rw = &TextileWriter{w: os.Stdout}
+	default:
+		rw = &TabWriter{w: os.Stdout}
+	}
+
+	rw.WriteHeader("ISIL", "Source", "Name", "Live", "Nonlive", "Diff", "Comment")
+
+	// XXX: Parallelize.
 	for _, institution := range institutions {
+		if strings.TrimSpace(institution) == "" {
+			continue
+		}
 		for _, sid := range sids {
 			query := fmt.Sprintf(`source_id:"%s" AND institution:"%s"`, sid, institution)
 			numLive, err := live.NumFound(query)
@@ -268,8 +363,10 @@ func main() {
 			if !ok {
 				name = "XXX: missing source name"
 			}
-			fmt.Printf("%s\t%s\t%s\t%d\t%d\t%d\n",
-				institution, sid, name, numLive, numNonlive, numNonlive-numLive)
+			rw.WriteFields(institution, sid, name, numLive, numNonlive, numNonlive-numLive, "")
+			if rw.Err() != nil {
+				log.Fatal(rw.Err())
+			}
 		}
 	}
 }
