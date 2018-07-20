@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // findSolrServer looks in the config for the whatislive.url key, takes the URL
