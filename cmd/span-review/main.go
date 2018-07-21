@@ -167,14 +167,6 @@ var (
 	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
 )
 
-// prependHTTP prepends http, if necessary.
-func prependHTTP(s string) string {
-	if !strings.HasPrefix(s, "http") {
-		return fmt.Sprintf("http://%s", s)
-	}
-	return s
-}
-
 // ReviewConfig contains various index review cases.
 type ReviewConfig struct {
 	SolrServer        string     `yaml:"solr"`
@@ -316,7 +308,7 @@ func main() {
 	if *ticket != "" {
 		log.Printf("attempt to update ticket %s", *ticket)
 	}
-	index := solrutil.Index{Server: prependHTTP(solrServer)}
+	index := solrutil.Index{Server: solrutil.PrependHTTP(solrServer)}
 
 	// Collect review results.
 	var results []Result

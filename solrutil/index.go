@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const DefaultFacetLimit = 100000
@@ -366,4 +367,12 @@ func (ix Index) NumFound(query string) (int64, error) {
 		return 0, err
 	}
 	return r.Response.NumFound, nil
+}
+
+// PrependHTTP prepends http, if necessary.
+func PrependHTTP(s string) string {
+	if !strings.HasPrefix(s, "http") {
+		return fmt.Sprintf("http://%s", s)
+	}
+	return s
 }
