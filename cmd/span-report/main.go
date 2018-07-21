@@ -75,10 +75,16 @@ func main() {
 			log.Fatal(err)
 		}
 		log.Printf("%s [%s] contains %d ISSN", *sid, *collection, len(results))
-		// INFO[0001] basic report on {http://172.18.113.7:8085/solr/biblio 0}
-		// INFO[0001] 49 [Poltava State Agrarian Academy (CrossRef)] contains 2 ISSN
 
-		// XXX: Find earliest and latest date, shard by month.
+		for _, issn := range results {
+			q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, *sid, *collection, issn)
+			count, err := index.NumFound(q)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Printf("%s (%d)", issn, count)
+		}
+		// XXX: Find earliest and latest date, shard by month, "publishDate".
 	default:
 		log.Fatalf("unknown report type: %s", *reportName)
 	}
