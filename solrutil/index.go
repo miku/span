@@ -4,6 +4,7 @@ package solrutil
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
@@ -367,6 +368,30 @@ func (ix Index) NumFound(query string) (int64, error) {
 		return 0, err
 	}
 	return r.Response.NumFound, nil
+}
+
+// RandomSource returns a random source identifier.
+func (ix Index) RandomSource() (string, error) {
+	vals, err := ix.SourceIdentifiers()
+	if err != nil {
+		return "", err
+	}
+	if len(vals) == 0 {
+		return "", fmt.Errorf("no source ids found")
+	}
+	return vals[rand.Intn(len(vals))], nil
+}
+
+// RandomCollection returns a random collection for a source identifier.
+func (ix Index) RandomCollection(sid string) (string, error) {
+	vals, err := ix.SourceCollections(sid)
+	if err != nil {
+		return "", err
+	}
+	if len(vals) == 0 {
+		return "", fmt.Errorf("source id %s has not collections", vals)
+	}
+	return vals[rand.Intn(len(vals))], nil
 }
 
 // PrependHTTP prepends http, if necessary.
