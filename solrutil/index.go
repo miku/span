@@ -12,29 +12,14 @@ import (
 
 const DefaultFacetLimit = 100000
 
-// SelectResponse wraps a select response, adjusted from JSONGen.
+// SelectResponse wraps a search and facet responses.
 type SelectResponse struct {
-	Response struct {
-		Docs     []interface{} `json:"docs"`
-		NumFound int64         `json:"numFound"`
-		Start    int64         `json:"start"`
-	} `json:"response"`
-	ResponseHeader struct {
-		Params struct {
-			Indent string `json:"indent"`
-			Q      string `json:"q"`
-			Wt     string `json:"wt"`
-		} `json:"params"`
-		QTime  int64
-		Status int64 `json:"status"`
-	} `json:"responseHeader"`
-}
-
-// FacetResponse wraps a facet response, adjusted from JSONGen output.
-type FacetResponse struct {
 	FacetCounts struct {
 		FacetDates struct {
 		} `json:"facet_dates"`
+		// FacetFields must be parsed by the user. It will contain a map from
+		// field name to facet value and counts. Example: {"name": ["Ben",
+		// 100, "Celine", 58, ...]}.
 		FacetFields   json.RawMessage `json:"facet_fields"`
 		FacetHeatmaps struct {
 		} `json:"facet_heatmaps"`
@@ -65,9 +50,9 @@ type FacetResponse struct {
 }
 
 // Facets unwraps the facet_fields list into a FacetMap.
-func (fr FacetResponse) Facets() (FacetMap, error) {
+func (sr SelectResponse) Facets() (FacetMap, error) {
 	unwrap := make(map[string]interface{})
-	if err := json.Unmarshal(fr.FacetCounts.FacetFields, &unwrap); err != nil {
+	if err := json.Unmarshal(sr.FacetCounts.FacetFields, &unwrap); err != nil {
 		return nil, err
 	}
 	if len(unwrap) == 0 {
@@ -104,44 +89,6 @@ func (fr FacetResponse) Facets() (FacetMap, error) {
 // FacetMap maps a facet value to its frequency. Solr uses pairs put into a
 // list, which is a bit awkward to work with.
 type FacetMap map[string]int
-
-// AllowedOnly returns an error if facets values contain non-zero values that
-// are not explicitly allowed.
-func (f FacetMap) AllowedKeys(allowed ...string) error {
-	var keys []string
-	for k := range f {
-		keys = append(keys, k)
-	}
-	s := make(map[string]bool)
-	for _, v := range allowed {
-		s[v] = true
-	}
-	for _, k := range keys {
-		if _, ok := s[k]; !ok && f[k] > 0 {
-			return fmt.Errorf("facet value not allowed: %s (%d)", k, f[k])
-		}
-	}
-	return nil
-}
-
-// EqualSizeNonZero checks if frequencies of the given keys are the same and
-// non-zero.
-func (f FacetMap) EqualSizeNonZero(keys ...string) error {
-	var prev int
-	for i, k := range keys {
-		size, ok := f[k]
-		if !ok {
-			return fmt.Errorf("facet key not found: %s", k)
-		}
-		if i > 0 {
-			if prev != size {
-				return fmt.Errorf("facet counts differ: %d vs %d", prev, size)
-			}
-		}
-		prev = size
-	}
-	return nil
-}
 
 // Index allows to send various queries to SOLR.
 type Index struct {
@@ -201,8 +148,8 @@ func (ix Index) Select(query string) (r *SelectResponse, err error) {
 }
 
 // Facet runs a facet query.
-func (ix Index) Facet(query, facetField string) (r *FacetResponse, err error) {
-	r = new(FacetResponse)
+func (ix Index) Facet(query, facetField string) (r *SelectResponse, err error) {
+	r = new(SelectResponse)
 	err = decodeLink(ix.FacetLink(query, facetField), r)
 	return
 }
@@ -214,99 +161,6 @@ func (ix Index) facets(query, field string) (FacetMap, error) {
 		return nil, err
 	}
 	return r.Facets()
-}
-
-// AllowedKeys checks for a query and facet field, whether the values contain
-// only allowed values.
-func (ix Index) AllowedKeys(query, field string, values ...string) error {
-	facets, err := ix.facets(query, field)
-	if err != nil {
-		return err
-	}
-	err = facets.AllowedKeys(values...)
-	if err != nil {
-		return fmt.Errorf("%s [%s]: %s", query, field, err)
-	}
-	return nil
-}
-
-// EqualSizeNonZero checks, if given facet field values have the same size.
-func (ix Index) EqualSizeNonZero(query, field string, values ...string) error {
-	facets, err := ix.facets(query, field)
-	if err != nil {
-		return err
-	}
-	err = facets.EqualSizeNonZero(values...)
-	if err != nil {
-		return fmt.Errorf("%s [%s]: %s", query, field, err)
-	}
-	return nil
-}
-
-// EqualSizeTotal checks, if given facet field values have the same size as the
-// total number of records.
-func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
-	r, err := ix.Facet(query, field)
-	if err != nil {
-		return err
-	}
-	total := r.Response.NumFound
-	facets, err := r.Facets()
-	if err != nil {
-		return err
-	}
-	err = facets.EqualSizeNonZero(values...)
-	if err != nil {
-		return fmt.Errorf("%s [%s]: %s", query, field, err)
-	}
-	if len(values) > 0 {
-		if int64(facets[values[0]]) != total {
-			return fmt.Errorf("%s [%s]: size mismatch, got %d, want %d",
-				query, field, facets[values[0]], total)
-		}
-	}
-	return nil
-}
-
-// MinRatioPct fails, if the number of records matching a value undercuts a given
-// ratio of all records matching the query. The ratio ranges from 0 to 100.
-func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) error {
-	r, err := ix.Facet(query, field)
-	if err != nil {
-		return err
-	}
-	total := r.Response.NumFound
-	facets, err := r.Facets()
-	if err != nil {
-		return err
-	}
-	size, ok := facets[value]
-	if !ok {
-		return fmt.Errorf("field not found: %s", field)
-	}
-	ratio := (float64(size) / float64(total)) * 100
-	if ratio < minRatioPct {
-		return fmt.Errorf("%s [%s=%s]: ratio undercut, got %0.2f%%, want %0.2f%%",
-			query, field, value, ratio, minRatioPct)
-	}
-	return nil
-}
-
-// MinCount fails, if the number of records matching a value undercuts a given size.
-func (ix Index) MinCount(query, field, value string, minCount int) error {
-	facets, err := ix.facets(query, field)
-	if err != nil {
-		return err
-	}
-	size, ok := facets[value]
-	if !ok {
-		return fmt.Errorf("field not found: %s", field)
-	}
-	if size < minCount {
-		return fmt.Errorf("%s [%s=%s]: undercut, got %d, want at least %d",
-			query, field, value, size, minCount)
-	}
-	return nil
 }
 
 // FacetKeysFunc returns all facet keys, that pass a filter, given as function
