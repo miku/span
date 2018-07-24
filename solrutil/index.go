@@ -10,9 +10,10 @@ import (
 	"strings"
 )
 
+// DefaultFacetLimit for fetching collections (there might be tens of thousands).
 const DefaultFacetLimit = 100000
 
-// SelectResponse wraps a search and facet responses.
+// SelectResponse wraps search and facet responses.
 type SelectResponse struct {
 	FacetCounts struct {
 		FacetDates struct {
@@ -31,9 +32,9 @@ type SelectResponse struct {
 		} `json:"facet_ranges"`
 	} `json:"facet_counts"`
 	Response struct {
-		Docs     []interface{} `json:"docs"`
-		NumFound int64         `json:"numFound"`
-		Start    int64         `json:"start"`
+		Docs     []json.RawMessage `json:"docs"`
+		NumFound int64             `json:"numFound"`
+		Start    int64             `json:"start"`
 	} `json:"response"`
 	ResponseHeader struct {
 		Params struct {
