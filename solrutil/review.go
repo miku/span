@@ -71,7 +71,7 @@ func (ix Index) EqualSizeNonZero(query, field string, values ...string) error {
 // EqualSizeTotal checks, if given facet field values have the same size as the
 // total number of records. Used for reviews.
 func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
-	r, err := ix.Facet(query, field)
+	r, err := ix.FacetQuery(query, field)
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
 // given ratio of all records matching the query. The ratio ranges from 0 to
 // 100. Used for reviews.
 func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) error {
-	r, err := ix.Facet(query, field)
+	r, err := ix.FacetQuery(query, field)
 	if err != nil {
 		return err
 	}
