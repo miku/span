@@ -15,6 +15,10 @@
 // These results are exported as CSV, TSV or similar, so they can be passed
 // forward into Excel, Pandas or other tools with visualization capabilities.
 //
+// TODO:
+//
+// * publishDate in SOLR is mostly years, but we need monthly reports, can we
+//   even use SOLR?
 package main
 
 import (
