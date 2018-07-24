@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/miku/span/solrutil"
@@ -63,7 +64,6 @@ func main() {
 
 	switch *reportName {
 	case "basic":
-		// Choose random source id and collection.
 		log.Printf("basic report on %v", index)
 
 		// Find all ISSN associated with sid and collection.
@@ -74,6 +74,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		log.Printf("%s [%s] contains %d ISSN", *sid, *collection, len(results))
 
 		for _, issn := range results {
@@ -82,9 +83,20 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			log.Printf("%s (%d)", issn, count)
+
+			// Facet on "publishDate" for given documents.
+			keys, err := index.FacetKeysFunc(q, "publishDate", func(s string, c int) bool {
+				return c > 0
+			})
+			if err != nil {
+				log.Fatal(err)
+			}
+			sort.Strings(keys)
+
+			log.Printf("%s (%d), %d distinct dates", issn, count, len(keys))
 		}
 		// XXX: Find earliest and latest date, shard by month, "publishDate".
+
 	default:
 		log.Fatalf("unknown report type: %s", *reportName)
 	}
