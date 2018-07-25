@@ -128,9 +128,6 @@ func main() {
 				log.Fatal(err)
 			}
 			for j, c := range cs {
-				if *verbose {
-					log.Printf("%d/%d %d/%d", i, len(sids), j, len(cs))
-				}
 				// Find all ISSN associated with sid and collection.
 				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
 				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
@@ -138,6 +135,9 @@ func main() {
 				})
 				if err != nil {
 					log.Fatal(err)
+				}
+				if *verbose {
+					log.Printf("%d/%d %d/%d %s", i+1, len(sids), j+1, len(cs), len(results))
 				}
 				for _, issn := range results {
 					q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, sid, c, issn)
