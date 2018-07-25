@@ -126,6 +126,9 @@ func writer(w io.Writer, result chan string, done chan bool) {
 		if _, err := io.WriteString(w, r); err != nil {
 			log.Fatal(err)
 		}
+		if _, err := io.WriteString(w, "\n"); err != nil {
+			log.Fatal(err)
+		}
 	}
 	done <- true
 }
