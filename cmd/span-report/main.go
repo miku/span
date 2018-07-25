@@ -76,6 +76,7 @@ type work struct {
 // Worker runs solr queries and pushes the results downstream.
 func worker(name string, index solrutil.Index, queue chan work, result chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
+	finished := 0
 	for w := range queue {
 		start := time.Now()
 		query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
@@ -115,8 +116,9 @@ func worker(name string, index solrutil.Index, queue chan work, result chan stri
 			}
 			result <- string(b)
 		}
+		finished++
 		if *verbose {
-			log.Printf("[%s] finished %v with %d issn in %s", name, w, len(results), time.Since(start))
+			log.Printf("[%s] (%d) finished %v with %d issn in %s", name, finished, w, len(results), time.Since(start))
 		}
 	}
 }
