@@ -30,8 +30,9 @@
 // Given a SOLR under load.
 //
 // Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
-// Facet (sid, c, issn, date) with facet.limit 10000 takes more than 1 hour.
-//
+// Facet (sid, c, issn, date) with facet.limit 10000 takes about 2 hours.
+// The "fast" report type runs about 240k queries in 2h40mins and could be
+// optimized a bit; it has no limit like facet.limit.
 package main
 
 import (
