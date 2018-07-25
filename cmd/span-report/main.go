@@ -22,6 +22,8 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -47,6 +49,7 @@ func main() {
 
 	if *listReports {
 		log.Println("basic")
+		log.Println("json")
 		os.Exit(0)
 	}
 
@@ -98,8 +101,62 @@ func main() {
 			sort.Strings(keys)
 
 			log.Printf("%s (%d), %d distinct dates", issn, count, len(keys))
+			// XXX: Find earliest and latest date, shard by month, "publishDate".
 		}
-		// XXX: Find earliest and latest date, shard by month, "publishDate".
+	case "json":
+
+		bw := bufio.NewWriter(os.Stdout)
+		defer bw.Flush()
+		enc := json.NewEncoder(bw)
+
+		sids, err := index.SourceIdentifiers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, sid := range sids {
+			cs, err := index.SourceCollections(sid)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, c := range cs {
+				// Find all ISSN associated with sid and collection.
+				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
+				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
+					return c > 0
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				for _, issn := range results {
+					q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, sid, c, issn)
+					count, err := index.NumFound(q)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					// Facet on "publishDate" for given subset.
+					keys, err := index.FacetKeysFunc(q, "publishDate", func(s string, c int) bool {
+						return c > 0
+					})
+					if err != nil {
+						log.Fatal(err)
+					}
+					sort.Strings(keys)
+
+					var entry = map[string]interface{}{
+						"sid":   sid,
+						"c":     c,
+						"issn":  issn,
+						"size":  count,
+						"dates": keys,
+					}
+					if err := enc.Encode(entry); err != nil {
+						log.Fatal(err)
+					}
+				}
+			}
+		}
 
 	default:
 		log.Fatalf("unknown report type: %s", *reportName)
