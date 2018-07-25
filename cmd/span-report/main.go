@@ -85,7 +85,7 @@ func partitionStrings(ss []string, size int) (result [][]string) {
 	for i, s := range ss {
 		if i > 0 && i%size == 0 {
 			result = append(result, batch)
-			batch = batch[:]
+			batch = nil
 		}
 		batch = append(batch, s)
 	}
