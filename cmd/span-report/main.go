@@ -27,7 +27,10 @@
 // facet.pivot=mega_collection,issn&facet=true&facet.field=source_id&facet.limit
 // =1000&rows=0&wt=json&indent=true&facet.pivot.mincount=1
 //
-// Facet (sid, c, issn) with 10000 keys takes, 42M response, 5 min (system under load, 20).
+// Given a SOLR under load.
+//
+// Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
+// Facet (sid, c, issn, date) with facet.limit 10000 takes more than 1 hour.
 package main
 
 import (
