@@ -31,6 +31,7 @@
 //
 // Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
 // Facet (sid, c, issn, date) with facet.limit 10000 takes more than 1 hour.
+//
 package main
 
 import (
@@ -249,6 +250,11 @@ func main() {
 			}
 		}
 	case "fast":
+		// XXX: Around five times faster than sequential queries. Currently not
+		// the most granular, all issn worked by the same goroutine. Stuck with
+		// a few of the larger collections after an hour. Solr load moderate.
+		// INFO[4021] [worker-14] (280) finished {105 Springer Journals} with
+		// 4555 issn in 30m34.486842709s
 		queue := make(chan work)
 		result := make(chan string)
 		done := make(chan bool)
