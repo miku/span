@@ -137,7 +137,7 @@ func main() {
 					log.Fatal(err)
 				}
 				if *verbose {
-					log.Printf("%d/%d %d/%d %s", i+1, len(sids), j+1, len(cs), len(results))
+					log.Printf("%d/%d %d/%d %d [%s %s]", i+1, len(sids), j+1, len(cs), len(results), sid, c)
 				}
 				for _, issn := range results {
 					q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, sid, c, issn)
