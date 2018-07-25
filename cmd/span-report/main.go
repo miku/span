@@ -38,10 +38,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/miku/span/solrutil"
@@ -55,6 +57,7 @@ var (
 	sid         = flag.String("sid", "", "source id")
 	collection  = flag.String("c", "", "collection name as in mega_collection")
 	verbose     = flag.Bool("verbose", false, "be verbose")
+	numWorker   = flag.Int("w", 32, "number of workers for parallel reports")
 )
 
 func normalizeISSN(s string) string {
@@ -63,6 +66,68 @@ func normalizeISSN(s string) string {
 		return s[:4] + "-" + s[4:]
 	}
 	return s
+}
+
+type work struct {
+	sid string
+	c   string
+}
+
+// Worker runs solr queries and pushes the results downstream.
+func worker(name string, index solrutil.Index, queue chan work, result chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for w := range queue {
+		start := time.Now()
+		query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
+		results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
+			return c > 0
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		if *verbose {
+			log.Printf("[%s] [%s %s]", name, w.sid, w.c)
+		}
+		for _, issn := range results {
+			q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, w.sid, w.c, issn)
+			count, err := index.NumFound(q)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fr, err := index.FacetQuery(q, "publishDate")
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmap, err := fr.Facets()
+			if err != nil {
+				log.Fatal(err)
+			}
+			var entry = map[string]interface{}{
+				"sid":   w.sid,
+				"c":     w.c,
+				"issn":  normalizeISSN(issn),
+				"size":  count,
+				"dates": fmap.Nonzero(),
+			}
+			b, err := json.Marshal(entry)
+			if err != nil {
+				log.Fatal(err)
+			}
+			result <- string(b)
+		}
+		if *verbose {
+			log.Printf("[%s] finished %v with %d issn in %s", name, w, len(results), time.Since(start))
+		}
+	}
+}
+
+func writer(w io.Writer, result chan string, done chan bool) {
+	for r := range result {
+		if _, err := io.WriteString(w, r); err != nil {
+			log.Fatal(err)
+		}
+	}
+	done <- true
 }
 
 func main() {
@@ -178,6 +243,38 @@ func main() {
 				}
 			}
 		}
+	case "fast":
+		queue := make(chan work)
+		result := make(chan string)
+		done := make(chan bool)
+
+		var wg sync.WaitGroup
+		go writer(os.Stdout, result, done)
+
+		for i := 0; i < *numWorker; i++ {
+			wg.Add(1)
+			name := fmt.Sprintf("worker-%02d", i)
+			go worker(name, index, queue, result, &wg)
+		}
+
+		sids, err := index.SourceIdentifiers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, sid := range sids {
+			cs, err := index.SourceCollections(sid)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, c := range cs {
+				queue <- work{sid: sid, c: c}
+			}
+		}
+
+		close(queue)
+		wg.Wait()
+		close(result)
+		<-done
 	default:
 		log.Fatalf("unknown report type: %s", *reportName)
 	}
