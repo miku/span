@@ -31,6 +31,11 @@
 //   optimized a bit; it has no limit like facet.limit.
 // * The "faster" report type run 240k queries in 103m35.106s. There is a bit
 //   more headroom by batching issns, to reduce local overhead.
+// * A 32 core SOLR can get to a load of 30; span-report will use up to 24 CPUs
+//   while SOLR will use mostly six. Around 300 qps, which still seems slow.
+//   There are actually two queries per issn (numFound and date faceting, the
+//   numFound is fluff). A first run (-w 64 -bs 200) took about 50min.
+//
 package main
 
 import (
@@ -63,12 +68,28 @@ var (
 	reportTypes = []string{"basic", "json", "fast", "faster"}
 )
 
+// normalizeISSN since SOLR returns the lowercased version without dash.
 func normalizeISSN(s string) string {
 	s = strings.ToUpper(s)
 	if len(s) == 8 {
 		return s[:4] + "-" + s[4:]
 	}
 	return s
+}
+
+// partitionStrings partitions a slice of strings into a slice of slices of a
+// given size. The last slice might be shorter.
+// https://play.golang.org/p/Us7ftuXBEsk
+func partitionStrings(ss []string, size int) (result [][]string) {
+	var batch []string
+	for i, s := range ss {
+		if i > 0 && i%size == 0 {
+			result = append(result, batch)
+			batch = batch[:]
+		}
+		batch = append(batch, s)
+	}
+	return result
 }
 
 // work is passed to a worker.
@@ -152,21 +173,6 @@ func writer(w io.Writer, result chan string, done chan bool) {
 		}
 	}
 	done <- true
-}
-
-// partitionStrings partitions a slice of strings into a slice of slices of a
-// given size. The last slice might be shorter.
-// https://play.golang.org/p/Us7ftuXBEsk
-func partitionStrings(ss []string, size int) (result [][]string) {
-	var batch []string
-	for i, s := range ss {
-		if i > 0 && i%size == 0 {
-			result = append(result, batch)
-			batch = batch[:]
-		}
-		batch = append(batch, s)
-	}
-	return result
 }
 
 func main() {
@@ -311,12 +317,13 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+			var items []work
 			for _, batch := range partitionStrings(cs, *batchSize) {
-				var items []work
 				for _, b := range batch {
 					items = append(items, work{sid: sid, c: b})
 				}
 				queue <- items
+				items = nil
 			}
 		}
 
@@ -356,12 +363,13 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
+				var items []work
 				for _, batch := range partitionStrings(results, *batchSize) {
-					var items []work
 					for _, b := range batch {
 						items = append(items, work{sid: sid, c: c, issn: b})
 					}
 					queue <- items
+					items = nil
 				}
 			}
 		}
