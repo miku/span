@@ -29,6 +29,7 @@ import (
 	"math/rand"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/miku/span/solrutil"
@@ -42,6 +43,14 @@ var (
 	sid         = flag.String("sid", "", "source id")
 	collection  = flag.String("c", "", "collection name as in mega_collection")
 )
+
+func normalizeISSN(s string) string {
+	s = strings.ToUpper(s)
+	if len(s) == 8 {
+		return s[:4] + "-" + s[4:]
+	}
+	return s
+}
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
@@ -104,7 +113,6 @@ func main() {
 			// XXX: Find earliest and latest date, shard by month, "publishDate".
 		}
 	case "json":
-
 		bw := bufio.NewWriter(os.Stdout)
 		defer bw.Flush()
 		enc := json.NewEncoder(bw)
@@ -127,29 +135,26 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-
 				for _, issn := range results {
 					q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, sid, c, issn)
 					count, err := index.NumFound(q)
 					if err != nil {
 						log.Fatal(err)
 					}
-
-					// Facet on "publishDate" for given subset.
-					keys, err := index.FacetKeysFunc(q, "publishDate", func(s string, c int) bool {
-						return c > 0
-					})
+					fr, err := index.FacetQuery(q, "publishDate")
 					if err != nil {
 						log.Fatal(err)
 					}
-					sort.Strings(keys)
-
+					fmap, err := fr.Facets()
+					if err != nil {
+						log.Fatal(err)
+					}
 					var entry = map[string]interface{}{
 						"sid":   sid,
 						"c":     c,
-						"issn":  issn,
+						"issn":  normalizeISSN(issn),
 						"size":  count,
-						"dates": keys,
+						"dates": fmap.Nonzero(),
 					}
 					if err := enc.Encode(entry); err != nil {
 						log.Fatal(err)
@@ -157,7 +162,6 @@ func main() {
 				}
 			}
 		}
-
 	default:
 		log.Fatalf("unknown report type: %s", *reportName)
 	}
