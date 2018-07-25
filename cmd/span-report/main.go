@@ -1,4 +1,4 @@
-// span-report allows for basic report generated from an index.
+// span-report creates data subsets from an index for reporting.
 //
 // Example report: For a given collection, find all ISSN it contains and the
 // number of publications in a given interval, e.g. per month.
@@ -157,7 +157,7 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 			}
 			completed++
 			if *verbose {
-				log.Printf("[%s] (%d) finished %v with %d issn in %s", name, completed, w, len(results), time.Since(start))
+				log.Printf("[%s] (%d) completed %v with %d issn in %s", name, completed, w, len(results), time.Since(start))
 			}
 		}
 	}
@@ -165,10 +165,7 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 
 func writer(w io.Writer, result chan string, done chan bool) {
 	for r := range result {
-		if _, err := io.WriteString(w, r); err != nil {
-			log.Fatal(err)
-		}
-		if _, err := io.WriteString(w, "\n"); err != nil {
+		if _, err := io.WriteString(w, r+"\n"); err != nil {
 			log.Fatal(err)
 		}
 	}
