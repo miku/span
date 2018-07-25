@@ -30,6 +30,7 @@ install -m 755 span-import $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-local-data $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-redact $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-report $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
@@ -62,6 +63,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-local-data
 /usr/sbin/span-oa-filter
 /usr/sbin/span-redact
+/usr/sbin/span-report
 /usr/sbin/span-review
 /usr/sbin/span-tag
 /usr/sbin/span-update-labels
