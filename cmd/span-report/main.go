@@ -107,8 +107,8 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 	completed := 0
 
 	for batch := range queue {
+		start := time.Now()
 		for _, w := range batch {
-			start := time.Now()
 
 			var err error
 			var results []string
@@ -156,9 +156,9 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 				result <- string(b)
 			}
 			completed++
-			if *verbose {
-				log.Printf("[%s] (%d) completed %v with %d issn in %s", name, completed, w, len(results), time.Since(start))
-			}
+		}
+		if *verbose {
+			log.Printf("[%s] (%d) completed batch (%d) in %s", name, completed, len(batch), time.Since(start))
 		}
 	}
 }
