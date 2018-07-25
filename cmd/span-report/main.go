@@ -42,6 +42,7 @@ var (
 	reportName  = flag.String("r", "basic", "report name")
 	sid         = flag.String("sid", "", "source id")
 	collection  = flag.String("c", "", "collection name as in mega_collection")
+	verbose     = flag.Bool("verbose", false, "be verbose")
 )
 
 func normalizeISSN(s string) string {
@@ -121,12 +122,15 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, sid := range sids {
+		for i, sid := range sids {
 			cs, err := index.SourceCollections(sid)
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, c := range cs {
+			for j, c := range cs {
+				if *verbose {
+					log.Printf("%d/%d %d/%d", i, len(sids), j, len(cs))
+				}
 				// Find all ISSN associated with sid and collection.
 				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
 				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
