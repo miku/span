@@ -58,6 +58,7 @@ var (
 	collection  = flag.String("c", "", "collection name as in mega_collection")
 	verbose     = flag.Bool("verbose", false, "be verbose")
 	numWorker   = flag.Int("w", 32, "number of workers for parallel reports")
+	batchSize   = flag.Int("bs", 1, "number of values passed to workers")
 
 	reportTypes = []string{"basic", "json", "fast", "faster"}
 )
@@ -80,60 +81,63 @@ type work struct {
 // Worker runs solr queries and pushes the results downstream. If the work item
 // has no issn specified, we find all issn (allows for small benchmarks between
 // approaches).
-func worker(name string, index solrutil.Index, queue chan work, result chan string, wg *sync.WaitGroup) {
+func worker(name string, index solrutil.Index, queue chan []work, result chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	finished := 0
-	for w := range queue {
-		start := time.Now()
+	completed := 0
 
-		var err error
-		var results []string
+	for batch := range queue {
+		for _, w := range batch {
+			start := time.Now()
 
-		if w.issn == "" {
-			query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
-			results, err = index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
-				return c > 0
-			})
-			if err != nil {
-				log.Fatal(err)
+			var err error
+			var results []string
+
+			if w.issn == "" {
+				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
+				results, err = index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
+					return c > 0
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
+				if *verbose {
+					log.Printf("[%s] [%s %s]", name, w.sid, w.c)
+				}
+			} else {
+				results = []string{w.issn}
 			}
+
+			for _, issn := range results {
+				q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, w.sid, w.c, issn)
+				count, err := index.NumFound(q)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fr, err := index.FacetQuery(q, "publishDate")
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmap, err := fr.Facets()
+				if err != nil {
+					log.Fatal(err)
+				}
+				var entry = map[string]interface{}{
+					"sid":   w.sid,
+					"c":     w.c,
+					"issn":  normalizeISSN(issn),
+					"size":  count,
+					"dates": fmap.Nonzero(),
+				}
+				b, err := json.Marshal(entry)
+				if err != nil {
+					log.Fatal(err)
+				}
+				result <- string(b)
+			}
+			completed++
 			if *verbose {
-				log.Printf("[%s] [%s %s]", name, w.sid, w.c)
+				log.Printf("[%s] (%d) finished %v with %d issn in %s", name, completed, w, len(results), time.Since(start))
 			}
-		} else {
-			results = []string{w.issn}
-		}
-
-		for _, issn := range results {
-			q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, w.sid, w.c, issn)
-			count, err := index.NumFound(q)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fr, err := index.FacetQuery(q, "publishDate")
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmap, err := fr.Facets()
-			if err != nil {
-				log.Fatal(err)
-			}
-			var entry = map[string]interface{}{
-				"sid":   w.sid,
-				"c":     w.c,
-				"issn":  normalizeISSN(issn),
-				"size":  count,
-				"dates": fmap.Nonzero(),
-			}
-			b, err := json.Marshal(entry)
-			if err != nil {
-				log.Fatal(err)
-			}
-			result <- string(b)
-		}
-		finished++
-		if *verbose {
-			log.Printf("[%s] (%d) finished %v with %d issn in %s", name, finished, w, len(results), time.Since(start))
 		}
 	}
 }
@@ -148,6 +152,21 @@ func writer(w io.Writer, result chan string, done chan bool) {
 		}
 	}
 	done <- true
+}
+
+// partitionStrings partitions a slice of strings into a slice of slices of a
+// given size. The last slice might be shorter.
+// https://play.golang.org/p/Us7ftuXBEsk
+func partitionStrings(ss []string, size int) (result [][]string) {
+	var batch []string
+	for i, s := range ss {
+		if i > 0 && i%size == 0 {
+			result = append(result, batch)
+			batch = batch[:]
+		}
+		batch = append(batch, s)
+	}
+	return result
 }
 
 func main() {
@@ -270,7 +289,7 @@ func main() {
 		// a few of the larger collections after an hour. Solr load moderate.
 		// INFO[4021] [worker-14] (280) finished {105 Springer Journals} with
 		// 4555 issn in 30m34.486842709s
-		queue := make(chan work)
+		queue := make(chan []work)
 		result := make(chan string)
 		done := make(chan bool)
 
@@ -292,8 +311,12 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, c := range cs {
-				queue <- work{sid: sid, c: c}
+			for _, batch := range partitionStrings(cs, *batchSize) {
+				var items []work
+				for _, b := range batch {
+					items = append(items, work{sid: sid, c: b})
+				}
+				queue <- items
 			}
 		}
 
@@ -303,7 +326,7 @@ func main() {
 		<-done
 	case "faster":
 		// XXX: Distribute work per issn. Better utilization, but increased overhead.
-		queue := make(chan work)
+		queue := make(chan []work)
 		result := make(chan string)
 		done := make(chan bool)
 
@@ -333,8 +356,12 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				for _, issn := range results {
-					queue <- work{sid: sid, c: c, issn: issn}
+				for _, batch := range partitionStrings(results, *batchSize) {
+					var items []work
+					for _, b := range batch {
+						items = append(items, work{sid: sid, c: c, issn: b})
+					}
+					queue <- items
 				}
 			}
 		}
