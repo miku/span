@@ -15,11 +15,6 @@
 // These results are exported as CSV, TSV or similar, so they can be passed
 // forward into Excel, Pandas or other tools with visualization capabilities.
 //
-// TODO:
-//
-// * publishDate in SOLR is mostly years, but we need monthly reports, can we
-//   even use SOLR?
-//
 // Expensive pivot query example (1000 issn per collection, might be more, e.g.
 // Springer has over 4000).
 //
@@ -29,10 +24,11 @@
 //
 // Given a SOLR under load.
 //
-// Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
-// Facet (sid, c, issn, date) with facet.limit 10000 takes about 2 hours.
-// The "fast" report type runs about 240k queries in 2h40mins and could be
-// optimized a bit; it has no limit like facet.limit.
+// * Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
+// * Facet (sid, c, issn, date) with facet.limit 10000 takes about 2 hours.
+//   1.3G response.
+// * The "fast" report type runs about 240k queries in 2h40mins and could be
+//   optimized a bit; it has no limit like facet.limit.
 package main
 
 import (
@@ -53,13 +49,15 @@ import (
 )
 
 var (
-	server      = flag.String("server", "http://localhost:8983/solr/biblio", "URL to SOLR")
+	server      = flag.String("server", "http://localhost:8983/solr/biblio", "SOLR server")
 	listReports = flag.Bool("list", false, "list available report types")
 	reportName  = flag.String("r", "basic", "report name")
 	sid         = flag.String("sid", "", "source id")
 	collection  = flag.String("c", "", "collection name as in mega_collection")
 	verbose     = flag.Bool("verbose", false, "be verbose")
 	numWorker   = flag.Int("w", 32, "number of workers for parallel reports")
+
+	reportTypes = []string{"basic", "json", "fast", "faster"}
 )
 
 func normalizeISSN(s string) string {
@@ -70,27 +68,40 @@ func normalizeISSN(s string) string {
 	return s
 }
 
+// work is passed to a worker.
 type work struct {
-	sid string
-	c   string
+	sid  string
+	c    string
+	issn string
 }
 
-// Worker runs solr queries and pushes the results downstream.
+// Worker runs solr queries and pushes the results downstream. If the work item
+// has no issn specified, we find all issn (allows for small benchmarks between
+// approaches).
 func worker(name string, index solrutil.Index, queue chan work, result chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	finished := 0
 	for w := range queue {
 		start := time.Now()
-		query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
-		results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
-			return c > 0
-		})
-		if err != nil {
-			log.Fatal(err)
+
+		var err error
+		var results []string
+
+		if w.issn == "" {
+			query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
+			results, err = index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
+				return c > 0
+			})
+			if err != nil {
+				log.Fatal(err)
+			}
+			if *verbose {
+				log.Printf("[%s] [%s %s]", name, w.sid, w.c)
+			}
+		} else {
+			results = []string{w.issn}
 		}
-		if *verbose {
-			log.Printf("[%s] [%s %s]", name, w.sid, w.c)
-		}
+
 		for _, issn := range results {
 			q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, w.sid, w.c, issn)
 			count, err := index.NumFound(q)
@@ -142,8 +153,9 @@ func main() {
 	flag.Parse()
 
 	if *listReports {
-		log.Println("basic")
-		log.Println("json")
+		for _, name := range reportTypes {
+			log.Println(name)
+		}
 		os.Exit(0)
 	}
 
@@ -280,6 +292,48 @@ func main() {
 			}
 			for _, c := range cs {
 				queue <- work{sid: sid, c: c}
+			}
+		}
+
+		close(queue)
+		wg.Wait()
+		close(result)
+		<-done
+	case "faster":
+		// XXX: Distribute work per issn. Better utilization, but increased overhead.
+		queue := make(chan work)
+		result := make(chan string)
+		done := make(chan bool)
+
+		var wg sync.WaitGroup
+		go writer(os.Stdout, result, done)
+
+		for i := 0; i < *numWorker; i++ {
+			wg.Add(1)
+			name := fmt.Sprintf("worker-%02d", i)
+			go worker(name, index, queue, result, &wg)
+		}
+
+		sids, err := index.SourceIdentifiers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, sid := range sids {
+			cs, err := index.SourceCollections(sid)
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, c := range cs {
+				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
+				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
+					return c > 0
+				})
+				if err != nil {
+					log.Fatal(err)
+				}
+				for _, issn := range results {
+					queue <- work{sid: sid, c: c, issn: issn}
+				}
 			}
 		}
 
