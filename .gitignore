@@ -51,5 +51,7 @@ fixtures/jstor.*
 fixtures/hhbd.xml
 fixtures/thieme.nlm.xml
 fixtures/thieme.xml
+fixtures/report.ldj
 
 logs/*
+
