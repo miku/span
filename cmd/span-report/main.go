@@ -29,6 +29,8 @@
 //   1.3G response.
 // * The "fast" report type runs about 240k queries in 2h40mins and could be
 //   optimized a bit; it has no limit like facet.limit.
+// * The "faster" report type run 240k queries in 103m35.106s. There is a bit
+//   more headroom by batching issns, to reduce local overhead.
 package main
 
 import (
