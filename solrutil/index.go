@@ -87,6 +87,17 @@ func (sr SelectResponse) Facets() (FacetMap, error) {
 	return result, nil
 }
 
+func (fm FacetMap) Nonzero() FacetMap {
+	result := make(FacetMap)
+	for k, v := range fm {
+		if v < 1 {
+			continue
+		}
+		result[k] = v
+	}
+	return result
+}
+
 // FacetMap maps a facet value to its frequency. Solr uses pairs put into a
 // list, which is a bit awkward to work with.
 type FacetMap map[string]int
