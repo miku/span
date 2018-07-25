@@ -19,6 +19,15 @@
 //
 // * publishDate in SOLR is mostly years, but we need monthly reports, can we
 //   even use SOLR?
+//
+// Expensive pivot query example (1000 issn per collection, might be more, e.g.
+// Springer has over 4000).
+//
+// q=*:*&wt=json&indent=true&q=*:*&facet.pivot=source_id,mega_collection,issn&
+// facet.pivot=mega_collection,issn&facet=true&facet.field=source_id&facet.limit
+// =1000&rows=0&wt=json&indent=true&facet.pivot.mincount=1
+//
+// Facet (sid, c, issn) with 10000 keys takes, 42M response, 5 min (system under load, 20).
 package main
 
 import (
