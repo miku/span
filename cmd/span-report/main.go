@@ -34,7 +34,7 @@
 // * A 32 core SOLR can get to a load of 30; span-report will use up to 24 CPUs
 //   while SOLR will use mostly six. Around 300 qps, which still seems slow.
 //   There are actually two queries per issn (numFound and date faceting, the
-//   numFound is fluff). A first run (-w 64 -bs 200) took about 50min.
+//   numFound is fluff). A first run (-w 32 -bs 100) took about 50min.
 //
 package main
 
@@ -206,7 +206,6 @@ func main() {
 	case "basic":
 		log.Printf("basic report on %v", index)
 
-		// Find all ISSN associated with sid and collection.
 		query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, *sid, *collection)
 		results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
 			return c > 0
@@ -214,7 +213,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		log.Printf("%s [%s] contains %d ISSN", *sid, *collection, len(results))
 
 		for _, issn := range results {
@@ -223,8 +221,6 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-
-			// Facet on "publishDate" for given documents.
 			keys, err := index.FacetKeysFunc(q, "publishDate", func(s string, c int) bool {
 				return c > 0
 			})
@@ -232,9 +228,7 @@ func main() {
 				log.Fatal(err)
 			}
 			sort.Strings(keys)
-
 			log.Printf("%s (%d), %d distinct dates", issn, count, len(keys))
-			// XXX: Find earliest and latest date, shard by month, "publishDate".
 		}
 	case "json":
 		bw := bufio.NewWriter(os.Stdout)
@@ -251,7 +245,6 @@ func main() {
 				log.Fatal(err)
 			}
 			for j, c := range cs {
-				// Find all ISSN associated with sid and collection.
 				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
 				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
 					return c > 0
@@ -300,7 +293,10 @@ func main() {
 		done := make(chan bool)
 
 		var wg sync.WaitGroup
-		go writer(os.Stdout, result, done)
+
+		bw := bufio.NewWriter(os.Stdout)
+		defer bw.Flush()
+		go writer(bw, result, done)
 
 		for i := 0; i < *numWorker; i++ {
 			wg.Add(1)
@@ -317,13 +313,12 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			var items []work
 			for _, batch := range partitionStrings(cs, *batchSize) {
-				for _, b := range batch {
-					items = append(items, work{sid: sid, c: b})
+				items := make([]work, len(batch))
+				for i, b := range batch {
+					items[i] = work{sid: sid, c: b}
 				}
 				queue <- items
-				items = nil
 			}
 		}
 
@@ -332,13 +327,15 @@ func main() {
 		close(result)
 		<-done
 	case "faster":
-		// XXX: Distribute work per issn. Better utilization, but increased overhead.
+		// XXX: Distribute work per issn. Better utilization, less overhead.
 		queue := make(chan []work)
 		result := make(chan string)
 		done := make(chan bool)
 
 		var wg sync.WaitGroup
-		go writer(os.Stdout, result, done)
+		bw := bufio.NewWriter(os.Stdout)
+		defer bw.Flush()
+		go writer(bw, result, done)
 
 		for i := 0; i < *numWorker; i++ {
 			wg.Add(1)
@@ -363,13 +360,12 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				var items []work
 				for _, batch := range partitionStrings(results, *batchSize) {
-					for _, b := range batch {
-						items = append(items, work{sid: sid, c: c, issn: b})
+					items := make([]work, len(batch))
+					for i, b := range batch {
+						items[i] = work{sid: sid, c: c, issn: b}
 					}
 					queue <- items
-					items = nil
 				}
 			}
 		}
