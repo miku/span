@@ -97,6 +97,17 @@ func parsePages(s string) (start, end, total string) {
 	return ss, es, fmt.Sprintf("%d", v-u)
 }
 
+// stringsContainsAny returns true, if vals contains v, comparisons are case
+// insensitive.
+func stringsContainsAny(v string, vals []string) bool {
+	for _, vv := range vals {
+		if strings.ToLower(v) == strings.ToLower(vv) {
+			return true
+		}
+	}
+	return false
+}
+
 func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
@@ -107,9 +118,11 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.MegaCollections = append(output.MegaCollections, "Gender Open")
 	output.Genre = "article"
 	output.RefType = "EJOUR"
+	output.Format = "ElectronicArticle"
+	output.Languages = []string{record.Metadata.Dc.Language.Text}
 
 	output.ArticleTitle = record.Metadata.Dc.Title.Text
-	output.BookTitle = record.Metadata.Dc.Source.Text
+
 	for _, v := range record.Metadata.Dc.Creator {
 		output.Authors = append(output.Authors, finc.Author{Name: v.Text})
 	}
@@ -117,14 +130,24 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		if strings.HasPrefix(v.Text, "http") {
 			output.URL = append(output.URL, v.Text)
 		}
+		if strings.HasPrefix(v.Text, "urn:ISSN:") {
+			output.ISSN = append(output.ISSN, strings.Replace(v.Text, "urn:ISSN:", "", 1))
+		}
 		if strings.HasPrefix(v.Text, "http://dx.doi.org/") {
 			output.DOI = strings.Replace(v.Text, "http://dx.doi.org/", "", -1)
 		}
 	}
 
+	// Article from books, articles from journals.
+	if stringsContainsAny(output.ArticleTitle, []string{"zeitschrift", "journal"}) || len(output.ISSN) > 0 {
+		output.JournalTitle = record.Metadata.Dc.Source.Text
+	} else {
+		output.BookTitle = record.Metadata.Dc.Source.Text
+	}
 	for _, p := range record.Metadata.Dc.Publisher {
 		output.Publishers = append(output.Publishers, p.Text)
 	}
+
 	if record.Metadata.Dc.Date.Text == "" {
 		return output, span.Skip{Reason: "empty date"}
 	}
