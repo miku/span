@@ -100,7 +100,7 @@ func parsePages(s string) (start, end, total string) {
 func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
-	output.SourceID = "13024"
+	output.SourceID = "162"
 	encodedRecordID := base64.RawURLEncoding.EncodeToString([]byte(record.Header.Identifier.Text))
 	output.RecordID = encodedRecordID
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, output.RecordID)
