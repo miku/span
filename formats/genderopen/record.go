@@ -172,6 +172,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.StartPage = start
 	output.EndPage = end
 	output.PageCount = total
+	output.OpenAccess = true
 
 	return output, nil
 }
