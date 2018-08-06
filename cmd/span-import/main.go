@@ -59,7 +59,7 @@ var FormatMap = map[string]Factory{
 	"degruyter":  func() interface{} { return new(degruyter.Article) },
 	"disson":     func() interface{} { return new(disson.Record) },
 	"doaj":       func() interface{} { return new(doaj.Response) },
-	"doaj-next":  func() interface{} { return new(doaj.ArticleV1) },
+	"doaj-api":   func() interface{} { return new(doaj.ArticleV1) },
 	"dummy":      func() interface{} { return new(dummy.Example) },
 	"genderopen": func() interface{} { return new(genderopen.Record) },
 	"genios":     func() interface{} { return new(genios.Document) },
@@ -233,7 +233,7 @@ func main() {
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
-	case "doaj", "doaj-next", "crossref", "dummy":
+	case "doaj", "doaj-api", "crossref", "dummy":
 		if err := processJSON(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
