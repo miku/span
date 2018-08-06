@@ -2,9 +2,14 @@ package doaj
 
 import (
 	"fmt"
+	"html"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/miku/span"
+	"github.com/miku/span/container"
+	"github.com/miku/span/formats/finc"
 )
 
 // ArticleV1 represents an API v1 response.
@@ -34,11 +39,12 @@ type ArticleV1 struct {
 			Title     string `json:"title"`
 			Volume    string `json:"volume"`
 		} `json:"journal"`
-		Link []struct {
-			ContentType string `json:"content_type"`
-			Type        string `json:"type"`
-			Url         string `json:"url"`
+		Keywords []string `json:"keywords"`
+		Link     []struct {
+			Type string `json:"type"`
+			Url  string `json:"url"`
 		} `json:"link"`
+		Month     string `json:"month"`
 		StartPage string `json:"start_page"`
 		Subject   []struct {
 			Code   string `json:"code"`
@@ -53,16 +59,15 @@ type ArticleV1 struct {
 	LastUpdated string `json:"last_updated"`
 }
 
-// Date return the document date. Journals entries usually have no date, so
-// they will err.
+// Date return the document date.
 func (doc ArticleV1) Date() (time.Time, error) {
 	if doc.CreatedDate != "" {
-		return time.Parse("2006-01-02T15:04:05Z", doc.Index.Date)
+		return time.Parse("2006-01-02T15:04:05Z", doc.CreatedDate)
 	}
 	var s string
-	if y, err := strconv.Atoi(doc.BibJSON.Year); err == nil {
+	if y, err := strconv.Atoi(doc.Bibjson.Year); err == nil {
 		s = fmt.Sprintf("%04d-01-01", y)
-		if m, err := strconv.Atoi(doc.BibJSON.Month); err == nil {
+		if m, err := strconv.Atoi(doc.Bibjson.Month); err == nil {
 			if m > 0 && m < 13 {
 				s = fmt.Sprintf("%04d-%02d-01", y, m)
 			}
@@ -73,9 +78,9 @@ func (doc ArticleV1) Date() (time.Time, error) {
 
 // DOI returns the DOI or the empty string.
 func (doc ArticleV1) DOI() string {
-	for _, identifier := range doc.BibJSON.Identifier {
+	for _, identifier := range doc.Bibjson.Identifier {
 		if identifier.Type == "doi" {
-			id := strings.TrimSpace(identifier.ID)
+			id := strings.TrimSpace(identifier.Id)
 			if !strings.Contains(id, "http") {
 				return id
 			}
@@ -83,4 +88,103 @@ func (doc ArticleV1) DOI() string {
 		}
 	}
 	return ""
+}
+
+// Authors returns a list of authors.
+func (doc ArticleV1) Authors() (authors []finc.Author) {
+	for _, author := range doc.Bibjson.Author {
+		authors = append(authors, finc.Author{Name: html.UnescapeString(author.Name)})
+	}
+	return authors
+}
+
+// ToIntermediateSchema converts a doaj document to intermediate schema. For
+// now any record, that has no usable date will be skipped.
+func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+	var err error
+
+	output := finc.NewIntermediateSchema()
+	output.Date, err = doc.Date()
+	if err != nil {
+		return output, span.Skip{Reason: err.Error()}
+	}
+	output.RawDate = output.Date.Format("2006-01-02")
+
+	id := fmt.Sprintf("ai-%s-%s", SourceIdentifier, doc.Id)
+	if len(id) > span.KeyLengthLimit {
+		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
+	}
+
+	output.ArticleTitle = doc.Bibjson.Title
+	output.Authors = doc.Authors()
+	output.DOI = doc.DOI()
+	output.Format = Format
+	output.Genre = Genre
+
+	output.ISSN = doc.Bibjson.Journal.Issns
+	output.JournalTitle = doc.Bibjson.Journal.Title
+	output.MegaCollections = []string{Collection}
+
+	publisher := strings.TrimSpace(doc.Bibjson.Journal.Publisher)
+	if publisher != "" {
+		output.Publishers = append(output.Publishers, publisher)
+	}
+
+	output.RecordID = doc.DOI()
+	output.ID = id
+	output.SourceID = SourceIdentifier
+	output.Volume = doc.Bibjson.Journal.Volume
+
+	// refs. #8709
+	if output.DOI != "" {
+		output.URL = append(output.URL, "http://doi.org/"+output.DOI)
+	}
+
+	// refs. #8709
+	if len(output.URL) == 0 {
+		for _, link := range doc.Bibjson.Link {
+			output.URL = append(output.URL, link.Url)
+		}
+	}
+
+	// refs. #6634
+	if len(output.URL) == 0 {
+		output.URL = append(output.URL, "https://doaj.org/article/"+doc.Id)
+	}
+
+	output.StartPage = doc.Bibjson.StartPage
+	output.EndPage = doc.Bibjson.EndPage
+
+	if sp, err := strconv.Atoi(doc.Bibjson.StartPage); err == nil {
+		if ep, err := strconv.Atoi(doc.Bibjson.EndPage); err == nil {
+			output.PageCount = fmt.Sprintf("%d", ep-sp)
+			output.Pages = fmt.Sprintf("%d-%d", sp, ep)
+		}
+	}
+
+	subjects := container.NewStringSet()
+	for _, s := range doc.Bibjson.Subject {
+		class := LCCPatterns.LookupDefault(s.Code, finc.NotAssigned)
+		if class != finc.NotAssigned {
+			subjects.Add(class)
+		}
+	}
+	if subjects.Size() == 0 {
+		output.Subjects = []string{finc.NotAssigned}
+	} else {
+		output.Subjects = subjects.SortedValues()
+	}
+
+	languages := container.NewStringSet()
+	for _, l := range doc.Bibjson.Journal.Language {
+		detected, err := span.DetectLang3(l)
+		if detected == "" || err != nil {
+			detected = "und"
+		}
+		languages.Add(detected)
+	}
+	output.Languages = languages.Values()
+
+	output.RefType = DefaultRefType
+	return output, nil
 }
