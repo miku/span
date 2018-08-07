@@ -194,14 +194,16 @@ if __name__ == '__main__':
 
             for month in range(1, 13):
                 s = pd.Series()
+                prefix = '%s-%02d' % (year, month)
 
                 for _, doc in entries.items():
-                    c, prefix = doc['c'], '%s-%02d' % (year, month)
+                    c = doc['c']
+                    total = 0
                     for date, count in doc['dates'].items():
                         if date.startswith(prefix):
-                            if c not in s:
-                                s[c] = 0
-                            s[c] += count
+                            total += count
+
+                        s[c] = total
 
                 ms = '%02d' % (month)
                 df[ms] = s.sort_index()
