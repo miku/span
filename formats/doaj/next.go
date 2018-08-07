@@ -177,8 +177,8 @@ func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Bibjson.Journal.Language {
-		detected, err := span.DetectLang3(l)
-		if detected == "" || err != nil {
+		detected := span.LanguageIdentifier(l)
+		if detected == "" {
 			detected = "und"
 		}
 		languages.Add(detected)
