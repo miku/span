@@ -147,14 +147,16 @@ if __name__ == '__main__':
         # logger.debug(df.memory_usage(index=True).sum())
 
         for _, doc in tqdm.tqdm(entries.items()):
-            for date, count in doc['dates'].items():
-                if date in invalid:
-                    continue
-                ck = (doc['issn'], doc['sid'], doc['c'])
-                # logger.debug(ck)
-                if count > 65535:
-                    raise ValueError('too big, if failed: %d' % count)
-                df.loc[date, ck] = np.uint16(count)
+            ck = (doc['issn'], doc['sid'], doc['c'])
+            vs = [(date, count) for date, count in doc['dates'].items() if count < 65536 and date not in invalid]
+            dates, counts = [v[0] for v in vs], [v[1] for v in vs]
+            # logger.debug('dates=%d, counts=%d', len(dates), len(counts))
+            # 10x faster than setting single values.
+            df.loc[df.index.isin(dates), ck] = np.uint16(counts)
+
+        # df.to_pickle('df.pkl.gz')
+        df.to_hdf('df.h5', 'df')
+        # df.to_parquet('df.parquet.gz', compression='gz')
 
         logger.debug("ok")
 
