@@ -96,6 +96,7 @@ if __name__ == '__main__':
     entries = {}
 
     if not os.path.exists('r0.pkl'):
+        # XXX: fileinput and args break
         for line in fileinput.input():
             doc = json.loads(line)
             key = (doc['issn'], doc['c'])
@@ -195,7 +196,7 @@ if __name__ == '__main__':
                 s = pd.Series()
 
                 for _, doc in entries.items():
-                    c, prefix = doc['c'], '%d-%02d' % (year, month)
+                    c, prefix = doc['c'], '%s-%02d' % (year, month)
                     for date, count in doc['dates'].items():
                         if date.startswith(prefix):
                             if c not in s:
@@ -204,7 +205,7 @@ if __name__ == '__main__':
 
                 ms = '%02d' % (month)
                 df[ms] = s.sort_index()
-                logger.debug("done %d-%02d", year, month)
+                logger.debug("done %s-%02d", year, month)
 
             df.to_excel(writer, sheet_name='%d' % year)
 
