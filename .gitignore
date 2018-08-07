@@ -56,3 +56,4 @@ fixtures/report.ldj
 logs/*
 
 *.pkl
+df.h5
