@@ -207,7 +207,7 @@ if __name__ == '__main__':
                 df[ms] = s.sort_index()
                 logger.debug("done %s-%02d", year, month)
 
-            df.to_excel(writer, sheet_name='%d' % year)
+            df.to_excel(writer, sheet_name=year)
 
         writer.save()
         logger.debug("ok")
