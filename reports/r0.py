@@ -192,22 +192,15 @@ if __name__ == '__main__':
         for year in years:
             df = pd.DataFrame()
 
-            for month in range(1, 13):
+            for month in ('%02d' % s for s in range(1, 13)):
                 s = pd.Series()
-                prefix = '%s-%02d' % (year, month)
+                prefix = '%s-%s' % (year, month)
 
                 for _, doc in entries.items():
-                    c = doc['c']
-                    total = 0
-                    for date, count in doc['dates'].items():
-                        if date[:7] == prefix:
-                            total += count
+                    s[doc['c']] = sum(count for date, count in doc['dates'].items() if date[:7] == prefix)
 
-                    s[c] = total
-
-                ms = '%02d' % (month)
-                df[ms] = s.sort_index()
-                logger.debug("done %s-%02d", year, month)
+                df[month] = s.sort_index()
+                logger.debug("done %s-%s", year, month)
 
             df.to_excel(writer, sheet_name=year)
 
