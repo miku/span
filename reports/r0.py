@@ -200,10 +200,10 @@ if __name__ == '__main__':
                     c = doc['c']
                     total = 0
                     for date, count in doc['dates'].items():
-                        if date.startswith(prefix):
+                        if date[:7] == prefix:
                             total += count
 
-                        s[c] = total
+                    s[c] = total
 
                 ms = '%02d' % (month)
                 df[ms] = s.sort_index()
