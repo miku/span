@@ -35,21 +35,24 @@ Option: Create one DataFrame per sheet and then write it out.
 """
 
 import argparse
-import pandas as pd
-import numpy as np
-import fileinput
-import json
-import pickle
-import os
 import collections
-import tqdm
+import fileinput
+import itertools
+import json
 import logging
+import numpy as np
+import os
+import pandas as pd
+import pickle
+import sys
+import tqdm
 
 
 logger = logging.getLogger('r0')
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-formatter = logging.Formatter('[%(asctime)s][%(name)s][%(levelname)s] %(message)s')
+formatter = logging.Formatter(
+    '[%(asctime)s][%(name)s][%(levelname)s] %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
@@ -86,6 +89,8 @@ if __name__ == '__main__':
                         help='List all occuring dates')
     parser.add_argument('--data-frame', '-f', action='store_true',
                         help='Create Pandas DataFrame')
+    parser.add_argument('--excel', '-x', action='store_true',
+                        help='Create Excel file manually')
     args = parser.parse_args()
 
     entries = {}
@@ -140,23 +145,69 @@ if __name__ == '__main__':
         index = pd.DatetimeIndex(sorted(dates))
 
         # MemoryError, 11,655,842,342
-        # Size:        11,656,237,206 // 11G
-        logger.debug('want to create %dx%d shape', len(index), len(columns))
+        # Size:        11,656,237,206 ~ 11G
         data = np.zeros((len(index), len(columns)), dtype=np.uint16)
         df = pd.DataFrame(data, index=index, columns=columns)
         # logger.debug(df.memory_usage(index=True).sum())
 
         for _, doc in tqdm.tqdm(entries.items()):
             ck = (doc['issn'], doc['sid'], doc['c'])
-            vs = [(date, count) for date, count in doc['dates'].items() if count < 65536 and date not in invalid]
+            vs = [(date, count) for date, count in doc['dates'].items()
+                  if count < 65536 and date not in invalid]
             dates, counts = [v[0] for v in vs], [v[1] for v in vs]
-            # logger.debug('dates=%d, counts=%d', len(dates), len(counts))
             # 10x faster than setting single values.
             df.loc[df.index.isin(dates), ck] = np.uint16(counts)
 
-        # df.to_pickle('df.pkl.gz')
-        df.to_hdf('df.h5', 'df')
-        # df.to_parquet('df.parquet.gz', compression='gz')
+        df.to_hdf('df.h5', 'df')  # 22G
 
+        logger.debug("ok")
+
+    if args.excel:
+        # 1. For each year, find the ISSN that actually have issues in that year.
+        # 2. For a year, shard it into 12 month and sum up issues per month.
+        # 3. Write out Excel sheet for a year.
+
+        #             01  02  03 ...
+        # ISSN SID C   0  12  31
+        #      SID C   9   2   1
+        # ISSN SID C   3   4   1
+        # ISSN SID C   4   5   2
+        # ...
+
+        #
+        # C ISSN       1   3   4
+        # ...
+
+        # C            1   2   3
+
+        dates = set(itertools.chain(*[doc['dates'].keys() for _, doc in entries.items()]))
+        logger.debug("distinct dates %s", len(dates))
+
+        years = sorted([year for year in set([date[:4] for date in dates]) if '1700' < year < '2019'], reverse=True)
+        logger.debug("distinct years %s, %s", len(years), years[:10])
+
+        writer = pd.ExcelWriter('df.xlsx', engine='xlsxwriter')
+
+        for year in years:
+            df = pd.DataFrame()
+
+            for month in range(1, 13):
+                s = pd.Series()
+
+                for _, doc in entries.items():
+                    c, prefix = doc['c'], '%d-%02d' % (year, month)
+                    for date, count in doc['dates'].items():
+                        if date.startswith(prefix):
+                            if c not in s:
+                                s[c] = 0
+                            s[c] += count
+
+                ms = '%02d' % (month)
+                df[ms] = s.sort_index()
+                logger.debug("done %d-%02d", year, month)
+
+            df.to_excel(writer, sheet_name='%d' % year)
+
+        writer.save()
         logger.debug("ok")
 
