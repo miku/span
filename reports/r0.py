@@ -7,8 +7,8 @@ WIP: Create an Excel report from a span-0.1.253-ish span-report output.
     $ span-report -bs 100 -r faster -server 10.1.1.1:8085/solr/biblio > data.json
     $ python reports/r0.py -x data.json
 
-The span-report output for AI in June 2018 contains 236149 entries, where each
-line contains one issn:
+The span-report output (data.json) for AI in June 2018 contains 236149 entries,
+where each line contains one issn:
 
     {
       "c": "Scientific Online Publishing, Co. Ltd. (CrossRef)",
@@ -24,17 +24,8 @@ line contains one issn:
 Now we try to fit 40 dates per issn (on average, 10M data points in total) into
 a single Excel file, so that it's readable. The raw data is about 150MB.
 
-1. For each year, find the ISSN that actually have issues in that year.
-2. For a year, shard it into 12 month and sum up issues per month.
-3. Write out Excel sheet for a year.
-
-Option: Create an advanced DataFrame:
-
-* DateTimeIndex for each publication date, there are 49434 different dates.
-* Column is a hierarchical index, issn > collection. One issn can belong to
-  multiple collections, there will be 200000 columns.
-
-Option: Create one DataFrame per sheet and then write it out.
+A first version (https://git.io/fNSTT) was slow, 90min for an Excel file with
+315 sheets, years 2018 to 1700.
 """
 
 import argparse
@@ -85,7 +76,8 @@ def publications_per_year(entries):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--publications-per-year', '-y', action='store_true',
                         help='TSV with publications per year.')
@@ -141,12 +133,14 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if args.excel:
-        # First version, pre sheet: collections x month.
-        dates = set(itertools.chain(*[doc['dates'].keys() for _, doc in entries.items()]))
+        # First version, per sheet: collections x month.
+        dates = set(itertools.chain(*[doc['dates'].keys()
+                                      for _, doc in entries.items()]))
         logger.debug("distinct dates %s", len(dates))
 
-        years = sorted([year for year in set([date[:4] for date in dates]) if '1700' < year < '2019'], reverse=True)
-        logger.debug("distinct years %s, %s", len(years), years[:10])
+        years = sorted([year for year in set(
+            [date[:4] for date in dates]) if '1700' < year < '2019'], reverse=True)
+        logger.debug("distinct years %s, %s ...", len(years), years[:10])
 
         writer = pd.ExcelWriter(args.output, engine='xlsxwriter')
 
@@ -156,7 +150,8 @@ if __name__ == '__main__':
             for month in ('%02d' % s for s in range(1, 13)):
                 prefix = '%s-%s' % (year, month)
                 for _, doc in entries.items():
-                    s = sum(count for date, count in doc['dates'].items() if date[:7] == prefix)
+                    s = sum(count for date,
+                            count in doc['dates'].items() if date[:7] == prefix)
                     if s > 0:
                         data[month][doc['c']] = s
 
@@ -165,4 +160,3 @@ if __name__ == '__main__':
                 break
 
         writer.save()
-
