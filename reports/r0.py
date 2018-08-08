@@ -4,6 +4,9 @@
 """
 WIP: Create an Excel report from a span-0.1.253-ish span-report output.
 
+    $ span-report -bs 100 -r faster -server 10.1.1.1:8085/solr/biblio > data.json
+    $ python reports/r0.py -x data.json
+
 The span-report output for AI in June 2018 contains 236149 entries, where each
 line contains one issn:
 
@@ -82,27 +85,37 @@ def publications_per_year(entries):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     parser.add_argument('--publications-per-year', '-y', action='store_true',
-                        help='TSV with publications per year')
+                        help='TSV with publications per year.')
     parser.add_argument('--date-list', '-d', action='store_true',
-                        help='List all occuring dates')
-    parser.add_argument('--data-frame', '-f', action='store_true',
-                        help='Create Pandas DataFrame')
+                        help='List all occuring dates.')
+    parser.add_argument('--output', '-o', default='df.xlsx',
+                        help='Excel output filename.')
     parser.add_argument('--excel', '-x', action='store_true',
-                        help='Create Excel file manually')
+                        help='Create Excel file manually.')
+    parser.add_argument('--force', '-f', action='store_true',
+                        help='Do not use cached version.')
+    parser.add_argument('--max-sheets', '-m', default=10000, type=int,
+                        help='Maximum number of sheets to write.')
+    parser.add_argument('file', metavar='file', type=str, nargs=1,
+                        help='Raw report file.')
     args = parser.parse_args()
+
+    if args.force and os.path.exists('r0.pkl'):
+        os.remove('r0.pkl')
 
     entries = {}
 
     if not os.path.exists('r0.pkl'):
-        # XXX: fileinput and args break
-        for line in fileinput.input():
-            doc = json.loads(line)
-            key = (doc['issn'], doc['c'])
-            if key in entries:
-                raise ValueError('duplicate issn and collection: %s' % key)
-            entries[key] = doc
+        with open(args.file) as handle:
+            for line in handle:
+                doc = json.loads(line)
+                key = (doc['issn'], doc['c'])
+                if key in entries:
+                    raise ValueError('duplicate issn and collection: %s' % key)
+                entries[key] = doc
 
         with open('r0.pkl.tmp', 'wb') as output:
             pickle.dump(entries, output)
@@ -112,94 +125,44 @@ if __name__ == '__main__':
         entries = pickle.load(handle)
 
     if args.publications_per_year:
-        yearsize = publications_per_year(entries)
-
-        for year, size in sorted(yearsize.items()):
+        for year, size in sorted(publications_per_year(entries).items()):
             print('%s\t%s' % (year, size))
+        sys.exit(0)
 
     if args.date_list:
         dates = set()
+
         for _, doc in entries.items():
             for date in doc['dates']:
                 dates.add(date)
 
         for date in sorted(dates):
             print(date)
-
-    if args.data_frame:
-        # Try to pack everything into a single DataFrame to take advantage of
-        # DatetimeIndex.
-        columns = pd.MultiIndex.from_tuples(
-            [(doc['issn'], doc['sid'], doc['c']) for _, doc in entries.items()])
-
-        dates, invalid = set(), set()
-
-        for _, doc in entries.items():
-            for date in doc['dates']:
-                if not '1700-00-00' < date < '2200-00-00':
-                    logger.debug('skipping date: %s', date)
-                    invalid.add(date)
-                    continue
-                dates.add(date)
-
-        logger.debug('skipped %d possible invalid dates', len(invalid))
-        index = pd.DatetimeIndex(sorted(dates))
-
-        # MemoryError, 11,655,842,342
-        # Size:        11,656,237,206 ~ 11G
-        data = np.zeros((len(index), len(columns)), dtype=np.uint16)
-        df = pd.DataFrame(data, index=index, columns=columns)
-        # logger.debug(df.memory_usage(index=True).sum())
-
-        for _, doc in tqdm.tqdm(entries.items()):
-            ck = (doc['issn'], doc['sid'], doc['c'])
-            vs = [(date, count) for date, count in doc['dates'].items()
-                  if count < 65536 and date not in invalid]
-            dates, counts = [v[0] for v in vs], [v[1] for v in vs]
-            # 10x faster than setting single values.
-            df.loc[df.index.isin(dates), ck] = np.uint16(counts)
-
-        df.to_hdf('df.h5', 'df')  # 22G
-
-        logger.debug("ok")
+        sys.exit(0)
 
     if args.excel:
-        # 1. For each year, find the ISSN that actually have issues in that year.
-        # 2. For a year, shard it into 12 month and sum up issues per month.
-        # 3. Write out Excel sheet for a year.
-
-        #             01  02  03 ...
-        # ISSN SID C   0  12  31
-        #      SID C   9   2   1
-        # ISSN SID C   3   4   1
-        # ISSN SID C   4   5   2
-        # ...
-
-        #
-        # C ISSN       1   3   4
-        # ...
-
-        # C            1   2   3
-
+        # First version, pre sheet: collections x month.
         dates = set(itertools.chain(*[doc['dates'].keys() for _, doc in entries.items()]))
         logger.debug("distinct dates %s", len(dates))
 
         years = sorted([year for year in set([date[:4] for date in dates]) if '1700' < year < '2019'], reverse=True)
         logger.debug("distinct years %s, %s", len(years), years[:10])
 
-        writer = pd.ExcelWriter('df.xlsx', engine='xlsxwriter')
+        writer = pd.ExcelWriter(args.output, engine='xlsxwriter')
 
-        for year in years:
+        for i, year in enumerate(tqdm.tqdm(years, total=min(len(years), args.max_sheets)), start=1):
             data = collections.defaultdict(dict)
+
             for month in ('%02d' % s for s in range(1, 13)):
                 prefix = '%s-%s' % (year, month)
                 for _, doc in entries.items():
                     s = sum(count for date, count in doc['dates'].items() if date[:7] == prefix)
                     if s > 0:
                         data[month][doc['c']] = s
-                logger.debug("done %s-%s", year, month)
 
             pd.DataFrame(data).to_excel(writer, sheet_name=year)
+            if i == args.max_sheets:
+                break
 
         writer.save()
-        logger.debug("ok")
+
