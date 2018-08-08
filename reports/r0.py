@@ -190,19 +190,16 @@ if __name__ == '__main__':
         writer = pd.ExcelWriter('df.xlsx', engine='xlsxwriter')
 
         for year in years:
-            df = pd.DataFrame()
-
+            data = collections.defaultdict(dict)
             for month in ('%02d' % s for s in range(1, 13)):
-                s = pd.Series()
                 prefix = '%s-%s' % (year, month)
-
                 for _, doc in entries.items():
-                    s[doc['c']] = sum(count for date, count in doc['dates'].items() if date[:7] == prefix)
-
-                df[month] = s.sort_index()
+                    s = sum(count for date, count in doc['dates'].items() if date[:7] == prefix)
+                    if s > 0:
+                        data[month][doc['c']] = s
                 logger.debug("done %s-%s", year, month)
 
-            df.to_excel(writer, sheet_name=year)
+            pd.DataFrame(data).to_excel(writer, sheet_name=year)
 
         writer.save()
         logger.debug("ok")
