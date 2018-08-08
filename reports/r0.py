@@ -40,13 +40,13 @@ import fileinput
 import itertools
 import json
 import logging
-import numpy as np
 import os
-import pandas as pd
 import pickle
 import sys
-import tqdm
 
+import numpy as np
+import pandas as pd
+import tqdm
 
 logger = logging.getLogger('r0')
 logger.setLevel(logging.DEBUG)
@@ -206,4 +206,3 @@ if __name__ == '__main__':
 
         writer.save()
         logger.debug("ok")
-
