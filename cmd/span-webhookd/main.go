@@ -93,21 +93,26 @@ func Worker(done chan bool) {
 	done <- true
 }
 
-// Repo points to a local clone containing the configuration we want.
+// Repo points to a local clone containing the configuration we want. A token
+// is required to clone the repo from GitLab.
 type Repo struct {
 	URL   string
 	Dir   string
 	Token string
 }
 
-// AuthURL returns an authenticated repository URL.
+// AuthURL returns an authenticated repository URL, if no token is supplied,
+// just return the repo URL as is.
 func (r Repo) AuthURL() string {
+	if token == "" {
+		return r.URL
+	}
 	return strings.Replace(r.URL, "https://", fmt.Sprintf("https://oauth2:%s@", r.Token), 1)
 }
 
 // String representation.
 func (r Repo) String() string {
-	return fmt.Sprintf("Repo from %s at %s", r.URL, r.Dir)
+	return fmt.Sprintf("git repo from %s at %s", r.URL, r.Dir)
 }
 
 // Update just runs a git pull, as per strong convention, this will always be a
@@ -131,7 +136,7 @@ func (r Repo) Update() error {
 	} else {
 		cmd, args = "git", []string{"-C", r.Dir, "pull", "origin", "master"}
 	}
-	// XXX: black out token.
+	// XXX: black out token for logs.
 	log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
 	return exec.Command(cmd, args...).Run()
 }
@@ -225,10 +230,11 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("request from %s", r.RemoteAddr)
 	if r.Header.Get("X-FORWARDED-FOR") != "" {
-		log.Printf("X-FF: %s", r.Header.Get("X-FORWARDED-FOR"))
+		log.Printf("X-FORWARDED-FOR: %s", r.Header.Get("X-FORWARDED-FOR"))
 	}
 
 	gitlabEvent := strings.TrimSpace(r.Header.Get("X-Gitlab-Event"))
+
 	switch gitlabEvent {
 	case "Push Hook":
 		var payload PushPayload
