@@ -1,12 +1,9 @@
 // span-review runs plausibility queries against a SOLR server, mostly facet
 // queries, refs #12756.
 //
-// TODO:
-//
-// * configurable
-// * fetch from gitlab
-// * run
-// * post to gitlab or redmine
+// There is a yaml file for configuring queries. It is possible to send results
+// directly to a Redmine ticket. This program can be used standalone, or via
+// span-webhookd.
 package main
 
 import (
