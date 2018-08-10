@@ -232,7 +232,7 @@ func (w *TabWriter) WriteHeader(header ...string) {}
 func (w *TabWriter) WriteFields(fields ...interface{}) {
 	var s []string
 	for _, f := range fields {
-		s = append(s, fmt.Sprintf("%s", f))
+		s = append(s, fmt.Sprintf("%v", f))
 	}
 	_, w.err = fmt.Fprintf(w.w, "%s\n", strings.Join(s, "\t"))
 }
