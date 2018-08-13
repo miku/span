@@ -104,7 +104,7 @@ type Repo struct {
 // AuthURL returns an authenticated repository URL, if no token is supplied,
 // just return the repo URL as is.
 func (r Repo) AuthURL() string {
-	if token == "" {
+	if r.Token == "" {
 		return r.URL
 	}
 	return strings.Replace(r.URL, "https://", fmt.Sprintf("https://oauth2:%s@", r.Token), 1)
