@@ -17,11 +17,11 @@ solr: "auto"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "13684"
+ticket: "13622"
 
 
 # If set to "fail" an empty result set will be marked as failure.
-# Otherwise a empty result set will - most of the time - not be considered a violoation.
+# Otherwise a empty result set will - most of the time - not be considered a violation.
 zero-results-policy: "fail"
 
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
@@ -188,5 +188,5 @@ min-ratio:
 # MinCount: Query, Facet-Field, Value, Min Count. Checks, if the given value
 # appears at least a fixed number of times.
 min-count:
-    - ["source_id:89", "facet_avail", "Free", 100] # TESTCOMMIT-IGNORE 
+    - ["source_id:89", "facet_avail", "Free", 100]
 
