@@ -320,14 +320,16 @@ func main() {
 		if err = index.AllowedKeys(query, field, values...); err != nil {
 			log.Println(err)
 		}
+		passed := (err == nil)
+
 		numFound, err := index.NumFound(query)
 		if err != nil {
 			log.Fatal(err)
 		}
-		passed := err == nil
 		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
 			passed = false
 		}
+
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
@@ -348,14 +350,16 @@ func main() {
 		if err = index.EqualSizeTotal(query, field, values...); err != nil {
 			log.Println(err)
 		}
+		passed := (err == nil)
+
 		numFound, err := index.NumFound(query)
 		if err != nil {
 			log.Fatal(err)
 		}
-		passed := err == nil
 		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
 			passed = false
 		}
+
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
@@ -379,14 +383,16 @@ func main() {
 		if err = index.MinRatioPct(query, field, value, minRatioPct); err != nil {
 			log.Println(err)
 		}
+		passed := (err == nil)
+
 		numFound, err := index.NumFound(query)
 		if err != nil {
 			log.Fatal(err)
 		}
-		passed := err == nil
 		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
 			passed = false
 		}
+
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
@@ -411,14 +417,16 @@ func main() {
 		if err = index.MinCount(query, field, value, minCount); err != nil {
 			log.Println(err)
 		}
+		passed := (err == nil)
+
 		numFound, err := index.NumFound(query)
 		if err != nil {
 			log.Fatal(err)
 		}
-		passed := err == nil
 		if numFound == 0 && config.ZeroResultsPolicy == "fail" {
 			passed = false
 		}
+
 		results = append(results, Result{
 			SourceIdentifier: MustParseSourceIdentifier(query),
 			Link:             index.FacetLink(query, field),
