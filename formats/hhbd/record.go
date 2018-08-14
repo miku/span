@@ -10,10 +10,16 @@ import (
 
 	"github.com/miku/span"
 
+	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 )
 
-var datePattern = regexp.MustCompile(`[012][0-9][0-9][0-9]`)
+var (
+	datePattern = regexp.MustCompile(`[012][0-9][0-9][0-9]`)
+	Formats     = assetutil.MustLoadStringMap("assets/hhbd/formats.json")
+	Genres      = assetutil.MustLoadStringMap("assets/hhbd/genres.json")
+	RefTypes    = assetutil.MustLoadStringMap("assets/hhbd/reftypes.json")
+)
 
 func uniqueStrings(s []string) (result []string) {
 	m := make(map[string]bool)
@@ -124,9 +130,9 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.MegaCollections = []string{"sid-107-col-heidelberg"}
 
 	// XXX: Guess.
-	output.Format = "Manuscript"
-	output.Genre = "MANSCPT"
-	output.RefType = "GEN"
+	output.Format = Formats.LookupDefault(record.Metadata.Dc.Type.Text, "Manuscript")
+	output.Genre = Genres.LookupDefault(record.Metadata.Dc.Type.Text, "unknown")
+	output.RefType = RefTypes.LookupDefault(record.Metadata.Dc.Type.Text, "GEN")
 
 	// Date.
 	date, err := record.date()

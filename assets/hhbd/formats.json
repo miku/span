@@ -1,0 +1,14 @@
+{
+  "Monograph": "Monograph",
+  "Volume": "Volume",
+  "Manuscript": "Manuscript",
+  "Multivolume_work": "Manuscript",
+  "Charter": "Charter",
+  "Periodical": "Periodical",
+  "Fragment": "Fragment",
+  "Letter": "Letter",
+  "Map": "Map",
+  "Series": "Series",
+  "Text": "Text",
+  "Article": "Article"
+}

@@ -1,0 +1,14 @@
+{
+  "Monograph": "BOOK",
+  "Volume": "MANSCPT",
+  "Manuscript": "MANSCPT",
+  "Multivolume_work": "MANSCPT",
+  "Charter": "MANSCPT",
+  "Periodical": "SER",
+  "Fragment": "MANSCPT",
+  "Letter": "MANSCPT",
+  "Map": "MAP",
+  "Series": "SER",
+  "Text": "MANSCPT",
+  "Article": "EJOUR"
+}
