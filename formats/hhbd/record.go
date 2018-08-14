@@ -130,7 +130,9 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.MegaCollections = []string{"sid-107-col-heidelberg"}
 
 	// XXX: Guess.
-	output.Format = Formats.LookupDefault(record.Metadata.Dc.Type.Text, "Manuscript")
+	if len(record.Metadata.Dc.Ispartof) > 0 {
+		output.Format = Formats.LookupDefault(record.Metadata.Dc.Ispartof[0].Text, "Manuscript")
+	}
 	output.Genre = Genres.LookupDefault(record.Metadata.Dc.Type.Text, "unknown")
 	output.RefType = RefTypes.LookupDefault(record.Metadata.Dc.Type.Text, "GEN")
 
