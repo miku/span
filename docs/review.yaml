@@ -115,7 +115,7 @@ all-records:
     - ["source_id:162", "format_de15", "Article, E-Article"]
     - ["source_id:162", "facet_avail", "Online", "Free"]
     - ["source_id:162", "access_facet", "Electronic Resources"]
-    - ["source_id:162", "mega_collection", "GenderOpen"]
+    - ["source_id:162", "mega_collection", "Gender Open"]
 # Sources indexed in UBL-main
     - ["source_id:5", "facet_avail", "Online"]
     - ["source_id:9", "facet_avail", "Online", "Free"]
