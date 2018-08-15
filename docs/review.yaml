@@ -13,12 +13,12 @@
 # "http://localhost:8983/solr/biblio". If "auto", then the current testing "ai" solr
 # server will be figured out automatically.
 # solr: "auto"
-solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
-# solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
+# solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
+solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "13600"
+ticket: "13109"
 
 
 # If set to "fail" an empty result set will be marked as failure.
@@ -156,12 +156,12 @@ all-records:
     - ["source_id:77", "facet_avail", "Online", "Free"]
     - ["source_id:78", "facet_avail", "Online"]
     - ["source_id:79", "facet_avail", "Online"]
-    - ["source_id:80", "facet_avail", "Online"]
+    - ["source_id:80", "facet_avail", "Online", "Free"]
     - ["source_id:84", "facet_avail", "Online", "Free"]
-    - ["source_id:88", "facet_avail", "Online"]
+    - ["source_id:88", "facet_avail", "Online", "Free"]
     - ["source_id:96", "facet_avail", "Online"]
-    - ["source_id:99", "facet_avail", "Online"]
-    - ["source_id:100", "facet_avail", "Online"]
+    - ["source_id:99", "facet_avail", "Online", "Free"]
+    - ["source_id:100", "facet_avail", "Online", "Free"]
     - ["source_id:103", "facet_avail", "Online"]
     - ["source_id:106", "facet_avail", "Online", "Free"]
     - ["source_id:107", "facet_avail", "Online", "Free"]
