@@ -14,7 +14,7 @@ process millions of records fast.
     $ go get github.com/miku/span/cmd/...
 
 Span has frequent [releases](https://github.com/miku/span/releases), although
-not all version will be pacakged as deb or rpm.
+not all version will be packaged as deb or rpm.
 
 ## Background
 
