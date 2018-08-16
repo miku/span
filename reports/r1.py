@@ -27,8 +27,7 @@ single sheet (120 columns). Collection > ISSN > Dates.
 
 import argparse
 import collections
-import fileinput
-import itertools
+import datetime
 import json
 import logging
 import os
@@ -37,7 +36,6 @@ import random
 import string
 import sys
 
-import numpy as np
 import pandas as pd
 import tqdm
 
@@ -63,6 +61,8 @@ if __name__ == '__main__':
                         help='Create Excel file manually.')
     parser.add_argument('--force', '-f', action='store_true',
                         help='Do not use cached version.')
+    parser.add_argument('--sort-by-collection-size', '-s', action='store_true',
+                        help='Sort by collection size.')
     parser.add_argument('--max-sheets', '-m', default=10000, type=int,
                         help='Maximum number of sheets to write.')
     parser.add_argument('file', metavar='file', type=str,
@@ -91,26 +91,35 @@ if __name__ == '__main__':
         writer = pd.ExcelWriter(args.output, engine='xlsxwriter')
 
         names = set()
+        today = datetime.date.today()
 
-        for i, (c, blob) in enumerate(entries.items()):
-            logger.debug('%s (%s)', c, len(blob))
-            drop = True # Drop sheet, if all entries are zero.
+        key = lambda x: x
+        if args.sort_by_collection_size:
+            key = lambda x: len(x[1])
 
-            # blob is a dictionary, issn key, the document as value
-            # data will be fed into DataFrame
+        for i, (c, blob) in enumerate(sorted(entries.items(), key=key, reverse=True), start=1):
+            logger.debug('%d/%d %s (%s)', i, len(entries), c, len(blob))
+
+            # Drop sheet, if all entries are zero.
+            drop = True
+
+            # blob is a dictionary, issn key, the document as value, data will
+            # be fed into DataFrame.
             data = collections.defaultdict(dict)
 
-            for issn, doc in blob.items():
+            for issn, doc in sorted(blob.items()):
                 for year in range(2018, 2007, -1):
-                    for month in ('%02d' % s for s in range(12, 0, -1)):
-                        prefix = '%d-%s' % (year, month)
-                        s = sum(count for date, count in doc['dates'].items()
-                                if date[:7] == prefix)
+                    for month in range(12, 0, -1):
+                        if datetime.date(year, month, 1) > today:
+                            continue
 
+                        prefix = '%04d-%02d' % (year, month)
+                        s = sum(count for date, count in doc['dates'].items() if date[:7] == prefix)
                         data[prefix][issn] = s if s else ''
 
                         if s > 0:
                             drop = False
+
             if drop:
                 continue
 
