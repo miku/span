@@ -1,5 +1,7 @@
 # Span
 
+![](docs/ticino_26242_sm.gif)
+
 Span started as a single tool to convert [Crossref
 API](https://www.crossref.org/services/metadata-delivery/rest-api/) data into a
 VuFind/SOLR format as used in [finc](https://finc.info). Go was choosen as the
