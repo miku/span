@@ -4,10 +4,10 @@
 """
 WIP: Create an Excel report from a span-0.1.253-ish span-report output.
 
-    $ span-report -bs 100 -r faster -server 10.1.1.1:8085/solr/biblio > data.json
-    $ python reports/r0.py -x data.json
+    $ span-report -bs 100 -r faster -server 10.1.1.1:8085/solr/biblio > data.ndj
+    $ python reports/r0.py -x data.ndj
 
-The span-report output (data.json) for AI in June 2018 contains 236149 entries,
+The span-report output (data.ndj) for AI in June 2018 contains 236149 entries,
 where each line contains one issn:
 
     {
