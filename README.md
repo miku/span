@@ -1,100 +1,89 @@
-Span
-====
+# Span
 
-The span tools convert to and from an intermediate schema and support license
-tagging and quality assurance.
+Span started as a single tool to convert [Crossref
+API](https://www.crossref.org/services/metadata-delivery/rest-api/) data into a
+VuFind/SOLR format as used in [finc](https://finc.info). Go was choosen as the
+implementation language because it is easy to deploy and has concurrency
+support built into the language. A basic scatter-gather design allowed to
+process millions of records fast.
 
-The intermediate schema is a normalization vehicle, spec: https://github.com/ubleipzig/intermediateschema
+![](docs/scatter.png)
 
-[![goodtables.io](https://goodtables.io/badge/github/miku/span.svg)](https://goodtables.io/github/miku/span)
-
-----
-
-Install with
+## Installation
 
     $ go get github.com/miku/span/cmd/...
 
-or via deb or rpm [packages](https://github.com/miku/span/releases).
+Span has frequent [releases](https://github.com/miku/span/releases), although
+not all version will be pacakged as deb or rpm.
 
-Formats
--------
+## Background
 
-* [CrossRef API](http://api.crossref.org/), works and members
-* JATS [Journal Archiving and Interchange Tag Set](http://jats.nlm.nih.gov/archiving/versions.html), with various flavours for JSTOR and others
-* [DOAJ](http://doaj.org/) exports
-* FINC [Intermediate Format](https://github.com/ubleipzig/intermediateschema)
-* Various FINC [SOLR Schema](https://github.com/finc/index/blob/master/schema.xml)
-* GENIOS Profile XML
-* Elsevier Transport
-* Thieme TM Style
-* [Formeta](https://github.com/culturegraph)
-* IEEE IDAMS Exchange V2.0.0
+The first weeks, there was only a single `span` command. In March 2015,
+`span-import` and `span-export` appeared. There were some rudimentary commands
+for dealing with holding files of various formats. In early 2016, a licensing
+tool was briefly named `span-label` before becoming `span-tag`. In Summer 2016,
+`span-check`, `span-deduplicate`, `span-redact` were added, later a first
+man-page followed. In Summer 2017, `span-deduplicate` was gone, the doi-based
+deduplication was split up between the blunt, but fast
+[groupcover](https://github.com/miku/groupcover) and the generic
+`span-update-labels`. A new `span-oa-filter` helped to mark open-access
+records. In Winter 2017, a `span-freeze` was added to allow for fixed
+configuration across dozens of files. The `span-crossref-snapshot` tool
+replaced a sequence of luigi tasks responsible for creating a snapshot of
+crossref data (the process has been summarized in [a
+comment](https://github.com/datahq/awesome-data/issues/29#issuecomment-405089255)).
+In Summer 2018, three new tools were added: `span-compare` for generating index
+diffs for index update tickets, `span-review` for generating reports based on
+SOLR queries and `span-webhookd` for triggering index reviews and ticket
+updates through GitLab. During the development, new input and output formats
+have been added. The parallel processing of records has been streamlined with
+the help of a small library called
+[parallel](https://github.com/miku/parallel). Since Winter 2017, the
+[zek](https://github.com/miku/zek) struct generator takes care of the initial
+screening of sources serialized as XML - making the process of mapping new data
+sources easier.
 
-Also:
+## Documentation
 
-* [KBART](http://www.uksg.org/KBART)
+See: manual [source](https://github.com/miku/span/blob/master/docs/span.md).
 
-Addings data sources
---------------------
+## Performance
 
-The following kinds of data shapes are supported at the moment:
+Processing 150M JSON documents regularly and fast requires a bit of care. In
+the best case no complete processing of the data should take more than two
+hours or run slower than 20000 records/s. The most expensive part is the JSON
+serialization, but we keep JSON for now for the sake of readability. Experiments with
+faster JSON serializers and msgpack have been encouraging, a faster
+serialization should be the next measure to improve performance.
 
-* A stream of XML, containing zero, one or more records, identified by an XML
-tag. Moderately fast.
-* Newline delimited JSON, containing zero, one or more records, one record per
-line. Fast.
-* Single records of arbitrary shape. Slow.
+Most tools that work on lines will try to use as many workers as CPU cores.
+Except for `span-tag` - which needs to keep all holdings data in memory - all
+tools work well in a low-memory environment.
 
-Use span, if
-[metafacture](https://github.com/culturegraph/metafacture-core/wiki) or
-[jq](https://stedolan.github.io/jq/) or a Python snippet are not sufficient.
+## Integration
 
-Steps:
+The span tools are used in various tasks in siskin (which contains all
+orchestration code). All span tools work fine standalone, and most will accept
+input from stdin as well, allowing for one-off things like:
 
-* Add a new subpackage for your format, e.g. [dummy](https://github.com/miku/span/tree/master/formats/dummy).
-* Add a [struct](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/formats/dummy/example.go#L12-L15) representing the original record (XML, JSON, bytes).
-* Implement the conversion functions required, e.g. [ToIntermediateSchema](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/formats/dummy/example.go#L17-L22)
-* Add an entry into the [format map](https://github.com/miku/span/blob/f89ef0337249ba5f75d05d8a3db7c85b5c389eaa/cmd/span-import/main.go#L59) for span-import
-* [Decide](https://github.com/miku/span/blob/9f07e35be39c184686b05e759b4d826b1de1a905/cmd/span-import/main.go#L202),
-which kind of source this is (XML stream, newline delimited JSON, single
-records, something else)
-* Recompile and ship.
-
-Ideas for span 0.2.0
---------------------
-
-TODO:
-
-* Do not require recompilation for mapping updates (allow various sources)
-* Decouple format from source. Things like SourceID and MegaCollection are per source, not format.
-* Allow loadable assets from ~/.config/span/maps, some specified location or a single JSON file.
-
-More taggable formats:
-
-Let formats implement a single function interface, that takes a filter value.
-How to make this filter generic? Or use Tag as an adapeter?
-
-```go
-// Tag alters the document by applying a filter to it.
-func (doc *Document) Tag(f Filter) error {
-    // Adapt.
-    record = FilterRecord{
-	ISSN: doc.ISSN,
-	Title: doc.CombinedTitle(),
-	// ...
-    }
-    // Apply.
-    return f.Apply(record)
-}
+```shell
+$ metha-cat http://oai.web | span-import -i name | span-tag -c amsl | span-export | solrbulk
 ```
 
-DONE:
+## TODO
 
-* Reuse more generic code, e.g. [parallel](http://github.com/miku/parallel)
-* Make conversions a simpler with [xmlstream](https://github.com/miku/xmlstream), [zek](https://github.com/miku/zek)
+There is a [open issue](https://github.com/miku/span/issues/2) regarding more
+flexible license labelling. While this would be useful, it would be probably
+even more useful to separate content conversions from licensing issues
+altogether. There is lots of work done in prototypes, which explore how fast
+and how reliable we can rewrite documents in a production server.
 
-Licence
--------
+Ideally, a cron job or trigger regularly checks and ensures compliance.
 
-* GPLv3
-* This project uses the Compact Language Detector 2 - [CLD2](https://github.com/CLD2Owners/cld2), Apache License Version 2.0
+```shell
+$ span-r12n -c config.json -server 10.1.1.100:8080/solr/biblio
+```
+
+Since August 2018, the indices track the `last_updated` date of documents,
+which can help with fast checks on newly indexed records.
+
