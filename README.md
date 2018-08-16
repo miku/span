@@ -9,8 +9,6 @@ implementation language because it is easy to deploy and has concurrency
 support built into the language. A basic scatter-gather design allowed to
 process millions of records fast.
 
-![](docs/scatter.png)
-
 ## Installation
 
     $ go get github.com/miku/span/cmd/...
@@ -62,6 +60,8 @@ Most tools that work on lines will try to use as many workers as CPU cores.
 Except for `span-tag` - which needs to keep all holdings data in memory - all
 tools work well in a low-memory environment.
 
+![](docs/scatter.png)
+
 ## Integration
 
 The span tools are used in various tasks in siskin (which contains all
@@ -86,6 +86,9 @@ Ideally, a cron job or trigger regularly checks and ensures compliance.
 $ span-r12n -c config.json -server 10.1.1.100:8080/solr/biblio
 ```
 
-Since August 2018, the indices track the `last_updated` date of documents,
-which can help with fast checks on newly indexed records.
+This bot-oriented design has been in parts inspired by the [fatcat RFC](http://fatcat.wiki/).
+
+Since August 2018, the [finc indices](https://finc.info) track the
+`last_updated` date of documents, which can help with fast checks on newly
+indexed records.
 
