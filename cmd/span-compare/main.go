@@ -368,7 +368,7 @@ func main() {
 		rw = &TabWriter{w: os.Stdout}
 	}
 
-	rw.WriteHeader("ISIL", "Source", "Name", "Live", "Nonlive", "Diff", "Comment")
+	rw.WriteHeader("ISIL", "Source", "Name", "Live", "Nonlive", "Diff", "Pct", "Comment")
 
 	// XXX: Parallelize.
 	for _, institution := range institutions {
@@ -403,6 +403,9 @@ func main() {
 			var liveField = fmt.Sprintf("%d", numLive)
 			var nonliveField = fmt.Sprintf("%d", numNonlive)
 
+			pctChange := (float64(numNonlive-numLive) / float64(numLive)) * 100
+			pctChangeField := fmt.Sprintf("%0.2f", pctChange)
+
 			if *textile {
 				data := struct {
 					SourceID    string
@@ -429,7 +432,7 @@ func main() {
 				}
 			}
 
-			rw.WriteFields(renderInstitution, sid, name, liveField, nonliveField, numNonlive-numLive, "")
+			rw.WriteFields(renderInstitution, sid, name, liveField, nonliveField, numNonlive-numLive, pctChangeField, "")
 			if rw.Err() != nil {
 				log.Fatal(rw.Err())
 			}
