@@ -196,6 +196,11 @@ var SourceNames = map[string]string{
 	"161": "Cambridge eBooks Open Access",
 	"162": "Gender Open Repositorium",
 	"163": "Nachlässe der UB Leipzig",
+	"164": "Japanische Videospielsammlung (UBL)",
+	"165": "Tectum eBooks (HfMT Köln)|In Bearbeitung (techn.)",
+	"166": "Kunsthistorisches Institut Florenz",
+	"167": "Bildarchiv Foto Marburg|In Bearbeitung (techn.)",
+	"168": "Bibliotheca Hertziana – Max–Planck–Institut für Kunstgeschichte|In Bearbeitung (techn.)",
 	"200": "finc TEST",
 }
 
