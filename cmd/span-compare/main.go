@@ -403,8 +403,16 @@ func main() {
 			var liveField = fmt.Sprintf("%d", numLive)
 			var nonliveField = fmt.Sprintf("%d", numNonlive)
 
+			// Percentage change, refs #12756.
 			pctChange := (float64(numNonlive-numLive) / float64(numLive)) * 100
-			pctChangeField := fmt.Sprintf("%0.2f", pctChange)
+			var pctChangeField string
+
+			switch {
+			case pctChange > 5.0 || pctChange < 5.0:
+				pctChangeField = fmt.Sprintf("*%0.2f*", pctChange)
+			default:
+				pctChangeField = fmt.Sprintf("%0.2f", pctChange)
+			}
 
 			if *textile {
 				data := struct {
