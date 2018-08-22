@@ -1,7 +1,7 @@
-// WIP: move siskin:bin/indexcompare into a tool, factor out solr stuff into
+// WIP: move siskin:bin/indexcompare into this tool, factor out solr stuff into
 // solrutil.go.
 //
-// $ span-compare -a 10.1.1.7:8085/solr/biblio  -b 10.1.1.15:8085/solr/biblio
+// $ span-compare -a 10.1.1.7:8085/solr/biblio -b 10.1.1.15:8085/solr/biblio
 // DE-1156    13   Diss Online                         0         219277    219277
 // DE-D117    13   Diss Online                         0         219277    219277
 // DE-L152    13   Diss Online                         0         219277    219277
