@@ -4,17 +4,19 @@
 
 Span started as a single tool to convert [Crossref
 API](https://www.crossref.org/services/metadata-delivery/rest-api/) data into a
-VuFind/SOLR format as used in [finc](https://finc.info). Go was choosen as the
-implementation language because it is easy to deploy and has concurrency
-support built into the language. A basic scatter-gather design allowed to
-process millions of records fast.
+VuFind/SOLR format as used in [finc](https://finc.info). An [intermediate
+representation](https://github.com/ubleipzig/intermediateschema) for article
+metadata is used for normalizing various input formats.
+[Go](https://golang.org/) was choosen as the implementation language because it
+is easy to deploy and has concurrency support built into the language. A basic
+scatter-gather design allowed to process millions of records fast.
 
 ## Installation
 
     $ go get github.com/miku/span/cmd/...
 
 Span has frequent [releases](https://github.com/miku/span/releases), although
-not all version will be packaged as deb or rpm.
+not all versions will be packaged as deb or rpm.
 
 ## Background
 
@@ -52,9 +54,10 @@ See: manual [source](https://github.com/miku/span/blob/master/docs/span.md).
 Processing 150M JSON documents regularly and fast requires a bit of care. In
 the best case no complete processing of the data should take more than two
 hours or run slower than 20000 records/s. The most expensive part is the JSON
-serialization, but we keep JSON for now for the sake of readability. Experiments with
-faster JSON serializers and msgpack have been encouraging, a faster
-serialization should be the next measure to improve performance.
+[serialization](https://raw.githubusercontent.com/miku/span/master/docs/span-import.0.1.253.png),
+but we keep JSON for now for the sake of readability. Experiments with faster
+JSON serializers and msgpack have been encouraging, a faster serialization
+should be the next measure to improve performance.
 
 Most tools that work on lines will try to use as many workers as CPU cores.
 Except for `span-tag` - which needs to keep all holdings data in memory - all
