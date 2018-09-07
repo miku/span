@@ -16,7 +16,7 @@ import (
 // directory and error). When this function returns, all URLs in the
 // filterconfig have then been replaced by absolute path on the file system.
 // Cleanup of temporary directory is responsibility of caller.
-func UnfreezeFilterConfig(frozenfile string) (dir string, blob string, err error) {
+func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 	dir, err = ioutil.TempDir("", "span-tag-unfreeze-")
 	if err != nil {
 		return dir, "", err
