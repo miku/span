@@ -7,5 +7,6 @@
     "ElectronicResourceRemoteAccess": "Article, E-Article",
     "ElectronicSerial": "Article, E-Article",
     "ElectronicThesis": "Article, E-Article",
-    "Unknown": "Article, E-Article" 
+    "Unknown": "Article, E-Article",
+    "Video": "Video" 
 }
