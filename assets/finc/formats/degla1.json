@@ -7,5 +7,6 @@
     "ElectronicResourceRemoteAccess": "Electronic Resource (Remote Access)",
     "ElectronicSerial": "E-Journal",
     "ElectronicThesis": "Thesis",
-    "Unknown": "Unknown Format"
+    "Unknown": "Unknown Format",
+    "Video": "Video"
 }
