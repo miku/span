@@ -61,7 +61,7 @@ type StringSet struct {
 	Set map[string]struct{}
 }
 
-// NewString returns an empty string set.
+// NewString returns an empty string set. XXX: Make the zero value usable.
 func NewStringSet(s ...string) *StringSet {
 	ss := &StringSet{Set: make(map[string]struct{})}
 	for _, item := range s {
@@ -111,6 +111,28 @@ func (set *StringSet) SortedValues() (values []string) {
 	}
 	sort.Strings(values)
 	return values
+}
+
+// Intersection returns the intersection of two string sets.
+func (set *StringSet) Intersection(other *StringSet) *StringSet {
+	isect := NewStringSet()
+	for k := range set.Set {
+		if other.Contains(k) {
+			isect.Add(k)
+		}
+	}
+	return isect
+}
+
+// Difference returns all items, that are in set but not in other.
+func (set *StringSet) Difference(other *StringSet) *StringSet {
+	diff := NewStringSet()
+	for k := range set.Set {
+		if !other.Contains(k) {
+			diff.Add(k)
+		}
+	}
+	return diff
 }
 
 // Define a type named "StringSlice" as a slice of strings.
