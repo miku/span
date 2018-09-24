@@ -26,6 +26,7 @@ install -m 755 span-check $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-hcov $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-local-data $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/sbin
@@ -59,6 +60,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-compare
 /usr/sbin/span-export
 /usr/sbin/span-freeze
+/usr/sbin/span-hcov
 /usr/sbin/span-import
 /usr/sbin/span-local-data
 /usr/sbin/span-oa-filter
