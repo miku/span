@@ -55,14 +55,14 @@ func main() {
 
 	b, err := json.Marshal(map[string]interface{}{
 		"coverage_pct":        fmt.Sprintf("%0.2f%%", coveragePct*100),
+		"date":                time.Now(),
 		"holdings":            hset.Size(),
+		"holdings_file":       *holdingsFile,
+		"holdings_only":       hset.Difference(iset).SortedValues(),
+		"holdings_only_count": hset.Difference(iset).Size(),
 		"index":               iset.Size(),
 		"index_url":           *server,
 		"intersection":        hset.Intersection(iset).Size(),
-		"holdings_only_count": hset.Difference(iset).Size(),
-		"holdings_only_list":  hset.Difference(iset).SortedValues(),
-		"holdings_file":       *holdingsFile,
-		"date":                time.Now(),
 	})
 	if err != nil {
 		log.Fatal(err)
