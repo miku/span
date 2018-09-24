@@ -3,7 +3,8 @@
 .PP
 span\-import, span\-tag, span\-export, span\-check, span\-oa\-filter,
 span\-update\-labels, span\-crossref\-snapshot, span\-local\-data, span\-freeze,
-span\-review, span\-webhookd \- intermediate schema and integration tools
+span\-review, span\-webhookd, span\-hcov \- intermediate schema and integration
+tools
 .SH SYNOPSIS
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
@@ -27,6 +28,8 @@ span\-review, span\-webhookd \- intermediate schema and integration tools
 \fB\fCspan\-review\fR [\fB\fC\-server\fR \fIurl\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-c\fR \fIfile\fP] [\fB\fC\-a\fR] [\fB\fC\-t\fR] [\fB\fC\-ticket\fR \fInumber\fP]
 .PP
 \fB\fCspan\-webhookd\fR [\fB\fC\-addr\fR \fIhostport\fP] [\fB\fC\-logfile\fR \fIfile\fP] [\fB\fCrepo\-dir\fR \fIpath\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-token\fR \fItoken\fP]
+.PP
+\fB\fCspan\-hcov\fR \fB\fC\-f\fR \fIfile\fP \fB\fC\-server\fR \fIurl\fP
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -368,6 +371,43 @@ is \fB\fC~/.config/span/span.json\fR, with \fB\fC/etc/span/span.json\fR as fallb
   "redmine.baseurl": "https://projects.example.com",
   "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e",
   "port": 8080
+}
+.fi
+.RE
+.SH COVERAGE REPORT
+.PP
+A simple coverage report can be generated with \fB\fCspan\-hcov\fR tool.
+.PP
+.RS
+.nf
+$ span\-hcov \-f kbart.txt \-server 10.1.1.1:8085/solr/biblio
+.fi
+.RE
+.PP
+This will calculate the ratio of ISSN overlap between holdings and index.
+.PP
+Example report (might change in the future):
+.PP
+.RS
+.nf
+{
+  "coverage_pct": "83.29%",
+  "date": "2018\-09\-24T14:42:46.565617857+02:00",
+  "holdings": 22122,
+  "holdings_file": "tmp/MFHB_ALkbart_2018\-08\-23.txt",
+  "holdings_only_count": 3697,
+  "holdings_only": [
+    "0000\-0600",
+    "0000\-3600",
+    "0001\-0196",
+    "0001\-4672",
+    ...
+    "8756\-7113",
+    "8756\-8160"
+  ],
+  "index": 156708,
+  "index_url": "http://172.18.113.7:8085/solr/biblio",
+  "intersection": 18425
 }
 .fi
 .RE

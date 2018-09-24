@@ -6,7 +6,8 @@ NAME
 
 span-import, span-tag, span-export, span-check, span-oa-filter,
 span-update-labels, span-crossref-snapshot, span-local-data, span-freeze,
-span-review, span-webhookd - intermediate schema and integration tools
+span-review, span-webhookd, span-hcov - intermediate schema and integration
+tools
 
 SYNOPSIS
 --------
@@ -32,6 +33,8 @@ SYNOPSIS
 `span-review` [`-server` *url*] [`-span-config` *file*] [`-c` *file*] [`-a`] [`-t`] [`-ticket` *number*]
 
 `span-webhookd` [`-addr` *hostport*] [`-logfile` *file*] [`repo-dir` *path*] [`-span-config` *file*] [`-token` *token*]
+
+`span-hcov` `-f` *file* `-server` *url*
 
 DESCRIPTION
 -----------
@@ -372,6 +375,41 @@ is `~/.config/span/span.json`, with `/etc/span/span.json` as fallback. The
   "redmine.baseurl": "https://projects.example.com",
   "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e",
   "port": 8080
+}
+```
+
+COVERAGE REPORT
+---------------
+
+A simple coverage report can be generated with `span-hcov` tool.
+
+```
+$ span-hcov -f kbart.txt -server 10.1.1.1:8085/solr/biblio
+```
+
+This will calculate the ratio of ISSN overlap between holdings and index.
+
+Example report (might change in the future):
+
+```
+{
+  "coverage_pct": "83.29%",
+  "date": "2018-09-24T14:42:46.565617857+02:00",
+  "holdings": 22122,
+  "holdings_file": "tmp/MFHB_ALkbart_2018-08-23.txt",
+  "holdings_only_count": 3697,
+  "holdings_only": [
+    "0000-0600",
+    "0000-3600",
+    "0001-0196",
+    "0001-4672",
+    ...
+    "8756-7113",
+    "8756-8160"
+  ],
+  "index": 156708,
+  "index_url": "http://172.18.113.7:8085/solr/biblio",
+  "intersection": 18425
 }
 ```
 
