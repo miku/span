@@ -78,7 +78,6 @@ func (r Record) ID() (string, error) {
 	} else {
 		return strings.TrimSpace(parts[1]), nil
 	}
-	return "", fmt.Errorf("no identifier found: %s", r.Header.Identifier.Text)
 }
 
 // FindYear tries to find a year.
