@@ -43,10 +43,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Normalize.
-	hlist = normalizeSerialNumbers(hlist)
-	ilist = normalizeSerialNumbers(ilist)
-
 	// Use sets.
 	hset := container.NewStringSet(hlist...)
 	iset := container.NewStringSet(ilist...)
@@ -79,7 +75,7 @@ func normalizeSerialNumbers(s []string) (result []string) {
 		}
 		result = append(result, r)
 	}
-	return result
+	return normalizeSerialNumbers(result)
 }
 
 // indexSerialNumbers returns a unique list of ISSN from a SOLR index.
@@ -101,5 +97,5 @@ func holdingsSerialNumbers(r io.Reader) ([]string, error) {
 			unique.Add(issn)
 		}
 	}
-	return unique.SortedValues(), nil
+	return normalizeSerialNumbers(unique.SortedValues()), nil
 }
