@@ -20,15 +20,15 @@ not all versions will be packaged as deb or rpm.
 
 ## Background
 
-Initial import *Tue Feb 3 19:11:08 2015*. The first weeks, there was only a
-single `span` command. In March 2015, `span-import` and `span-export` appeared.
-There were some rudimentary commands for dealing with holding files of various
-formats. In early 2016, a licensing tool was briefly named `span-label` before
-becoming `span-tag`. In Summer 2016, `span-check`, `span-deduplicate`,
-`span-redact` were added, later a first man-page followed. In Summer 2017,
-`span-deduplicate` was gone, the doi-based deduplication was split up between
-the blunt, but fast [groupcover](https://github.com/miku/groupcover) and the
-generic `span-update-labels`. A new `span-oa-filter` helped to mark open-access
+Initial import *Tue Feb 3 19:11:08 2015*, a single `span` command. In March
+2015, `span-import` and `span-export` appeared.  There were some rudimentary
+commands for dealing with holding files of various formats. In early 2016, a
+licensing tool was briefly named `span-label` before becoming `span-tag`. In
+Summer 2016, `span-check`, `span-deduplicate`, `span-redact` were added, later
+a first man-page followed. In Summer 2017, `span-deduplicate` was gone, the
+doi-based deduplication was split up between the blunt, but fast
+[groupcover](https://github.com/miku/groupcover) and the generic
+`span-update-labels`. A new `span-oa-filter` helped to mark open-access
 records. In Winter 2017, a `span-freeze` was added to allow for fixed
 configuration across dozens of files. The `span-crossref-snapshot` tool
 replaced a sequence of luigi tasks responsible for creating a snapshot of
