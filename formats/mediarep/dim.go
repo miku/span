@@ -7,8 +7,8 @@ import (
 	"github.com/miku/span/formats/finc"
 )
 
-// Record was generated 2018-10-02 14:55:51 by tir on sol.
-type Record struct {
+// Dim was generated 2018-10-02 14:55:51 by tir on sol.
+type Dim struct {
 	XMLName xml.Name `xml:"Record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
@@ -40,7 +40,7 @@ type Record struct {
 
 // FieldValue returns the first value given a mdschema and element attribute
 // name, empty string if nothing is found.
-func (r *Record) FieldValue(schema, element, qualifier string) string {
+func (r *Dim) FieldValue(schema, element, qualifier string) string {
 	for _, f := range r.Metadata.Dim.Field {
 		if f.Mdschema == schema && f.Element == element && f.Qualifier == qualifier {
 			return f.Text
@@ -51,7 +51,7 @@ func (r *Record) FieldValue(schema, element, qualifier string) string {
 
 // FieldValues returns the all values given a mdschema and element attribute
 // name, empty slice if nothing is found.
-func (r *Record) FieldValues(schema, element, qualifier string) (result []string) {
+func (r *Dim) FieldValues(schema, element, qualifier string) (result []string) {
 	for _, f := range r.Metadata.Dim.Field {
 		if f.Mdschema == schema && f.Element == element && f.Qualifier == qualifier {
 			result = append(result, f.Text)
@@ -61,7 +61,7 @@ func (r *Record) FieldValues(schema, element, qualifier string) (result []string
 }
 
 // ToIntermediateSchema converts mediarep/dim to intermediate schema
-func (r *Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
+func (r *Dim) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	output.ArticleTitle = r.FieldValue("dc", "title", "")

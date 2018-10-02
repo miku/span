@@ -33,6 +33,7 @@ import (
 	"github.com/miku/span/formats/ieee"
 	"github.com/miku/span/formats/imslp"
 	"github.com/miku/span/formats/jstor"
+	"github.com/miku/span/formats/mediarep"
 	"github.com/miku/span/formats/olms"
 	"github.com/miku/span/formats/ssoar"
 	"github.com/miku/span/formats/thieme"
