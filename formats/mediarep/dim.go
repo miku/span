@@ -2,6 +2,8 @@ package mediarep
 
 import (
 	"encoding/xml"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/miku/span/formats/finc"
@@ -60,9 +62,30 @@ func (r *Dim) FieldValues(schema, element, qualifier string) (result []string) {
 	return result
 }
 
+// PageCount returns number of pages as string or the the empty string.
+func (r *Dim) PageCount() string {
+	spage := r.FieldValue("local", "source", "spage")
+	epage := r.FieldValue("local", "source", "epage")
+	s, err := strconv.Atoi(spage)
+	if err != nil {
+		return ""
+	}
+	e, err := strconv.Atoi(epage)
+	if err != nil {
+		return ""
+	}
+	if e < s {
+		return ""
+	}
+	return fmt.Sprintf("%d", e-s)
+}
+
 // ToIntermediateSchema converts mediarep/dim to intermediate schema
 func (r *Dim) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
+
+	output.SourceID = "170"
+	output.MegaCollections = []string{"sid-170-col-mediarep"}
 
 	output.ArticleTitle = r.FieldValue("dc", "title", "")
 	output.Subjects = r.FieldValues("dc", "subject", "")
@@ -74,6 +97,9 @@ func (r *Dim) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Issue = r.FieldValue("local", "source", "issue")
 	output.Volume = r.FieldValue("local", "source", "volume")
 	output.RawDate = r.FieldValue("dc", "date", "issued")
+	output.StartPage = r.FieldValue("local", "source", "spage")
+	output.EndPage = r.FieldValue("local", "source", "epage")
+	output.PageCount = r.PageCount()
 
 	date, err := time.Parse("2006", output.RawDate)
 	if err != nil {
