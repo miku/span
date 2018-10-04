@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path"
 	"sort"
@@ -404,11 +405,16 @@ func main() {
 			var nonliveField = fmt.Sprintf("%d", numNonlive)
 
 			// Percentage change, refs #12756.
-			pctChange := (float64(numNonlive-numLive) / float64(numLive)) * 100
+			pctChange := (float64(numNonlive-numLive) / (0.001 + float64(numLive))) * 100
+
+			// Remove -0.00 from rendering.
+			if pctChange == 0 {
+				pctChange = math.Copysign(pctChange, 1)
+			}
 			var pctChangeField string
 
 			switch {
-			case pctChange > 5.0 || pctChange < 5.0:
+			case pctChange > 5.0 || pctChange < -5.0:
 				pctChangeField = fmt.Sprintf("*%0.2f*", pctChange)
 			default:
 				pctChangeField = fmt.Sprintf("%0.2f", pctChange)
