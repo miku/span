@@ -12,13 +12,13 @@
 # The solr server to query, including scheme, port and core/collection, e.g.
 # "http://localhost:8983/solr/biblio". If "auto", then the current testing "ai" solr
 # server will be figured out automatically.
-# solr: "auto"
+solr: "auto"
 # solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
-solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
+# solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "13109"
+ticket: "13804"
 
 
 # If set to "fail" an empty result set will be marked as failure.
