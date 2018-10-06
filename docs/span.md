@@ -130,7 +130,7 @@ OPTIONS
 EXAMPLES
 --------
 
-List supported format for conversion to intermediate schema:
+List supported formats for conversion to intermediate schema:
 
   `span-import -list`
 
