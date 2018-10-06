@@ -292,7 +292,7 @@ Or use the service shipped with the distribution packages.
 
   `servicectl span-webhookd start`
 
-The service requires `/var/log/span-webhhokd.log` to be writeable by `daemon`.
+The service requires `/var/log/span-webhookd.log` to be writable by `daemon`.
 
 The default port is 8080 (change this in SPAN CONFIG). The server listens on
 all interfaces. The default URL is: `http://0.0.0.0:8080/trigger`. Enter this
