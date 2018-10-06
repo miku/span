@@ -59,7 +59,7 @@ OPTIONS
   EXAMPLE for a CONFIGURATION FILE. `span-review` details in INDEX REVIEW.
 
 `-list`
-  List support formats. `span-import`, `span-export` only.
+  List supported formats. `span-import`, `span-export` only.
 
 `-verbose`
   More output. `span-check` only.
