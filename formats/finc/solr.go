@@ -149,7 +149,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
 
-	// is we do not have a title yet be rft.btitle is non-empty, use that
+	// In intermediate schema we do not have a title yet but rft.btitle is
+	// non-empty, use that.
 	if s.Title == "" && is.BookTitle != "" {
 		sanitized := sanitize.HTML(is.BookTitle)
 		s.Title, s.TitleFull, s.TitleShort = sanitized, sanitized, sanitized
@@ -159,7 +160,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
 	}
 
-	// collect sanizized authors
+	// Collect sanitized authors.
 	var authors []string
 	for _, author := range is.Authors {
 		sanitized := AuthorReplacer.Replace(author.String())
@@ -179,7 +180,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.AccessFacet = AIAccessFacet
 	s.BranchNrw = s.AccessFacet // refs #11605
 
-	// site specific formats, TODO: fix this soon
+	// Site specific formats, TODO: fix this now.
 	s.FormatDe105 = []string{FormatDe105.LookupDefault(is.Format, "")}
 	s.FormatDe14 = []string{FormatDe14.LookupDefault(is.Format, "")}
 	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
