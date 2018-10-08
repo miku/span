@@ -162,6 +162,10 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	// Collect sanitized authors.
 	var authors []string
+
+	// Refs. https://github.com/miku/span/issues/12.
+	var authorCorps []string
+
 	for _, author := range is.Authors {
 		sanitized := AuthorReplacer.Replace(author.String())
 		if sanitized == "" {
@@ -169,6 +173,11 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		}
 		authors = append(authors, sanitized)
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
+
+		// Refs. https://github.com/miku/span/issues/12.
+		if author.Corporation != "" {
+			authorCorps = append(authorCorps, author.Corporation)
+		}
 	}
 
 	// refs #7092, gh #8, refs #12310
