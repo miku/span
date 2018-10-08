@@ -15,6 +15,7 @@ import (
 type Solr5Vufind3 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
+	AuthorCorporate      []string `json:"author_corp,omitempty"`
 	Authors              []string `json:"author,omitempty"`
 	AuthorSort           string   `json:"author_sort,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
@@ -164,7 +165,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	var authors []string
 
 	// Refs. https://github.com/miku/span/issues/12.
-	var authorCorps []string
+	var authorCorporate []string
 
 	for _, author := range is.Authors {
 		sanitized := AuthorReplacer.Replace(author.String())
@@ -175,9 +176,13 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
 
 		// Refs. https://github.com/miku/span/issues/12.
-		if author.Corporation != "" {
-			authorCorps = append(authorCorps, author.Corporation)
+		if author.Corporate != "" {
+			authorCorporate = append(authorCorporate, author.Corporate)
 		}
+	}
+
+	if len(authorCorporate) > 0 {
+		s.AuthorCorporate = authorCorporate
 	}
 
 	// refs #7092, gh #8, refs #12310

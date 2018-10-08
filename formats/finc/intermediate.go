@@ -58,7 +58,12 @@ type Author struct {
 	FirstInitial string `json:"rft.auinit1,omitempty"`
 	MiddleName   string `json:"rft.auinitm,omitempty"`
 	Suffix       string `json:"rft.ausuffix,omitempty"`
-	Corporation  string `json:"rft.aucorp,omitempty"`
+
+	// Organization or corporation that is the author or creator of the book;
+	// "Mellon Foundation", for example. (Table 14: Z39.88-2004 Matrix
+	// Constraint Definition of KEV Metadata Format for "book", Excerpt,
+	// https://groups.niso.org/apps/group_public/download.php/14833/z39_88_2004_r2010.pdf#page=55).
+	Corporate string `json:"rft.aucorp,omitempty"`
 }
 
 // String returns a formatted author string.
