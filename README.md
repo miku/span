@@ -4,7 +4,9 @@
 
 Span started as a single tool to convert [Crossref
 API](https://www.crossref.org/services/metadata-delivery/rest-api/) data into a
-VuFind/SOLR format as used in [finc](https://finc.info). An [intermediate
+[VuFind](https://github.com/vufind-org/vufind)/[SOLR
+format](https://github.com/finc/index/blob/master/schema.xml) as used in
+[finc](https://finc.info). An [intermediate
 representation](https://github.com/ubleipzig/intermediateschema) for article
 metadata is used for normalizing various input formats.
 [Go](https://golang.org/) was choosen as the implementation language because it
