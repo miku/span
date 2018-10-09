@@ -405,7 +405,13 @@ func main() {
 			var nonliveField = fmt.Sprintf("%d", numNonlive)
 
 			// Percentage change, refs #12756.
-			pctChange := (float64(numNonlive-numLive) / (0.001 + float64(numLive))) * 100
+			var pctChange float64
+			switch {
+			case numLive == 0 && numNonlive > 0:
+				pctChange = 100
+			default:
+				pctChange = (float64(numNonlive-numLive) / (float64(numLive))) * 100
+			}
 
 			// Remove -0.00 from rendering.
 			if pctChange == 0 {
