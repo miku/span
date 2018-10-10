@@ -14,6 +14,9 @@ import (
 	"github.com/miku/span/formats/finc"
 )
 
+// bookTitlePattern for extracting book title from dc.source.
+var bookTitlePattern = regexp.MustCompile(`([^:]*):([^\(]*)`)
+
 // Record was generated 2018-05-11 14:30:28 by tir on sol.
 type Record struct {
 	XMLName xml.Name `xml:"Record"`
@@ -86,6 +89,20 @@ type Record struct {
 	} `xml:"about"`
 }
 
+// BookTitle parses book title out of a citation string. Input may be "Knapp,
+// Gudrun-Axeli; Wetterer, Angelika\n (Hrsg.): Achsen der Differenz.
+// Gesellschaftstheorie und feministische Kritik II (Münster: Westfälisches
+// Dampfboot, 2003), 73-100", https://play.golang.org/p/LApV7V_Ogz5. Fallback
+// to original string, refs #13024.
+func (r *Record) BookTitle() string {
+	s := strings.Replace(r.Metadata.Dc.Source.Text, "\n", " ", -2)
+	matches := bookTitlePattern.FindStringSubmatch(s)
+	if len(matches) == 3 {
+		return strings.TrimSpace(matches[2])
+	}
+	return s
+}
+
 func parsePages(s string) (start, end, total string) {
 	p := regexp.MustCompile(`([1-9][0-9]*)-([1-9][0-9]*)`)
 	match := p.FindStringSubmatch(s)
@@ -143,7 +160,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if stringsContainsAny(output.ArticleTitle, []string{"zeitschrift", "journal"}) || len(output.ISSN) > 0 {
 		output.JournalTitle = record.Metadata.Dc.Source.Text
 	} else {
-		output.BookTitle = record.Metadata.Dc.Source.Text
+		output.BookTitle = record.BookTitle()
 	}
 	for _, p := range record.Metadata.Dc.Publisher {
 		output.Publishers = append(output.Publishers, p.Text)
