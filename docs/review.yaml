@@ -29,7 +29,7 @@ zero-results-policy: "fail"
 # contain only given values.
 allowed-keys:
     - ["source_id:30", "format", "eBook", "ElectronicArticle"]
-    - ["source_id:30", "format_de15", "Book, eBook", "Article, E-Article"]
+    - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
     - ["source_id:48", "language", "German", "English"]
     - ["source_id:49", "facet_avail", "Online", "Free"]
     - ["source_id:55", "facet_avail", "Online", "Free"]
