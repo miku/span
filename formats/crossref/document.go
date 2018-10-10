@@ -223,6 +223,12 @@ func (doc *Document) ShortTitle() (s string) {
 	return
 }
 
+// FindLanguages tries to find language, falls back to English.
+func (doc *Document) FindLanguages() []string {
+	// XXX(miku): implement.
+	return []string{"eng"}
+}
+
 // ToIntermediateSchema converts a crossref document into IS. XXX: Use a
 // canonical publisher, based on doi prefix, /cc @ad.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
@@ -283,7 +289,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
 	output.Issue = strings.TrimLeft(doc.Issue, "0")
-	output.Languages = []string{"eng"}
+	output.Languages = doc.FindLanguages()
 	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
 	output.SourceID = SourceID
