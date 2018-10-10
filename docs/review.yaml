@@ -18,7 +18,7 @@ solr: "auto"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "13804"
+ticket: "NA"
 
 
 # If set to "fail" an empty result set will be marked as failure.
@@ -31,6 +31,8 @@ allowed-keys:
     - ["source_id:30", "format", "eBook", "ElectronicArticle"]
     - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
     - ["source_id:48", "language", "German", "English"]
+    - ["source_id:49", "format", "ElectronicArticle", "ElectronicBookPart", "ElectronicProceeding", "ElectronicResourceRemoteAccess", "eBook", "ElectronicSerial", "ElectronicJournal"]
+    - ["source_id:49", "format_de15", "Book, E-Book", "Article, E-Article", "Proceeding", "Electronic Resource (Remote Access)", "Journal, E-Journal"]
     - ["source_id:49", "facet_avail", "Online", "Free"]
     - ["source_id:55", "facet_avail", "Online", "Free"]
 
