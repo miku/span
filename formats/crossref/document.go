@@ -87,37 +87,71 @@ type DatePart []int
 // DateField contains two representations of one value.
 type DateField struct {
 	DateParts []DatePart `json:"date-parts"`
+	DateTime  string     `json:"date-time"`
 	Timestamp int64      `json:"timestamp"`
 }
 
-// Document is a example 'works' API response - message part only.
+// Document is an updated v1 crossref API message.
 type Document struct {
 	Abstract string `json:"abstract"`
 	Author   []struct {
 		Family string `json:"family"`
 		Given  string `json:"given"`
 	} `json:"author"`
-	ContainerTitle []string  `json:"container-title"`
-	Deposited      DateField `json:"deposited"`
-	DOI            string    `json:"DOI"`
-	Indexed        DateField `json:"indexed"`
-	ISSN           []string  `json:"ISSN"`
-	Issue          string    `json:"issue"`
-	Issued         DateField `json:"issued"`
-	Member         string    `json:"member"`
-	Page           string    `json:"page"`
-	Prefix         string    `json:"prefix"`
-	PublishedPrint DateField `json:"published-print"`
-	Publisher      string    `json:"publisher"`
-	ReferenceCount int       `json:"reference-count"`
-	Score          float64   `json:"score"`
-	Source         string    `json:"source"`
-	Subjects       []string  `json:"subject"`
-	Subtitle       []string  `json:"subtitle"`
-	Title          []string  `json:"title"`
-	Type           string    `json:"type"`
-	URL            string    `json:"URL"`
-	Volume         string    `json:"volume"`
+	ContainerTitle []string `json:"container-title"`
+	ContentDomain  struct {
+		CrossmarkRestriction bool          `json:"crossmark-restriction"`
+		Domain               []interface{} `json:"domain"`
+	} `json:"content-domain"`
+	Created             DateField `json:"created"`
+	DOI                 string
+	Deposited           DateField `json:"deposited"`
+	ISSN                []string
+	Indexed             DateField `json:"indexed"`
+	IsReferencedByCount int64     `json:"is-referenced-by-count"`
+	IssnType            []struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"issn-type"`
+	Issue        string    `json:"issue"`
+	Issued       DateField `json:"issued"`
+	JournalIssue struct {
+		Issue          string    `json:"issue"`
+		PublishedPrint DateField `json:"published-print"`
+	} `json:"journal-issue"`
+	Language string `json:"language"`
+	License  []struct {
+		ContentVersion string    `json:"content-version"`
+		DelayInDays    int64     `json:"delay-in-days"`
+		Start          DateField `json:"start"`
+		URL            string
+	} `json:"license"`
+	Link []struct {
+		ContentType         string `json:"content-type"`
+		ContentVersion      string `json:"content-version"`
+		IntendedApplication string `json:"intended-application"`
+		URL                 string
+	} `json:"link"`
+	Member          string        `json:"member"`
+	OriginalTitle   []interface{} `json:"original-title"`
+	Page            string        `json:"page"`
+	Prefix          string        `json:"prefix"`
+	PublishedPrint  DateField     `json:"published-print"`
+	Publisher       string        `json:"publisher"`
+	ReferenceCount  int64         `json:"reference-count"`
+	ReferencesCount int64         `json:"references-count"`
+	Relation        struct {
+	} `json:"relation"`
+	Score               float64     `json:"score"`
+	ShortContainerTitle []string    `json:"short-container-title"`
+	ShortTitle          interface{} `json:"short-title"`
+	Source              string      `json:"source"`
+	Subject             []string    `json:"subject"`
+	Subtitle            []string    `json:"subtitle"`
+	Title               []string    `json:"title"`
+	Type                string      `json:"type"`
+	URL                 string      `json:"URL"`
+	Volume              string      `json:"volume"`
 }
 
 // PageInfo holds various page related data.
@@ -215,8 +249,8 @@ func (doc *Document) CombinedTitle() string {
 	return ""
 }
 
-// ShortTitle returns the first main title only.
-func (doc *Document) ShortTitle() (s string) {
+// FindShortTitle returns the first main title only.
+func (doc *Document) FindShortTitle() (s string) {
 	if len(doc.Title) > 0 {
 		s = span.UnescapeTrim(doc.Title[0])
 	}
@@ -225,7 +259,11 @@ func (doc *Document) ShortTitle() (s string) {
 
 // FindLanguages tries to find language, falls back to English.
 func (doc *Document) FindLanguages() []string {
-	// XXX(miku): implement.
+	if doc.Language != "" {
+		if lang := span.LanguageIdentifier(doc.Language); lang != "" {
+			return []string{lang}
+		}
+	}
 	return []string{"eng"}
 }
 
@@ -293,7 +331,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
 	output.SourceID = SourceID
-	output.Subjects = doc.Subjects
+	output.Subjects = doc.Subject
 	output.Type = doc.Type
 	output.URL = append(output.URL, doc.URL)
 	output.Volume = strings.TrimLeft(doc.Volume, "0")
