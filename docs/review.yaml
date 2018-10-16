@@ -36,7 +36,7 @@ allowed-keys:
     - ["source_id:49", "format_de15", "Book, E-Book", "Article, E-Article", "Proceeding", "Electronic Resource (Remote Access)", "Journal, E-Journal"]
     - ["source_id:49", "facet_avail", "Online", "Free"]
     - ["source_id:50", "language", "German", "English", "French", "Italian", "Spanish", "Chinese", "Russian", "Modern"]
-    - ["source_id:50", "finc_class_facet", "not assigned", "Ethnologie (Volks- und Völkerkunde)", "Wirtschaftswissenschaften", "Medizin", "Pädagogik", "Rechtswissenschaften", "Allgemeines", "Philosophie"]
+    - ["source_id:50", "finc_class_facet", "not assigned", "Ethnologie (Volks- und Völkerkunde)", "Wirtschaftswissenschaften", "Medizin", "Pädagogik", "Rechtswissenschaft", "Allgemeines", "Philosophie"]
     - ["source_id:55", "facet_avail", "Online", "Free"]
     - ["source_id:60", "language", "German", "English", "French", "Spanish", "Portuguese", "Undetermined"]
     - ["source_id:60", "finc_class_facet", "not assigned", "Chemie und Pharmazie", "Medizin", "Philosophie", "Technik", "Geschichte", "Biologie", "Klassische Philologie"]
