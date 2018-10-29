@@ -235,5 +235,14 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	// refs #11478
 	s.Physical = []string{is.Pages}
 
+	// refs #14215
+	if is.SourceID == "48" {
+		s.ISSN = []string{}
+		s.Description = ""
+		s.Languages = []string{}
+		s.Publishers = []string{}
+		s.Fulltext = ""
+	}
+
 	return nil
 }
