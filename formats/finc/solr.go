@@ -15,7 +15,7 @@ import (
 type Solr5Vufind3 struct {
 	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
-	AuthorCorporate      []string `json:"author_corp,omitempty"`
+	AuthorCorporate      []string `json:"author_corporate,omitempty"`
 	Authors              []string `json:"author,omitempty"`
 	AuthorSort           string   `json:"author_sort,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
