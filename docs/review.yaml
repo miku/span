@@ -18,7 +18,7 @@ solr: "auto"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates.
-ticket: "NA"
+ticket: "14102"
 
 
 # If set to "fail" an empty result set will be marked as failure.
@@ -30,11 +30,21 @@ zero-results-policy: "fail"
 allowed-keys:
     - ["source_id:30", "format", "eBook", "ElectronicArticle"]
     - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
+    - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
     - ["source_id:48", "language", "German", "English"]
     - ["source_id:49", "format", "ElectronicArticle", "ElectronicBookPart", "ElectronicProceeding", "ElectronicResourceRemoteAccess", "eBook", "ElectronicSerial", "ElectronicJournal"]
     - ["source_id:49", "format_de15", "Book, E-Book", "Article, E-Article", "Proceeding", "Electronic Resource (Remote Access)", "Journal, E-Journal"]
     - ["source_id:49", "facet_avail", "Online", "Free"]
+    - ["source_id:50", "language", "German", "English", "French", "Italian", "Spanish", "Chinese", "Russian", "Modern"]
+    - ["source_id:50", "finc_class_facet", "not assigned", "Ethnologie (Volks- und Völkerkunde)", "Wirtschaftswissenschaften", "Medizin", "Pädagogik", "Rechtswissenschaft", "Allgemeines", "Philosophie"]
     - ["source_id:55", "facet_avail", "Online", "Free"]
+    - ["source_id:60", "language", "German", "English", "French", "Spanish", "Portuguese", "Undetermined"]
+    - ["source_id:60", "finc_class_facet", "not assigned", "Chemie und Pharmazie", "Medizin", "Philosophie", "Technik", "Geschichte", "Biologie", "Klassische Philologie"]
+    - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Technik"]
+    - ["source_id:107", "finc_class_facet", "not assigned", "Medizin"]
+    - ["source_id:141", "language", "German", "English"]
+    - ["source_id:162", "language", "German", "English", "French", "Italian"]
+    - ["source_id:162", "finc_class_facet", "not assigned", "Allgemeines", "Philosophie", "Ethnologie (Volks- und Völkerkunde)", "Pädagogik"]
 
 # All records: [Query, Facet-Field, Value, ...] checks if all record contain
 # only the given values.
@@ -86,6 +96,7 @@ all-records:
     - ["source_id:85", "access_facet", "Electronic Resources"]
     - ["source_id:85", "language", "English"]
     - ["source_id:85", "mega_collection", "Elsevier Journals"]
+    - ["source_id:85", "finc_class_facet", "not assigned"]
     - ["source_id:87", "format", "ElectronicArticle"]
     - ["source_id:87", "format_de15", "Article, E-Article"]
     - ["source_id:87", "facet_avail", "Online", "Free"]
@@ -103,6 +114,7 @@ all-records:
     - ["source_id:101", "access_facet", "Electronic Resources"]
     - ["source_id:101", "mega_collection", "Kieler Beiträge zur Filmmusikforschung"]
     - ["source_id:101", "finc_class_facet", "not assigned"]
+    - ["source_id:101", "language", "German"]
     - ["source_id:105", "format", "ElectronicArticle"]
     - ["source_id:105", "format_de15", "Article, E-Article"]
     - ["source_id:105", "facet_avail", "Online"]
@@ -112,6 +124,8 @@ all-records:
     - ["source_id:107", "facet_avail", "Online", "Free"]
     - ["source_id:107", "access_facet", "Electronic Resources"]
     - ["source_id:107", "mega_collection", "sid-107-col-heidelberg"]
+    - ["source_id:141", "format", "Video"]
+    - ["source_id:141", "format_de15", "Video"]
     - ["source_id:162", "format", "ElectronicArticle"]
     - ["source_id:162", "format_de15", "Article, E-Article"]
     - ["source_id:162", "facet_avail", "Online", "Free"]
