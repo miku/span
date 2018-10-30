@@ -60,6 +60,17 @@ func main() {
 		// Redact full text.
 		is.Fulltext = ""
 
+		// Redact 48, refs #14215.
+		if is.SourceID == "48" {
+			is.Abstract = ""
+			is.ISSN = []string{}
+			is.EISSN = []string{}
+			is.ISBN = []string{}
+			is.EISBN = []string{}
+			is.DOI = ""
+			is.Publishers = []string{}
+		}
+
 		bb, err := json.Marshal(is)
 		if err != nil {
 			return bb, err
