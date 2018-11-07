@@ -213,9 +213,6 @@ var (
 	whatIsLive       = flag.Bool("e", false, "use whatislive.url to determine live and non live servers")
 	liveLinkTemplate = flag.String("tl", "https://katalog.ub.uni-leipzig.de/Search/Results?lookfor=source_id:{{ .SourceID }}",
 		"live link template for source (for focus institution)")
-	// XXX: Probably shard not configured?
-	nonliveLinkTemplate = flag.String("tn", "https://alpha.finc.info/vufind2/de_15/12441/Search/Results?lookfor=source_id:{{ .SourceID }}+AND+institution:{{ .Institution }}&shard[]=ai-nonlive",
-		"nonlive link template for source (for focus institution)")
 	spanConfigFile   = flag.String("span-config", defaultConfigPath, "for whatislive.url")
 	textile          = flag.Bool("t", false, "emit textile")
 	focusInstitution = flag.String("emph", "DE-15", "emphasize institution in textile output")
@@ -441,15 +438,12 @@ func main() {
 						log.Fatal(err)
 					}
 				} else {
-					liveField, err = renderSourceLink(*nonliveLinkTemplate, data, fmt.Sprintf("%d", numLive))
+					liveField, err = renderSourceLink(*liveLinkTemplate, data, fmt.Sprintf("%d", numLive))
 					if err != nil {
 						log.Fatal(err)
 					}
 				}
-				nonliveField, err = renderSourceLink(*nonliveLinkTemplate, data, fmt.Sprintf("%d", numNonlive))
-				if err != nil {
-					log.Fatal(err)
-				}
+				nonliveField = fmt.Sprintf("%d", numNonlive)
 			}
 
 			rw.WriteFields(renderInstitution, sid, name, liveField, nonliveField, numNonlive-numLive, pctChangeField, "")
