@@ -55,27 +55,28 @@ type Factory func() interface{}
 
 // FormatMap maps format name to pointer to format struct.
 var FormatMap = map[string]Factory{
-	"ceeol":        func() interface{} { return new(ceeol.Article) },
-	"crossref":     func() interface{} { return new(crossref.Document) },
-	"degruyter":    func() interface{} { return new(degruyter.Article) },
-	"disson":       func() interface{} { return new(disson.Record) },
-	"doaj":         func() interface{} { return new(doaj.Response) },
-	"doaj-api":     func() interface{} { return new(doaj.ArticleV1) },
-	"dummy":        func() interface{} { return new(dummy.Example) },
-	"genderopen":   func() interface{} { return new(genderopen.Record) },
-	"genios":       func() interface{} { return new(genios.Document) },
-	"hhbd":         func() interface{} { return new(hhbd.Record) },
-	"highwire":     func() interface{} { return new(highwire.Record) },
-	"ieee":         func() interface{} { return new(ieee.Publication) },
-	"imslp":        func() interface{} { return new(imslp.Data) },
-	"jstor":        func() interface{} { return new(jstor.Article) },
-	"mediarep-dim": func() interface{} { return new(mediarep.Dim) },
-	"olms":         func() interface{} { return new(olms.Record) },
-	"olms-mets":    func() interface{} { return new(olms.MetsRecord) },
-	"ssoar":        func() interface{} { return new(ssoar.Record) },
-	"thieme-nlm":   func() interface{} { return new(thieme.Record) },
-	"zvdd":         func() interface{} { return new(zvdd.DublicCoreRecord) },
-	"zvdd-mets":    func() interface{} { return new(zvdd.MetsRecord) },
+	"ceeol":         func() interface{} { return new(ceeol.Article) },
+	"ceeol-marcxml": func() interface{} { return new(ceeol.Record) },
+	"crossref":      func() interface{} { return new(crossref.Document) },
+	"degruyter":     func() interface{} { return new(degruyter.Article) },
+	"disson":        func() interface{} { return new(disson.Record) },
+	"doaj":          func() interface{} { return new(doaj.Response) },
+	"doaj-api":      func() interface{} { return new(doaj.ArticleV1) },
+	"dummy":         func() interface{} { return new(dummy.Example) },
+	"genderopen":    func() interface{} { return new(genderopen.Record) },
+	"genios":        func() interface{} { return new(genios.Document) },
+	"hhbd":          func() interface{} { return new(hhbd.Record) },
+	"highwire":      func() interface{} { return new(highwire.Record) },
+	"ieee":          func() interface{} { return new(ieee.Publication) },
+	"imslp":         func() interface{} { return new(imslp.Data) },
+	"jstor":         func() interface{} { return new(jstor.Article) },
+	"mediarep-dim":  func() interface{} { return new(mediarep.Dim) },
+	"olms":          func() interface{} { return new(olms.Record) },
+	"olms-mets":     func() interface{} { return new(olms.MetsRecord) },
+	"ssoar":         func() interface{} { return new(ssoar.Record) },
+	"thieme-nlm":    func() interface{} { return new(thieme.Record) },
+	"zvdd":          func() interface{} { return new(zvdd.DublicCoreRecord) },
+	"zvdd-mets":     func() interface{} { return new(zvdd.MetsRecord) },
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -231,7 +232,8 @@ func main() {
 	// XXX: Configure this in one place.
 	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm",
 		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms",
-		"olms-mets", "ssoar", "disson", "genderopen", "mediarep-dim":
+		"olms-mets", "ssoar", "disson", "genderopen", "mediarep-dim",
+		"ceeol-marcxml":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
