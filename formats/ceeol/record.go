@@ -3,11 +3,14 @@ package ceeol
 import (
 	"encoding/xml"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 )
+
+var identifierRegexp = regexp.MustCompile("id=([0-9]*)")
 
 // Record for MARC-XML data, Ceeol style.
 type Record struct {
@@ -109,11 +112,11 @@ func (r Record) ID() (string, error) {
 		return "", err
 	}
 	for _, v := range values {
-		// XXX: https://www.ceeol.com/search/article-detail?id=
-		id := strings.Replace(v, "https://www.ceeol.com/search/book-detail?id=", "", -1)
-		if id == "" {
-			continue
+		matches := identifierRegexp.FindStringSubmatch(v)
+		if len(matches) < 2 {
+			return "", fmt.Errorf("value without id: %v", v)
 		}
+		id := matches[1]
 		return id, nil
 	}
 	return "", fmt.Errorf("missing identifier")
