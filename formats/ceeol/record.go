@@ -10,6 +10,7 @@ import (
 	"github.com/miku/span/formats/finc"
 )
 
+// identifierRegexp, since ID is buried in 856.u link.
 var identifierRegexp = regexp.MustCompile("id=([0-9]*)")
 
 // Record for MARC-XML data, Ceeol style.
@@ -130,6 +131,11 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: err.Error()}
 	}
 	output.RecordID = v
+	output.Format = Format
 	output.SourceID = SourceIdentifier
+	output.Genre = Genre
+	output.RefType = DefaultRefType
+	output.MegaCollections = []string{Collection}
+
 	return output, nil
 }
