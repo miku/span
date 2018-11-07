@@ -52,6 +52,7 @@ var (
 	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	logfile        = flag.String("logfile", "", "log to file")
 	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	triggerPath    = flag.String("trigger-path", "trigger", "path trigger, {host}:{port}/{trigger-path}")
 	banner         = `
                          888       888                        888   _         888
 Y88b    e    /  e88~~8e  888-~88e  888-~88e  e88~-_   e88~-_  888 e~ ~   e88~\888
@@ -370,7 +371,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
-	r.HandleFunc("/trigger", HookHandler)
+	r.HandleFunc(fmt.Sprintf("/%s", *triggerPath), HookHandler)
 	http.Handle("/", r)
 
 	port, err := parsePort(*addr)
@@ -384,7 +385,7 @@ func main() {
 	}
 	for _, address := range addrs {
 		if ipnet, ok := address.(*net.IPNet); ok {
-			log.Printf("http://%s:%d/trigger", ipnet.IP.String(), port)
+			log.Printf("http://%s:%d/%s", ipnet.IP.String(), port, *triggerPath)
 		}
 	}
 
