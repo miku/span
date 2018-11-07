@@ -314,7 +314,7 @@ func main() {
 	// Multiple values are alternatives.
 	for _, c := range config.AllowedKeys {
 		if len(c) < 3 {
-			log.Fatal("invalid test case, too few fields: %s", c)
+			log.Fatalf("invalid test case, too few fields: %s", c)
 		}
 		query, field, values := c[0], c[1], c[2:]
 		if err = index.AllowedKeys(query, field, values...); err != nil {
@@ -344,7 +344,7 @@ func main() {
 	// All records must have one or more facet values.
 	for _, c := range config.AllRecords {
 		if len(c) < 3 {
-			log.Fatal("invalid test case, too few fields: %s", c)
+			log.Fatalf("invalid test case, too few fields: %s", c)
 		}
 		query, field, values := c[0], c[1], c[2:]
 		if err = index.EqualSizeTotal(query, field, values...); err != nil {
@@ -373,12 +373,12 @@ func main() {
 	// Cases like "facet_avail:Free für mindestens 0,5% aller Records".
 	for _, c := range config.MinRatio {
 		if len(c) != 4 {
-			log.Fatal("invalid test case, expected four fields: %s", c)
+			log.Fatalf("invalid test case, expected four fields: %s", c)
 		}
 		query, field, value := c[0], c[1], c[2]
 		minRatioPct, err := strconv.ParseFloat(c[3], 64)
 		if err != nil {
-			log.Fatal("minRatio is not a float: %s", err)
+			log.Fatalf("minRatio is not a float: %s", err)
 		}
 		if err = index.MinRatioPct(query, field, value, minRatioPct); err != nil {
 			log.Println(err)
@@ -407,12 +407,12 @@ func main() {
 	// Cases like "facet_avail:Free für mindestens 50 Records".
 	for _, c := range config.MinCount {
 		if len(c) != 4 {
-			log.Fatal("invalid test case, expected four fields: %s", c)
+			log.Fatalf("invalid test case, expected four fields: %s", c)
 		}
 		query, field, value := c[0], c[1], c[2]
 		minCount, err := strconv.Atoi(c[3])
 		if err != nil {
-			log.Fatal("minCount is not an int: %s", err)
+			log.Fatalf("minCount is not an int: %s", err)
 		}
 		if err = index.MinCount(query, field, value, minCount); err != nil {
 			log.Println(err)
