@@ -125,7 +125,7 @@ OPTIONS
   Post review results into a Redmine ticket. `span-review` only.
 
 `-trigger-path` *path*
-  Path trigger (default "trigger").
+  Path trigger (default "trigger"), `span-webhookd` only.
 
 `-h`
   Show usage.
