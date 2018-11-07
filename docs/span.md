@@ -32,7 +32,7 @@ SYNOPSIS
 
 `span-review` [`-server` *url*] [`-span-config` *file*] [`-c` *file*] [`-a`] [`-t`] [`-ticket` *number*]
 
-`span-webhookd` [`-addr` *hostport*] [`-logfile` *file*] [`repo-dir` *path*] [`-span-config` *file*] [`-token` *token*]
+`span-webhookd` [`-addr` *hostport*] [`-logfile` *file*] [`repo-dir` *path*] [`-span-config` *file*] [`-token` *token*] [`-trigger-path` *path*]
 
 `span-hcov` `-f` *file* `-server` *url*
 
@@ -123,6 +123,9 @@ OPTIONS
 
 `-ticket` *id*
   Post review results into a Redmine ticket. `span-review` only.
+
+`-trigger-path` *path*
+  Path trigger (default "trigger").
 
 `-h`
   Show usage.

@@ -27,7 +27,7 @@ tools
 .PP
 \fB\fCspan\-review\fR [\fB\fC\-server\fR \fIurl\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-c\fR \fIfile\fP] [\fB\fC\-a\fR] [\fB\fC\-t\fR] [\fB\fC\-ticket\fR \fInumber\fP]
 .PP
-\fB\fCspan\-webhookd\fR [\fB\fC\-addr\fR \fIhostport\fP] [\fB\fC\-logfile\fR \fIfile\fP] [\fB\fCrepo\-dir\fR \fIpath\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-token\fR \fItoken\fP]
+\fB\fCspan\-webhookd\fR [\fB\fC\-addr\fR \fIhostport\fP] [\fB\fC\-logfile\fR \fIfile\fP] [\fB\fCrepo\-dir\fR \fIpath\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-token\fR \fItoken\fP] [\fB\fC\-trigger\-path\fR \fIpath\fP]
 .PP
 \fB\fCspan\-hcov\fR \fB\fC\-f\fR \fIfile\fP \fB\fC\-server\fR \fIurl\fP
 .SH DESCRIPTION
@@ -114,6 +114,9 @@ Location of SOLR, including scheme, host, port and core. \fB\fCspan\-review\fR o
 .TP
 \fB\fC\-ticket\fR \fIid\fP
 Post review results into a Redmine ticket. \fB\fCspan\-review\fR only.
+.TP
+\fB\fC\-trigger\-path\fR \fIpath\fP
+Path trigger (default "trigger").
 .TP
 \fB\fC\-h\fR
 Show usage.
