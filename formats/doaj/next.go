@@ -110,6 +110,9 @@ func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.RawDate = output.Date.Format("2006-01-02")
 
+	if doc.Id == "" {
+		return output, span.Skip{Reason: "no identifier in source"}
+	}
 	id := fmt.Sprintf("ai-%s-%s", SourceIdentifier, doc.Id)
 	if len(id) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
@@ -130,7 +133,7 @@ func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Publishers = append(output.Publishers, publisher)
 	}
 
-	output.RecordID = doc.DOI()
+	output.RecordID = doc.Id
 	output.ID = id
 	output.SourceID = SourceIdentifier
 	output.Volume = doc.Bibjson.Journal.Volume
