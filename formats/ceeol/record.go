@@ -275,6 +275,7 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		return output, span.Skip{Reason: err.Error()}
 	}
 	output.RecordID = v
+	output.ID = fmt.Sprintf("ai-53-%s", output.RecordID)
 
 	v, err = r.Title()
 	if err != nil {
