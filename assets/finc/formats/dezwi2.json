@@ -8,5 +8,6 @@
     "ElectronicSerial": "Journal, E-Journal",
     "ElectronicThesis": "Thesis",
     "Unknown": "Unknown Format",
+    "Norm": "Norm",
     "Video": "Video"
 }
