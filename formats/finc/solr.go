@@ -161,6 +161,13 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
 	}
 
+	// TODO(miku): What's with author_corp_ref, https://goo.gl/sx1s3r
+	// Verweisungsform aus den Normdaten für Körperschaften und Kongresse bei
+	// Marc-Quellen, die entsprechend angereichert wurden (SWB, GBV)
+	// grundsätzlich aber bei allen Datenquellen möglich, welche solche
+	// Informationen enthalten bzw. referenzieren sollte zukünftig ggf. auch in
+	// author_corporate_ref umbenannt werden"
+
 	// Collect sanitized authors.
 	var authors []string
 
