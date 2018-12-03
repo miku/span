@@ -177,15 +177,14 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	for _, author := range is.Authors {
 		sanitized := AuthorReplacer.Replace(author.String())
 		if sanitized == "" {
+			// Refs. https://github.com/miku/span/issues/12.
+			if author.Corporate != "" {
+				authorCorporate = append(authorCorporate, author.Corporate)
+			}
 			continue
 		}
 		authors = append(authors, sanitized)
 		s.AuthorFacet = append(s.AuthorFacet, sanitized)
-
-		// Refs. https://github.com/miku/span/issues/12.
-		if author.Corporate != "" {
-			authorCorporate = append(authorCorporate, author.Corporate)
-		}
 	}
 
 	if len(authorCorporate) > 0 {
