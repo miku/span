@@ -1,0 +1,50 @@
+# Maintainer: Martin Czygan <martin.czygan@uni-leipzig.de>
+
+pkgname=span
+pkgver=0.1.270
+pkgrel=1
+pkgdesc="Project FINC intermediate schema tools."
+arch=('i686' 'x86_64')
+url="https://github.com/miku/span"
+license=('GPL')
+makedepends=('go' 'git')
+options=('!strip' '!emptydirs')
+conflicts=("${pkgname}-bin")
+replaces=("${pkgname}-bin")
+source=("${url}/archive/v${pkgver}.tar.gz")
+sha256sums=('1761225de53d009acedac2b34542cbb942e336349eda504998d380d063b134d4')
+_gourl='github.com/miku/span/cmd/...'
+
+prepare() {
+  export GOPATH="${srcdir}/go"
+  mkdir -p "$GOPATH/src/github.com/miku"
+  mv "${srcdir}/${pkgname}-${pkgver}" "$GOPATH/src/github.com/miku/span"
+  cd "$GOPATH/src/github.com/miku/span" && make clean all
+}
+
+package() {
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-check" "${pkgdir}/usr/bin/${pkgname}-check"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-compare" "${pkgdir}/usr/bin/${pkgname}-compare"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-crossref-snapshot" "${pkgdir}/usr/bin/${pkgname}-crossref-snapshot"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-export" "${pkgdir}/usr/bin/${pkgname}-export"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-freeze" "${pkgdir}/usr/bin/${pkgname}-freeze"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-hcov" "${pkgdir}/usr/bin/${pkgname}-hcov"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-import" "${pkgdir}/usr/bin/${pkgname}-import"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-local-data" "${pkgdir}/usr/bin/${pkgname}-local-data"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-oa-filter" "${pkgdir}/usr/bin/${pkgname}-oa-filter"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-redact" "${pkgdir}/usr/bin/${pkgname}-redact"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-report" "${pkgdir}/usr/bin/${pkgname}-report"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-review" "${pkgdir}/usr/bin/${pkgname}-review"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-tag" "${pkgdir}/usr/bin/${pkgname}-tag"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-update-labels" "${pkgdir}/usr/bin/${pkgname}-update-labels"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-webhookd" "${pkgdir}/usr/bin/${pkgname}-webhookd"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/docs/${pkgname}.1" "${pkgdir}/usr/share/man/man1/${pkgname}.1"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/packaging/span-webhookd.service" "${pkgdir}/usr/lib/systemd/system/span-webhookd.service"
+
+  mkdir -p "${pkgdir}/var/log"
+  touch "${pkgdir}/var/log/span-webhookd.log"
+  chown daemon.daemon "${pkgdir}/var/log/span-webhookd.log"
+}
+
+# vim:set ft=sh ts=2 sw=2 et:
+
