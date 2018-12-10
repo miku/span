@@ -8,5 +8,6 @@ $(NAME)-$(VERSION)-$(RELEASE)-x86_64.pkg.tar.xz: PKGBUILD
 clean:
 	rm -f $(NAME)-$(VERSION)-$(RELEASE)-x86_64.pkg.tar.xz
 	rm -f v$(VERSION).tar.gz
+	rm -f v$(VERSION).tar.gz.part
 	rm -rf pkg/
 	rm -rf src/
