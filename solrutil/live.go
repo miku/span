@@ -12,8 +12,8 @@ import (
 )
 
 // findSolrServer looks in the config for the whatislive.url key, takes the URL
-// and parses the nginx snippet for the given kind, live or nonlive. Poor man's
-// service discovery (PMSD).
+// and parses the nginx snippet for the given kind, "live" or "nonlive" (as
+// used in nginx config). Poor man's service discovery (PMSD).
 func findSolrServer(spanConfigFile, kind string) (string, error) {
 	if _, err := os.Stat(spanConfigFile); os.IsNotExist(err) {
 		return "", fmt.Errorf("missing config file: %s", spanConfigFile)
@@ -53,12 +53,13 @@ func findSolrServer(spanConfigFile, kind string) (string, error) {
 // FindNonliveSolrServer tries to find the URL of the current testing solr.
 // There might be different way to retrieve a useable URL (configuration,
 // probes). For now we use a separate configuration file, that contains the URL
-// to the nginx snippet.
+// to the nginx snippet. XXX: Maybe make findSolrServer public and skip the
+// special methods.
 func FindNonliveSolrServer(spanConfigFile string) (string, error) {
 	return findSolrServer(spanConfigFile, "nonlive")
 }
 
-// FindLiveSolrServer returns the current live SOLR URL.
+// FindLiveSolrServer returns the current live SOLR URL. XXX: Maybe drop.
 func FindLiveSolrServer(spanConfigFile string) (string, error) {
 	return findSolrServer(spanConfigFile, "live")
 }
