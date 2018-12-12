@@ -325,7 +325,7 @@ solr: "auto"
 ticket: "NA"
 
 # If set to "fail" an empty result set will be marked as failure.
-# Otherwise a empty result set will - most of the time - not be considered a violoation.
+# Otherwise a empty result set will - most of the time - not be considered a violation.
 zero-results-policy: "fail"
 
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
