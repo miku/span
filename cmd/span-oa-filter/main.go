@@ -49,7 +49,7 @@ func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 	for _, item := range items {
 		key := fmt.Sprintf("%s:%s", item.Sid, item.MegaCollection)
 		switch strings.TrimSpace(strings.ToLower(item.FreeContent)) {
-		case "ja", "yes", "ok", "1":
+		case "ja", "yes", "ok", "1", "T", "true":
 			lookup[key] = true
 		case "nicht festgelegt":
 			lookup[key] = false
