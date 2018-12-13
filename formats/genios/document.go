@@ -53,7 +53,7 @@ const (
 	// maxAuthorLength example: document/BOND__b0604160052
 	maxAuthorLength = 200
 	minAuthorLength = 4
-	maxTitleLength  = 4096
+	maxTitleLength  = 2048
 )
 
 // Document represents a Genios document.
