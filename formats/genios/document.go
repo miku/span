@@ -255,6 +255,8 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(output.ArticleTitle) > maxTitleLength {
 		return output, span.Skip{Reason: fmt.Sprintf("article title too long: %d", len(output.ArticleTitle))}
 	}
+
+	// TODO(miku): Find DB names where this is relevant.
 	output.JournalTitle = strings.Replace(strings.TrimSpace(doc.PublicationTitle), "\n", " ", -1)
 
 	output.ISSN = doc.ISSNList()
