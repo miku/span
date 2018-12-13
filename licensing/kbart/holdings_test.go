@@ -51,8 +51,9 @@ func TestFilter(t *testing.T) {
 	entries := holdings.Filter(func(e licensing.Entry) bool {
 		return strings.Contains(strings.ToLower(e.TitleURL), "wiso")
 	})
-	if len(entries) != 593 {
-		t.Errorf("Filter: got %v, want %v", len(entries), 593)
+	want := 702
+	if len(entries) != want {
+		t.Errorf("Filter: got %v, want %v", len(entries), want)
 	}
 
 	// Test database name extraction.
@@ -64,17 +65,18 @@ func TestFilter(t *testing.T) {
 			names.Add(m)
 		}
 	}
-
-	if len(names.Values()) != 516 {
-		t.Errorf("Filter: got %v, want %v", len(names.Values()), 516)
+	want = 534
+	if len(names.Values()) != want {
+		t.Errorf("Filter: got %v, want %v", len(names.Values()), want)
 	}
 }
 
 func TestSerialNumberMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.SerialNumberMap()
-	if len(m) != 37712 {
-		t.Errorf("SerialNumberMap: got %v, want %v", len(m), 37712)
+	want := 84089
+	if len(m) != want {
+		t.Errorf("SerialNumberMap: got %v, want %v", len(m), want)
 	}
 }
 
@@ -94,7 +96,8 @@ func BenchmarkLookupViaSerialNumberMap(b *testing.B) {
 	issn := "2079-8245"
 
 	for i := 0; i < b.N; i++ {
-		_ = m[issn]
+		v := m[issn]
+		_ = len(v) // Dummyop.
 	}
 }
 
@@ -119,16 +122,17 @@ func BenchmarkLookupViaFilter(b *testing.B) {
 // --- PASS: TestFilter (4.29s)
 // === RUN   TestSerialNumberMap
 // --- PASS: TestSerialNumberMap (0.45s)
-// BenchmarkSerialNumberMap-4            	       2	 514861084 ns/op
-// BenchmarkLookupViaSerialNumberMap-4   	100000000	        21.5 ns/op
-// BenchmarkLookupViaFilter-4            	     100	  13340319 ns/op
+// BenchmarkSerialNumberMap-4                      2           514861084   ns/op
+// BenchmarkLookupViaSerialNumberMap-4             100000000          21.5 ns/op
+// BenchmarkLookupViaFilter-4                      100          13340319   ns/op
 // PASS
-// ok  	github.com/miku/span/licensing/kbart	12.653s
+// ok    github.com/miku/span/licensing/kbart    12.653s
 
 func TestWisoDatabaseMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.WisoDatabaseMap()
-	if len(m) != 511 {
-		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), 511)
+	want := 534
+	if len(m) != want {
+		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), want)
 	}
 }

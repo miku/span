@@ -238,7 +238,7 @@ func (entry *Entry) endGranularity(g DateGranularity) time.Time {
 	}
 }
 
-// containsDateTime returns nil, if the given time lies between this entries
+// containsDateTime returns nil, if the given time lies between this entries'
 // dates. If the given time is the zero value, it will be contained by any
 // interval.
 func (entry *Entry) containsDateTime(t time.Time, g DateGranularity) error {
@@ -285,7 +285,7 @@ func FindSerialNumbers(s string) []string {
 
 // parseWithGranularity tries to parse a string without explicit layout into a
 // date. If successful, also return the granularity. Any value that is not
-// recorgnized results in an ErrInvalidDate.
+// recorgnized results in an error.
 func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) {
 	if s == "" {
 		return time.Time{}, GRANULARITY_DAY, ErrInvalidDate

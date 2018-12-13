@@ -26,8 +26,8 @@ func TestLinkReader(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	s := buf.String()
-	if s != "2A==" {
-		t.Errorf("Read: got %v, want 2A==", s)
+	if s != "xQ==" {
+		t.Errorf("Read: got %v, want xQ==", s)
 	}
 }
 
