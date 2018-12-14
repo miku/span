@@ -18,7 +18,7 @@ solr: "auto"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
-ticket: "14229"
+ticket: "NA"
 
 
 # If set to "fail" an empty result set will be marked as failure.
@@ -93,7 +93,7 @@ all-records:
     - ["source_id:60", "access_facet", "Electronic Resources"]
     - ["source_id:60", "mega_collection", "Thieme E-Journals"]
     - ["source_id:78", "facet_avail", "Online"]
-    - ["source_id:78", "access_facet", "Electronic Ressources"]
+    - ["source_id:78", "access_facet", "Electronic Resources"]
     - ["source_id:78", "mega_collection", "IZI-Datenbank"]
     - ["source_id:85", "format", "ElectronicArticle"]
     - ["source_id:85", "format_de15", "Article, E-Article"]
