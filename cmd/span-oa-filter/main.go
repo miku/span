@@ -73,13 +73,15 @@ func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
 func main() {
 
 	var excludeSourceIdentifiersFlags span.ArrayFlags
+	var openAccessSourceIdentifiersFlags span.ArrayFlags
 
 	showVersion := flag.Bool("v", false, "prints current program version")
 	kbartFile := flag.String("f", "", "path to a single KBART file")
-	freeContentFile := flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON")
+	freeContentFile := flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON file")
 	batchsize := flag.Int("b", 25000, "batch size")
 	verbose := flag.Bool("verbose", false, "debug output")
 	flag.Var(&excludeSourceIdentifiersFlags, "xsid", "exclude a given SID from checks, x.oa will always be false (repeatable)")
+	flag.Var(&openAccessSourceIdentifiersFlags, "oasid", "always set x.oa true for a given sid (repeatable)")
 
 	flag.Parse()
 
@@ -119,6 +121,11 @@ func main() {
 		excludeSids[sid] = true
 	}
 
+	openAccessSids := make(map[string]bool)
+	for _, sid := range openAccessSourceIdentifiersFlags {
+		openAccessSids[sid] = true
+	}
+
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
 
@@ -128,21 +135,25 @@ func main() {
 			return nil, err
 		}
 
-		// Bail out on excluded SIDs, refs #12738.
-		if _, ok := excludeSids[is.SourceID]; !ok {
+		if _, ok := openAccessSids[is.SourceID]; ok {
+			is.OpenAccess = true
+		} else {
+			// Bail out on excluded SIDs, refs #12738.
+			if _, ok := excludeSids[is.SourceID]; !ok {
 
-			// Set OA by KBART: various list (e.g. KBART in AMSL, OA GOLD list, maybe more in this format).
-			if filter.Apply(is) {
-				is.OpenAccess = true
-			}
+				// Set OA by KBART: various list (e.g. KBART in AMSL, OA GOLD list, maybe more in this format).
+				if filter.Apply(is) {
+					is.OpenAccess = true
+				}
 
-			// Additionally, compare free content API results.
-			for _, c := range is.MegaCollections {
-				key := fmt.Sprintf("%s:%s", is.SourceID, c)
-				if v, ok := lookup[key]; ok {
-					is.OpenAccess = v
-					if v {
-						break // In case of multiple collections, we keep the max.
+				// Additionally, compare free content API results.
+				for _, c := range is.MegaCollections {
+					key := fmt.Sprintf("%s:%s", is.SourceID, c)
+					if v, ok := lookup[key]; ok {
+						is.OpenAccess = v
+						if v {
+							break // In case of multiple collections, we keep the max.
+						}
 					}
 				}
 			}
