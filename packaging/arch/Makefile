@@ -1,6 +1,6 @@
 NAME = span
-VERSION = 0.1.270
-RELEASE = 1
+VERSION = 0.1.271
+RELEASE = 0
 
 $(NAME)-$(VERSION)-$(RELEASE)-x86_64.pkg.tar.xz: PKGBUILD
 	makepkg

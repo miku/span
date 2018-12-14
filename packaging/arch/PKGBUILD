@@ -1,8 +1,8 @@
 # Maintainer: Martin Czygan <martin.czygan@uni-leipzig.de>
 
 pkgname=span
-pkgver=0.1.270
-pkgrel=1
+pkgver=0.1.271
+pkgrel=0
 pkgdesc="Project FINC intermediate schema tools."
 arch=('i686' 'x86_64')
 url="https://github.com/miku/span"
