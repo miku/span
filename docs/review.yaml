@@ -18,7 +18,7 @@ solr: "auto"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
-ticket: "NA"
+ticket: "14229"
 
 
 # If set to "fail" an empty result set will be marked as failure.
