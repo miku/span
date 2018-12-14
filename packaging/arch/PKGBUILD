@@ -1,4 +1,6 @@
 # Maintainer: Martin Czygan <martin.czygan@uni-leipzig.de>
+#
+# TODO(miku): Simplify asset handling, make everything simply go-get-able.
 
 pkgname=span
 pkgver=0.1.271
@@ -17,9 +19,10 @@ _gourl='github.com/miku/span/cmd/...'
 
 prepare() {
   export GOPATH="${srcdir}/go"
+  rm -rf "$GOPATH/src/github.com/miku/span"
   mkdir -p "$GOPATH/src/github.com/miku"
   mv "${srcdir}/${pkgname}-${pkgver}" "$GOPATH/src/github.com/miku/span"
-  cd "$GOPATH/src/github.com/miku/span" && make clean all
+  cd "$GOPATH/src/github.com/miku/span" && go get ./... && make clean assets all
 }
 
 package() {
