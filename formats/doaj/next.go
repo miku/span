@@ -187,6 +187,7 @@ func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		languages.Add(detected)
 	}
 	output.Languages = languages.Values()
+	output.OpenAccess = true
 
 	output.RefType = DefaultRefType
 	return output, nil
