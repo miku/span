@@ -93,7 +93,7 @@ all-records:
     - ["source_id:60", "access_facet", "Electronic Resources"]
     - ["source_id:60", "mega_collection", "Thieme E-Journals"]
     - ["source_id:78", "facet_avail", "Online"]
-    - ["source_id:78", "access_facet", "Electronic Ressources"]
+    - ["source_id:78", "access_facet", "Electronic Resources"]
     - ["source_id:78", "mega_collection", "IZI-Datenbank"]
     - ["source_id:85", "format", "ElectronicArticle"]
     - ["source_id:85", "format_de15", "Article, E-Article"]
