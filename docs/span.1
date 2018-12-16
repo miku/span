@@ -15,7 +15,7 @@ tools
 .PP
 \fB\fCspan\-check\fR [\fB\fC\-verbose\fR] < \fIfile\fP
 .PP
-\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] [\fB\fC\-fc\fR \fIfile\fP] [\fB\fC\-xsid\fR \fIstring\fP] < \fIfile\fP
+\fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] [\fB\fC\-fc\fR \fIfile\fP] [\fB\fC\-xsid\fR \fIstring\fP] [\fB\fC\-oasid\fR \fIstring\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
 .PP
@@ -84,6 +84,9 @@ Filename to DOI to exclude, one per line. \fB\fCspan\-crossref\-snapshot\fR only
 .TP
 \fB\fC\-xsid\fR \fIsid\fP
 Do not apply processing on a given source id. \fB\fCspan\-oa\-filter\fR only.
+.TP
+\fB\fC\-oasid\fR \fIsid\fP
+Set \fB\fCx.oa\fR to true for all records of a given source id. \fB\fCspan\-oa\-filter\fR only.
 .TP
 \fB\fC\-z\fR
 Input is gzip compressed. \fB\fCspan\-crossref\-snapshot\fR only.

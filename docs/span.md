@@ -20,7 +20,7 @@ SYNOPSIS
 
 `span-check` [`-verbose`] < *file*
 
-`span-oa-filter` [`-f` *file*] [`-fc` *file*] [`-xsid` *string*] < *file*
+`span-oa-filter` [`-f` *file*] [`-fc` *file*] [`-xsid` *string*] [`-oasid` *string*] < *file*
 
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
@@ -93,6 +93,9 @@ OPTIONS
 
 `-xsid` *sid*
   Do not apply processing on a given source id. `span-oa-filter` only.
+
+`-oasid` *sid*
+  Set `x.oa` to true for all records of a given source id. `span-oa-filter` only.
 
 `-z`
   Input is gzip compressed. `span-crossref-snapshot` only.
