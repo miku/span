@@ -231,7 +231,7 @@ Set OA flag (via KBART-ish file):
 
 Update labels:
 
-  `echo '{"finc.record_id": "1"}' | span-update-labels -f <(echo '1,X,Y')`
+  `echo '{"finc.id": "1"}' | span-update-labels -f <(echo '1,X,Y')`
 
 Create a snapshot of crossref works API message items:
 
@@ -242,7 +242,7 @@ response - one per line - for example:
 
   `curl -sL goo.gl/Cq34Bd | jq .message`
 
-Given an intermediate schema file, extract record id, source id, doi and labels
+Given an intermediate schema file, extract id, source id, doi and labels
 (ISIL). Can be fed into groupcover(1) for deduplication.
 
   `span-local-data < input.ldj > output.tsv`
@@ -449,7 +449,7 @@ Example debugging output, record rejected because it's outside licence coverage:
     2016/07/14 14:29:45 {
         "document": {
             ...
-            "finc.record_id": "ai-55-aHR0cDovL3d3dy5qc3Rvci5vcmcvc3RhYmxlLzEwLjE0MzIxL3JoZXRwdWJsYWZmYS4xOC4xLjAxNjE",
+            "finc.id": "ai-55-aHR0cDovL3d3dy5qc3Rvci5vcmcvc3RhYmxlLzEwLjE0MzIxL3JoZXRwdWJsYWZmYS4xOC4xLjAxNjE",
             ...
             "rft.atitle": "Review: Depression: A Public Feeling",
             ...
