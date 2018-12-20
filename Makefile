@@ -9,6 +9,9 @@ test: assets deps
 
 	go test ./...
 
+lint:
+	golint -set_exit_status ./...
+
 bench:
 	go test -v -bench ./...
 
