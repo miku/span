@@ -122,7 +122,7 @@ func main() {
 
 	if len(mu) == 0 || len(hfc) == 0 || len(hf) == 0 || len(cf) == 0 {
 		if !*allowEmpty {
-			log.Fatal("at least one empty response in %s", fetchlist)
+			log.Fatalf("at least one empty response in %s", fetchlist)
 		}
 		log.Println("at least one API endpoint returned an empty response")
 	}
