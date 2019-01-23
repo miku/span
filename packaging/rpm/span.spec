@@ -1,6 +1,6 @@
 Summary:    Library data tools.
 Name:       span
-Version:    0.1.272
+Version:    0.1.273
 Release:    0
 License:    GPL
 ExclusiveArch:  x86_64
@@ -22,6 +22,7 @@ Library data tools.
 %install
 
 mkdir -p $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-amsl $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-check $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
@@ -56,6 +57,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 %files
 %defattr(-,root,root)
 
+/usr/sbin/span-amsl
 /usr/sbin/span-check
 /usr/sbin/span-compare
 /usr/sbin/span-export
@@ -76,6 +78,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 %attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
 %changelog
+
+* Wed Jan 23 2019 Martin Czygan
+- 0.1.273 release
+- add span-amsl api helper
 
 * Tue Jul 10 2018 Martin Czygan
 - 0.1.240 release

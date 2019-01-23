@@ -3,7 +3,7 @@
 # TODO(miku): Simplify asset handling, make everything simply go-get-able.
 
 pkgname=span
-pkgver=0.1.272
+pkgver=0.1.273
 pkgrel=0
 pkgdesc="Project FINC intermediate schema tools."
 arch=('i686' 'x86_64')
@@ -26,6 +26,7 @@ prepare() {
 }
 
 package() {
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-amsl" "${pkgdir}/usr/bin/${pkgname}-amsl"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-check" "${pkgdir}/usr/bin/${pkgname}-check"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-compare" "${pkgdir}/usr/bin/${pkgname}-compare"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-crossref-snapshot" "${pkgdir}/usr/bin/${pkgname}-crossref-snapshot"
