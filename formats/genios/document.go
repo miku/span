@@ -49,7 +49,7 @@ const (
 	// DefaultRefType is the default ris.type.
 	DefaultRefType = "EJOUR"
 	// If no abstract is found accept this number of chars from doc.Text as Abstract.
-	textAsAbstractCutoff = 2000
+	textAsAbstractCutoff = 200
 	// maxAuthorLength example: document/BOND__b0604160052
 	maxAuthorLength = 200
 	minAuthorLength = 4
