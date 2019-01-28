@@ -14,7 +14,7 @@ options=('!strip' '!emptydirs')
 conflicts=("${pkgname}-bin")
 replaces=("${pkgname}-bin")
 source=("${url}/archive/v${pkgver}.tar.gz")
-sha256sums=('b8cb2613b3de6ba229349bc30205b772ef268f8e7665e617613e1397e4f944e0')
+sha256sums=('51c9f1c82a272be78e58a5be7d66ab0e05f1e644c1a46ae9ef56b8411b665fde')
 _gourl='github.com/miku/span/cmd/...'
 
 prepare() {
