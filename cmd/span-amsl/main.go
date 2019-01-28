@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
 	"github.com/sethgrid/pester"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -25,15 +25,16 @@ var (
 // Doc contains keys and values.
 type Doc map[string]string
 
-// MatchByKey return true, if both docs contain the same value in the key
-// field.
+// MatchByKey return true, if both docs contain the same value at key.
 func (doc Doc) MatchByKey(other Doc, key string) bool {
-	v, ok := doc[key]
-	if !ok {
+	var (
+		v, w string
+		ok   bool
+	)
+	if v, ok = doc[key]; !ok {
 		return false
 	}
-	w, ok := other[key]
-	if !ok {
+	if w, ok = other[key]; !ok {
 		return false
 	}
 	return v == w
@@ -56,15 +57,15 @@ func fetchLink(link string) (filename string, err error) {
 	if _, err := io.Copy(f, resp.Body); err != nil {
 		return "", err
 	}
+	log.Printf("%s saved at %s", link, f.Name())
 	return f.Name(), nil
 }
 
-// loadDocs loads api response items either from file or link.
-func loadDocs(name string) (docs []Doc, err error) {
-	var filename = name
-	if strings.HasPrefix(name, "http://") || strings.HasPrefix(name, "https") {
-		filename, err = fetchLink(name)
-		if err != nil {
+// loadDocs loads api response items either from filename or link.
+func loadDocs(location string) (docs []Doc, err error) {
+	var filename = location
+	if strings.HasPrefix(location, "http://") || strings.HasPrefix(location, "https") {
+		if filename, err = fetchLink(location); err != nil {
 			return
 		}
 		defer os.Remove(filename)
@@ -84,43 +85,44 @@ func main() {
 	flag.Parse()
 
 	fetchlist := map[string]string{
-		"mu":  fmt.Sprintf("%s/outboundservices/list?do=metadata_usage", *live),
-		"hfc": fmt.Sprintf("%s/outboundservices/list?do=holdings_file_concat", *staging),
-		"hf":  fmt.Sprintf("%s/outboundservices/list?do=holdingsfiles", *live),
-		"cf":  fmt.Sprintf("%s/outboundservices/list?do=contentfiles", *live),
+		"mu": fmt.Sprintf("%s/outboundservices/list?do=metadata_usage", *live),
+		"hc": fmt.Sprintf("%s/outboundservices/list?do=holdings_file_concat", *staging),
+		"hf": fmt.Sprintf("%s/outboundservices/list?do=holdingsfiles", *live),
+		"cf": fmt.Sprintf("%s/outboundservices/list?do=contentfiles", *live),
 	}
 	if *cached {
 		fetchlist = map[string]string{
-			"mu":  "metadata_usage.json",
-			"hfc": "holdings_file_concat.json",
-			"hf":  "holdingsfiles.json",
-			"cf":  "contentfiles.json",
+			"mu": "metadata_usage.json",
+			"hc": "holdings_file_concat.json",
+			"hf": "holdingsfiles.json",
+			"cf": "contentfiles.json",
 		}
 	}
 
-	mu, err := loadDocs(fetchlist["mu"])
-	if err != nil {
+	var (
+		mu, hc, hf, cf []Doc
+		err            error
+	)
+
+	if mu, err = loadDocs(fetchlist["mu"]); err != nil {
 		log.Fatal(err)
 	}
-	hfc, err := loadDocs(fetchlist["hfc"])
-	if err != nil {
+	if hc, err = loadDocs(fetchlist["hc"]); err != nil {
 		log.Fatal(err)
 	}
-	hf, err := loadDocs(fetchlist["hf"])
-	if err != nil {
+	if hf, err = loadDocs(fetchlist["hf"]); err != nil {
 		log.Fatal(err)
 	}
-	cf, err := loadDocs(fetchlist["cf"])
-	if err != nil {
+	if cf, err = loadDocs(fetchlist["cf"]); err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println(len(mu))
-	log.Println(len(hfc))
+	log.Println(len(hc))
 	log.Println(len(hf))
 	log.Println(len(cf))
 
-	if len(mu) == 0 || len(hfc) == 0 || len(hf) == 0 || len(cf) == 0 {
+	if len(mu) == 0 || len(hc) == 0 || len(hf) == 0 || len(cf) == 0 {
 		if !*allowEmpty {
 			log.Fatalf("at least one empty response in %s", fetchlist)
 		}
@@ -151,20 +153,27 @@ func main() {
 			}
 		}
 
-		// If the item is not shipped in HFC API response, it's a no.
+		// If the item is not shipped in HC (HoldingsFile Concat) API response,
+		// it's a no.
 		doc["evaluateHoldingsFileForLibrary"] = "no"
 
 		// Holding files concatenated, if there is a matching entry here, we
 		// need to evaluate the file.
-		for _, other := range hfc {
-			if !doc.MatchByKey(other, "megaCollection") && !doc.MatchByKey(other, "ISIL") {
+		for _, other := range hc {
+			if !doc.MatchByKey(other, "megaCollection") {
 				continue
 			}
-			// Update from matching document.
+			if !doc.MatchByKey(other, "ISIL") {
+				continue
+			}
+			// Update from matching document, if collection and ISIL are matching.
 			for k, v := range other {
 				if _, ok := doc[k]; !ok {
 					doc[k] = v
 				}
+			}
+			if doc["ISIL"] == "DE-14" {
+				log.Printf("DE-14 match: %s, other: %s", doc, other)
 			}
 			doc["evaluateHoldingsFileForLibrary"] = "yes"
 		}
