@@ -175,7 +175,12 @@ func main() {
 			}
 		}
 
+		if len(hf) == 0 {
+			log.Println("no holding files")
+		}
+
 		// Holding files. For each holding file, we create a new doc.
+		// XXX: No every collection will need a holdings file.
 		for _, other := range hf {
 			if !doc.MatchByKey(other, "ISIL") {
 				continue
