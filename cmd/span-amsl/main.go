@@ -154,7 +154,8 @@ func main() {
 		// If the item is not shipped in HFC API response, it's a no.
 		doc["evaluateHoldingsFileForLibrary"] = "no"
 
-		// Holding files concatenated.
+		// Holding files concatenated, if there is a matching entry here, we
+		// need to evaluate the file.
 		for _, other := range hfc {
 			if !doc.MatchByKey(other, "megaCollection") && !doc.MatchByKey(other, "ISIL") {
 				continue
@@ -175,12 +176,15 @@ func main() {
 			}
 		}
 
-		if len(hf) == 0 {
-			log.Println("no holding files")
+		// If we do not need holdings file, just emit the doc as is and
+		// continue.
+		if doc["evaluateHoldingsFileForLibrary"] == "no" {
+			updates = append(updates, doc)
+			log.Printf("claim without holding file for %s and %s", doc["ISIL"], doc["sourceID"])
+			continue
 		}
 
 		// Holding files. For each holding file, we create a new doc.
-		// XXX: No every collection will need a holdings file.
 		for _, other := range hf {
 			if !doc.MatchByKey(other, "ISIL") {
 				continue
