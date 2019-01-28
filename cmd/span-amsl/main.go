@@ -156,7 +156,7 @@ func main() {
 
 		// Holding files concatenated.
 		for _, other := range hfc {
-			if !doc.MatchByKey(other, "megaCollection") {
+			if !doc.MatchByKey(other, "megaCollection") && !doc.MatchByKey(other, "ISIL") {
 				continue
 			}
 			// Update from matching document.
