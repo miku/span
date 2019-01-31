@@ -20,6 +20,7 @@ var (
 	staging    = flag.String("staging", "", "AMSL staging base url")
 	cached     = flag.Bool("cached", false, "use cached files (metadata_usage.json, holdingsfiles.json, ...)")
 	allowEmpty = flag.Bool("allow-empty", false, "allow empty responses from api")
+	verbose    = flag.Bool("verbose", false, "be verbose")
 )
 
 // Doc contains keys and values.
@@ -189,7 +190,9 @@ func main() {
 		// continue.
 		if doc["evaluateHoldingsFileForLibrary"] == "no" {
 			updates = append(updates, doc)
-			log.Printf("claim without holding file for %s and %s", doc["ISIL"], doc["sourceID"])
+			if *verbose {
+				log.Printf("claim without holding file for %s and %s", doc["ISIL"], doc["sourceID"])
+			}
 			continue
 		}
 
