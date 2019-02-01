@@ -164,19 +164,28 @@ func main() {
 			if !doc.MatchByKey(other, "megaCollection") {
 				continue
 			}
-			if !doc.MatchByKey(other, "ISIL") {
-				continue
+			// XXX: ISIL list separated by semicolon.
+			vs, ok := other["ISIL"]
+			if !ok {
+				log.Fatal("missing ISIL key in holding_files_concat")
 			}
-			// Update from matching document, if collection and ISIL are matching.
-			for k, v := range other {
-				if _, ok := doc[k]; !ok {
-					doc[k] = v
+			values := strings.Split(vs, ";")
+			for _, v := range values {
+				v = strings.TrimSpace(v)
+				if doc["ISIL"] != v {
+					continue
 				}
+				// Update from matching document, if collection and ISIL are matching.
+				for k, v := range other {
+					if _, ok := doc[k]; !ok {
+						doc[k] = v
+					}
+				}
+				if doc["ISIL"] == "DE-14" {
+					log.Printf("DE-14 match: %s, other: %s", doc, other)
+				}
+				doc["evaluateHoldingsFileForLibrary"] = "yes"
 			}
-			if doc["ISIL"] == "DE-14" {
-				log.Printf("DE-14 match: %s, other: %s", doc, other)
-			}
-			doc["evaluateHoldingsFileForLibrary"] = "yes"
 		}
 
 		if v, ok := doc["contentFileURI"]; ok {

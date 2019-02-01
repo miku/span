@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl
+TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl span-amsl-next
 PKGNAME = span
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
