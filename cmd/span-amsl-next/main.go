@@ -229,6 +229,7 @@ func main() {
 			SourceID:              mu.SourceID,
 			TechnicalCollectionID: mu.TechnicalCollectionID,
 		}
+
 		// Merge fields from content file.
 		for _, cf := range cfr {
 			if cf.MegaCollection != mu.MegaCollection {
@@ -283,16 +284,16 @@ func main() {
 				ContentFileLabel:               update.ContentFileLabel,
 				ContentFileURI:                 update.ContentFileURI,
 				EvaluateHoldingsFileForLibrary: update.EvaluateHoldingsFileForLibrary,
-				ISIL:                           update.ISIL,
-				LinkToContentFile:              update.LinkToContentFile,
-				MegaCollection:                 update.MegaCollection,
-				ProductISIL:                    update.ProductISIL,
-				ShardLabel:                     update.ShardLabel,
-				SourceID:                       update.SourceID,
-				TechnicalCollectionID:          update.TechnicalCollectionID,
-				LinkToHoldingsFile:             hf.LinkToFile,
-				DokumentLabel:                  hf.DokumentLabel,
-				DokumentURI:                    hf.DokumentURI,
+				ISIL:                  update.ISIL,
+				LinkToContentFile:     update.LinkToContentFile,
+				MegaCollection:        update.MegaCollection,
+				ProductISIL:           update.ProductISIL,
+				ShardLabel:            update.ShardLabel,
+				SourceID:              update.SourceID,
+				TechnicalCollectionID: update.TechnicalCollectionID,
+				LinkToHoldingsFile:    hf.LinkToFile,
+				DokumentLabel:         hf.DokumentLabel,
+				DokumentURI:           hf.DokumentURI,
 			}
 			if hf.DokumentURI != "" {
 				ndoc.LinkToHoldingsFile = fmt.Sprintf(
