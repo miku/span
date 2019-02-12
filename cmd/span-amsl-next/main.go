@@ -168,6 +168,8 @@ func fetchFrom(base, kind string, r io.ReaderFrom) (int64, error) {
 }
 
 func main() {
+	flag.Parse()
+
 	var (
 		mur MetadataUsageResponse
 		hcr HoldingsFileConcatResponse
