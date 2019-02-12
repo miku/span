@@ -85,13 +85,13 @@ func SeparatedFields(s, sep string) (result []string) {
 	return
 }
 
-// ReaderCounter is counter for io.Reader
+// ReaderCounter counts the number of bytes read.
 type ReaderCounter struct {
 	count int64
 	r     io.Reader
 }
 
-// NewReaderCounter function for create new ReaderCounter
+// NewReaderCounter function for create new ReaderCounter.
 func NewReaderCounter(r io.Reader) *ReaderCounter {
 	return &ReaderCounter{r: r}
 }
