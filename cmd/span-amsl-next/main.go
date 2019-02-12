@@ -103,14 +103,13 @@ func (counter *ReaderCounter) Read(buf []byte) (int, error) {
 	return n, err
 }
 
-// Count function return counted bytes.
+// Count function returns bytes read so far.
 func (counter *ReaderCounter) Count() int64 {
 	return atomic.LoadInt64(&counter.count)
 }
 
-// readFrom helper to decode data from reader into value, returning number ob
-// bytes read.
-func readFrom(v interface{}, r io.Reader) (int64, error) {
+// readFrom decodes data from reader into value, returning bytes read.
+func readFrom(r io.Reader, v interface{}) (int64, error) {
 	rc := NewReaderCounter(r)
 	if err := json.NewDecoder(rc).Decode(v); err != nil {
 		return 0, err
@@ -123,7 +122,7 @@ type MetadataUsageResponse []MetadataUsage
 
 // ReadFrom populates a response with MetadataUsage items.
 func (resp *MetadataUsageResponse) ReadFrom(r io.Reader) (int64, error) {
-	return readFrom(resp, r)
+	return readFrom(r, resp)
 }
 
 // ContentFilesResponse group many content files items.
@@ -131,7 +130,7 @@ type ContentFilesResponse []ContentFiles
 
 // ReadFrom populates a response with MetadataUsage items.
 func (resp *ContentFilesResponse) ReadFrom(r io.Reader) (int64, error) {
-	return readFrom(resp, r)
+	return readFrom(r, resp)
 }
 
 // HoldingsFiles group many holdings files items.
@@ -139,7 +138,7 @@ type HoldingsFilesResponse []HoldingsFiles
 
 // ReadFrom populates a response with MetadataUsage items.
 func (resp *HoldingsFilesResponse) ReadFrom(r io.Reader) (int64, error) {
-	return readFrom(resp, r)
+	return readFrom(r, resp)
 }
 
 // HoldingsFileConcatResponse group many holdings files (concat) items.
@@ -147,7 +146,7 @@ type HoldingsFileConcatResponse []HoldingsFileConcat
 
 // ReadFrom populates a response with MetadataUsage items.
 func (resp *HoldingsFileConcatResponse) ReadFrom(r io.Reader) (int64, error) {
-	return readFrom(resp, r)
+	return readFrom(r, resp)
 }
 
 // fetchLocation fetches a HTTP location into a io.ReaderFrom.
