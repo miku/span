@@ -79,7 +79,7 @@ type HoldingsFileConcat struct {
 
 // SeparatedFields splits s on given separator and trims whitespace.
 func SeparatedFields(s, sep string) (result []string) {
-	for _, v := range strings.Split(s, ";") {
+	for _, v := range strings.Split(s, sep) {
 		result = append(result, strings.TrimSpace(v))
 	}
 	return
