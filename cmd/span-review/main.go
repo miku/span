@@ -4,6 +4,9 @@
 // There is a yaml file for configuring queries. It is possible to send results
 // directly to a Redmine ticket. This program can be used standalone, or via
 // span-webhookd.
+//
+// Additional rules: Ansigelung, sigeltest.
+//
 package main
 
 import (
@@ -242,8 +245,8 @@ func MustParseSourceIdentifier(s string) string {
 	return parts[1]
 }
 
-// ErrorOrComment returns error or message if error is nil.
-func ErrorOrComment(err error, message string) string {
+// ErrorOrMessage returns error or message if error is nil.
+func ErrorOrMessage(err error, message string) string {
 	if err != nil {
 		return fmt.Sprintf("%v", err)
 	}
@@ -336,7 +339,7 @@ func main() {
 			SolrField:        field,
 			FixedResult:      true,
 			Passed:           passed,
-			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", query, field, values)),
+			Comment:          ErrorOrMessage(err, fmt.Sprintf("%s %s %s", query, field, values)),
 		})
 	}
 
@@ -366,7 +369,7 @@ func main() {
 			SolrField:        field,
 			FixedResult:      true,
 			Passed:           passed,
-			Comment:          ErrorOrComment(err, fmt.Sprintf("%s %s %s", query, field, values)),
+			Comment:          ErrorOrMessage(err, fmt.Sprintf("%s %s %s", query, field, values)),
 		})
 	}
 
@@ -399,7 +402,7 @@ func main() {
 			SolrField:        field,
 			FixedResult:      true,
 			Passed:           passed,
-			Comment: ErrorOrComment(err, fmt.Sprintf("%s %s %s %0.4f",
+			Comment: ErrorOrMessage(err, fmt.Sprintf("%s %s %s %0.4f",
 				query, field, value, minRatioPct)),
 		})
 	}
@@ -433,7 +436,7 @@ func main() {
 			SolrField:        field,
 			FixedResult:      true,
 			Passed:           passed,
-			Comment: ErrorOrComment(err, fmt.Sprintf("%s %s %s %d",
+			Comment: ErrorOrMessage(err, fmt.Sprintf("%s %s %s %d",
 				query, field, value, minCount)),
 		})
 	}
