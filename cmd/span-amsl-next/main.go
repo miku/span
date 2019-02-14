@@ -256,9 +256,9 @@ func main() {
 				}
 				update.ProductISIL = hc.ProductISIL
 				update.ShardLabel = hc.ShardLabel
+				update.EvaluateHoldingsFileForLibrary = "yes"
 				break
 			}
-			update.EvaluateHoldingsFileForLibrary = "yes"
 		}
 
 		// Add link to content file.
