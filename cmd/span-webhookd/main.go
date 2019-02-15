@@ -35,6 +35,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -220,6 +221,17 @@ func (p PushPayload) IsFileModified(filename string) bool {
 	return false
 }
 
+// MatchModified returns a list of paths matching a pattern (match against the
+// full path in repo, e.g. docs/review.*).
+func (p PushPayload) MatchModified(re *regexp.Regexp) (filenames []string) {
+	for _, modified := range p.ModifiedFiles() {
+		if re.MatchString(modified) {
+			filenames = append(filenames, modified)
+		}
+	}
+	return
+}
+
 // HookHandler can act as webhook receiver. The hook we use at the moment is
 // the Push Hook. Other types are Issue, Note or Tag Push Hook.
 func HookHandler(w http.ResponseWriter, r *http.Request) {
@@ -244,11 +256,14 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("gitlab payload: %v", payload)
-		log.Printf("modified files: %s", strings.Join(payload.ModifiedFiles(), ", "))
-		if !payload.IsFileModified("docs/review.yaml") {
-			log.Println("review.yaml not modified, hook done")
+
+		pattern := "^docs/review.*yaml$"
+		reviewFiles := payload.MatchModified(regexp.MustCompile(pattern))
+		if len(reviewFiles) == 0 {
+			log.Println("%s matched nothing, hook done")
 			return
 		}
+
 		repo := Repo{
 			URL:   payload.Project.GitHttpUrl,
 			Dir:   *repoDir,
@@ -263,10 +278,13 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		// XXX: exit code handling, non-portable.
 		log.Printf("successfully updated repo at %s", repo.Dir)
 
-		rr := IndexReviewRequest{
-			ReviewConfigFile: path.Join(repo.Dir, "docs/review.yaml"),
+		for _, reviewFile := range reviewFiles {
+			rr := IndexReviewRequest{
+				ReviewConfigFile: path.Join(repo.Dir, reviewFile),
+			}
+			IndexReviewQueue <- rr
+			log.Printf("dispatched review for %s", reviewFile)
 		}
-		IndexReviewQueue <- rr
 	case "":
 		log.Printf("X-Gitlab-Event not given or empty")
 		w.WriteHeader(http.StatusBadRequest)
