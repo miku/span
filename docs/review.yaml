@@ -14,11 +14,12 @@
 # server will be figured out automatically.
 # solr: "auto"
 # solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
-solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
+# solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
+solr: "http://172.18.113.12:8080/solr/biblio/" # UBL-main Gesamtimport 2018-12
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
-ticket: "NA"
+ticket: "14728"
 
 
 # If set to "fail" an empty result set will be marked as failure.
@@ -48,6 +49,8 @@ allowed-keys:
 #    - ["source_id:141", "language", "German", "English"]
 #    - ["source_id:162", "language", "German", "English", "French", "Italian"]
 #    - ["source_id:162", "finc_class_facet", "not assigned", "Allgemeines", "Philosophie", "Ethnologie (Volks- und Völkerkunde)", "Pädagogik"]
+# Sources indexed in UBL-main
+     - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger", "Munzinger KLG", "Munzinger KLfG"]
 
 # All records: [Query, Facet-Field, Value, ...] checks if all record contain
 # only the given values.
