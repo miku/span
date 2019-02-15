@@ -235,7 +235,7 @@ func (w *TextileResultWriter) WriteResults(rs []Result) (written int, err error)
 }
 
 // Given a query string, parse out the source identifier, panics currently, if
-// query is not of the form source_id:23.
+// query is not of the form source_id:23. TODO(miku): make this more flexible.
 func MustParseSourceIdentifier(s string) string {
 	parts := strings.Split(s, ":")
 	if len(parts) != 2 {
