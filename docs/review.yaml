@@ -1,7 +1,12 @@
 # Review configuration, refs #12756.
 #
+# Proposed updates:
+#
+# 1. Just use bash scripts.
+#
+#
 # TODO(miku): post any error in ticket
-# TODO: maybe just use a bash script
+# 
 #
 # Proposed workflow:
 #
