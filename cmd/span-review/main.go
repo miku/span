@@ -218,21 +218,20 @@ func (w *TextileResultWriter) WriteResult(r Result) (int, error) {
 }
 
 // WriteResults writes a batch of results.
-func (w *TextileResultWriter) WriteResults(rs []Result) (int, error) {
-	bw := 0
+func (w *TextileResultWriter) WriteResults(rs []Result) (written int, err error) {
 	if n, err := w.WriteHeader(); err != nil {
 		return 0, err
 	} else {
-		bw += n
+		written += n
 	}
 	for _, r := range rs {
 		if n, err := w.WriteResult(r); err != nil {
 			return 0, err
 		} else {
-			bw += n
+			written += n
 		}
 	}
-	return bw, nil
+	return written, nil
 }
 
 // Given a query string, parse out the source identifier, panics currently, if
