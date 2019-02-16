@@ -299,6 +299,9 @@ func main() {
 			config.SolrServer = strings.Replace(config.SolrServer, "/#", "", -1)
 		}
 		solrServer = config.SolrServer
+
+		// A URL like http://solr.web:8080/solr/biblio//select?q=*:* would 404 (with 5.5.5).
+		solrServer = strings.TrimRight(solrServer, "/")
 	}
 	if *server != "" {
 		solrServer = *server
