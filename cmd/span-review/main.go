@@ -162,7 +162,7 @@ var (
 	server         = flag.String("server", "", "location of SOLR server, overrides review.yaml")
 	textile        = flag.Bool("t", false, "emit a textile table to stdout")
 	ascii          = flag.Bool("a", false, "emit ascii table to stdout")
-	configFile     = flag.String("c", "", "path to review.yaml config file")
+	reviewFile     = flag.String("c", "", "path to review.yaml file containing test cases, e.g. https://git.io/fh5Zh")
 	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
 )
@@ -266,11 +266,11 @@ func main() {
 
 	// Read review configuration.
 	var configReader io.Reader
-	if *configFile == "" {
+	if *reviewFile == "" {
 		log.Println("no file given, using default review config (https://git.io/fNUD4)")
 		configReader = strings.NewReader(defaultConfig)
 	} else {
-		f, err := os.Open(*configFile)
+		f, err := os.Open(*reviewFile)
 		if err != nil {
 			log.Fatal(err)
 		}
