@@ -119,6 +119,9 @@ func (r Repo) String() string {
 
 // Update just runs a git pull, as per strong convention, this will always be a
 // fast forward. If repo does not exist yet, clone.
+// gitlab/profile/personal_access_tokens: You can also use personal access
+// tokens to authenticate against Git over HTTP. They are the only accepted
+// password when you have Two-Factor Authentication (2FA) enabled.
 func (r Repo) Update() error {
 	log.Printf("updating %s", r)
 	if r.Token == "" {
