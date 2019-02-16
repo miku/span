@@ -504,7 +504,7 @@ func main() {
 		}
 
 		fmt.Fprintf(&buf, "* tested SOLR at %s\n", index.Server)
-		fmt.Fprintf(&buf, "* ran span-review %s on %s\n\n", span.AppVersion, hostname)
+		fmt.Fprintf(&buf, "* ran span-review %s on %s with review %s\n\n", span.AppVersion, hostname, *reviewFile)
 
 		tw := NewTextileTableWriter(&buf)
 		if _, err := tw.WriteResults(results); err != nil {
