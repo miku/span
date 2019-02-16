@@ -263,7 +263,7 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		pattern := "^docs/review.*yaml"
 		reviewFiles := payload.MatchModified(regexp.MustCompile(pattern))
 		if len(reviewFiles) == 0 {
-			log.Printf("%s matched nothing, hook done", patter)
+			log.Printf("%s matched nothing, hook done", pattern)
 			return
 		}
 
