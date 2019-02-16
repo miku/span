@@ -227,6 +227,9 @@ func (p PushPayload) MatchModified(re *regexp.Regexp) (filenames []string) {
 	for _, modified := range p.ModifiedFiles() {
 		if re.MatchString(modified) {
 			filenames = append(filenames, modified)
+			log.Printf("%s matches %s", modified, re)
+		} else {
+			log.Printf("%s ignored", modified)
 		}
 	}
 	return
@@ -257,10 +260,10 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("gitlab payload: %v", payload)
 
-		pattern := "^docs/review.*yaml$"
+		pattern := "^docs/review.*yaml"
 		reviewFiles := payload.MatchModified(regexp.MustCompile(pattern))
 		if len(reviewFiles) == 0 {
-			log.Println("%s matched nothing, hook done")
+			log.Printf("%s matched nothing, hook done", patter)
 			return
 		}
 
