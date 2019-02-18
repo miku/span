@@ -10,8 +10,8 @@ import (
 	"io"
 	"os"
 	"strings"
-	"sync/atomic"
 
+	"github.com/miku/span"
 	"github.com/sethgrid/pester"
 	log "github.com/sirupsen/logrus"
 )
@@ -87,32 +87,9 @@ func SeparatedFields(s, sep string) (result []string) {
 	return
 }
 
-// ReaderCounter counts the number of bytes read.
-type ReaderCounter struct {
-	count int64
-	r     io.Reader
-}
-
-// NewReaderCounter function for create new ReaderCounter.
-func NewReaderCounter(r io.Reader) *ReaderCounter {
-	return &ReaderCounter{r: r}
-}
-
-// Read keeps count.
-func (counter *ReaderCounter) Read(buf []byte) (int, error) {
-	n, err := counter.r.Read(buf)
-	atomic.AddInt64(&counter.count, int64(n))
-	return n, err
-}
-
-// Count function returns bytes read so far.
-func (counter *ReaderCounter) Count() int64 {
-	return atomic.LoadInt64(&counter.count)
-}
-
 // readFrom decodes data from reader into value, returning bytes read.
 func readFrom(r io.Reader, v interface{}) (int64, error) {
-	rc := NewReaderCounter(r)
+	rc := span.NewReaderCounter(r)
 	if err := json.NewDecoder(rc).Decode(v); err != nil {
 		return 0, err
 	}
