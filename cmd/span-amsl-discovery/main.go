@@ -1,3 +1,5 @@
+// The span-amsl-discovery tool will create a discovery (now defunkt) like API
+// response from available AMSL endpoints, refs #14456, #14415.
 package main
 
 import (
@@ -281,19 +283,19 @@ func main() {
 			}
 			// Create a new item for each holding file.
 			ndoc := Discovery{
+				DokumentLabel:                  hf.DokumentLabel,
+				DokumentURI:                    hf.DokumentURI,
+				LinkToHoldingsFile:             hf.LinkToFile,
 				ContentFileLabel:               update.ContentFileLabel,
 				ContentFileURI:                 update.ContentFileURI,
 				EvaluateHoldingsFileForLibrary: update.EvaluateHoldingsFileForLibrary,
-				ISIL:                           update.ISIL,
-				LinkToContentFile:              update.LinkToContentFile,
-				MegaCollection:                 update.MegaCollection,
-				ProductISIL:                    update.ProductISIL,
-				ShardLabel:                     update.ShardLabel,
-				SourceID:                       update.SourceID,
-				TechnicalCollectionID:          update.TechnicalCollectionID,
-				LinkToHoldingsFile:             hf.LinkToFile,
-				DokumentLabel:                  hf.DokumentLabel,
-				DokumentURI:                    hf.DokumentURI,
+				ISIL:                  update.ISIL,
+				LinkToContentFile:     update.LinkToContentFile,
+				MegaCollection:        update.MegaCollection,
+				ProductISIL:           update.ProductISIL,
+				ShardLabel:            update.ShardLabel,
+				SourceID:              update.SourceID,
+				TechnicalCollectionID: update.TechnicalCollectionID,
 			}
 			if hf.DokumentURI != "" {
 				ndoc.LinkToHoldingsFile = fmt.Sprintf(
