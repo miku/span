@@ -6,8 +6,8 @@ NAME
 
 span-import, span-tag, span-export, span-check, span-oa-filter,
 span-update-labels, span-crossref-snapshot, span-local-data, span-freeze,
-span-review, span-webhookd, span-hcov - intermediate schema and integration
-tools
+span-review, span-webhookd, span-hcov, span-amsl-discovery - intermediate
+schema and integration tools
 
 SYNOPSIS
 --------
@@ -35,6 +35,8 @@ SYNOPSIS
 `span-webhookd` [`-addr` *hostport*] [`-logfile` *file*] [`repo-dir` *path*] [`-span-config` *file*] [`-token` *token*] [`-trigger-path` *path*]
 
 `span-hcov` `-f` *file* `-server` *url*
+
+`span-amsl-discovery` `-live` *URL* `-staging` *URL* [`-allow-empty`] [`-verbose`]
 
 DESCRIPTION
 -----------
@@ -481,6 +483,22 @@ Example debugging output, record rejected because it's outside licence coverage:
             "EmbargoDisallowEarlier": false
         }
     }
+
+AMSL DISCOVERY API COMPAT
+-------------------------
+
+In December 2018, the AMSL discovery API, required for licensing via span-tag,
+has been shut down. In order to not have to rewrite too much code at this
+point, we rebuild a discovery-like response from the existing endpoints:
+*metadata_usage*, *holdingsfiles*, *contentfiles* and the new
+*holdings_file_concat*.
+
+At the moment (Feb 2019), the following command writes a discovery API like
+JSON response to stdout:
+
+    `span-amsl-discovery -live https://live.example.technology -staging https://staging.example.technology`
+
+This command might change in the future.
 
 
 BUGS

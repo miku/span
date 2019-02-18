@@ -3,8 +3,8 @@
 .PP
 span\-import, span\-tag, span\-export, span\-check, span\-oa\-filter,
 span\-update\-labels, span\-crossref\-snapshot, span\-local\-data, span\-freeze,
-span\-review, span\-webhookd, span\-hcov \- intermediate schema and integration
-tools
+span\-review, span\-webhookd, span\-hcov, span\-amsl\-discovery \- intermediate
+schema and integration tools
 .SH SYNOPSIS
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
@@ -30,6 +30,8 @@ tools
 \fB\fCspan\-webhookd\fR [\fB\fC\-addr\fR \fIhostport\fP] [\fB\fC\-logfile\fR \fIfile\fP] [\fB\fCrepo\-dir\fR \fIpath\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-token\fR \fItoken\fP] [\fB\fC\-trigger\-path\fR \fIpath\fP]
 .PP
 \fB\fCspan\-hcov\fR \fB\fC\-f\fR \fIfile\fP \fB\fC\-server\fR \fIurl\fP
+.PP
+\fB\fCspan\-amsl\-discovery\fR \fB\fC\-live\fR \fIURL\fP \fB\fC\-staging\fR \fIURL\fP [\fB\fC\-allow\-empty\fR] [\fB\fC\-verbose\fR]
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -484,6 +486,24 @@ Example debugging output, record rejected because it's outside licence coverage:
 }
 .fi
 .RE
+.SH AMSL DISCOVERY API COMPAT
+.PP
+In December 2018, the AMSL discovery API, required for licensing via span\-tag,
+has been shut down. In order to not have to rewrite too much code at this
+point, we rebuild a discovery\-like response from the existing endpoints:
+\fImetadata_usage\fP, \fIholdingsfiles\fP, \fIcontentfiles\fP and the new
+\fIholdings\fIfile\fPconcat\fP\&.
+.PP
+At the moment (Feb 2019), the following command writes a discovery API like
+JSON response to stdout:
+.PP
+.RS
+.nf
+`span\-amsl\-discovery \-live https://live.example.technology \-staging https://staging.example.technology`
+.fi
+.RE
+.PP
+This command might change in the future.
 .SH BUGS
 .PP
 Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.
