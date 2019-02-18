@@ -266,13 +266,13 @@ func main() {
 				ContentFileLabel:               update.ContentFileLabel,
 				ContentFileURI:                 update.ContentFileURI,
 				EvaluateHoldingsFileForLibrary: update.EvaluateHoldingsFileForLibrary,
-				ISIL:                  update.ISIL,
-				LinkToContentFile:     update.LinkToContentFile,
-				MegaCollection:        update.MegaCollection,
-				ProductISIL:           update.ProductISIL,
-				ShardLabel:            update.ShardLabel,
-				SourceID:              update.SourceID,
-				TechnicalCollectionID: update.TechnicalCollectionID,
+				ISIL:                           update.ISIL,
+				LinkToContentFile:              update.LinkToContentFile,
+				MegaCollection:                 update.MegaCollection,
+				ProductISIL:                    update.ProductISIL,
+				ShardLabel:                     update.ShardLabel,
+				SourceID:                       update.SourceID,
+				TechnicalCollectionID:          update.TechnicalCollectionID,
 			}
 			if hf.DokumentURI != "" {
 				ndoc.LinkToHoldingsFile = fmt.Sprintf(

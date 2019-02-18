@@ -38,10 +38,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/miku/span"
+	"github.com/miku/span/reviewutil"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -70,6 +72,21 @@ type IndexReviewRequest struct {
 	ReviewConfigFile string
 }
 
+// PeekTicketNumber will fish out the ticket number from the YAML review
+// configuration.
+func (irr *IndexReviewRequest) PeekTicketNumber() (ticket string, err error) {
+	reviewConfig := &reviewutil.ReviewConfig{}
+	f, err := os.Open(irr.ReviewConfigFile)
+	if err != nil {
+		return ticket, err
+	}
+	defer f.Close()
+	if _, err := reviewConfig.ReadFrom(f); err != nil {
+		return ticket, err
+	}
+	return reviewConfig.Ticket, nil
+}
+
 // IndexReviewQueue takes requests for index reviews, add come buffering, so we
 // can accept a few requests at a time, although this is improbable.
 var IndexReviewQueue = make(chan IndexReviewRequest, 100)
@@ -85,16 +102,39 @@ func Worker(done chan bool) {
 		cmd, args := "span-review", []string{"-c", rr.ReviewConfigFile}
 		log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
 
-		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code, https://stackoverflow.com/a/10385867.
+		// TODO(miku): use runCommand, but handle stdout, stderr as well.
+		out, err := exec.Command(cmd, args...).CombinedOutput()
 		if err != nil {
 			log.Printf("%s failed: %s, combined output: %s", cmd, err, string(out))
 			continue
 		}
+		// TODO(miku): use PeekTicketNumber to send error to ticket if needed.
 		log.Printf("[output] %s", out)
 		log.Println("review completed")
 	}
 	log.Println("worker shutdown")
 	done <- true
+}
+
+// runCommand will execute a program with args and will return an error, if the
+// program returned an non-zero exit code. The error can then be propagated
+// into logs or a ticket. This works on Linux only (and maybe, accidentally on
+// Windows), https://stackoverflow.com/a/10385867.
+func runCommand(program string, args ...string) error {
+	cmd := exec.Command(program, args...)
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("[runCommand] could not start: %v", cmd)
+	}
+	if err := cmd.Wait(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+				return fmt.Errorf("[runCommand] %v exit status: %d", cmd.Path, status.ExitStatus())
+			}
+		} else {
+			fmt.Errorf("[runCommand] cmd.Wait failed for %v", cmd)
+		}
+	}
+	return nil
 }
 
 // Repo points to a local clone containing the review configuration we want. A
