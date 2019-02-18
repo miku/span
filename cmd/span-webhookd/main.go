@@ -45,6 +45,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// DefaultPort to listen on for gitlab hook.
 const DefaultPort = 8080
 
 var (
@@ -69,12 +70,13 @@ type IndexReviewRequest struct {
 	ReviewConfigFile string
 }
 
-// IndexReviewQueue takes requests for index reviews.
+// IndexReviewQueue takes requests for index reviews, add come buffering, so we
+// can accept a few requests at a time, although this is improbable.
 var IndexReviewQueue = make(chan IndexReviewRequest, 100)
 var done = make(chan bool)
 
-// Worker hangs in there, checks for any new review requests and starts to run
-// the review, if required..
+// Worker hangs in there, checks for any new review requests on the index
+// review queue and starts review, if requested.
 func Worker(done chan bool) {
 	log.Println("worker started")
 	for rr := range IndexReviewQueue {
@@ -83,7 +85,7 @@ func Worker(done chan bool) {
 		cmd, args := "span-review", []string{"-c", rr.ReviewConfigFile}
 		log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
 
-		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code.
+		out, err := exec.Command(cmd, args...).CombinedOutput() // XXX: Pick off exit code, https://stackoverflow.com/a/10385867.
 		if err != nil {
 			log.Printf("%s failed: %s, combined output: %s", cmd, err, string(out))
 			continue
@@ -95,8 +97,8 @@ func Worker(done chan bool) {
 	done <- true
 }
 
-// Repo points to a local clone containing the configuration we want. A token
-// is required to clone the repo from GitLab.
+// Repo points to a local clone containing the review configuration we want. A
+// personal access token is required to clone the repo from GitLab.
 type Repo struct {
 	URL   string
 	Dir   string
@@ -117,8 +119,8 @@ func (r Repo) String() string {
 	return fmt.Sprintf("git repo from %s at %s", r.URL, r.Dir)
 }
 
-// Update just runs a git pull, as per strong convention, this will always be a
-// fast forward. If repo does not exist yet, clone.
+// Update runs a git pull (or clone), as per strong convention, this will
+// always be a fast forward. If repo does not exist yet, clone.
 // gitlab/profile/personal_access_tokens: You can also use personal access
 // tokens to authenticate against Git over HTTP. They are the only accepted
 // password when you have Two-Factor Authentication (2FA) enabled.
@@ -143,10 +145,12 @@ func (r Repo) Update() error {
 	}
 	// XXX: black out token for logs.
 	log.Printf("[cmd] %s %s", cmd, strings.Join(args, " "))
+	// XXX: exit code handling, https://stackoverflow.com/a/10385867.
 	return exec.Command(cmd, args...).Run()
 }
 
-// PushPayload delivered on push and web edits.
+// PushPayload delivered on push and web edits. This is the whole response, we
+// are mainly interested in the modified files in a commit.
 type PushPayload struct {
 	After       string `json:"after"`
 	Before      string `json:"before"`
@@ -269,7 +273,6 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("%s matched nothing, hook done", pattern)
 			return
 		}
-
 		repo := Repo{
 			URL:   payload.Project.GitHttpUrl,
 			Dir:   *repoDir,
@@ -281,9 +284,10 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// XXX: exit code handling, non-portable.
+		// XXX: exit code handling, non-portable, https://stackoverflow.com/a/10385867.
 		log.Printf("successfully updated repo at %s", repo.Dir)
 
+		// We can have multiple review files, issue a request for each of them.
 		for _, reviewFile := range reviewFiles {
 			rr := IndexReviewRequest{
 				ReviewConfigFile: path.Join(repo.Dir, reviewFile),
@@ -309,6 +313,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// parsePort takes a hostport and returns the port number as int.
 func parsePort(addr string) (int, error) {
 	parts := strings.Split(addr, ":")
 	if len(parts) != 2 {
@@ -317,7 +322,8 @@ func parsePort(addr string) (int, error) {
 	return strconv.Atoi(parts[1])
 }
 
-// findGitlabToken returns the GitLab auth token, if configured.
+// findGitlabToken returns the GitLab auth token, if configured. XXX: Use
+// proper config library.
 func findGitlabToken() (string, error) {
 	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
 		// XXX: Use a real config framework, not these hacks.
@@ -339,7 +345,8 @@ func findGitlabToken() (string, error) {
 	return conf.Token, nil
 }
 
-// findConfiguredPort returns a configured port number or 8080 if none is specified.
+// findConfiguredPort returns a configured port number or 8080 if none is
+// specified. XXX: Use proper config library.
 func findConfiguredPort() int {
 	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
 		return DefaultPort
@@ -391,6 +398,9 @@ func main() {
 
 	if *token == "" {
 		*token, err = findGitlabToken()
+		if err != nil {
+			log.Printf("gitlab token not configured, might be an issue")
+		}
 	}
 
 	r := mux.NewRouter()
