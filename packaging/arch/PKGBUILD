@@ -26,7 +26,7 @@ prepare() {
 }
 
 package() {
-  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-amsl" "${pkgdir}/usr/bin/${pkgname}-amsl"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-amsl-discovery" "${pkgdir}/usr/bin/${pkgname}-amsl-discovery"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-check" "${pkgdir}/usr/bin/${pkgname}-check"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-compare" "${pkgdir}/usr/bin/${pkgname}-compare"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-crossref-snapshot" "${pkgdir}/usr/bin/${pkgname}-crossref-snapshot"

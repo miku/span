@@ -22,7 +22,7 @@ Library data tools.
 %install
 
 mkdir -p $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-amsl $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-check $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
@@ -57,7 +57,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 %files
 %defattr(-,root,root)
 
-/usr/sbin/span-amsl
+/usr/sbin/span-amsl-discovery
 /usr/sbin/span-check
 /usr/sbin/span-compare
 /usr/sbin/span-export
@@ -78,6 +78,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 %attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
 %changelog
+
+* Mon Feb 18 2019 Martin Czygan
+- 0.1.281 release
+- replace span-amsl with span-amsl-discovery
 
 * Wed Jan 23 2019 Martin Czygan
 - 0.1.273 release
