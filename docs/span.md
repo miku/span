@@ -36,7 +36,7 @@ SYNOPSIS
 
 `span-hcov` `-f` *file* `-server` *url*
 
-`span-amsl-discovery` `-live` *URL* `-staging` *URL* [`-allow-empty`] [`-verbose`]
+`span-amsl-discovery` `-live` *URL* [`-allow-empty`] [`-verbose`]
 
 DESCRIPTION
 -----------
@@ -496,10 +496,7 @@ point, we rebuild a discovery-like response from the existing endpoints:
 At the moment (Feb 2019), the following command writes a discovery API like
 JSON response to stdout:
 
-    `span-amsl-discovery -live https://live.example.technology -staging https://staging.example.technology`
-
-This command might change in the future.
-
+    `span-amsl-discovery -live https://live.example.technology`
 
 BUGS
 ----

@@ -31,7 +31,7 @@ schema and integration tools
 .PP
 \fB\fCspan\-hcov\fR \fB\fC\-f\fR \fIfile\fP \fB\fC\-server\fR \fIurl\fP
 .PP
-\fB\fCspan\-amsl\-discovery\fR \fB\fC\-live\fR \fIURL\fP \fB\fC\-staging\fR \fIURL\fP [\fB\fC\-allow\-empty\fR] [\fB\fC\-verbose\fR]
+\fB\fCspan\-amsl\-discovery\fR \fB\fC\-live\fR \fIURL\fP [\fB\fC\-allow\-empty\fR] [\fB\fC\-verbose\fR]
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -499,11 +499,9 @@ JSON response to stdout:
 .PP
 .RS
 .nf
-`span\-amsl\-discovery \-live https://live.example.technology \-staging https://staging.example.technology`
+`span\-amsl\-discovery \-live https://live.example.technology`
 .fi
 .RE
-.PP
-This command might change in the future.
 .SH BUGS
 .PP
 Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.
