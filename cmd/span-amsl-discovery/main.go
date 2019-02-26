@@ -18,7 +18,6 @@ import (
 
 var (
 	live       = flag.String("live", "https://example.technology", "AMSL live base url")
-	staging    = flag.String("staging", "https://example.technology", "AMSL staging base url")
 	allowEmpty = flag.Bool("allow-empty", false, "allow empty responses from api")
 )
 
@@ -157,12 +156,12 @@ func main() {
 
 	// Where we get the data from.
 	fetchlist := []struct {
-		base string        // This can be live or staging.
+		base string        // The AMSL base URL.
 		kind string        // Name of the query.
 		r    io.ReaderFrom // Struct wrapped in a ReaderFrom.
 	}{
 		{*live, "metadata_usage", &mur},
-		{*staging, "holdings_file_concat", &hcr}, // TODO(miku): Change this to *live.
+		{*live, "holdings_file_concat", &hcr},
 		{*live, "holdingsfiles", &hfr},
 		{*live, "contentfiles", &cfr},
 	}
