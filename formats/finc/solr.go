@@ -23,6 +23,7 @@ type Solr5Vufind3 struct {
 	Edition              string   `json:"edition,omitempty"`
 	FacetAvail           []string `json:"facet_avail"`
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
+	Footnotes            []string `json:"footnote,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
 	Fulltext             string   `json:"fulltext,omitempty"`
@@ -249,6 +250,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.Publishers = []string{}
 		s.Fulltext = ""
 	}
+
+	s.Footnotes = is.Footnotes
 
 	return nil
 }

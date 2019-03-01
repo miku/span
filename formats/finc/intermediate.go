@@ -161,6 +161,9 @@ type IntermediateSchema struct {
 	// OpenAccess, refs. #8986, prototype
 	OpenAccess bool     `json:"x.oa,omitempty"`
 	License    []string `json:"x.license,omitempty"`
+
+	// Footnote, via solr schema, refs #13653
+	Footnotes []string `json:"x.footnotes,omitempty"`
 }
 
 // NewIntermediateSchema creates a new intermediate schema document with the
