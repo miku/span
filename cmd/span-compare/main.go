@@ -383,6 +383,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+			// XXX: Might catch too much, e.g. DOAJ, refs #14417.
 			if numLive == 0 && numNonlive == 0 {
 				continue
 			}
