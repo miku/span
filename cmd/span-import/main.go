@@ -60,6 +60,7 @@ var FormatMap = map[string]Factory{
 	"crossref":      func() interface{} { return new(crossref.Document) },
 	"degruyter":     func() interface{} { return new(degruyter.Article) },
 	"disson":        func() interface{} { return new(disson.Record) },
+	"doaj-oai":      func() interface{} { return new(doaj.Record) },
 	"doaj-legacy":   func() interface{} { return new(doaj.Response) },
 	"doaj":          func() interface{} { return new(doaj.ArticleV1) },
 	"dummy":         func() interface{} { return new(dummy.Example) },
@@ -233,7 +234,7 @@ func main() {
 	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm",
 		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms",
 		"olms-mets", "ssoar", "disson", "genderopen", "mediarep-dim",
-		"ceeol-marcxml":
+		"ceeol-marcxml", "doaj-oai":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
