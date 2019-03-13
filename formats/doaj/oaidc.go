@@ -2,8 +2,14 @@ package doaj
 
 import (
 	"encoding/xml"
+	"fmt"
+	"html"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -46,7 +52,122 @@ type Record struct {
 // Date tries to parse the date.
 func (record Record) Date() (time.Time, error) {
 	// <dc:date>2012-01-01T00:00:00Z</dc:date>
-	return time.Parse("2006-01-02T15:04:05Z")
+	return time.Parse("2006-01-02T15:04:05Z", record.Metadata.Dc.Date)
+}
+
+// DOI returns DOI or empty string.
+func (record Record) DOI() string {
+	for _, id := range record.Metadata.Dc.Identifier {
+		if strings.HasPrefix(id, "10.") {
+			return id
+		}
+	}
+	return ""
+}
+
+func (record Record) Authors() (authors []finc.Author) {
+	for _, creator := range record.Metadata.Dc.Creator {
+		authors = append(authors, finc.Author{Name: html.UnescapeString(creator)})
+	}
+	return authors
+}
+
+// Identifier returns the DOAJ identifier.
+func (record Record) Identifier() string {
+	// https://doaj.org/article/ce5cbc9701d14155b0b9a45373027d67
+	for _, id := range record.Metadata.Dc.Identifier {
+		if strings.HasPrefix(id, "https://doaj.org/article") {
+			return strings.Replace(id, "https://doaj.org/article", "", -1)
+		}
+	}
+	return ""
+}
+
+// Links returns any URL associated with this record.
+func (record Record) Links() (links []string) {
+	for _, v := range record.Metadata.Dc.Identifier {
+		if strings.HasPrefix(v, "http") {
+			links = append(links, v)
+		}
+		if strings.HasPrefix(v, "10.") {
+			links = append(links, fmt.Sprintf("https://doi.org/%s", v))
+		}
+	}
+	for _, v := range record.Metadata.Dc.Relation {
+		if strings.HasPrefix(v, "http") {
+			links = append(links, v)
+		}
+	}
+	return links
+}
+
+// Volume parses volume from dc:source, https://git.io/fjekV.
+func (record Record) Volume() string {
+	// <dc:source>Case Reports in Oncology, Vol 10, Iss 3, Pp 1085-1091 (2017)</dc:source>
+	re := regexp.MustCompile(`(?i)vol [0-9]*`)
+	return strings.Replace(re.FindString(record.Metadata.Dc.Source), "Vol", "", -1)
+}
+
+func (record Record) Issue() string {
+	// <dc:source>Case Reports in Oncology, Vol 10, Iss 3, Pp 1085-1091 (2017)</dc:source>
+	re := regexp.MustCompile(`(?i)iss [0-9]*`)
+	return strings.Replace(re.FindString(record.Metadata.Dc.Source), "Iss", "", -1)
+}
+
+// JournalTitle returns journal title.
+func (record Record) JournalTitle() string {
+	// <dc:source>Case Reports in Oncology, Vol 10, Iss 3, Pp 1085-1091 (2017)</dc:source>
+	parts := strings.Split(record.Metadata.Dc.Source, ",")
+	if len(parts) > 0 {
+		return strings.TrimSpace(parts[0])
+	}
+	return ""
+}
+
+// ISSN returns ISSN, if available.
+func (record Record) ISSN() (issn []string) {
+	re := regexp.MustCompile(`[0-9{4,4}-[0-9xX]{4,4}`)
+	for _, v := range record.Metadata.Dc.Identifier {
+		if re.MatchString(v) {
+			issn = append(issn, v)
+		}
+	}
+	return issn
+}
+
+func (record Record) StartPage() string {
+	re := regexp.MustCompile(`[0-9]{1,5}-[0-9]{1,5}`)
+	s := re.FindString(record.Metadata.Dc.Source)
+	parts := strings.Split(s, "-")
+	if len(parts) != 2 {
+		return ""
+	}
+	return parts[0]
+}
+func (record Record) EndPage() string {
+	re := regexp.MustCompile(`[0-9]{1,5}-[0-9]{1,5}`)
+	s := re.FindString(record.Metadata.Dc.Source)
+	parts := strings.Split(s, "-")
+	if len(parts) != 2 {
+		return ""
+	}
+	return parts[1]
+}
+
+func (record Record) Pages() string {
+	spage, err := strconv.Atoi(record.StartPage())
+	if err != nil {
+		return ""
+	}
+	epage, err := strconv.Atoi(record.EndPage())
+	if err != nil {
+		return ""
+	}
+	pages := epage - spage
+	if pages > 0 {
+		return fmt.Sprintf("%d", pages)
+	}
+	return ""
 }
 
 // ToIntermediateSchema converts OAI record to intermediate schema.
@@ -60,6 +181,30 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.Date = date
 	output.RawDate = date.Format("2006-01-02")
+	output.Authors = record.Authors()
+	output.DOI = record.DOI()
+	output.RecordID = record.Identifier()
+	if output.RecordID == "" {
+		return output, fmt.Errorf("missing record id")
+	}
+	output.SourceID = "28"
+	output.ID = fmt.Sprintf("ai-28-%s", output.RecordID)
 
-	return output
+	output.URL = record.Links()
+	output.JournalTitle = record.JournalTitle()
+	output.Volume = record.Volume()
+	output.Issue = record.Issue()
+	output.ISSN = record.ISSN()
+	output.StartPage = record.StartPage()
+	output.EndPage = record.EndPage()
+	output.PageCount = record.Pages()
+	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+
+	languages := container.NewStringSet()
+	for _, l := range record.Metadata.Dc.Language {
+		languages.Add(LanguageMap.LookupDefault(l, "und"))
+	}
+	output.Languages = languages.Values()
+
+	return output, nil
 }
