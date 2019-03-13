@@ -496,7 +496,7 @@ point, we rebuild a discovery-like response from the existing endpoints:
 At the moment (Feb 2019), the following command writes a discovery API like
 JSON response to stdout:
 
-    `span-amsl-discovery -live https://live.example.technology`
+`span-amsl-discovery -live https://live.example.technology`
 
 BUGS
 ----
