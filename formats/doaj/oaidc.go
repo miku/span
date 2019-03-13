@@ -66,6 +66,7 @@ func (record Record) DOI() string {
 	return ""
 }
 
+// Authors returns authors.
 func (record Record) Authors() (authors []finc.Author) {
 	for _, creator := range record.Metadata.Dc.Creator {
 		authors = append(authors, finc.Author{Name: html.UnescapeString(creator)})
@@ -73,7 +74,7 @@ func (record Record) Authors() (authors []finc.Author) {
 	return authors
 }
 
-// Identifier returns the DOAJ identifier.
+// Identifier returns the DOAJ identifier, e.g. ce5cbc9701d14155b0b9a45373027d67.
 func (record Record) Identifier() string {
 	// https://doaj.org/article/ce5cbc9701d14155b0b9a45373027d67
 	prefix := "https://doaj.org/article/"
@@ -85,19 +86,12 @@ func (record Record) Identifier() string {
 	return ""
 }
 
-// Links returns any URL associated with this record.
+// Links returns any URL associated with this record. There are more links in
+// the dataset, just use the DOI for now.
 func (record Record) Links() (links []string) {
 	for _, v := range record.Metadata.Dc.Identifier {
-		if strings.HasPrefix(v, "http") {
-			links = append(links, v)
-		}
 		if strings.HasPrefix(v, "10.") {
 			links = append(links, fmt.Sprintf("https://doi.org/%s", v))
-		}
-	}
-	for _, v := range record.Metadata.Dc.Relation {
-		if strings.HasPrefix(v, "http") {
-			links = append(links, v)
 		}
 	}
 	return links
@@ -137,6 +131,7 @@ func (record Record) ISSN() (issn []string) {
 	return issn
 }
 
+// StartPage returns start page.
 func (record Record) StartPage() string {
 	re := regexp.MustCompile(`[0-9]{1,5}-[0-9]{1,5}`)
 	s := re.FindString(record.Metadata.Dc.Source)
@@ -146,6 +141,8 @@ func (record Record) StartPage() string {
 	}
 	return parts[0]
 }
+
+// EndPage returns end page or empty string.
 func (record Record) EndPage() string {
 	re := regexp.MustCompile(`[0-9]{1,5}-[0-9]{1,5}`)
 	s := re.FindString(record.Metadata.Dc.Source)
@@ -156,6 +153,7 @@ func (record Record) EndPage() string {
 	return parts[1]
 }
 
+// Pages returns number of pages, or empty string.
 func (record Record) Pages() string {
 	spage, err := strconv.Atoi(record.StartPage())
 	if err != nil {
@@ -172,6 +170,24 @@ func (record Record) Pages() string {
 	return ""
 }
 
+// Subjects returns a mapped (https://git.io/fjesG) list of LCSH subjects.
+func (record Record) Subjects() []string {
+	subjects := container.NewStringSet()
+	for _, v := range record.Metadata.Dc.Subject {
+		if v.Type != "dcterms:LCSH" {
+			continue
+		}
+		if len(v.Text) > 1 && !strings.Contains(v.Text, "-") {
+			continue
+		}
+		class := LCCPatterns.LookupDefault(v.Text, finc.NotAssigned)
+		if class != finc.NotAssigned {
+			subjects.Add(class)
+		}
+	}
+	return subjects.SortedValues()
+}
+
 // ToIntermediateSchema converts OAI record to intermediate schema.
 func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
@@ -181,6 +197,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if err != nil {
 		return output, span.Skip{Reason: "missing date"}
 	}
+	output.ArticleTitle = record.Metadata.Dc.Title
 	output.Date = date
 	output.RawDate = date.Format("2006-01-02")
 	output.Authors = record.Authors()
@@ -214,6 +231,9 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = "article"
 	output.RefType = "EJOUR"
 	output.MegaCollections = []string{"DOAJ Directory of Open Access Journals"}
+
+	// Subjects, if LCSH can be resolved.
+	output.Subjects = record.Subjects()
 
 	return output, nil
 }
