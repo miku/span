@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
@@ -75,9 +76,10 @@ func (record Record) Authors() (authors []finc.Author) {
 // Identifier returns the DOAJ identifier.
 func (record Record) Identifier() string {
 	// https://doaj.org/article/ce5cbc9701d14155b0b9a45373027d67
+	prefix := "https://doaj.org/article/"
 	for _, id := range record.Metadata.Dc.Identifier {
-		if strings.HasPrefix(id, "https://doaj.org/article") {
-			return strings.Replace(id, "https://doaj.org/article", "", -1)
+		if strings.HasPrefix(id, prefix) {
+			return strings.Replace(id, prefix, "", -1)
 		}
 	}
 	return ""
@@ -105,13 +107,13 @@ func (record Record) Links() (links []string) {
 func (record Record) Volume() string {
 	// <dc:source>Case Reports in Oncology, Vol 10, Iss 3, Pp 1085-1091 (2017)</dc:source>
 	re := regexp.MustCompile(`(?i)vol [0-9]*`)
-	return strings.Replace(re.FindString(record.Metadata.Dc.Source), "Vol", "", -1)
+	return strings.TrimSpace(strings.Replace(re.FindString(record.Metadata.Dc.Source), "Vol", "", -1))
 }
 
 func (record Record) Issue() string {
 	// <dc:source>Case Reports in Oncology, Vol 10, Iss 3, Pp 1085-1091 (2017)</dc:source>
 	re := regexp.MustCompile(`(?i)iss [0-9]*`)
-	return strings.Replace(re.FindString(record.Metadata.Dc.Source), "Iss", "", -1)
+	return strings.TrimSpace(strings.Replace(re.FindString(record.Metadata.Dc.Source), "Iss", "", -1))
 }
 
 // JournalTitle returns journal title.
@@ -126,7 +128,7 @@ func (record Record) JournalTitle() string {
 
 // ISSN returns ISSN, if available.
 func (record Record) ISSN() (issn []string) {
-	re := regexp.MustCompile(`[0-9{4,4}-[0-9xX]{4,4}`)
+	re := regexp.MustCompile(`[0-9]{4,4}-[0-9xX]{4,4}`)
 	for _, v := range record.Metadata.Dc.Identifier {
 		if re.MatchString(v) {
 			issn = append(issn, v)
@@ -177,7 +179,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 	date, err := record.Date()
 	if err != nil {
-		return output, err
+		return output, span.Skip{Reason: "missing date"}
 	}
 	output.Date = date
 	output.RawDate = date.Format("2006-01-02")
@@ -199,12 +201,19 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.EndPage = record.EndPage()
 	output.PageCount = record.Pages()
 	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+	if output.Pages == "-" {
+		output.Pages = ""
+	}
 
 	languages := container.NewStringSet()
 	for _, l := range record.Metadata.Dc.Language {
 		languages.Add(LanguageMap.LookupDefault(l, "und"))
 	}
 	output.Languages = languages.Values()
+	output.Format = "ElectronicArticle"
+	output.Genre = "article"
+	output.RefType = "EJOUR"
+	output.MegaCollections = []string{"DOAJ Directory of Open Access Journals"}
 
 	return output, nil
 }
