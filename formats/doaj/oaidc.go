@@ -177,6 +177,7 @@ func (record Record) Subjects() []string {
 		if v.Type != "dcterms:LCSH" {
 			continue
 		}
+		// RS1-441, Q, ...
 		if len(v.Text) > 1 && !strings.Contains(v.Text, "-") {
 			continue
 		}
