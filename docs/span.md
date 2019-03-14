@@ -142,9 +142,9 @@ List supported formats for conversion to intermediate schema:
 
   `span-import -list`
 
-Convert DOAJ dump into intermediate schema:
+Convert DOAJ OAI harvest to intermediate schema:
 
-  `span-import -i doaj dump.ldj`
+  `span-import -i doaj-oai harvest.xml`
 
 Apply licensing information from a string with streaming input.
 
@@ -234,11 +234,11 @@ Set OA flag (via KBART-ish file):
 
   `echo '{"rft.issn": ["1234-1234"], "rft.date": "2000-01-01"}' | span-oa-filter -f <(echo $'online_identifier\n1234-1234')`
 
-Update labels:
+Update labels, for example after a deduplication run with groupcover(1):
 
   `echo '{"finc.id": "1"}' | span-update-labels -f <(echo '1,X,Y')`
 
-Create a snapshot of crossref works API message items:
+Create a snapshot of crossref works API message items (more details in https://git.io/fjeih):
 
   `span-crossref-snapshot -o snapshot.ldj.gz messages.ldj.gz`
 
@@ -260,7 +260,7 @@ Freezing a filterconfig
 -----------------------
 
 When given a single file containing a number of URLs, it is required to keep
-both the file and all URLs it contains for a given point in time. The
+both the file and all URLs it contains for a given point in time (#12021). The
 `span-freeze` tool is generic, in that it does not assume any format. It will
 create a zip file with the following layout:
 
@@ -283,6 +283,10 @@ temporary location and the configuration is modified accordingly before tagging
 starts.
 
   `span-tag -unfreeze frozen.zip < intermediate.file`
+
+The freeze tool is generic, albeit of limited utility:
+
+  `curl -sL https://www.heise.de | span-freeze -b -o heise.zip`
 
 INDEX REVIEWS
 -------------

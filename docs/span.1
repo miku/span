@@ -131,9 +131,9 @@ List supported formats for conversion to intermediate schema:
 .IP
 \fB\fCspan\-import \-list\fR
 .PP
-Convert DOAJ dump into intermediate schema:
+Convert DOAJ OAI harvest to intermediate schema:
 .IP
-\fB\fCspan\-import \-i doaj dump.ldj\fR
+\fB\fCspan\-import \-i doaj\-oai harvest.xml\fR
 .PP
 Apply licensing information from a string with streaming input.
 .IP
@@ -227,11 +227,12 @@ Set OA flag (via KBART\-ish file):
 .IP
 \fB\fCecho '{"rft.issn": ["1234\-1234"], "rft.date": "2000\-01\-01"}' | span\-oa\-filter \-f <(echo $'online_identifier\\n1234\-1234')\fR
 .PP
-Update labels:
+Update labels, for example after a deduplication run with 
+.BR groupcover (1):
 .IP
 \fB\fCecho '{"finc.id": "1"}' | span\-update\-labels \-f <(echo '1,X,Y')\fR
 .PP
-Create a snapshot of crossref works API message items:
+Create a snapshot of crossref works API message items (more details in \[la]https://git.io/fjeih):\[ra]
 .IP
 \fB\fCspan\-crossref\-snapshot \-o snapshot.ldj.gz messages.ldj.gz\fR
 .PP
@@ -253,7 +254,7 @@ Example output:
 .SH Freezing a filterconfig
 .PP
 When given a single file containing a number of URLs, it is required to keep
-both the file and all URLs it contains for a given point in time. The
+both the file and all URLs it contains for a given point in time (#12021). The
 \fB\fCspan\-freeze\fR tool is generic, in that it does not assume any format. It will
 create a zip file with the following layout:
 .PP
@@ -280,6 +281,10 @@ temporary location and the configuration is modified accordingly before tagging
 starts.
 .IP
 \fB\fCspan\-tag \-unfreeze frozen.zip < intermediate.file\fR
+.PP
+The freeze tool is generic, albeit of limited utility:
+.IP
+\fB\fCcurl \-sL https://www.heise.de | span\-freeze \-b \-o heise.zip\fR
 .SH INDEX REVIEWS
 .PP
 Since 0.1.241 it is possible to run slightly automated SOLR index reviews. The
