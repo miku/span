@@ -238,7 +238,7 @@ Update labels, for example after a deduplication run with groupcover(1):
 
   `echo '{"finc.id": "1"}' | span-update-labels -f <(echo '1,X,Y')`
 
-Create a snapshot of crossref works API message items (more details in https://git.io/fjeih):
+Create a snapshot of crossref works API message items -- more details in https://git.io/fjeih:
 
   `span-crossref-snapshot -o snapshot.ldj.gz messages.ldj.gz`
 
