@@ -473,7 +473,7 @@ func clipString(s string, length int) string {
 	return s[:length] + "..."
 }
 
-// ToInternalSchema converts a jats article into an internal schema.
+// ToIntermediateSchema converts a jats article into an internal schema.
 // This is a basic implementation, different source might implement their own.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()

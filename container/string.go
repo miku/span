@@ -61,7 +61,7 @@ type StringSet struct {
 	Set map[string]struct{}
 }
 
-// NewString returns an empty string set. XXX: Make the zero value usable.
+// NewStringSet returns an empty string set. XXX: Make the zero value usable.
 func NewStringSet(s ...string) *StringSet {
 	ss := &StringSet{Set: make(map[string]struct{})}
 	for _, item := range s {
@@ -77,7 +77,7 @@ func (set *StringSet) Add(s string) bool {
 	return !found // False if it existed already
 }
 
-// Add adds a set of string to a set.
+// AddAll adds adds a set of string to a set.
 func (set *StringSet) AddAll(s ...string) bool {
 	for _, item := range s {
 		set.Set[item] = struct{}{}

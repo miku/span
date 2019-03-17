@@ -2,7 +2,7 @@ package solrutil
 
 import "fmt"
 
-// AllowedOnly returns an error if facets values contain non-zero values that
+// AllowedKeys returns an error if facets values contain non-zero values that
 // are not explicitly allowed. Used for reviews.
 func (f FacetMap) AllowedKeys(allowed ...string) error {
 	var keys []string

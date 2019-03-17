@@ -113,7 +113,7 @@ func (article *Article) ReviewedProduct() string {
 	return ""
 }
 
-// ToInternalSchema converts an article into an internal schema. There are a
+// ToIntermediateSchema converts an article into an internal schema. There are a
 // couple of content-dependent choices here.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()

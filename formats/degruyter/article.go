@@ -60,7 +60,7 @@ func (article *Article) Identifiers() (jats.Identifiers, error) {
 	return jats.Identifiers{DOI: doi, URL: locator, ID: id}, nil
 }
 
-// ToInternalSchema converts a jats article into an internal schema.
+// ToIntermediateSchema converts a jats article into an internal schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
 	if err != nil {
