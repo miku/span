@@ -14,7 +14,7 @@ options=('!strip' '!emptydirs')
 conflicts=("${pkgname}-bin")
 replaces=("${pkgname}-bin")
 source=("${url}/archive/v${pkgver}.tar.gz")
-sha256sums=('3f6324649c29da86af992dce541845032b73b53810a7682f889be39b2d874c53')
+sha256sums=('31b3c9afaa756e9c12c7f19d38d9df1bc0f44c5df12f2eb2de781e10ae15cd04')
 _gourl='github.com/miku/span/cmd/...'
 
 prepare() {
@@ -22,7 +22,7 @@ prepare() {
   rm -rf "$GOPATH/src/github.com/miku/span"
   mkdir -p "$GOPATH/src/github.com/miku"
   mv "${srcdir}/${pkgname}-${pkgver}" "$GOPATH/src/github.com/miku/span"
-  cd "$GOPATH/src/github.com/miku/span" && go get ./... && make clean assets all
+  cd "$GOPATH/src/github.com/miku/span" && make assets && go get ./... && make clean assets all
 }
 
 package() {
