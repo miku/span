@@ -140,7 +140,6 @@ var SourceNames = map[string]string{
 	"103": "Margaret Herrick Library",
 	"104": "WTI",
 	"105": "Springer Journals",
-	"105": "Springer Journals",
 	"106": "Primary Sources for Slavic Studies",
 	"107": "Heidelberger historische Bestände digital",
 	"108": "De Gruyter eBooks Open Access",
