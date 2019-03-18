@@ -87,11 +87,19 @@ func (record Record) Identifier() string {
 }
 
 // Links returns any URL associated with this record. There are more links in
-// the dataset, just use the DOI for now.
+// the dataset, just use the DOI for now, refs #8709, #6634.
 func (record Record) Links() (links []string) {
 	for _, v := range record.Metadata.Dc.Identifier {
 		if strings.HasPrefix(v, "10.") {
 			links = append(links, fmt.Sprintf("https://doi.org/%s", v))
+		}
+	}
+	if len(links) > 0 {
+		return
+	}
+	for _, v := range record.Metadata.Dc.Identifier {
+		if strings.HasPrefix(v, "https://doaj.org/article/") {
+			links = append(links, v)
 		}
 	}
 	return links
