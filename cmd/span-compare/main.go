@@ -380,6 +380,10 @@ func main() {
 		if strings.TrimSpace(institution) == "" {
 			continue
 		}
+		// TODO(miku): This should not be in the index in the first place
+		if strings.TrimSpace(institution) == `" "` {
+			continue
+		}
 		for _, sid := range sids {
 			query := fmt.Sprintf(`source_id:"%s" AND institution:"%s"`, sid, institution)
 			numLive, err := live.NumFound(query)
