@@ -375,7 +375,7 @@ func main() {
 
 	rw.WriteHeader("ISIL", "Source", "Name", "Live", "Nonlive", "Diff", "Pct", "Comment")
 
-	// XXX: Parallelize.
+	// TODO(miku): Parallelize queries.
 	for _, institution := range institutions {
 		if strings.TrimSpace(institution) == "" {
 			continue
@@ -390,7 +390,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			// XXX: Might catch too much, e.g. DOAJ, refs #14417.
+			// TODO(miku): Might catch too much, e.g. DOAJ, refs #14417.
 			if numLive == 0 && numNonlive == 0 {
 				continue
 			}
