@@ -99,7 +99,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	if is.DOI == "" {
 		return
 	}
-	link := fmt.Sprintf(`%s/select?wt=json&q=%s`, *server, is.DOI)
+	link := fmt.Sprintf(`%s/select?wt=json&q="%s"`, *server, is.DOI)
 	resp, err := http.Get(link)
 	if err != nil {
 		return labels, err
