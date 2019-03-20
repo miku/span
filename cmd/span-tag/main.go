@@ -122,7 +122,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				// The prio position of the document is higher (mean lower prio). We may drop this label.
 				labels = append(labels, label)
 			} else {
-				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", is.doi)
+				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", doi)
 			}
 		}
 	}
