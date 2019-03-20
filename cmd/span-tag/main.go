@@ -8,6 +8,12 @@
 // unpreferred source is indexed, we cannot currently update the index, so just
 // emit a warning and do not change anything.
 //
+// TODO(miku): Allow to skip label attachment by inspecting a SOLR index on the
+// fly. Calculate label attachments for record, query index for doi or similar
+// id, if the preferred source is already in the index, drop the label. If the
+// unpreferred source is indexed, we cannot currently update the index, so just
+// emit a warning and do not change anything.
+//
 // $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
 //
 package main
@@ -29,6 +35,12 @@ import (
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
 )
+
+// DroppableLabels returns a list of labels, that can be dropped with regard to
+// an index.
+func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
+	return
+}
 
 // DroppableLabels returns a list of labels, that can be dropped with regard to
 // an index.
@@ -117,6 +129,11 @@ func main() {
 		}
 
 		tagged := tagger.Tag(is)
+
+		// TODO(miku): If requested, inspect SOLR, we might be able to drop some labels.
+		if *server != "" {
+			log.Fatal("not yet implemented")
+		}
 
 		// TODO(miku): If requested, inspect SOLR, we might be able to drop some labels.
 		if *server != "" {
