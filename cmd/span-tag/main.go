@@ -24,9 +24,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -36,26 +38,96 @@ import (
 	"github.com/miku/span/parallel"
 )
 
-// DroppableLabels returns a list of labels, that can be dropped with regard to
-// an index.
-func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
-	return
+var (
+	config     = flag.String("c", "", "JSON config file for filters")
+	version    = flag.Bool("v", false, "show version")
+	size       = flag.Int("b", 20000, "batch size")
+	numWorkers = flag.Int("w", runtime.NumCPU(), "number of workers")
+	cpuProfile = flag.String("cpuprofile", "", "write cpu profile to file")
+	unfreeze   = flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
+	server     = flag.String("server", "", "if given, query SOLR to deduplicate on-the-fly")
+	prefs      = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred first")
+)
+
+// SelectResponse with reduced fields.
+type SelectResponse struct {
+	Response struct {
+		Docs []struct {
+			Institution []string `json:"institution"`
+			SourceID    string   `json:"source_id"`
+		} `json:"docs"`
+		NumFound int64 `json:"numFound"`
+		Start    int64 `json:"start"`
+	} `json:"response"`
+	ResponseHeader struct {
+		Params struct {
+			Q  string `json:"q"`
+			Wt string `json:"wt"`
+		} `json:"params"`
+		QTime  int64
+		Status int64 `json:"status"`
+	} `json:"responseHeader"`
+}
+
+// stringSliceContains returns true, if a given string is contained in a slice.
+func stringSliceContains(ss []string, s string) bool {
+	for _, v := range ss {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}
+
+// preferencePosition returns the position of a given preference as int.
+// Smaller means preferred. If there is no match, return some higher number
+// (low prio).
+func preferencePosition(sid string) int {
+	fields := strings.Fields(*prefs)
+	for pos, v := range fields {
+		v = strings.TrimSpace(v)
+		if v == sid {
+			return pos
+		}
+	}
+	return 1000
 }
 
 // DroppableLabels returns a list of labels, that can be dropped with regard to
 // an index.
 func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
-	return
+	if is.DOI == "" {
+		return
+	}
+	link := fmt.Sprintf(`%s/select?wt=json&q=%s`, *server, is.DOI)
+	resp, err := http.Get(link)
+	if err != nil {
+		return labels, err
+	}
+	defer resp.Body.Close()
+	var sr SelectResponse
+	if err := json.NewDecoder(resp.Body).Decode(&sr); err != nil {
+		return labels, err
+	}
+	for _, label := range is.Labels {
+		// For each label (ISIL), see, whether the match in SOLR has it as well.
+		for _, doc := range sr.Response.Docs {
+			if !stringSliceContains(doc.Institution, label) {
+				continue
+			}
+			// The document (is) might be already in the index (same or other source).
+			if preferencePosition(is.SourceID) >= preferencePosition(doc.SourceID) {
+				// The prio position of the document is higher (mean lower prio). We may drop this label.
+				labels = append(labels, label)
+			} else {
+				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", is.DOI)
+			}
+		}
+	}
+	return labels, nil
 }
 
 func main() {
-	config := flag.String("c", "", "JSON config file for filters")
-	version := flag.Bool("v", false, "show version")
-	size := flag.Int("b", 20000, "batch size")
-	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
-	cpuProfile := flag.String("cpuprofile", "", "write cpu profile to file")
-	unfreeze := flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
-	server := flag.String("server", "", "if given, query SOLR to deduplicate on-the-fly")
 
 	flag.Parse()
 
@@ -132,12 +204,13 @@ func main() {
 
 		// TODO(miku): If requested, inspect SOLR, we might be able to drop some labels.
 		if *server != "" {
-			log.Fatal("not yet implemented")
-		}
-
-		// TODO(miku): If requested, inspect SOLR, we might be able to drop some labels.
-		if *server != "" {
-			log.Fatal("not yet implemented")
+			droppable, err := DroppableLabels(is)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if len(droppable) > 0 {
+				log.Printf("todo(miku): drop labels %s from %s", droppable, tagged.ID)
+			}
 		}
 
 		bb, err := json.Marshal(tagged)
