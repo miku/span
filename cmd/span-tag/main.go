@@ -96,10 +96,11 @@ func preferencePosition(sid string) int {
 // DroppableLabels returns a list of labels, that can be dropped with regard to
 // an index.
 func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
-	if is.DOI == "" {
+	doi := strings.TrimSpace(is.DOI)
+	if doi == "" {
 		return
 	}
-	link := fmt.Sprintf(`%s/select?wt=json&q="%s"`, *server, is.DOI)
+	link := fmt.Sprintf(`%s/select?wt=json&q="%s"`, *server, doi)
 	log.Println(link)
 	resp, err := http.Get(link)
 	if err != nil {
@@ -121,7 +122,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				// The prio position of the document is higher (mean lower prio). We may drop this label.
 				labels = append(labels, label)
 			} else {
-				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", is.DOI)
+				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", is.doi)
 			}
 		}
 	}
