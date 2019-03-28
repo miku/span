@@ -522,7 +522,7 @@ A hacky way around the fact, that SOLR only supports single document updates, if
 
 If we could generate smaller updates (daily, weekly) per source (or
 collection), then a live-updater could be feasible, albeit generating extra
-load on server.
+load on server (https://i.imgur.com/fkQNGIr.png).
 
 BUGS
 ----
