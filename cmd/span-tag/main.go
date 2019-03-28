@@ -117,6 +117,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 		// For each label (ISIL), see, whether any match in SOLR has the same
 		// label (ISIL) as well.
 		for _, doc := range sr.Response.Docs {
+			// TODO(miku): we need to check all responses, find all source ids and then decide. Do we?
 			if !stringSliceContains(doc.Institution, label) {
 				continue
 			}
@@ -124,13 +125,23 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 			if preferencePosition(is.SourceID) >= preferencePosition(doc.SourceID) {
 				// The prio position of the document is higher (means: lower prio). We may drop this label.
 				labels = append(labels, label)
+				break
 			} else {
-				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", doi)
+				log.Printf("%s (%s) has lower prio in index, but we cannot update index docs yet, skipping", is.ID, doi)
 			}
 		}
 	}
-	log.Printf("found: %d, droplist: %v  for %s", len(is.Labels), labels, link)
 	return labels, nil
+}
+
+// removeEach returns a new slice with element not in a drop list.
+func removeEach(ss []string, drop []string) (result []string) {
+	for _, s := range ss {
+		if !stringSliceContains(drop, s) {
+			result = append(result, s)
+		}
+	}
+	return
 }
 
 func main() {
@@ -210,12 +221,14 @@ func main() {
 
 		// TODO(miku): If requested, inspect SOLR, we might be able to drop some labels.
 		if *server != "" {
-			droppable, err := DroppableLabels(is)
+			droppable, err := DroppableLabels(tagged)
 			if err != nil {
 				log.Fatal(err)
 			}
 			if len(droppable) > 0 {
-				log.Printf("todo(miku): drop labels %s from %s", droppable, tagged.ID)
+				before := len(tagged.Labels)
+				tagged.Labels = removeEach(tagged.Labels, droppable)
+				log.Printf("[%s] from %d to %d labels: %s", before, len(tagged.Labels), tagged.Labels)
 			}
 		}
 
