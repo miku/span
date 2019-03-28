@@ -96,7 +96,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	if doi == "" {
 		return
 	}
-	link := fmt.Sprintf(`%s/select?wt=json&q="%s"`, *server, doi)
+	link := fmt.Sprintf(`%s/select?df=allfields&wt=json&q="%s"`, *server, doi)
 	resp, err := http.Get(link)
 	if err != nil {
 		return labels, err
@@ -129,7 +129,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 			}
 		}
 	}
-	log.Printf("droppable: %v for %s", labels, link)
+	log.Printf("found: %d, droplist: %v  for %s", len(is.Labels), labels, link)
 	return labels, nil
 }
 
