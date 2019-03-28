@@ -14,11 +14,13 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"runtime/pprof"
@@ -90,7 +92,7 @@ func preferencePosition(sid string) int {
 // DroppableLabels returns a list of labels, that can be dropped with regard to
 // an index. If document has no DOI, there is nothing to return.
 func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
-	doi := strings.TrimSpace(is.DOI)
+	doi := url.QueryEscape(strings.TrimSpace(is.DOI))
 	if doi == "" {
 		return
 	}
@@ -102,7 +104,14 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	}
 	defer resp.Body.Close()
 	var sr SelectResponse
-	if err := json.NewDecoder(resp.Body).Decode(&sr); err != nil {
+
+	// Keep response for debugging.
+	var buf bytes.Buffer
+	tee := io.TeeReader(resp.Body, &buf)
+
+	if err := json.NewDecoder(tee).Decode(&sr); err != nil {
+		log.Printf("failed link: %s", link)
+		log.Printf("failed response: %s", buf.String())
 		return labels, err
 	}
 	for _, label := range is.Labels {
