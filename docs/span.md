@@ -14,7 +14,7 @@ SYNOPSIS
 
 `span-import` [`-i` *input-format*] < *file*
 
-`span-tag` [`-c` *config*, `-unfreeze` *file*] < *file*
+`span-tag` [`-c` *config*, `-unfreeze` *file*, `-server` *url*, `-prefs` *prefs*] < *file*
 
 `span-export` [`-o` *output-format*] < *file*
 
@@ -501,6 +501,28 @@ At the moment (Feb 2019), the following command writes a discovery API like
 JSON response to stdout:
 
 `span-amsl-discovery -live https://live.example.technology`
+
+DEDUPLICATION AGAINST SOLR
+--------------------------
+
+Since 0.1.285, preliminary support for deduplication (DOI) against SOLR to shorten time-to-index. Basically:
+
+    $ cat file.is | span-tag -unfreeze $(taskoutput AMSLFilterConfigFreeze) -server example.com/solr/biblio -w 64 -b 2000 -verbose > tagged.is
+
+This will take an untagged intermediate schema file, attach all ISIL according
+to config (AMSL) and post-process the document by looking up the DOI in the
+given index, checking whether we have a higher prio source for a document and
+ISIL - if so, drop the label, then serialize.
+
+A hacky way around the fact, that SOLR only supports single document updates, if *all* fields are stored:
+
+1. Drop the source, collection or whatever set from the index.
+2. Find the associated intermediate schema files, run span-tag ... -server ... and span-export.
+3. Reindex with solrbulk(1).
+
+If we could generate smaller updates (daily, weekly) per source (or
+collection), then a live-updater could be feasible, albeit generating extra
+load on server.
 
 BUGS
 ----

@@ -9,7 +9,7 @@ schema and integration tools
 .PP
 \fB\fCspan\-import\fR [\fB\fC\-i\fR \fIinput\-format\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP, \fB\fC\-unfreeze\fR \fIfile\fP] < \fIfile\fP
+\fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP, \fB\fC\-unfreeze\fR \fIfile\fP, \fB\fC\-server\fR \fIurl\fP, \fB\fC\-prefs\fR \fIprefs\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] < \fIfile\fP
 .PP
@@ -503,6 +503,36 @@ At the moment (Feb 2019), the following command writes a discovery API like
 JSON response to stdout:
 .PP
 \fB\fCspan\-amsl\-discovery \-live https://live.example.technology\fR
+.SH DEDUPLICATION AGAINST SOLR
+.PP
+Since 0.1.285, preliminary support for deduplication (DOI) against SOLR to shorten time\-to\-index. Basically:
+.PP
+.RS
+.nf
+$ cat file.is | span\-tag \-unfreeze $(taskoutput AMSLFilterConfigFreeze) \-server example.com/solr/biblio \-w 64 \-b 2000 \-verbose > tagged.is
+.fi
+.RE
+.PP
+This will take an untagged intermediate schema file, attach all ISIL according
+to config (AMSL) and post\-process the document by looking up the DOI in the
+given index, checking whether we have a higher prio source for a document and
+ISIL \- if so, drop the label, then serialize.
+.PP
+A hacky way around the fact, that SOLR only supports single document updates, if \fIall\fP fields are stored:
+.nr step0 0 1
+.RS
+.IP \n+[step0]
+Drop the source, collection or whatever set from the index.
+.IP \n+[step0]
+Find the associated intermediate schema files, run span\-tag ... \-server ... and span\-export.
+.IP \n+[step0]
+Reindex with 
+.BR solrbulk (1).
+.RE
+.PP
+If we could generate smaller updates (daily, weekly) per source (or
+collection), then a live\-updater could be feasible, albeit generating extra
+load on server.
 .SH BUGS
 .PP
 Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.
