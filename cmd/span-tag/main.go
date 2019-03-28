@@ -8,12 +8,6 @@
 // unpreferred source is indexed, we cannot currently update the index, so just
 // emit a warning and do not change anything.
 //
-// TODO(miku): Allow to skip label attachment by inspecting a SOLR index on the
-// fly. Calculate label attachments for record, query index for doi or similar
-// id, if the preferred source is already in the index, drop the label. If the
-// unpreferred source is indexed, we cannot currently update the index, so just
-// emit a warning and do not change anything.
-//
 // $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
 //
 package main
@@ -45,8 +39,8 @@ var (
 	numWorkers = flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuProfile = flag.String("cpuprofile", "", "write cpu profile to file")
 	unfreeze   = flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
-	server     = flag.String("server", "", "if given, query SOLR to deduplicate on-the-fly")
-	prefs      = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred first")
+	server     = flag.String("server", "", "if not empty, query SOLR to deduplicate on-the-fly")
+	prefs      = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred source id first, for deduplication")
 )
 
 // SelectResponse with reduced fields.
@@ -90,11 +84,11 @@ func preferencePosition(sid string) int {
 			return pos
 		}
 	}
-	return 1000
+	return 1000 // Or anything higher than the number of sources.
 }
 
 // DroppableLabels returns a list of labels, that can be dropped with regard to
-// an index.
+// an index. If document has no DOI, there is nothing to return.
 func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	doi := strings.TrimSpace(is.DOI)
 	if doi == "" {
@@ -112,14 +106,15 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 		return labels, err
 	}
 	for _, label := range is.Labels {
-		// For each label (ISIL), see, whether the match in SOLR has it as well.
+		// For each label (ISIL), see, whether any match in SOLR has the same
+		// label (ISIL) as well.
 		for _, doc := range sr.Response.Docs {
 			if !stringSliceContains(doc.Institution, label) {
 				continue
 			}
 			// The document (is) might be already in the index (same or other source).
 			if preferencePosition(is.SourceID) >= preferencePosition(doc.SourceID) {
-				// The prio position of the document is higher (mean lower prio). We may drop this label.
+				// The prio position of the document is higher (means: lower prio). We may drop this label.
 				labels = append(labels, label)
 			} else {
 				log.Printf("doi:%s has lower prio in index, but we cannot update index docs yet, skipping", doi)
