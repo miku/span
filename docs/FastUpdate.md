@@ -30,3 +30,9 @@ Developer dreams:
 
 * create throwaway indices (with new data) plus some web for end user testing
 
+Options:
+
+* ignore duplicates, handle them in solr at search time
+* licensing and deduplication proxy (extra component)
+* implement custom request handler in solr (tied to solr)
+* ...
