@@ -1,4 +1,4 @@
-# Notes on fast and transparent index update cycles
+# Notes on fast and transparent index updates
 
 > 2019-03-29
 
