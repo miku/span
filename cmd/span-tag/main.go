@@ -120,12 +120,11 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 		log.Printf("failed response: %s", buf.String())
 		return labels, err
 	}
+	// Ignored merely counts the number of docs, that had the same id in the index, for logging.
+	var ignored int
 	for _, label := range is.Labels {
 		// For each label (ISIL), see, whether any match in SOLR has the same
 		// label (ISIL) as well.
-
-		// Ignored merely counts the number of docs, that had the same id in the index, for logging.
-		var ignored int
 
 		for _, doc := range sr.Response.Docs {
 			if *ignoreSameIdentifier && doc.ID == is.ID {
@@ -144,9 +143,9 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				log.Printf("%s (%s) has lower prio in index, but we cannot update index docs yet, skipping", is.ID, doi)
 			}
 		}
-		if ignored > 0 && *verbose {
-			log.Printf("ignored %d docs", ignored)
-		}
+	}
+	if ignored > 0 && *verbose {
+		log.Printf("ignored %d docs", ignored)
 	}
 	return labels, nil
 }
