@@ -144,7 +144,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				log.Printf("%s (%s) has lower prio in index, but we cannot update index docs yet, skipping", is.ID, doi)
 			}
 		}
-		if *ignored > 0 && *verbose {
+		if ignored > 0 && *verbose {
 			log.Printf("ignored %d docs", ignored)
 		}
 	}
