@@ -102,7 +102,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	}
 	link := fmt.Sprintf(`%s/select?df=allfields&wt=json&q="%s"`, *server, url.QueryEscape(doi))
 	if *verbose {
-		log.Println(link)
+		log.Printf("[%s] fetching: %s", is.ID, link)
 	}
 	resp, err := http.Get(link)
 	if err != nil {
@@ -116,8 +116,8 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	tee := io.TeeReader(resp.Body, &buf)
 
 	if err := json.NewDecoder(tee).Decode(&sr); err != nil {
-		log.Printf("failed link: %s", link)
-		log.Printf("failed response: %s", buf.String())
+		log.Printf("[%s] failed link: %s", is.ID, link)
+		log.Printf("[%s] failed response: %s", is.ID, buf.String())
 		return labels, err
 	}
 	// Ignored merely counts the number of docs, that had the same id in the index, for logging.
@@ -145,7 +145,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 		}
 	}
 	if ignored > 0 && *verbose {
-		log.Printf("ignored %d docs", ignored)
+		log.Printf("[%s] ignored %d docs", is.ID, ignored)
 	}
 	return labels, nil
 }
