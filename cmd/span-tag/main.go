@@ -170,6 +170,10 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	if *server != "" {
+		*server = solrutil.PrependHTTP(*server)
+	}
+
 	// The configuration forest.
 	var tagger filter.Tagger
 
