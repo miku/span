@@ -32,24 +32,27 @@ import (
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
+	"github.com/miku/span/solrutil"
 )
 
 var (
-	config     = flag.String("c", "", "JSON config file for filters")
-	version    = flag.Bool("v", false, "show version")
-	size       = flag.Int("b", 20000, "batch size")
-	numWorkers = flag.Int("w", runtime.NumCPU(), "number of workers")
-	cpuProfile = flag.String("cpuprofile", "", "write cpu profile to file")
-	unfreeze   = flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
-	verbose    = flag.Bool("verbose", false, "verbose output")
-	server     = flag.String("server", "", "if not empty, query SOLR to deduplicate on-the-fly")
-	prefs      = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred source id first, for deduplication")
+	config               = flag.String("c", "", "JSON config file for filters")
+	version              = flag.Bool("v", false, "show version")
+	size                 = flag.Int("b", 20000, "batch size")
+	numWorkers           = flag.Int("w", runtime.NumCPU(), "number of workers")
+	cpuProfile           = flag.String("cpuprofile", "", "write cpu profile to file")
+	unfreeze             = flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
+	verbose              = flag.Bool("verbose", false, "verbose output")
+	server               = flag.String("server", "", "if not empty, query SOLR to deduplicate on-the-fly")
+	prefs                = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred source id first, for deduplication")
+	ignoreSameIdentifier = flag.Bool("isi", false, "when doing deduplication, ignore matches in index with the same id")
 )
 
 // SelectResponse with reduced fields.
 type SelectResponse struct {
 	Response struct {
 		Docs []struct {
+			ID          string   `json:"id"`
 			Institution []string `json:"institution"`
 			SourceID    string   `json:"source_id"`
 		} `json:"docs"`
@@ -120,8 +123,15 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	for _, label := range is.Labels {
 		// For each label (ISIL), see, whether any match in SOLR has the same
 		// label (ISIL) as well.
+
+		// Ignored merely counts the number of docs, that had the same id in the index, for logging.
+		var ignored int
+
 		for _, doc := range sr.Response.Docs {
-			// TODO(miku): we need to check all responses, find all source ids and then decide. Do we?
+			if *ignoreSameIdentifier && doc.ID == is.ID {
+				ignored++
+				continue
+			}
 			if !stringSliceContains(doc.Institution, label) {
 				continue
 			}
@@ -133,6 +143,9 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 			} else {
 				log.Printf("%s (%s) has lower prio in index, but we cannot update index docs yet, skipping", is.ID, doi)
 			}
+		}
+		if *ignored > 0 && *verbose {
+			log.Printf("ignored %d docs", ignored)
 		}
 	}
 	return labels, nil
