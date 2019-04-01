@@ -318,7 +318,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	// refs. #8428
-	if len(output.ArticleTitle) > 32000 {
+	if len(output.ArticleTitle) > 2400 {
 		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.ID)}
 	}
 
