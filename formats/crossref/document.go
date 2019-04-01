@@ -317,7 +317,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.ArticleTitle = p.ReplaceAllString(output.ArticleTitle, "")
 	}
 
-	// refs. #8428
+	// refs. #8428, refs. #14286
 	if len(output.ArticleTitle) > 2400 {
 		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.ID)}
 	}
