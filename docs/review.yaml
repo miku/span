@@ -15,14 +15,14 @@
 # The solr server to query, including scheme, port and core/collection, e.g.
 # "http://localhost:8983/solr/biblio". If "auto", then the current testing "ai" solr
 # server will be figured out automatically.
-solr: "auto"
-# solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
+# solr: "auto"
+ solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
 # solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 # solr: "http://172.18.113.24:8080/solr/biblio/" # UBL-main Gesamtimport 2018-12
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
-ticket: "14417"
+ticket: "14961"
 
 
 # If set to "fail" an empty result set will be marked as failure.
@@ -32,9 +32,6 @@ zero-results-policy: "fail"
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
 allowed-keys:
-    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
-    - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
-    - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
     - ["source_id:48", "language", "German", "English"]
     - ["source_id:49", "format", "ElectronicArticle", "ElectronicBookPart", "ElectronicProceeding", "ElectronicResourceRemoteAccess", "eBook", "ElectronicSerial", "ElectronicJournal"]
     - ["source_id:49", "format_de15", "Book, E-Book", "Article, E-Article", "Proceeding", "Electronic Resource (Remote Access)", "Journal, E-Journal"]
@@ -54,6 +51,9 @@ allowed-keys:
     - ["source_id:162", "finc_class_facet", "not assigned", "Allgemeines", "Philosophie", "Ethnologie (Volks- und Völkerkunde)", "Pädagogik"]
 # Sources indexed in UBL-main
 #     - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger", "Munzinger KLG", "Munzinger KLfG"]
+#     - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+#     - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
+#     - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
 #     - ["source_id:88", "institution", "DE-15-FID"]
 #     - ["source_id:39", "institution", "DE-15", "DE-15-FID"]
 
@@ -67,9 +67,6 @@ all-records:
     - ["source_id:28", "access_facet", "Electronic Resources"]
     - ["source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"]
     - ["source_id:28", "finc_class_facet", "not assigned"]
-    - ["source_id:30", "facet_avail", "Online", "Free"]
-    - ["source_id:30", "access_facet", "Electronic Resources"]
-    - ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
     - ["source_id:34", "format", "ElectronicThesis"]
     - ["source_id:34", "format_de15", "Thesis"]
     - ["source_id:34", "facet_avail", "Online", "Free"]
@@ -103,6 +100,11 @@ all-records:
     - ["source_id:78", "facet_avail", "Online"]
     - ["source_id:78", "access_facet", "Electronic Resources"]
     - ["source_id:78", "mega_collection", "IZI-Datenbank"]
+    - ["source_id:80", "format", "ElectronicArticle"]
+    - ["source_id:80", "format_de15", "Article, E-Article"]
+    - ["source_id:80", "facet_avail", "Online"]
+    - ["source_id:80", "access_facet", "Electronic Resources"]
+    - ["source_id:80", "mega_collection", "Datenbank Internetquellen"]
     - ["source_id:85", "format", "ElectronicArticle"]
     - ["source_id:85", "format_de15", "Article, E-Article"]
     - ["source_id:85", "facet_avail", "Online"]
@@ -162,6 +164,9 @@ all-records:
 #    - ["source_id:26", "facet_avail", "Online", "Free"]
 #    - ["source_id:27", "facet_avail", "Online"]
 #    - ["source_id:29", "facet_avail", "Online", "Free"]
+#    - ["source_id:30", "facet_avail", "Online", "Free"]
+#    - ["source_id:30", "access_facet", "Electronic Resources"]
+#    - ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
 #    - ["source_id:31", "facet_avail", "Online"]
 #    - ["source_id:35", "facet_avail", "Online", "Free"]
 #    - ["source_id:39", "facet_avail", "Online", "Free"]
