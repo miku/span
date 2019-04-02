@@ -267,8 +267,12 @@ func main() {
 		defer f.Close()
 		configReader = f
 	}
+
 	var config reviewutil.ReviewConfig
-	if err := yaml.NewDecoder(configReader).Decode(&config); err != nil {
+
+	dec := yaml.NewDecoder(configReader)
+	dec.SetStrict(true)
+	if err := dec.Decode(&config); err != nil {
 		log.Fatal(err)
 	}
 
@@ -298,8 +302,9 @@ func main() {
 	}
 	log.Printf("using solr at %s", solrServer)
 	if *ticket != "" {
-		log.Printf("attempt to update ticket %s", *ticket)
+		log.Printf("will attempt to update ticket %s", *ticket)
 	}
+	log.Printf("%d/%d/%d/%d", len(config.AllowedKeys), len(config.AllRecords), len(config.MinRatio), len(config.MinCount))
 	index := solrutil.Index{Server: solrutil.PrependHTTP(solrServer)}
 
 	// Collect review results.
