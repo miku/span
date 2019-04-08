@@ -69,6 +69,7 @@ type Solr5Vufind3 struct {
 	FormatDel189 []string `json:"format_del189,omitempty"`
 	FormatDeZi4  []string `json:"format_dezi4,omitempty"`
 	FormatDeZwi2 []string `json:"format_dezwi2,omitempty"`
+	FormatFinc   []string `json:"format_finc,omitempty"`
 	FormatNrw    []string `json:"format_nrw,omitempty"`
 	BranchNrw    string   `json:"branch_nrw,omitempty"` // refs #11605
 }
@@ -215,6 +216,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.FormatDeZi4 = []string{FormatDeZi4.LookupDefault(is.Format, "")}
 	s.FormatDeZwi2 = []string{FormatDeZwi2.LookupDefault(is.Format, "")}
 	s.FormatNrw = []string{FormatNrw.LookupDefault(is.Format, "")}
+	// TODO(miku): Is this correct?
+	s.FormatFinc = []string{FormatDe15.LookupDefault(is.Format, "")}
 
 	s.ContainerVolume = is.Volume
 	s.ContainerIssue = is.Issue
