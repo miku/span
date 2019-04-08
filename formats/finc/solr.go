@@ -217,7 +217,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.FormatDeZwi2 = []string{FormatDeZwi2.LookupDefault(is.Format, "")}
 	s.FormatNrw = []string{FormatNrw.LookupDefault(is.Format, "")}
 	// TODO(miku): Is this correct?
-	s.FormatFinc = []string{FormatDe15.LookupDefault(is.Format, "")}
+	s.FormatFinc = []string{FormatFinc.LookupDefault(is.Format, "")}
 
 	s.ContainerVolume = is.Volume
 	s.ContainerIssue = is.Issue
