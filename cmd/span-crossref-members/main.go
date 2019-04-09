@@ -1,7 +1,7 @@
 // span-crossref-members fetches crossref members api. It will merely paginate
-// through the api responses and will output one response per line. Pipe the
-// output of this task to: jq -rc '.message.items[].prefix[] | [.value, .name]
-// | @tsv' to get prefix and name table.
+// through the api responses and will output one response per line.  Create
+// mapping from DOI to name: span-crossref-members | jq -rc '.message.items[].prefix[] |
+// {(.value|tostring): .name}' | jq -s add
 package main
 
 import (
