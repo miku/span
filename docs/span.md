@@ -38,7 +38,7 @@ SYNOPSIS
 
 `span-amsl-discovery` `-live` *URL* [`-allow-empty`] [`-verbose`]
 
-`span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`rows` *N*] [`-q`] [`-sleep` *duration*] [`-email` *addr*]
+`span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`-rows` *N*] [`-q`] [`-sleep` *duration*] [`-email` *addr*]
 
 DESCRIPTION
 -----------
