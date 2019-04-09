@@ -346,7 +346,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Publishers = []string{publisher}
 	} else {
 		publisher = doc.Publisher
-		log.Printf("[%s] did not find publisher for prefix: %s, using document publisher", output.ID, doc.PrefixFromDOI())
+		log.Printf("[%s] did not find publisher for prefix: %s, using document publisher: %s", output.ID, doc.PrefixFromDOI(), publisher)
 		output.Publishers = []string{doc.Publisher}
 	}
 
