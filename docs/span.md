@@ -38,6 +38,8 @@ SYNOPSIS
 
 `span-amsl-discovery` `-live` *URL* [`-allow-empty`] [`-verbose`]
 
+`span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`rows` *N*] [`-q`] [`-sleep` *duration*] [`-email` *addr*]
+
 DESCRIPTION
 -----------
 
@@ -87,7 +89,7 @@ OPTIONS
 `-unfreeze` *file*
   Take a file created with `span-freeze` and use it instead of a filterconfig. `span-tag` only.
 
-`-v`
+`-v` or `-version`
   Show version.
 
 `-x` *file*
@@ -131,6 +133,24 @@ OPTIONS
 
 `-trigger-path` *path*
   Path trigger (default "trigger"), `span-webhookd` only.
+
+`-base` *url*
+  API base URL (default "http://api.crossref.org/members"), `span-crossref-members` only.
+
+`-offset` *N*
+  Offset to start fetching data from (default 0), `span-crossref-members` only.
+
+`-rows` *N*
+  Rows to fetch (default 20), `span-crossref-members` only.
+
+`-sleep` *duration*
+  Sleep between requests (default 1s), `span-crossref-members` only.
+
+`-q`
+  Suppress logging output, `span-crossref-members` only.
+
+`-email` *addr*
+  Use email address in query parameter for API etiquette, `span-crossref-members` only.
 
 `-h`
   Show usage.

@@ -32,6 +32,8 @@ schema and integration tools
 \fB\fCspan\-hcov\fR \fB\fC\-f\fR \fIfile\fP \fB\fC\-server\fR \fIurl\fP
 .PP
 \fB\fCspan\-amsl\-discovery\fR \fB\fC\-live\fR \fIURL\fP [\fB\fC\-allow\-empty\fR] [\fB\fC\-verbose\fR]
+.PP
+\fB\fCspan\-crossref\-members\fR [\fB\fC\-base\fR \fIURL\fP] [\fB\fC\-offset\fR \fIN\fP] [\fB\fCrows\fR \fIN\fP] [\fB\fC\-q\fR] [\fB\fC\-sleep\fR \fIduration\fP] [\fB\fC\-email\fR \fIaddr\fP]
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -78,7 +80,7 @@ Field separator. \fB\fCspan\-update\-labels\fR only.
 \fB\fC\-unfreeze\fR \fIfile\fP
 Take a file created with \fB\fCspan\-freeze\fR and use it instead of a filterconfig. \fB\fCspan\-tag\fR only.
 .TP
-\fB\fC\-v\fR
+\fB\fC\-v\fR or \fB\fC\-version\fR
 Show version.
 .TP
 \fB\fC\-x\fR \fIfile\fP
@@ -122,6 +124,24 @@ Post review results into a Redmine ticket. \fB\fCspan\-review\fR only.
 .TP
 \fB\fC\-trigger\-path\fR \fIpath\fP
 Path trigger (default "trigger"), \fB\fCspan\-webhookd\fR only.
+.TP
+\fB\fC\-base\fR \fIurl\fP
+API base URL (default "\[la]http://api.crossref.org/members"\[ra]), \fB\fCspan\-crossref\-members\fR only.
+.TP
+\fB\fC\-offset\fR \fIN\fP
+Offset to start fetching data from (default 0), \fB\fCspan\-crossref\-members\fR only.
+.TP
+\fB\fC\-rows\fR \fIN\fP
+Rows to fetch (default 20), \fB\fCspan\-crossref\-members\fR only.
+.TP
+\fB\fC\-sleep\fR \fIduration\fP
+Sleep between requests (default 1s), \fB\fCspan\-crossref\-members\fR only.
+.TP
+\fB\fC\-q\fR
+Suppress logging output, \fB\fCspan\-crossref\-members\fR only.
+.TP
+\fB\fC\-email\fR \fIaddr\fP
+Use email address in query parameter for API etiquette, \fB\fCspan\-crossref\-members\fR only.
 .TP
 \fB\fC\-h\fR
 Show usage.
@@ -532,7 +552,7 @@ Reindex with
 .PP
 If we could generate smaller updates (daily, weekly) per source (or
 collection), then a live\-updater could be feasible, albeit generating extra
-load on server.
+load on server (\[la]https://i.imgur.com/fkQNGIr.png\[ra]).
 .SH BUGS
 .PP
 Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.
