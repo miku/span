@@ -25,6 +25,8 @@ mkdir -p $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-check $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-hcov $RPM_BUILD_ROOT/usr/sbin
@@ -60,6 +62,8 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-amsl-discovery
 /usr/sbin/span-check
 /usr/sbin/span-compare
+/usr/sbin/span-crossref-snapshot
+/usr/sbin/span-crossref-members
 /usr/sbin/span-export
 /usr/sbin/span-freeze
 /usr/sbin/span-hcov
