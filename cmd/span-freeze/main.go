@@ -78,7 +78,7 @@ func main() {
 	}
 	f.Write(b)
 
-	urls := xurls.Strict().FindAllString(string(b), -1)
+	urls := xurls.Strict.FindAllString(string(b), -1)
 
 	seen := make(map[string]bool)
 	var unique []string
