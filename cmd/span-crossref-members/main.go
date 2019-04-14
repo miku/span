@@ -133,7 +133,7 @@ func main() {
 			log.Fatal(err)
 		}
 		if mr.Status != "ok" {
-			log.Fatal("status not ok: %s", mr.Status)
+			log.Fatalf("status not ok: %s", mr.Status)
 		}
 		if mr.Message.Query.StartIndex >= mr.Message.TotalResults {
 			break
