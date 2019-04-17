@@ -47,6 +47,10 @@ func (r *Redmine) TicketLink(ticket string) string {
 	return fmt.Sprintf("%s/issues/%s.json", r.BaseURL, ticket)
 }
 
+func (r *Redmine) IssueLink(ticket string) string {
+	return fmt.Sprintf("%s/issues/%s", r.BaseURL, ticket)
+}
+
 // UpdateTicket updates ticket given ticket number and message.
 // http://www.redmine.org/projects/redmine/wiki/Rest_Issues#Updating-an-issue
 func (r *Redmine) UpdateTicket(ticket, message string) error {
@@ -86,6 +90,6 @@ func (r *Redmine) UpdateTicket(ticket, message string) error {
 	default:
 		log.Printf("redmine response [%d] (%db): %s", resp.StatusCode, len(b), string(b))
 	}
-	log.Printf("updated %s/issues/%s", r.BaseURL, ticket)
+	log.Printf("updated %s", r.IssueLink(ticket))
 	return nil
 }
