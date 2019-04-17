@@ -61,6 +61,17 @@ func UnescapeTrim(s string) string {
 	return strings.TrimSpace(html.UnescapeString(s))
 }
 
+// SetFromFilename fills an initialized map as set with items from line in
+// filename, with newlines stripped.
+func SetFromFilename(filename string, m map[string]struct{}) error {
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return LoadSet(f, m)
+}
+
 // LoadSet reads the content of from a reader and creates a set from each line.
 func LoadSet(r io.Reader, m map[string]struct{}) error {
 	br := bufio.NewReader(r)
