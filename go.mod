@@ -16,18 +16,24 @@ require (
 	github.com/klauspost/compress v1.4.1 // indirect
 	github.com/klauspost/cpuid v1.2.0 // indirect
 	github.com/klauspost/pgzip v1.2.1
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/kr/pty v1.1.4 // indirect
 	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348 // indirect
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
-	github.com/miku/xmlstream v0.0.0-20170615084628-bbc08c4a3dca
+	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
 	github.com/olebedev/config v0.0.0-20180910155717-57f804269e64
 	github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.4.1
-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3 // indirect
+	github.com/stretchr/objx v0.2.0 // indirect
+	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a // indirect
+	golang.org/x/net v0.0.0-20190415214537-1da14a5a36f2 // indirect
+	golang.org/x/sys v0.0.0-20190416152802-12500544f89f // indirect
 	golang.org/x/text v0.3.0
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 	mvdan.cc/xurls v1.1.0
 )
