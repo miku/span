@@ -1,17 +1,18 @@
-package span
+// Package xflag add an additional flag type Array for repeated string flags.
+package xflag
 
 import "strings"
 
 // ArrayFlags allows to store lists of flag values.
-type ArrayFlags []string
+type Array []string
 
 // String representation.
-func (f *ArrayFlags) String() string {
+func (f *Array) String() string {
 	return strings.Join(*f, ", ")
 }
 
 // Set appends a value.
-func (f *ArrayFlags) Set(value string) error {
+func (f *Array) Set(value string) error {
 	*f = append(*f, value)
 	return nil
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
+	"github.com/miku/span/xflag"
 )
 
 // FreeContentItem is a single item from the API response (2017-12-01).
@@ -72,8 +73,8 @@ func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
 
 func main() {
 
-	var excludeSourceIdentifiersFlags span.ArrayFlags
-	var openAccessSourceIdentifiersFlags span.ArrayFlags
+	var excludeSourceIdentifiersFlags xflag.Array
+	var openAccessSourceIdentifiersFlags xflag.Array
 
 	showVersion := flag.Bool("v", false, "prints current program version")
 	kbartFile := flag.String("f", "", "path to a single KBART file")
