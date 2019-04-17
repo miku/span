@@ -47,29 +47,43 @@ LIST="$1" LC_ALL=C awk '
   }' < "$2"
 `
 
-// WriteFields writes a variable number of fields as tab separated values into a writer.
-func WriteFields(w io.Writer, values ...interface{}) (int, error) {
-	var s []string
+var (
+	excludeFile = flag.String("x", "", "a list of DOI to further ignore")
+	outputFile  = flag.String("o", "", "output file")
+	compressed  = flag.Bool("z", false, "input is gzip compressed")
+	batchsize   = flag.Int("b", 40000, "batch size")
+	cpuProfile  = flag.String("cpuprofile", "", "write cpuprofile to file")
+	verbose     = flag.Bool("verbose", false, "be verbose")
+)
+
+// writeFields writes a variable number of values separated by sep to a given
+// writer. Returns bytes written and error.
+func writeFields(w io.Writer, sep string, values ...interface{}) (int, error) {
+	var ss []string
 	for _, v := range values {
-		s = append(s, fmt.Sprintf("%v", v))
+		switch v.(type) {
+		case int, int8, int16, int32, int64:
+			ss = append(ss, fmt.Sprintf("%d", v))
+		case uint, uint8, uint16, uint32, uint64:
+			ss = append(ss, fmt.Sprintf("%d", v))
+		case float32, float64:
+			ss = append(ss, fmt.Sprintf("%f", v))
+		case fmt.Stringer:
+			ss = append(ss, fmt.Sprintf("%s", v))
+		default:
+			ss = append(ss, fmt.Sprintf("%v", v))
+		}
 	}
-	return io.WriteString(w, fmt.Sprintf("%s\n", strings.Join(s, "\t")))
+	s := fmt.Sprintln(strings.Join(ss, sep))
+	return io.WriteString(w, s)
 }
 
 func main() {
-	excludeFile := flag.String("x", "", "a list of DOI to further ignore")
-	outputFile := flag.String("o", "", "output file")
-	compressed := flag.Bool("z", false, "input is gzip compressed")
-	batchsize := flag.Int("b", 40000, "batch size")
-	cpuProfile := flag.String("cpuprofile", "", "write cpuprofile to file")
-	verbose := flag.Bool("verbose", false, "be verbose")
-
 	flag.Parse()
 
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
 	}
-
 	if *cpuProfile != "" {
 		f, err := os.Create(*cpuProfile)
 		if err != nil {
@@ -78,7 +92,6 @@ func main() {
 		pprof.StartCPUProfile(f)
 		defer pprof.StopCPUProfile()
 	}
-
 	if flag.NArg() == 0 {
 		log.Fatal("input file required")
 	}
@@ -86,6 +99,7 @@ func main() {
 		log.Fatal("output filename required")
 	}
 
+	// Read file or compressed file.
 	var reader io.Reader
 
 	f, err := os.Open(flag.Arg(0))
@@ -147,7 +161,7 @@ func main() {
 			return nil, nil
 		}
 		var buf bytes.Buffer
-		if _, err := WriteFields(&buf, lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
+		if _, err := writeFields(&buf, "\t", lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
 			return nil, err
 		}
 		return buf.Bytes(), nil
