@@ -48,6 +48,7 @@ var (
 	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
 	showVersion = flag.Bool("v", false, "prints current program version")
 	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to file")
+	logfile     = flag.String("log", "", "path to logfile to append to, otherwise stderr")
 )
 
 // Factory creates things.
@@ -209,6 +210,15 @@ func main() {
 			fmt.Println(k)
 		}
 		os.Exit(0)
+	}
+
+	if *logfile != "" {
+		f, err := os.OpenFile(*logfile, os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
 	}
 
 	w := bufio.NewWriter(os.Stdout)
