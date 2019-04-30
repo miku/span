@@ -345,7 +345,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if publisher != "" {
 		output.Publishers = []string{publisher}
 		if publisher != doc.Publisher {
-			log.Printf("document and prefix: %s, %s", publisher, doc.Publisher)
+			log.Printf("diff doc: %s prefix: %s", publisher, doc.Publisher)
 		}
 	} else {
 		publisher = doc.Publisher
