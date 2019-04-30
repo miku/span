@@ -213,7 +213,7 @@ func main() {
 	}
 
 	if *logfile != "" {
-		f, err := os.OpenFile(*logfile, os.O_APPEND|os.O_WRONLY, 0600)
+		f, err := os.OpenFile(*logfile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 		if err != nil {
 			log.Fatal(err)
 		}
