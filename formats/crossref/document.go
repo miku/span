@@ -344,6 +344,9 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	publisher := strings.TrimSpace(Members.LookupDefault(doc.PrefixFromDOI(), ""))
 	if publisher != "" {
 		output.Publishers = []string{publisher}
+		if publisher != doc.Publisher {
+			log.Printf("document and prefix: %s, %s", publisher, doc.Publisher)
+		}
 	} else {
 		publisher = doc.Publisher
 		log.Printf("[%s][%s] did not find publisher for prefix: %s, using document publisher: %s", output.ID, doc.DOI, doc.PrefixFromDOI(), publisher)
