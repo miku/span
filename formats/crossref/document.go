@@ -266,7 +266,7 @@ func (doc *Document) FindLanguages() []string {
 			return []string{lang}
 		}
 	}
-	return []string{"eng"}
+	return []string{"und"}
 }
 
 // PrefixFromDOI returns the prefix part of the documents doi.
