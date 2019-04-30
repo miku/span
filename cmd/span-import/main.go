@@ -48,7 +48,7 @@ var (
 	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
 	showVersion = flag.Bool("v", false, "prints current program version")
 	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to file")
-	logfile     = flag.String("log", "", "path to logfile to append to, otherwise stderr")
+	logfile     = flag.String("logfile", "", "path to logfile to append to, otherwise stderr")
 )
 
 // Factory creates things.

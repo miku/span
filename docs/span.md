@@ -108,7 +108,7 @@ OPTIONS
   Hostport to listen on. `span-webhookd` only.
 
 `-logfile` *file*
-  Logfile to log to. `span-webhookd` only.
+  Logfile to log to. `span-webhookd`, `span-import` only.
 
 `-repo-dir` *path*
   Local repo clone. `span-webhookd` only.
