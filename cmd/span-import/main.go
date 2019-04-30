@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"sort"
 
-	log "github.com/sirupsen/logrus"
-
 	"bufio"
 
+	"github.com/lytics/logrus"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/ceeol"
 	"github.com/miku/span/formats/crossref"
@@ -218,7 +218,10 @@ func main() {
 			log.Fatal(err)
 		}
 		defer f.Close()
-		log.SetOutput(f)
+		logger := logrus.New()
+		logger.Formatter = &logrus.JSONFormatter{}
+		logger.Out = f
+		log.SetOutput(logger.Writer())
 	}
 
 	w := bufio.NewWriter(os.Stdout)
