@@ -23,6 +23,12 @@
 // * There is no error reporting except in the logs.
 // * Exit code from spawned span-review is ignored.
 //
+// TODO:
+//
+// * [ ] proper config handling
+// * [ ] send errors into ticket or e-mail
+// * [ ] more, maybe more flexible rules
+//
 package main
 
 import (
