@@ -35,6 +35,10 @@ import (
 	"github.com/miku/span/solrutil"
 )
 
+// LOW_PRIO number, something that is larger than the number of data sources
+// currently.
+const LOW_PRIO = 9999
+
 var (
 	config               = flag.String("c", "", "JSON config file for filters")
 	version              = flag.Bool("v", false, "show version")
@@ -90,7 +94,7 @@ func preferencePosition(sid string) int {
 			return pos
 		}
 	}
-	return 1000 // Or anything higher than the number of sources.
+	return LOW_PRIO // Or anything higher than the number of sources.
 }
 
 // DroppableLabels returns a list of labels, that can be dropped with regard to
