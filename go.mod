@@ -31,10 +31,10 @@ require (
 	github.com/sirupsen/logrus v1.4.1
 	github.com/stretchr/objx v0.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734 // indirect
-	golang.org/x/net v0.0.0-20190501004415-9ce7a6920f09 // indirect
-	golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 // indirect
+	golang.org/x/net v0.0.0-20190502183928-7f726cade0ab // indirect
+	golang.org/x/sys v0.0.0-20190502175342-a43fa875dd82 // indirect
 	golang.org/x/text v0.3.2
-	golang.org/x/tools v0.0.0-20190501045030-23463209683d // indirect
+	golang.org/x/tools v0.0.0-20190503030157-5cec639030af // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 	mvdan.cc/xurls v1.1.0
