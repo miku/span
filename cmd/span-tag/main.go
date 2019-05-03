@@ -235,7 +235,8 @@ func main() {
 		reader = io.MultiReader(files...)
 	}
 
-	p := parallel.NewProcessor(bufio.NewReader(reader), w, func(_ int64, b []byte) ([]byte, error) {
+	// Processing function, tagging documents.
+	procfunc := func(_ int64, b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
 		if err := json.Unmarshal(b, &is); err != nil {
 			return b, err
@@ -247,7 +248,7 @@ func main() {
 		if *server != "" {
 			droppable, err := DroppableLabels(tagged)
 			if err != nil {
-				log.Fatal(err)
+				return nil, err
 			}
 			if len(droppable) > 0 {
 				before := len(tagged.Labels)
@@ -265,7 +266,9 @@ func main() {
 		}
 		bb = append(bb, '\n')
 		return bb, nil
-	})
+	}
+
+	p := parallel.NewProcessor(bufio.NewReader(reader), w, procfunc)
 
 	p.NumWorkers = *numWorkers
 	p.BatchSize = *size
