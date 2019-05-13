@@ -60,7 +60,7 @@ names: assets/crossref/names.ndj
 
 # Primary and other names.
 assets/crossref/names.ndj:
-	span-crossref-members | jq '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > assets/crossref/names.ndj
+	span-crossref-members | jq -rc '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > assets/crossref/names.ndj
 
 deb: all
 	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
