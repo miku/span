@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl-discovery span-crossref-members
+TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl-discovery span-crossref-members span-crossref-pubprefix
 PKGNAME = span
 
 .PHONY: test lint bench deps imports assets vet clean deb rpm cloc clean-docs all
