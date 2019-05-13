@@ -8,6 +8,7 @@ require (
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
 	github.com/fatih/color v1.7.0
 	github.com/fatih/structs v1.1.0
+	github.com/francoispqt/gojay v1.2.10
 	github.com/goodsign/monday v0.0.0-20190214151228-5432518a29cd
 	github.com/gorilla/mux v1.7.1
 	github.com/hoisie/mustache v0.0.0-20160804235033-6375acf62c69 // indirect
@@ -19,11 +20,12 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kr/pty v1.1.4 // indirect
-	github.com/kylelemons/godebug v1.0.0 // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
+	github.com/miku/parallel v0.0.0-20170719114747-dd55491c9ac3 // indirect
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
 	github.com/olebedev/config v0.0.0-20180910155717-57f804269e64
 	github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0
