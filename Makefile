@@ -48,6 +48,13 @@ clean:
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
 	rm -f assetutil/bindata.go
 
+# Just a shortcut.
+members: assets/crossref/members.json
+	@echo "Run rm $< manually to rebuild."
+
+assets/crossref/members.json:
+	span-crossref-members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
+
 deb: all
 	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
 	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/sbin
