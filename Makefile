@@ -55,6 +55,13 @@ members: assets/crossref/members.json
 assets/crossref/members.json:
 	span-crossref-members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("^[[:space:]]+"; "") | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
 
+names: assets/crossref/names.ndj
+	@echo "Note: Run rm $< manually to rebuild."
+
+# Primary and other names.
+assets/crossref/names.ndj:
+	span-crossref-members | jq '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > assets/crossref/names.ndj
+
 deb: all
 	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
 	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/sbin
