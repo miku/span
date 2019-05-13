@@ -50,7 +50,7 @@ clean:
 
 # Just a shortcut.
 members: assets/crossref/members.json
-	@echo "Run rm $< manually to rebuild."
+	@echo "Note: Run rm $< manually to rebuild."
 
 assets/crossref/members.json:
 	span-crossref-members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
