@@ -53,7 +53,7 @@ members: assets/crossref/members.json
 	@echo "Note: Run rm $< manually to rebuild."
 
 assets/crossref/members.json:
-	span-crossref-members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
+	span-crossref-members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("^[[:space:]]+"; "") | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
 
 deb: all
 	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
