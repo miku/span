@@ -275,6 +275,7 @@ func NewSkipReader(r *bufio.Reader) *SkipReader {
 
 // ReadString will return only non-empty lines and lines not starting with a comment prefix.
 func (r SkipReader) ReadString(delim byte) (s string, err error) {
+OuterLoop:
 	for {
 		s, err = r.r.ReadString(delim)
 		if err == io.EOF {
@@ -286,7 +287,7 @@ func (r SkipReader) ReadString(delim byte) (s string, err error) {
 		}
 		for _, p := range r.CommentPrefixes {
 			if strings.HasPrefix(s, p) {
-				continue
+				continue OuterLoop
 			}
 		}
 		break
@@ -296,7 +297,6 @@ func (r SkipReader) ReadString(delim byte) (s string, err error) {
 
 // WriteCounter counts the number of bytes written through it.
 type WriteCounter struct {
-	w     io.Writer
 	count uint64
 }
 
