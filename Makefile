@@ -27,8 +27,7 @@ imports:
 assets: assetutil/bindata.go
 
 assetutil/bindata.go:
-	go get -u github.com/jteeuwen/go-bindata
-	go-bindata -o assetutil/bindata.go -pkg assetutil assets/...
+	go generate
 
 vet:
 	go vet ./...
