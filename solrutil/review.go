@@ -42,8 +42,8 @@ func (f FacetMap) EqualSizeNonZero(keys ...string) error {
 
 // AllowedKeys checks for a query and facet field, whether the values contain
 // only allowed values. Used for reviews.
-func (ix Index) AllowedKeys(query, field string, values ...string) error {
-	facets, err := ix.facets(query, field)
+func (index Index) AllowedKeys(query, field string, values ...string) error {
+	facets, err := index.facets(query, field)
 	if err != nil {
 		return err
 	}
@@ -56,8 +56,8 @@ func (ix Index) AllowedKeys(query, field string, values ...string) error {
 
 // EqualSizeNonZero checks, if given facet field values have the same size.
 // Used for reviews.
-func (ix Index) EqualSizeNonZero(query, field string, values ...string) error {
-	facets, err := ix.facets(query, field)
+func (index Index) EqualSizeNonZero(query, field string, values ...string) error {
+	facets, err := index.facets(query, field)
 	if err != nil {
 		return err
 	}
@@ -70,8 +70,8 @@ func (ix Index) EqualSizeNonZero(query, field string, values ...string) error {
 
 // EqualSizeTotal checks, if given facet field values have the same size as the
 // total number of records. Used for reviews.
-func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
-	r, err := ix.FacetQuery(query, field)
+func (index Index) EqualSizeTotal(query, field string, values ...string) error {
+	r, err := index.FacetQuery(query, field)
 	if err != nil {
 		return err
 	}
@@ -96,8 +96,8 @@ func (ix Index) EqualSizeTotal(query, field string, values ...string) error {
 // MinRatioPct fails, if the number of records matching a value undercuts a
 // given ratio of all records matching the query. The ratio ranges from 0 to
 // 100. Used for reviews.
-func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) error {
-	r, err := ix.FacetQuery(query, field)
+func (index Index) MinRatioPct(query, field, value string, minRatioPct float64) error {
+	r, err := index.FacetQuery(query, field)
 	if err != nil {
 		return err
 	}
@@ -120,8 +120,8 @@ func (ix Index) MinRatioPct(query, field, value string, minRatioPct float64) err
 
 // MinCount fails, if the number of records matching a value undercuts a given
 // size. Used for reviews.
-func (ix Index) MinCount(query, field, value string, minCount int) error {
-	facets, err := ix.facets(query, field)
+func (index Index) MinCount(query, field, value string, minCount int) error {
+	facets, err := index.facets(query, field)
 	if err != nil {
 		return err
 	}
