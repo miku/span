@@ -31,6 +31,7 @@ type Solr5Vufind3 struct {
 	ID                   string   `json:"id,omitempty"`
 	Institutions         []string `json:"institution,omitempty"`
 	Imprint              string   `json:"imprint,omitempty"`
+	ImprintStrMv         []string `json:"imprint_str_mv,omitempty"`
 	ISSN                 []string `json:"issn,omitempty"`
 	ISBN                 []string `json:"isbn,omitempty"`
 	Languages            []string `json:"language,omitempty"`
@@ -92,6 +93,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.ID = is.ID
 	s.RecordID = is.RecordID
 	s.Imprint = is.Imprint()
+	s.ImprintStrMv = []string{s.Imprint}
 	s.ISSN = is.ISSNList()
 	s.ISBN = is.ISBNList()
 	s.Edition = is.Edition
