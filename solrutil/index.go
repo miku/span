@@ -66,7 +66,7 @@ func (sr SelectResponse) Facets() (FacetMap, error) {
 	for _, v := range unwrap {
 		flist, ok := v.([]interface{})
 		if !ok {
-			return nil, fmt.Errorf("facet frequencies not a list")
+			return nil, fmt.Errorf("facet frequency is not a list")
 		}
 		var name string
 		var freq float64
@@ -78,7 +78,7 @@ func (sr SelectResponse) Facets() (FacetMap, error) {
 				}
 			case i%2 == 1:
 				if freq, ok = item.(float64); !ok {
-					return nil, fmt.Errorf("expected int, got %T", item)
+					return nil, fmt.Errorf("expected number, got %T", item)
 				}
 				result[name] = int(freq)
 			}
@@ -87,6 +87,7 @@ func (sr SelectResponse) Facets() (FacetMap, error) {
 	return result, nil
 }
 
+// Nonzero returns a FacetMap, which contains only non-zero frequencies.
 func (fm FacetMap) Nonzero() FacetMap {
 	result := make(FacetMap)
 	for k, v := range fm {
@@ -109,48 +110,46 @@ type Index struct {
 }
 
 // Select allows to pass any parameter to select.
-func (ix Index) Select(vs url.Values) (*SelectResponse, error) {
-	link := fmt.Sprintf("%s/select?%s", ix.Server, vs.Encode())
-	sr := new(SelectResponse)
-	if err := decodeLink(link, sr); err != nil {
+func (index Index) Select(vs url.Values) (*SelectResponse, error) {
+	link := fmt.Sprintf("%s/select?%s", index.Server, vs.Encode())
+	resp := new(SelectResponse)
+	if err := decodeLink(link, resp); err != nil {
 		return nil, err
 	}
-	return sr, nil
+	return resp, nil
 }
 
 // selectLink constructs a link to a JSON response.
-func (ix Index) selectLink(query string) string {
-	vals := url.Values{}
+func (index Index) selectLink(query string) string {
 	if query == "" {
 		query = "*:*"
 	}
+	vals := url.Values{}
 	vals.Add("q", query)
 	vals.Add("wt", "json")
-
-	return fmt.Sprintf("%s/select?%s", ix.Server, vals.Encode())
+	return fmt.Sprintf("%s/select?%s", index.Server, vals.Encode())
 }
 
 // FacetLink constructs a link to a JSON response.
-func (ix Index) FacetLink(query, facetField string) string {
-	vals := url.Values{}
+func (index Index) FacetLink(query, facetField string) string {
 	if query == "" {
 		query = "*:*"
 	}
-	if ix.FacetLimit == 0 {
-		ix.FacetLimit = DefaultFacetLimit
+	if index.FacetLimit == 0 {
+		index.FacetLimit = DefaultFacetLimit
 	}
+	vals := url.Values{}
 	vals.Add("q", query)
 	vals.Add("facet", "true")
 	vals.Add("facet.field", facetField)
-	vals.Add("facet.limit", fmt.Sprintf("%d", ix.FacetLimit))
+	vals.Add("facet.limit", fmt.Sprintf("%d", index.FacetLimit))
 	vals.Add("rows", "0")
 	vals.Add("wt", "json")
-
-	return fmt.Sprintf("%s/select?%s", ix.Server, vals.Encode())
+	return fmt.Sprintf("%s/select?%s", index.Server, vals.Encode())
 }
 
 // decodeLink fetches a link and unmarshals the response into a given value.
-func decodeLink(link string, val interface{}) error {
+func decodeLink(link string, value interface{}) error {
 	resp, err := http.Get(link)
 	if err != nil {
 		return err
@@ -159,36 +158,36 @@ func decodeLink(link string, val interface{}) error {
 		return fmt.Errorf("select failed with HTTP %d at %s", resp.StatusCode, link)
 	}
 	defer resp.Body.Close()
-	return json.NewDecoder(resp.Body).Decode(val)
+	return json.NewDecoder(resp.Body).Decode(value)
 }
 
 // SelectQuery runs a select query.
-func (ix Index) SelectQuery(query string) (r *SelectResponse, err error) {
-	r = new(SelectResponse)
-	err = decodeLink(ix.selectLink(query), r)
+func (index Index) SelectQuery(query string) (resp *SelectResponse, err error) {
+	resp = new(SelectResponse)
+	err = decodeLink(index.selectLink(query), resp)
 	return
 }
 
 // FacetQuery runs a facet query.
-func (ix Index) FacetQuery(query, facetField string) (r *SelectResponse, err error) {
-	r = new(SelectResponse)
-	err = decodeLink(ix.FacetLink(query, facetField), r)
+func (index Index) FacetQuery(query, facetField string) (resp *SelectResponse, err error) {
+	resp = new(SelectResponse)
+	err = decodeLink(index.FacetLink(query, facetField), resp)
 	return
 }
 
 // facets returns a facet map for a query and field.
-func (ix Index) facets(query, field string) (FacetMap, error) {
-	r, err := ix.FacetQuery(query, field)
+func (index Index) facets(query, field string) (FacetMap, error) {
+	resp, err := index.FacetQuery(query, field)
 	if err != nil {
 		return nil, err
 	}
-	return r.Facets()
+	return resp.Facets()
 }
 
 // FacetKeysFunc returns all facet keys, that pass a filter, given as function
 // of facet value and frequency.
-func (ix Index) FacetKeysFunc(query, field string, f func(string, int) bool) (result []string, err error) {
-	r, err := ix.FacetQuery(query, field)
+func (index Index) FacetKeysFunc(query, field string, f func(string, int) bool) (result []string, err error) {
+	r, err := index.FacetQuery(query, field)
 	if err != nil {
 		return result, err
 	}
@@ -205,12 +204,12 @@ func (ix Index) FacetKeysFunc(query, field string, f func(string, int) bool) (re
 }
 
 // FacetKeys returns the values of a facet as a string slice.
-func (ix Index) FacetKeys(query, field string) (result []string, err error) {
-	r, err := ix.FacetQuery(query, field)
+func (index Index) FacetKeys(query, field string) (result []string, err error) {
+	resp, err := index.FacetQuery(query, field)
 	if err != nil {
 		return result, err
 	}
-	fmap, err := r.Facets()
+	fmap, err := resp.Facets()
 	if err != nil {
 		return result, err
 	}
@@ -221,34 +220,34 @@ func (ix Index) FacetKeys(query, field string) (result []string, err error) {
 }
 
 // NumFound returns the size of the result set for a query.
-func (ix Index) NumFound(query string) (int64, error) {
-	r, err := ix.SelectQuery(query)
+func (index Index) NumFound(query string) (int64, error) {
+	resp, err := index.SelectQuery(query)
 	if err != nil {
 		return 0, err
 	}
-	return r.Response.NumFound, nil
+	return resp.Response.NumFound, nil
 }
 
 // Institutions returns a list of International Standard Identifier for
 // Libraries and Related Organisations (ISIL), ISO 15511 identifiers.
-func (ix Index) Institutions() (result []string, err error) {
-	return ix.FacetKeys("*:*", "institution")
+func (index Index) Institutions() (result []string, err error) {
+	return index.FacetKeys("*:*", "institution")
 }
 
 // SourceIdentifiers returns a list of source identifiers.
-func (ix Index) SourceIdentifiers() (result []string, err error) {
-	return ix.FacetKeys("*:*", "source_id")
+func (index Index) SourceIdentifiers() (result []string, err error) {
+	return index.FacetKeys("*:*", "source_id")
 }
 
 // SourceCollections returns the collections for a given source identifier.
-func (ix Index) SourceCollections(sid string) (result []string, err error) {
-	return ix.FacetKeysFunc("source_id:"+sid, "mega_collection",
+func (index Index) SourceCollections(sid string) (result []string, err error) {
+	return index.FacetKeysFunc("source_id:"+sid, "mega_collection",
 		func(_ string, v int) bool { return v > 0 })
 }
 
 // RandomSource returns a random source identifier.
-func (ix Index) RandomSource() (string, error) {
-	vals, err := ix.SourceIdentifiers()
+func (index Index) RandomSource() (string, error) {
+	vals, err := index.SourceIdentifiers()
 	if err != nil {
 		return "", err
 	}
@@ -259,8 +258,8 @@ func (ix Index) RandomSource() (string, error) {
 }
 
 // RandomCollection returns a random collection for a source identifier.
-func (ix Index) RandomCollection(sid string) (string, error) {
-	vals, err := ix.SourceCollections(sid)
+func (index Index) RandomCollection(sid string) (string, error) {
+	vals, err := index.SourceCollections(sid)
 	if err != nil {
 		return "", err
 	}
