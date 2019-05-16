@@ -2,7 +2,6 @@ package kbart
 
 import (
 	"bufio"
-	"errors"
 	"os"
 	"regexp"
 	"strings"
@@ -15,9 +14,8 @@ import (
 var (
 	// $ sha1sum fixtures/kbart.txt
 	// d072bc9cef32ffbeaecc4c8c97562a1b9e47468c  fixtures/kbart.txt
-	fixture           = "../../fixtures/kbart.txt"
-	holdings          *Holdings
-	errFixtureMissing = errors.New("missing fixture")
+	fixture  = "../../fixtures/kbart.txt"
+	holdings *Holdings
 )
 
 // skipper is shared by tests and benchmarks.

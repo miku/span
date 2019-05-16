@@ -76,7 +76,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	f.Write(b)
+	if _, err := f.Write(b); err != nil {
+		log.Fatal(err)
+	}
 
 	urls := xurls.Strict.FindAllString(string(b), -1)
 

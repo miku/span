@@ -44,7 +44,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -113,27 +112,6 @@ func Worker(done chan bool) {
 	}
 	log.Println("worker shutdown")
 	done <- true
-}
-
-// runCommand will execute a program with args and will return an error, if the
-// program returned an non-zero exit code. The error can then be propagated
-// into logs or a ticket. This works on Linux only (and maybe, accidentally on
-// Windows), https://stackoverflow.com/a/10385867.
-func runCommand(program string, args ...string) error {
-	cmd := exec.Command(program, args...)
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("[runCommand] could not start: %v", cmd)
-	}
-	if err := cmd.Wait(); err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
-			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				return fmt.Errorf("[runCommand] %v exit status: %d", cmd.Path, status.ExitStatus())
-			}
-		} else {
-			fmt.Errorf("[runCommand] cmd.Wait failed for %v", cmd)
-		}
-	}
-	return nil
 }
 
 // Repo points to a local clone containing the review configuration we want. A
