@@ -25,7 +25,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -53,7 +52,6 @@ var (
 	Formats  = assetutil.MustLoadStringMap("assets/crossref/formats.json")
 	Genres   = assetutil.MustLoadStringMap("assets/crossref/genres.json")
 	RefTypes = assetutil.MustLoadStringMap("assets/crossref/reftypes.json")
-	Members  = assetutil.MustLoadStringMap("assets/crossref/members.json")
 
 	// AuthorReplacer is a special cleaner for author names.
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
@@ -269,15 +267,6 @@ func (doc *Document) FindLanguages() []string {
 	return []string{"und"}
 }
 
-// PrefixFromDOI returns the prefix part of the documents doi.
-func (doc *Document) PrefixFromDOI() string {
-	if len(doc.DOI) == 0 {
-		return ""
-	}
-	parts := strings.Split(doc.DOI, "/")
-	return parts[0]
-}
-
 // ToIntermediateSchema converts a crossref document into IS. XXX: Use a
 // canonical publisher, based on doi prefix, /cc @ad.
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
@@ -339,20 +328,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.ISSN = doc.ISSN
 	output.Issue = strings.TrimLeft(doc.Issue, "0")
 	output.Languages = doc.FindLanguages()
-
-	// Try to use publisher via member API, refs #13587.
-	publisher := strings.TrimSpace(Members.LookupDefault(doc.PrefixFromDOI(), ""))
-	if publisher != "" {
-		output.Publishers = []string{publisher}
-		if publisher != doc.Publisher {
-			log.Printf("diff prefix: %s doc: %s", publisher, doc.Publisher)
-		}
-	} else {
-		publisher = doc.Publisher
-		log.Printf("[%s][%s] did not find publisher for prefix: %s, using document publisher: %s", output.ID, doc.DOI, doc.PrefixFromDOI(), publisher)
-		output.Publishers = []string{doc.Publisher}
-	}
-
+	output.Publishers = append(output.Publishers, doc.Publisher)
 	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subject
@@ -402,10 +378,10 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
-	if publisher == "" {
+	if doc.Publisher == "" {
 		output.MegaCollections = []string{fmt.Sprintf("X-U (CrossRef)")}
 	} else {
-		publisher = span.UnescapeTrim(strings.Replace(publisher, "\n", " ", -1))
+		publisher := span.UnescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
 		output.MegaCollections = []string{fmt.Sprintf("%s (CrossRef)", publisher)}
 	}
 
