@@ -164,6 +164,7 @@ var (
 	reviewFile     = flag.String("c", "", "path to review.yaml file containing test cases, e.g. https://git.io/fh5Zh")
 	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
+	noCollapse     = flag.String("C", false, "do not collapse details")
 )
 
 // Result represents a single result row. XXX: Maybe add more fields, e.g.
@@ -504,7 +505,13 @@ func main() {
 		}
 
 		redmine := &reviewutil.Redmine{BaseURL: conf.BaseURL, Token: conf.Token}
-		message := fmt.Sprintf("index review results\n\n%s", buf.String())
+		var message string
+		switch {
+		case *noCollapse:
+			message = fmt.Sprintf("index review results\n\n%s", buf.String())
+		default:
+			message = fmt.Sprintf("index review results\n\n{{collapse(Details)\n%s\n}}\n", buf.String())
+		}
 		if err := redmine.UpdateTicket(config.Ticket, message); err != nil {
 			log.Fatal(err)
 		}
