@@ -164,7 +164,7 @@ var (
 	reviewFile     = flag.String("c", "", "path to review.yaml file containing test cases, e.g. https://git.io/fh5Zh")
 	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
-	noCollapse     = flag.String("C", false, "do not collapse details")
+	noCollapse     = flag.Bool("C", false, "do not collapse details")
 )
 
 // Result represents a single result row. XXX: Maybe add more fields, e.g.
