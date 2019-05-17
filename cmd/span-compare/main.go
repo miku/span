@@ -140,6 +140,7 @@ var SourceNames = map[string]string{
 	"103": "Margaret Herrick Library",
 	"104": "WTI",
 	"105": "Springer Journals",
+	"105": "Springer Journals",
 	"106": "Primary Sources for Slavic Studies",
 	"107": "Heidelberger historische Bestände digital",
 	"108": "De Gruyter eBooks Open Access",
@@ -208,6 +209,7 @@ var SourceNames = map[string]string{
 	"171": "PressReader (via Digento)",
 	"172": "OER aus OPAL (UB Freiberg)",
 	"173": "Wolfenbütteler Bibliographie zur Geschichte des Buchwesens",
+	"174": "Zenodo",
 	"200": "finc TEST",
 	"201": "Perinorm",
 }
