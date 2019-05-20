@@ -44,7 +44,7 @@ curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --
 curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . > $WORK_TREE/contentfiles.json
 
 # Fetch combined API as well.
-span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . >$WORK_TREE/discovery.json
+span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . > $WORK_TREE/discovery.json
 
 # Commit, and push to a remote named origin.
 if [[ $(git status --porcelain) ]]; then
