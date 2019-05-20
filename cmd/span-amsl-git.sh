@@ -22,6 +22,11 @@ command -v curl >/dev/null 2>&1 || {
     exit 1
 }
 
+command -v jq >/dev/null 2>&1 || {
+    echo >&2 "jq required, https://stedolan.github.io/jq/"
+    exit 1
+}
+
 command -v span-amsl-discovery >/dev/null 2>&1 || {
     echo >&2 "span-amsl-discovery required, https://github.com/miku/span/releases"
     exit 1
@@ -38,26 +43,29 @@ if [ ! -d "$GIT_DIR" ]; then
 fi
 
 # Fetch smaller APIs separately.
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . > $WORK_TREE/metadata_usage.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . > $WORK_TREE/holdings_file_concat.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . > $WORK_TREE/holdingsfiles.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . > $WORK_TREE/contentfiles.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . >$WORK_TREE/metadata_usage.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . >$WORK_TREE/holdings_file_concat.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . >$WORK_TREE/holdingsfiles.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . >$WORK_TREE/contentfiles.json
 
 # Fetch combined API as well.
-span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . > $WORK_TREE/discovery.json
+span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . >$WORK_TREE/discovery.json
 
 # Fetch holding files.
-for uri in $(cat $WORK_TREE/holdingsfiles.json | jq -r '.[].DokumentURI' | sort -u); do
-    if [ -z $uri ]; then
-        continue
-    fi
-    name=$(basename $uri)
-    if [ -z $name ]; then
-        continue
-    fi
-    link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
-    curl -s --fail "$link" > "$WORK_TREE/hf-$name.tsv"
-done
+if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
+    for uri in $(cat $WORK_TREE/holdingsfiles.json | jq -r '.[].DokumentURI' | sort -u); do
+        if [ -z "$uri" ]; then
+            continue
+        fi
+        name=$(basename $uri)
+        if [ -z "$name" ]; then
+            continue
+        fi
+        link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
+        mkdir -p "$WORK_TREE/h/"
+        curl -s --fail "$link" >"$WORK_TREE/h/$name.tsv"
+    done
+fi
 
 # Commit, and push to a remote named origin.
 if [[ $(git status --porcelain) ]]; then
