@@ -42,6 +42,8 @@ AMSL_API_URL=$1
 WORK_TREE=$2
 GIT_DIR=${3:-$WORK_TREE/.git}
 
+echo "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
+
 command -v curl >/dev/null 2>&1 || {
     echo >&2 "curl required, https://curl.haxx.se/"
     exit 1
