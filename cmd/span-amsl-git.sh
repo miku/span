@@ -70,10 +70,9 @@ if [ ! -d "$GIT_DIR" ]; then
 fi
 
 # Fetch smaller APIs separately.
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . > "$WORK_TREE/metadata_usage.json"
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . > "$WORK_TREE/holdings_file_concat.json"
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . > "$WORK_TREE/holdingsfiles.json"
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . > "$WORK_TREE/contentfiles.json"
+for api in metadata_usage holdings_file_concat holdingsfiles contentfiles; do
+    curl -s --fail "$AMSL_API_URL/outboundservices/list?do=$api" | jq -r --sort-keys . > "$WORK_TREE/$api.json"
+done
 
 # Fetch combined API as well.
 span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . > "$WORK_TREE/discovery.json"
