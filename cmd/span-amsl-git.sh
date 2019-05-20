@@ -70,17 +70,17 @@ if [ ! -d "$GIT_DIR" ]; then
 fi
 
 # Fetch smaller APIs separately.
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . > $WORK_TREE/metadata_usage.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . > $WORK_TREE/holdings_file_concat.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . > $WORK_TREE/holdingsfiles.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . > $WORK_TREE/contentfiles.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . > "$WORK_TREE/metadata_usage.json"
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . > "$WORK_TREE/holdings_file_concat.json"
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . > "$WORK_TREE/holdingsfiles.json"
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . > "$WORK_TREE/contentfiles.json"
 
 # Fetch combined API as well.
-span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . > $WORK_TREE/discovery.json
+span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . > "$WORK_TREE/discovery.json"
 
 # Fetch holding files.
 if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
-    for uri in $(cat $WORK_TREE/holdingsfiles.json | jq -r '.[].DokumentURI' | sort -u); do
+    for uri in $(cat "$WORK_TREE/holdingsfiles.json" | jq -r '.[].DokumentURI' | sort -u); do
         if [ -z "$uri" ]; then
             continue
         fi
@@ -94,15 +94,13 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
     done
 fi
 
-date > $WORK_TREE/.date
-
-alias git="git --git-dir $GIT_DIR --work-tree $WORK_TREE"
+date > "$WORK_TREE/.date"
 
 # Commit, and push to a remote named origin.
-if [[ $(git status --porcelain) ]]; then
-    git add --all
-    git commit -m "auto-commit from $(hostname) by $(whoami)"
-    git push origin master
+if [[ $(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain) ]]; then
+    git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" add --all
+    git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) by $(whoami)"
+    git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" push origin master
 else
     exit 0
 fi
