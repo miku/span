@@ -46,10 +46,11 @@ curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --s
 # Fetch combined API as well.
 span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . >$WORK_TREE/discovery.json
 
-# Commit.
+# Commit, and push to a remote named origin.
 if [[ $(git status --porcelain) ]]; then
     git --git-dir $GIT_DIR --work-tree $WORK_TREE add --all
     git --git-dir $GIT_DIR --work-tree $WORK_TREE commit -m "auto-commit from $(hostname) by $(whoami)"
+    git --git-dir $GIT_DIR --work-tree $WORK_TREE push origin master
 else
     exit 0
 fi
