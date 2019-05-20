@@ -67,6 +67,8 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
     done
 fi
 
+date > $WORK_TREE/.date
+
 # Commit, and push to a remote named origin.
 if [[ $(git status --porcelain) ]]; then
     git --git-dir $GIT_DIR --work-tree $WORK_TREE add --all
