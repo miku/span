@@ -96,11 +96,13 @@ fi
 
 date > $WORK_TREE/.date
 
+alias git="git --git-dir $GIT_DIR --work-tree $WORK_TREE"
+
 # Commit, and push to a remote named origin.
 if [[ $(git status --porcelain) ]]; then
-    git --git-dir $GIT_DIR --work-tree $WORK_TREE add --all
-    git --git-dir $GIT_DIR --work-tree $WORK_TREE commit -m "auto-commit from $(hostname) by $(whoami)"
-    git --git-dir $GIT_DIR --work-tree $WORK_TREE push origin master
+    git add --all
+    git commit -m "auto-commit from $(hostname) by $(whoami)"
+    git push origin master
 else
     exit 0
 fi
