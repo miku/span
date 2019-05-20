@@ -3,7 +3,7 @@
 # Fetch AMSL API JSON document and commit documents into a git repo. If run
 # regularly, this can serve as a log of changes.
 #
-#   $ span-amsl-git https://example.amsl.technology /var/amsl-sync
+#   $ span-amsl-git.sh https://example.amsl.technology /var/amsl-sync
 #
 
 set -e -o pipefail
