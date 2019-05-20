@@ -43,13 +43,13 @@ if [ ! -d "$GIT_DIR" ]; then
 fi
 
 # Fetch smaller APIs separately.
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . >$WORK_TREE/metadata_usage.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . >$WORK_TREE/holdings_file_concat.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . >$WORK_TREE/holdingsfiles.json
-curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . >$WORK_TREE/contentfiles.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=metadata_usage" | jq -r --sort-keys . > $WORK_TREE/metadata_usage.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdings_file_concat" | jq -r --sort-keys . > $WORK_TREE/holdings_file_concat.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=holdingsfiles" | jq -r --sort-keys . > $WORK_TREE/holdingsfiles.json
+curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --sort-keys . > $WORK_TREE/contentfiles.json
 
 # Fetch combined API as well.
-span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . >$WORK_TREE/discovery.json
+span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . > $WORK_TREE/discovery.json
 
 # Fetch holding files.
 if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
@@ -63,7 +63,7 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         fi
         link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
         mkdir -p "$WORK_TREE/h/"
-        curl -s --fail "$link" >"$WORK_TREE/h/$name.tsv"
+        curl -s --fail "$link" > "$WORK_TREE/h/$name.tsv"
     done
 fi
 
