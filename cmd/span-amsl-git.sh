@@ -99,7 +99,7 @@ fi
 if [[ $(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain) ]]; then
     date > "$WORK_TREE/.date"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" add --all
-    git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) by $(whoami)"
+    git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) [$$])"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" push origin master
 else
     exit 0
