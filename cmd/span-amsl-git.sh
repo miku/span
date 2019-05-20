@@ -96,10 +96,9 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
     done
 fi
 
-date > "$WORK_TREE/.date"
-
 # Commit, and push to a remote named origin.
 if [[ $(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain) ]]; then
+    date > "$WORK_TREE/.date"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" add --all
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) by $(whoami)"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" push origin master
