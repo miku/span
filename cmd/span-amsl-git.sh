@@ -42,7 +42,7 @@ AMSL_API_URL=$1
 WORK_TREE=$2
 GIT_DIR=${3:-$WORK_TREE/.git}
 
-echo "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
+echo >&2 "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
 
 command -v curl >/dev/null 2>&1 || {
     echo >&2 "curl required, https://curl.haxx.se/"
@@ -78,7 +78,9 @@ curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --s
 # Fetch combined API as well.
 span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . > "$WORK_TREE/discovery.json"
 
-# Fetch holding files.
+# Fetch holding files, assume that an URI looks like
+# http://amsl.technology/discovery/metadata-usage/Dokument/KBART_FREEJOURNALS,
+# we utilize the unique base names, e.g. KBART_FREEJOURNALS.
 if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
     for uri in $(cat "$WORK_TREE/holdingsfiles.json" | jq -r '.[].DokumentURI' | sort -u); do
         if [ -z "$uri" ]; then
