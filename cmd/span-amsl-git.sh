@@ -46,6 +46,19 @@ curl -s --fail "$AMSL_API_URL/outboundservices/list?do=contentfiles" | jq -r --s
 # Fetch combined API as well.
 span-amsl-discovery -live $AMSL_API_URL | jq -r --sort-keys . > $WORK_TREE/discovery.json
 
+# Fetch holding files.
+for uri in $(cat $WORK_TREE/holdingsfiles.json | jq -r '.[].DokumentURI' | sort -u); do
+    if [ -z $uri ]; then
+        continue
+    fi
+    name=$(basename $uri)
+    if [ -z $name ]; then
+        continue
+    fi
+    link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
+    curl -s --fail "$link" > "$WORK_TREE/hf-$name.tsv"
+done
+
 # Commit, and push to a remote named origin.
 if [[ $(git status --porcelain) ]]; then
     git --git-dir $GIT_DIR --work-tree $WORK_TREE add --all
@@ -54,4 +67,3 @@ if [[ $(git status --porcelain) ]]; then
 else
     exit 0
 fi
-
