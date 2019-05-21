@@ -1,4 +1,4 @@
-// soctl is a prototype for real time index updates
+// soctl is a prototype for real time index updates.
 
 // Goal: separation of content and visibility. Continous updates.
 //
@@ -12,6 +12,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -83,8 +84,20 @@ func main() {
 		}
 		for _, isil := range isils {
 			for _, sid := range sids {
+				if strings.TrimSpace(isil) == "" {
+					log.Printf("skipping empty ISIL")
+					continue
+				}
+				if strings.Contains(isil, `"`) {
+					log.Printf("skipping invalid ISIL: %v", isil)
+					continue
+				}
 				// https://lucene.apache.org/solr/guide/6_6/the-standard-query-parser.html
-				numFound, err := index.NumFound(fmt.Sprintf(`(source_id:"%s")^=1 AND (institution:"%s")^=1`, sid, isil))
+				query := fmt.Sprintf(`(source_id:"%s")^=1 AND (institution:"%s")^=1`, sid, isil)
+				if *statusVerbose {
+					log.Printf("%v", query)
+				}
+				numFound, err := index.NumFound(query)
 				if err != nil {
 					log.Fatal(err)
 				}
