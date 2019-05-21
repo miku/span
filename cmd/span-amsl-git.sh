@@ -79,7 +79,8 @@ span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . > "$WORK_TREE/di
 
 # Fetch holding files, assume that an URI looks like
 # http://amsl.technology/discovery/metadata-usage/Dokument/KBART_FREEJOURNALS,
-# we utilize the unique base names, e.g. KBART_FREEJOURNALS.
+# we utilize the unique base names, e.g. KBART_FREEJOURNALS. Note: Files may or
+# may not be compressed, text would be nicer to diff.
 if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
     for uri in $(cat "$WORK_TREE/holdingsfiles.json" | jq -r '.[].DokumentURI' | sort -u); do
         if [ -z "$uri" ]; then
