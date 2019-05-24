@@ -137,6 +137,8 @@ all-records:
     - ["source_id:107", "facet_avail", "Online", "Free"]
     - ["source_id:107", "access_facet", "Electronic Resources"]
     - ["source_id:107", "mega_collection", "sid-107-col-heidelberg"]
+    - ["source_id:126", "access_facet", "Electronic Resources"]
+    - ["source_id:126", "facet_avail", "Online"]
     - ["source_id:141", "format", "Video"]
     - ["source_id:141", "format_de15", "Video"]
     - ["source_id:162", "format", "ElectronicArticle"]
@@ -222,7 +224,9 @@ all-records:
 min-ratio:
     - ["source_id:49", "facet_avail", "Free", 0.8]
     - ["source_id:55", "facet_avail", "Free", 2.2]
+    - ["source_id:89", "facet_avail", "Free", 0.14]
     - ["source_id:105", "facet_avail", "Free", 0.5]
+    - ["source_id:126", "facet_avail", "Free", 30.0]
 # Sources indexed in UBL-main
 #     - ["source_id:39", "institution", "DE-15-FID", 5.0]
 #     - ["source_id:39", "institution", "DE-15", 100.0]
