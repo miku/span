@@ -45,7 +45,7 @@ allowed-keys:
     - ["source_id:55", "facet_avail", "Online", "Free"]
     - ["source_id:60", "language", "German", "English", "French", "Spanish", "Portuguese", "Undetermined"]
     - ["source_id:60", "finc_class_facet", "not assigned", "Chemie und Pharmazie", "Medizin", "Philosophie", "Technik", "Geschichte", "Biologie", "Klassische Philologie"]
-    - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Technik"]
+    - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Mathematik", "Technik"]
     - ["source_id:107", "finc_class_facet", "not assigned", "Medizin"]
     - ["source_id:141", "language", "German", "English"]
     - ["source_id:162", "language", "German", "English", "French", "Italian"]
