@@ -25,9 +25,8 @@ solr: "http://172.18.113.15:8085/solr/#/biblio"
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
-# ticket: "14961"
 
-ticket: "NA"
+ticket: "14836"
 
 # If set to "fail" an empty result set will be marked as failure.
 # Otherwise a empty result set will - most of the time - not be considered a violation.
