@@ -102,6 +102,7 @@ all-records:
     - ["source_id:80", "facet_avail", "Online"]
     - ["source_id:80", "finc_class_facet", "not assigned"]
     - ["source_id:80", "access_facet", "Electronic Resources"]
+    - ["source_id:80", "language", "Undetermined"]
     - ["source_id:80", "mega_collection", "Datenbank Internetquellen"]
     - ["source_id:85", "format", "ElectronicArticle"]
     - ["source_id:85", "format_de15", "Article, E-Article"]
