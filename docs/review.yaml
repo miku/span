@@ -26,7 +26,7 @@ solr: "http://172.18.113.15:8085/solr/#/biblio"
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
 
-ticket: "14836"
+ticket: "na"
 
 # If set to "fail" an empty result set will be marked as failure.
 # Otherwise a empty result set will - most of the time - not be considered a violation.
@@ -100,6 +100,7 @@ all-records:
     - ["source_id:60", "access_facet", "Electronic Resources"]
     - ["source_id:60", "mega_collection", "Thieme E-Journals"]
     - ["source_id:80", "facet_avail", "Online"]
+    - ["source_id:80", "finc_class_facet", "not assigned"]
     - ["source_id:80", "access_facet", "Electronic Resources"]
     - ["source_id:80", "mega_collection", "Datenbank Internetquellen"]
     - ["source_id:85", "format", "ElectronicArticle"]
