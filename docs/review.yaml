@@ -27,7 +27,7 @@ solr: "http://172.18.113.15:8085/solr/#/biblio"
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
 # ticket: "14961"
 
-ticket: "14836"
+ticket: "NA"
 
 # If set to "fail" an empty result set will be marked as failure.
 # Otherwise a empty result set will - most of the time - not be considered a violation.
@@ -45,9 +45,6 @@ allowed-keys:
     - ["source_id:55", "facet_avail", "Online", "Free"]
     - ["source_id:60", "language", "German", "English", "French", "Spanish", "Portuguese", "Undetermined"]
     - ["source_id:60", "finc_class_facet", "not assigned", "Chemie und Pharmazie", "Medizin", "Philosophie", "Technik", "Geschichte", "Biologie", "Klassische Philologie"]
-    - ["source_id:78", "finc_class_facet", "not assigned", "Allgemeines", "Wirtschaftswissenschaften", "Informatik"]
-    - ["source_id:78", "format", "ElectronicArticle", "ElectronicBook", "ElectronicThesis"]
-    - ["source_id:78", "format_de15", "Book, E-Book", "Article, E-Article", "Thesis"]
     - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Technik"]
     - ["source_id:107", "finc_class_facet", "not assigned", "Medizin"]
     - ["source_id:141", "language", "German", "English"]
@@ -101,9 +98,6 @@ all-records:
     - ["source_id:60", "facet_avail", "Online"]
     - ["source_id:60", "access_facet", "Electronic Resources"]
     - ["source_id:60", "mega_collection", "Thieme E-Journals"]
-    - ["source_id:78", "facet_avail", "Online"]
-    - ["source_id:78", "access_facet", "Electronic Resources"]
-    - ["source_id:78", "mega_collection", "IZI-Datenbank"]
     - ["source_id:80", "format", "ElectronicArticle"]
     - ["source_id:80", "format_de15", "Article, E-Article"]
     - ["source_id:80", "facet_avail", "Online"]
