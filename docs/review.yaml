@@ -115,7 +115,7 @@ all-records:
     - ["source_id:87", "facet_avail", "Online", "Free"]
     - ["source_id:87", "access_facet", "Electronic Resources"]
     - ["source_id:87", "language", "English"]
-    - ["source_id:87", "mega_collection", "International Journal of Communication"]
+    - ["source_id:87", "mega_collection", "sid-87-col-intjcomm"]
     - ["source_id:89", "format", "ElectronicArticle"]
     - ["source_id:89", "format_de15", "Article, E-Article"]
     - ["source_id:89", "facet_avail", "Online"]
