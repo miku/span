@@ -63,11 +63,11 @@ fi
 
 # Fetch smaller APIs separately.
 for api in metadata_usage holdings_file_concat holdingsfiles contentfiles; do
-    curl -s --fail "$AMSL_API_URL/outboundservices/list?do=$api" | jq -r --sort-keys . > "$WORK_TREE/$api.json"
+    curl -s --fail "$AMSL_API_URL/outboundservices/list?do=$api" | jq -r --sort-keys . >"$WORK_TREE/$api.json"
 done
 
 # Fetch combined API as well.
-span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . > "$WORK_TREE/discovery.json"
+span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . >"$WORK_TREE/discovery.json"
 
 # Fetch holding files, assume that an URI looks like
 # http://amsl.technology/discovery/metadata-usage/Dokument/KBART_FREEJOURNALS,
@@ -84,13 +84,13 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         fi
         link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
         mkdir -p "$WORK_TREE/h/"
-        curl -s --fail "$link" > "$WORK_TREE/h/$name.tsv"
+        curl -s --fail "$link" >"$WORK_TREE/h/$name.tsv"
     done
 fi
 
 # Commit, and push to a remote named origin.
 if [[ $(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain) ]]; then
-    date > "$WORK_TREE/.date"
+    date >"$WORK_TREE/.date"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" add --all
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) [$$]"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" push origin master
