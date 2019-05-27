@@ -44,20 +44,12 @@ GIT_DIR=${3:-$WORK_TREE/.git}
 
 echo >&2 "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
 
-command -v curl >/dev/null 2>&1 || {
-    echo >&2 "curl required, https://curl.haxx.se/"
-    exit 1
-}
-
-command -v jq >/dev/null 2>&1 || {
-    echo >&2 "jq required, https://stedolan.github.io/jq/"
-    exit 1
-}
-
-command -v span-amsl-discovery >/dev/null 2>&1 || {
-    echo >&2 "span-amsl-discovery required, https://github.com/miku/span/releases"
-    exit 1
-}
+for req in curl jq span-amsl-discovery; do
+    command -v $req >/dev/null 2>&1 || {
+        echo >&2 "$req required"
+        exit 1
+    }
+done
 
 if [ ! -d "$WORK_TREE" ]; then
     echo "$WORK_TREE is not a directory"
