@@ -31,7 +31,7 @@
 #
 #   $ span-amsl-git.sh https://example.amsl.technology /var/somerepo
 #
-set -e -o pipefail
+set -e -u -o pipefail
 
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 AMSL-API-URL WORK-TREE [GIT-DIR]"
@@ -44,20 +44,12 @@ GIT_DIR=${3:-$WORK_TREE/.git}
 
 echo >&2 "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
 
-command -v curl >/dev/null 2>&1 || {
-    echo >&2 "curl required, https://curl.haxx.se/"
-    exit 1
-}
-
-command -v jq >/dev/null 2>&1 || {
-    echo >&2 "jq required, https://stedolan.github.io/jq/"
-    exit 1
-}
-
-command -v span-amsl-discovery >/dev/null 2>&1 || {
-    echo >&2 "span-amsl-discovery required, https://github.com/miku/span/releases"
-    exit 1
-}
+for req in curl jq span-amsl-discovery; do
+    command -v $req >/dev/null 2>&1 || {
+        echo >&2 "$req required"
+        exit 1
+    }
+done
 
 if [ ! -d "$WORK_TREE" ]; then
     echo "$WORK_TREE is not a directory"
@@ -71,11 +63,11 @@ fi
 
 # Fetch smaller APIs separately.
 for api in metadata_usage holdings_file_concat holdingsfiles contentfiles; do
-    curl -s --fail "$AMSL_API_URL/outboundservices/list?do=$api" | jq -r --sort-keys . > "$WORK_TREE/$api.json"
+    curl -s --fail "$AMSL_API_URL/outboundservices/list?do=$api" | jq -r --sort-keys . >"$WORK_TREE/$api.json"
 done
 
 # Fetch combined API as well.
-span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . > "$WORK_TREE/discovery.json"
+span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . >"$WORK_TREE/discovery.json"
 
 # Fetch holding files, assume that an URI looks like
 # http://amsl.technology/discovery/metadata-usage/Dokument/KBART_FREEJOURNALS,
@@ -92,13 +84,13 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         fi
         link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
         mkdir -p "$WORK_TREE/h/"
-        curl -s --fail "$link" > "$WORK_TREE/h/$name.tsv"
+        curl -s --fail "$link" >"$WORK_TREE/h/$name.tsv"
     done
 fi
 
 # Commit, and push to a remote named origin.
 if [[ $(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain) ]]; then
-    date > "$WORK_TREE/.date"
+    date >"$WORK_TREE/.date"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" add --all
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) [$$]"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" push origin master
