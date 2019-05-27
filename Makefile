@@ -2,7 +2,7 @@ SHELL = /bin/bash
 TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl-discovery span-crossref-members
 PKGNAME = span
 
-.PHONY: test lint bench deps imports assets vet clean deb rpm cloc clean-docs all
+.PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test: assets deps
