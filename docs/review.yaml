@@ -17,16 +17,16 @@
 # server will be figured out automatically.
 # solr: "auto"
 
-solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
+# solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
+solr: "http://172.18.113.15:8085/solr/#/biblio"
 
 # solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 # solr: "http://172.18.113.24:8080/solr/biblio/" # UBL-main Gesamtimport 2018-12
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
-# ticket: "14961"
 
-ticket: "14906"
+ticket: "na"
 
 # If set to "fail" an empty result set will be marked as failure.
 # Otherwise a empty result set will - most of the time - not be considered a violation.
@@ -44,10 +44,9 @@ allowed-keys:
     - ["source_id:55", "facet_avail", "Online", "Free"]
     - ["source_id:60", "language", "German", "English", "French", "Spanish", "Portuguese", "Undetermined"]
     - ["source_id:60", "finc_class_facet", "not assigned", "Chemie und Pharmazie", "Medizin", "Philosophie", "Technik", "Geschichte", "Biologie", "Klassische Philologie"]
-    - ["source_id:78", "finc_class_facet", "not assigned", "Allgemeines", "Wirtschaftswissenschaften", "Informatik"]
-    - ["source_id:78", "format", "ElectronicArticle", "ElectronicBook", "ElectronicThesis"]
-    - ["source_id:78", "format_de15", "Book, E-Book", "Article, E-Article", "Thesis"]
-    - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Technik"]
+    - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Mathematik", "Technik"]
+    - ["source_id:80", "format", "ElectronicArticle", "ElectronicIntegratingResource"]
+    - ["source_id:80", "format_de15", "Article, E-Article", "Website"]
     - ["source_id:107", "finc_class_facet", "not assigned", "Medizin"]
     - ["source_id:141", "language", "German", "English"]
     - ["source_id:162", "language", "German", "English", "French", "Italian"]
@@ -100,13 +99,10 @@ all-records:
     - ["source_id:60", "facet_avail", "Online"]
     - ["source_id:60", "access_facet", "Electronic Resources"]
     - ["source_id:60", "mega_collection", "Thieme E-Journals"]
-    - ["source_id:78", "facet_avail", "Online"]
-    - ["source_id:78", "access_facet", "Electronic Resources"]
-    - ["source_id:78", "mega_collection", "IZI-Datenbank"]
-    - ["source_id:80", "format", "ElectronicArticle"]
-    - ["source_id:80", "format_de15", "Article, E-Article"]
     - ["source_id:80", "facet_avail", "Online"]
+    - ["source_id:80", "finc_class_facet", "not assigned"]
     - ["source_id:80", "access_facet", "Electronic Resources"]
+    - ["source_id:80", "language", "Undetermined"]
     - ["source_id:80", "mega_collection", "Datenbank Internetquellen"]
     - ["source_id:85", "format", "ElectronicArticle"]
     - ["source_id:85", "format_de15", "Article, E-Article"]
@@ -120,7 +116,7 @@ all-records:
     - ["source_id:87", "facet_avail", "Online", "Free"]
     - ["source_id:87", "access_facet", "Electronic Resources"]
     - ["source_id:87", "language", "English"]
-    - ["source_id:87", "mega_collection", "International Journal of Communication"]
+    - ["source_id:87", "mega_collection", "sid-87-col-intjcomm"]
     - ["source_id:89", "format", "ElectronicArticle"]
     - ["source_id:89", "format_de15", "Article, E-Article"]
     - ["source_id:89", "facet_avail", "Online"]
@@ -141,6 +137,8 @@ all-records:
     - ["source_id:107", "facet_avail", "Online", "Free"]
     - ["source_id:107", "access_facet", "Electronic Resources"]
     - ["source_id:107", "mega_collection", "sid-107-col-heidelberg"]
+    - ["source_id:126", "access_facet", "Electronic Resources"]
+    - ["source_id:126", "facet_avail", "Online"]
     - ["source_id:141", "format", "Video"]
     - ["source_id:141", "format_de15", "Video"]
     - ["source_id:162", "format", "ElectronicArticle"]
@@ -226,7 +224,9 @@ all-records:
 min-ratio:
     - ["source_id:49", "facet_avail", "Free", 0.8]
     - ["source_id:55", "facet_avail", "Free", 2.2]
+    - ["source_id:89", "facet_avail", "Free", 0.14]
     - ["source_id:105", "facet_avail", "Free", 0.5]
+    - ["source_id:126", "facet_avail", "Free", 30.0]
 # Sources indexed in UBL-main
 #     - ["source_id:39", "institution", "DE-15-FID", 5.0]
 #     - ["source_id:39", "institution", "DE-15", 100.0]
