@@ -31,7 +31,7 @@
 #
 #   $ span-amsl-git.sh https://example.amsl.technology /var/somerepo
 #
-set -e -o pipefail
+set -e -u -o pipefail
 
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 AMSL-API-URL WORK-TREE [GIT-DIR]"
