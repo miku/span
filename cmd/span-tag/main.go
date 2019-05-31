@@ -45,6 +45,7 @@ var (
 	size                 = flag.Int("b", 20000, "batch size")
 	numWorkers           = flag.Int("w", runtime.NumCPU(), "number of workers")
 	cpuProfile           = flag.String("cpuprofile", "", "write cpu profile to file")
+	memProfile           = flag.String("memprofile", "", "write heap profile to file (go tool pprof -png --alloc_objects program mem.pprof > mem.png)")
 	unfreeze             = flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
 	verbose              = flag.Bool("verbose", false, "verbose output")
 	server               = flag.String("server", "", "if not empty, query SOLR to deduplicate on-the-fly")
@@ -275,5 +276,16 @@ func main() {
 
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
+	}
+	if *memProfile != "" {
+		f, err := os.Create(*memProfile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer f.Close()
+		runtime.GC()
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal(err)
+		}
 	}
 }

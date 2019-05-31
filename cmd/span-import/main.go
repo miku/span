@@ -48,6 +48,7 @@ var (
 	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
 	showVersion = flag.Bool("v", false, "prints current program version")
 	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to file")
+	memProfile  = flag.String("memprofile", "", "write heap profile to file (go tool pprof -png --alloc_objects program mem.pprof > mem.png)")
 	logfile     = flag.String("logfile", "", "path to logfile to append to, otherwise stderr")
 )
 
@@ -281,5 +282,16 @@ func main() {
 			log.Fatalf("input format required")
 		}
 		log.Fatalf("unknown format: %s", *name)
+	}
+	if *memProfile != "" {
+		f, err := os.Create(*memProfile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer f.Close()
+		runtime.GC()
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal(err)
+		}
 	}
 }

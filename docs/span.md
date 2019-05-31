@@ -77,6 +77,9 @@ OPTIONS
 `-cpuprofile` *pprof-file*
   Profiling. `span-import`, `span-tag`, `span-crossref-snapshot` only.
 
+`-memprofile` *pprof-file*
+  Profiling. `span-import`, `span-tag`, `span-export` only.
+
 `-f` *file*
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
 

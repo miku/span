@@ -19,6 +19,17 @@ import (
 	"github.com/miku/span/parallel"
 )
 
+var (
+	showVersion    = flag.Bool("v", false, "prints current program version")
+	size           = flag.Int("b", 20000, "batch size")
+	numWorkers     = flag.Int("w", runtime.NumCPU(), "number of workers")
+	cpuprofile     = flag.String("cpuprofile", "", "write cpu profile to file")
+	memProfile     = flag.String("memprofile", "", "write heap profile to file (go tool pprof -png --alloc_objects program mem.pprof > mem.png)")
+	format         = flag.String("o", "solr5vu3", "output format")
+	listFormats    = flag.Bool("list", false, "list output formats")
+	withFullrecord = flag.Bool("with-fullrecord", false, "populate fullrecord field with originating intermediate schema record")
+)
+
 // Exporters holds available export formats
 var Exporters = map[string]func() finc.Exporter{
 	"solr5vu3": func() finc.Exporter { return new(finc.Solr5Vufind3) },
@@ -26,13 +37,6 @@ var Exporters = map[string]func() finc.Exporter{
 }
 
 func main() {
-	showVersion := flag.Bool("v", false, "prints current program version")
-	size := flag.Int("b", 20000, "batch size")
-	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	format := flag.String("o", "solr5vu3", "output format")
-	listFormats := flag.Bool("list", false, "list output formats")
-	withFullrecord := flag.Bool("with-fullrecord", false, "populate fullrecord field with originating intermediate schema record")
 
 	flag.Parse()
 
@@ -114,5 +118,16 @@ func main() {
 
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
+	}
+	if *memProfile != "" {
+		f, err := os.Create(*memProfile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer f.Close()
+		runtime.GC()
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
