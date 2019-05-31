@@ -14,19 +14,21 @@ options=('!strip' '!emptydirs')
 conflicts=("${pkgname}-bin")
 replaces=("${pkgname}-bin")
 source=("${url}/archive/v${pkgver}.tar.gz")
-sha256sums=('1de9632a93128b8490ffd463443c2d73d2f3bb92884f86701867c2562c8f18fb')
+sha256sums=('89241cfa57200cce5dde53741b77be4147b834fef6092e025ae3ddcb9098420e')
 _gourl='github.com/miku/span/cmd/...'
 
 prepare() {
+  # TODO(miku): GOPATH is not really required any more. We use it to isolate the build for now.
   export GOPATH="${srcdir}/go"
   rm -rf "$GOPATH/src/github.com/miku/span"
   mkdir -p "$GOPATH/src/github.com/miku"
   mv "${srcdir}/${pkgname}-${pkgver}" "$GOPATH/src/github.com/miku/span"
-  cd "$GOPATH/src/github.com/miku/span" && make assets && go get ./... && make clean assets all
+  (cd "$GOPATH/src/github.com/miku/span" && GO111MODULE=on make assets && GO111MODULE=on go get ./... && GO111MODULE=on make clean assets all)
 }
 
 package() {
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-amsl-discovery" "${pkgdir}/usr/bin/${pkgname}-amsl-discovery"
+  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/cmd/${pkgname}-amsl-git.sh" "${pkgdir}/usr/bin/${pkgname}-amsl-git.sh"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-check" "${pkgdir}/usr/bin/${pkgname}-check"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-compare" "${pkgdir}/usr/bin/${pkgname}-compare"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-crossref-snapshot" "${pkgdir}/usr/bin/${pkgname}-crossref-snapshot"
