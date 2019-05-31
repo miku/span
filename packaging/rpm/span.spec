@@ -39,6 +39,7 @@ install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/sbin
+install -m 755 cmd/span-amsl-git.sh $RPM_BUILD_ROOT/usr/sbin
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
@@ -59,11 +60,14 @@ rm -rf %{_topdir}/BUILD/%{name}
 %files
 %defattr(-,root,root)
 
+/usr/lib/systemd/system/span-webhookd.service
+/usr/local/share/man/man1/span.1
 /usr/sbin/span-amsl-discovery
+/usr/sbin/span-amsl-git.sh
 /usr/sbin/span-check
 /usr/sbin/span-compare
-/usr/sbin/span-crossref-snapshot
 /usr/sbin/span-crossref-members
+/usr/sbin/span-crossref-snapshot
 /usr/sbin/span-export
 /usr/sbin/span-freeze
 /usr/sbin/span-hcov
@@ -76,8 +80,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-tag
 /usr/sbin/span-update-labels
 /usr/sbin/span-webhookd
-/usr/local/share/man/man1/span.1
-/usr/lib/systemd/system/span-webhookd.service
 
 %attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
