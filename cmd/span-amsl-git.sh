@@ -33,7 +33,7 @@
 #
 # TODO: only commit plain text, formatted JSON, unzipped holdings
 #
-set -e -u -o pipefail
+set -u -o pipefail
 
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 AMSL-API-URL WORK-TREE [GIT-DIR]"
