@@ -31,6 +31,8 @@
 #
 #   $ span-amsl-git.sh https://example.amsl.technology /var/somerepo
 #
+# TODO: only commit plain text, formatted JSON, unzipped holdings
+#
 set -e -u -o pipefail
 
 if [ "$#" -lt 2 ]; then
@@ -44,7 +46,7 @@ GIT_DIR=${3:-$WORK_TREE/.git}
 
 echo >&2 "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
 
-for req in curl jq span-amsl-discovery; do
+for req in curl jq unzip zipinfo span-amsl-discovery; do
     command -v $req >/dev/null 2>&1 || {
         echo >&2 "$req required"
         exit 1
@@ -69,22 +71,43 @@ done
 # Fetch combined API as well.
 span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . >"$WORK_TREE/discovery.json"
 
+# A place for holdings files.
+mkdir -p "$WORK_TREE/h/"
+
 # Fetch holding files, assume that an URI looks like
 # http://amsl.technology/discovery/metadata-usage/Dokument/KBART_FREEJOURNALS,
 # we utilize the unique base names, e.g. KBART_FREEJOURNALS. Note: Files may or
 # may not be compressed, text would be nicer to diff.
 if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
-    for uri in $(cat "$WORK_TREE/holdingsfiles.json" | jq -r '.[].DokumentURI' | sort -u); do
+    for uri in $(jq -r '.[].DokumentURI' <"$WORK_TREE/holdingsfiles.json" | sort -u); do
         if [ -z "$uri" ]; then
             continue
         fi
-        name=$(basename $uri)
+        name=$(basename "$uri")
         if [ -z "$name" ]; then
             continue
         fi
+
         link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
-        mkdir -p "$WORK_TREE/h/"
-        curl -s --fail "$link" >"$WORK_TREE/h/$name.tsv"
+        target="$WORK_TREE/h/$name.tsv"
+        tmp="$target.tmp"
+
+        curl -s --fail "$link" >"$tmp"
+
+        # Test if zip, non-zip might fail with 9.
+        if unzip -z "$tmp" /dev/null 2>&1; then
+            # Fail, if there more than one file in the zip.
+            filecount=$(zipinfo -t "$tmp" /dev/null 2>&1 | awk '{print $1}')
+            if [[ "$filecount" -ne 1 ]]; then
+                echo "expected single file in zip $tmp, got $filecount"
+                exit 1
+            else
+                unzip -p "$tmp" >"$target" && rm -f "$tmp"
+            fi
+        else
+            # Assume already plain text.
+            mv "$tmp" "$target"
+        fi
     done
 fi
 
