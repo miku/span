@@ -27,11 +27,9 @@
 #
 #   $ span-amsl-git.sh AMSL-API-URL WORK-TREE [GIT-DIR]
 #
-# Example:
+# Example (the git repo must exist, but can be empty):
 #
-#   $ span-amsl-git.sh https://example.amsl.technology /var/somerepo
-#
-# TODO: only commit plain text, formatted JSON, unzipped holdings
+#   $ span-amsl-git.sh https://example.amsl.technology /var/some-git-repo
 #
 set -u -o pipefail
 
@@ -44,6 +42,10 @@ AMSL_API_URL=$1
 WORK_TREE=$2
 GIT_DIR=${3:-$WORK_TREE/.git}
 
+# A separate dir for holdings files.
+HOLDINGSFILES_DIR="$WORK_TREE/h"
+mkdir -p "$HOLDINGSFILES_DIR"
+
 echo >&2 "using: $AMSL_API_URL $WORK_TREE $GIT_DIR"
 
 for req in curl jq unzip zipinfo span-amsl-discovery; do
@@ -53,15 +55,12 @@ for req in curl jq unzip zipinfo span-amsl-discovery; do
     }
 done
 
-if [ ! -d "$WORK_TREE" ]; then
-    echo "$WORK_TREE is not a directory"
-    exit 1
-fi
-
-if [ ! -d "$GIT_DIR" ]; then
-    echo "$GIT_DIR not found or not a directory"
-    exit 1
-fi
+for dir in "$WORK_TREE $GIT_DIR $HOLDINGSFILES_DIR"; do
+    if [ ! -d "$dir" ]; then
+        echo "$dir is not a directory"
+        exit 1
+    fi
+done
 
 # Fetch smaller APIs separately.
 for api in metadata_usage holdings_file_concat holdingsfiles contentfiles; do
@@ -70,9 +69,6 @@ done
 
 # Fetch combined API as well.
 span-amsl-discovery -live "$AMSL_API_URL" | jq -r --sort-keys . >"$WORK_TREE/discovery.json"
-
-# A place for holdings files.
-mkdir -p "$WORK_TREE/h/"
 
 # Fetch holding files, assume that an URI looks like
 # http://amsl.technology/discovery/metadata-usage/Dokument/KBART_FREEJOURNALS,
@@ -83,13 +79,14 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         if [ -z "$uri" ]; then
             continue
         fi
+
         name=$(basename "$uri")
         if [ -z "$name" ]; then
             continue
         fi
 
         link="$AMSL_API_URL/OntoWiki/files/get?setResource=$uri"
-        target="$WORK_TREE/h/$name.tsv"
+        target="$HOLDINGSFILES_DIR/$name.tsv"
         tmp="$target.tmp"
 
         curl -s --fail "$link" >"$tmp"
@@ -97,7 +94,7 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         # Test if zip, non-zip might fail with 9.
         if unzip -z "$tmp" >/dev/null 2>&1; then
             filecount=$(zipinfo -t "$tmp" | awk '{print $1}')
-            if [[ $filecount -ne 1 ]]; then
+            if [[ "$filecount" -ne 1 ]]; then
                 echo "expected single file in zip $tmp, got $filecount"
                 exit 1
             else
