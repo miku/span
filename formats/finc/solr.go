@@ -146,7 +146,9 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	var sanitized string
 	switch {
-	case is.BookTitle != "":
+	// refs #13024, book title shall not shadow article title (if both are
+	// given, keep the article title).
+	case is.BookTitle != "" && is.ArticleTitle == "":
 		sanitized = sanitize.HTML(is.BookTitle)
 	default:
 		sanitized = sanitize.HTML(is.ArticleTitle)
