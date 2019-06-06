@@ -55,7 +55,7 @@ for req in curl jq unzip zipinfo span-amsl-discovery; do
     }
 done
 
-for dir in "$WORK_TREE $GIT_DIR $HOLDINGSFILES_DIR"; do
+for dir in $WORK_TREE $GIT_DIR $HOLDINGSFILES_DIR; do
     if [ ! -d "$dir" ]; then
         echo "$dir is not a directory"
         exit 1
