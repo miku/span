@@ -17,76 +17,42 @@ import (
 // bookTitlePattern for extracting book title from dc.source.
 var bookTitlePattern = regexp.MustCompile(`([^:]*):([^\(]*)`)
 
-// Record was generated 2018-05-11 14:30:28 by tir on sol.
+// Record was generated 2019-06-06 16:38:16 by tir on sol.
 type Record struct {
 	XMLName xml.Name `xml:"Record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
-		Text       string `xml:",chardata"`
-		Status     string `xml:"status,attr"`
-		Identifier struct {
-			Text string `xml:",chardata"` // oai:www.genderopen.de:255...
-		} `xml:"identifier"`
-		Datestamp struct {
-			Text string `xml:",chardata"` // 2017-11-30T13:54:17Z, 201...
-		} `xml:"datestamp"`
-		SetSpec []struct {
-			Text string `xml:",chardata"` // com_13579_1, col_13579_3,...
-		} `xml:"setSpec"`
+		Text       string   `xml:",chardata"`
+		Status     string   `xml:"status,attr"`
+		Identifier string   `xml:"identifier"` // oai:www.genderopen.de:255...
+		Datestamp  string   `xml:"datestamp"`  // 2017-11-30T13:54:17Z, 201...
+		SetSpec    []string `xml:"setSpec"`    // com_25595_1, col_25595_3,...
 	} `xml:"header"`
 	Metadata struct {
 		Text string `xml:",chardata"`
 		Dc   struct {
-			Text           string `xml:",chardata"`
-			OaiDc          string `xml:"oai_dc,attr"`
-			Doc            string `xml:"doc,attr"`
-			Xsi            string `xml:"xsi,attr"`
-			Dc             string `xml:"dc,attr"`
-			SchemaLocation string `xml:"schemaLocation,attr"`
-			Title          struct {
-				Text string `xml:",chardata"` // Ausweitung der Geschlecht...
-			} `xml:"title"`
-			Creator []struct {
-				Text string `xml:",chardata"` // Brunner, Claudia, Döllin...
-			} `xml:"creator"`
-			Contributor []struct {
-				Text string `xml:",chardata"` // Lakitsch, Maximilian, Ste...
-			} `xml:"contributor"`
-			Subject []struct {
-				Text string `xml:",chardata"` // Geschlecht, Krieg, Gerech...
-			} `xml:"subject"`
-			Date struct {
-				Text string `xml:",chardata"` // 2015, 2004, 2016, 2007, 2...
-			} `xml:"date"`
-			Type []struct {
-				Text string `xml:",chardata"` // doc-type:bookPart, Text, ...
-			} `xml:"type"`
-			Identifier []struct {
-				Text string `xml:",chardata"` // urn:ISBN:978-3-643-50677-...
-			} `xml:"identifier"`
-			Language struct {
-				Text string `xml:",chardata"` // ger, ger, ger, ger, ger, ...
-			} `xml:"language"`
-			Rights []struct {
-				Text string `xml:",chardata"` // https://creativecommons.o...
-			} `xml:"rights"`
-			Format struct {
-				Text string `xml:",chardata"` // application/pdf, applicat...
-			} `xml:"format"`
-			Publisher []struct {
-				Text string `xml:",chardata"` // LIT, Wien, VSA-Verlag, Ha...
-			} `xml:"publisher"`
-			Source struct {
-				Text string `xml:",chardata"` // Lakitsch, Maximilian; Ste...
-			} `xml:"source"`
-			Description []struct {
-				Text string `xml:",chardata"` // Nachdem kosmetische Genit...
-			} `xml:"description"`
+			Text           string   `xml:",chardata"`
+			OaiDc          string   `xml:"oai_dc,attr"`
+			Doc            string   `xml:"doc,attr"`
+			Xsi            string   `xml:"xsi,attr"`
+			Dc             string   `xml:"dc,attr"`
+			SchemaLocation string   `xml:"schemaLocation,attr"`
+			Title          string   `xml:"title"`       // Ausweitung der Geschlecht...
+			Creator        []string `xml:"creator"`     // Brunner, Claudia, Döllin...
+			Contributor    []string `xml:"contributor"` // Lakitsch, Maximilian, Ste...
+			Subject        []string `xml:"subject"`     // Geschlecht, Krieg, Gerech...
+			Date           string   `xml:"date"`        // 2015, 2004, 2016, 2007, 2...
+			Type           []string `xml:"type"`        // info:eu-repo/semantics/bo...
+			Identifier     []string `xml:"identifier"`  // urn:ISBN:978-3-643-50677-...
+			Language       string   `xml:"language"`    // ger
+			Rights         []string `xml:"rights"`      // https://creativecommons.o...
+			Format         string   `xml:"format"`      // application/pdf
+			Publisher      []string `xml:"publisher"`   // LIT, Wien, VSA-Verlag, Ha...
+			Source         string   `xml:"source"`      // Lakitsch, Maximilian; Ste...
+			Description    []string `xml:"description"` // Nachdem kosmetische Genit...
 		} `xml:"dc"`
 	} `xml:"metadata"`
-	About struct {
-		Text string `xml:",chardata"`
-	} `xml:"about"`
+	About string `xml:"about"`
 }
 
 // BookTitle parses book title out of a citation string. Input may be "Knapp,
@@ -95,7 +61,7 @@ type Record struct {
 // Dampfboot, 2003), 73-100", https://play.golang.org/p/LApV7V_Ogz5. Fallback
 // to original string, refs #13024.
 func (r *Record) BookTitle() string {
-	s := strings.Replace(r.Metadata.Dc.Source.Text, "\n", " ", -2)
+	s := strings.Replace(r.Metadata.Dc.Source, "\n", " ", -2)
 	matches := bookTitlePattern.FindStringSubmatch(s)
 	if len(matches) == 3 {
 		return strings.TrimSpace(matches[2])
@@ -130,50 +96,50 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	output.SourceID = "162"
-	encodedRecordID := base64.RawURLEncoding.EncodeToString([]byte(record.Header.Identifier.Text))
+	encodedRecordID := base64.RawURLEncoding.EncodeToString([]byte(record.Header.Identifier))
 	output.RecordID = encodedRecordID
 	output.ID = fmt.Sprintf("ai-%s-%s", output.SourceID, output.RecordID)
 	output.MegaCollections = append(output.MegaCollections, "Gender Open")
 	output.Genre = "article"
 	output.RefType = "EJOUR"
 	output.Format = "ElectronicArticle"
-	output.Languages = []string{record.Metadata.Dc.Language.Text}
+	output.Languages = []string{record.Metadata.Dc.Language}
 
-	output.ArticleTitle = record.Metadata.Dc.Title.Text
+	output.ArticleTitle = record.Metadata.Dc.Title
 
 	for _, v := range record.Metadata.Dc.Creator {
-		output.Authors = append(output.Authors, finc.Author{Name: v.Text})
+		output.Authors = append(output.Authors, finc.Author{Name: v})
 	}
 	for _, v := range record.Metadata.Dc.Identifier {
-		if strings.HasPrefix(v.Text, "http") {
-			output.URL = append(output.URL, v.Text)
+		if strings.HasPrefix(v, "http") {
+			output.URL = append(output.URL, v)
 		}
-		if strings.HasPrefix(v.Text, "urn:ISSN:") {
-			output.ISSN = append(output.ISSN, strings.Replace(v.Text, "urn:ISSN:", "", 1))
+		if strings.HasPrefix(v, "urn:ISSN:") {
+			output.ISSN = append(output.ISSN, strings.Replace(v, "urn:ISSN:", "", 1))
 		}
-		if strings.HasPrefix(v.Text, "http://dx.doi.org/") {
-			output.DOI = strings.Replace(v.Text, "http://dx.doi.org/", "", -1)
+		if strings.HasPrefix(v, "http://dx.doi.org/") {
+			output.DOI = strings.Replace(v, "http://dx.doi.org/", "", -1)
 		}
 	}
 
 	// Article from books, articles from journals.
 	if stringsContainsAny(output.ArticleTitle, []string{"zeitschrift", "journal"}) || len(output.ISSN) > 0 {
-		output.JournalTitle = record.Metadata.Dc.Source.Text
+		output.JournalTitle = record.Metadata.Dc.Source
 	} else {
 		output.BookTitle = record.BookTitle()
 	}
 	for _, p := range record.Metadata.Dc.Publisher {
-		output.Publishers = append(output.Publishers, p.Text)
+		output.Publishers = append(output.Publishers, p)
 	}
 
-	if record.Metadata.Dc.Date.Text == "" {
+	if record.Metadata.Dc.Date == "" {
 		return output, span.Skip{Reason: "empty date"}
 	}
-	if len(record.Metadata.Dc.Date.Text) < 4 {
+	if len(record.Metadata.Dc.Date) < 4 {
 		return output, span.Skip{Reason: "short date"}
 	}
-	if record.Metadata.Dc.Date.Text != "" {
-		s := record.Metadata.Dc.Date.Text[:4]
+	if record.Metadata.Dc.Date != "" {
+		s := record.Metadata.Dc.Date[:4] // XXX: Check.
 		date, err := time.Parse("2006", s)
 		if err != nil {
 			return output, err
@@ -183,9 +149,9 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	for _, s := range record.Metadata.Dc.Subject {
-		output.Subjects = append(output.Subjects, s.Text)
+		output.Subjects = append(output.Subjects, s)
 	}
-	start, end, total := parsePages(record.Metadata.Dc.Source.Text)
+	start, end, total := parsePages(record.Metadata.Dc.Source)
 	output.StartPage = start
 	output.EndPage = end
 	output.PageCount = total
