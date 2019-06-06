@@ -107,7 +107,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 	}
 	// We could search for the DOI directly, e.g. in url field, but currently
 	// the url field in VuFind is not indexed (https://is.gd/zEBoEx).
-	link := fmt.Sprintf(`%s/select?wt=json&df=allfields&q="url:https://doi.org/%s"`, *server, url.QueryEscape(doi))
+	link := fmt.Sprintf(`%s/select?df=allfields&wt=json&q="%s"`, *server, url.QueryEscape(doi))
 	if *verbose {
 		log.Printf("[%s] fetching: %s", is.ID, link)
 	}
