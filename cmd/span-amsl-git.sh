@@ -95,10 +95,9 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         curl -s --fail "$link" >"$tmp"
 
         # Test if zip, non-zip might fail with 9.
-        if unzip -z "$tmp" /dev/null 2>&1; then
-            # Fail, if there more than one file in the zip.
-            filecount=$(zipinfo -t "$tmp" /dev/null 2>&1 | awk '{print $1}')
-            if [[ "$filecount" -ne 1 ]]; then
+        if unzip -z "$tmp" >/dev/null 2>&1; then
+            filecount=$(zipinfo -t "$tmp" | awk '{print $1}')
+            if [[ $filecount -ne 1 ]]; then
                 echo "expected single file in zip $tmp, got $filecount"
                 exit 1
             else
