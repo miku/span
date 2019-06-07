@@ -94,7 +94,7 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
         # Test if zip, non-zip might fail with 9.
         if unzip -z "$tmp" >/dev/null 2>&1; then
             filecount=$(zipinfo -t "$tmp" | awk '{print $1}')
-            if [[ "$filecount" -ne 1 ]]; then
+            if [ "$filecount" -ne 1 ]; then
                 echo "expected single file in zip $tmp, got $filecount"
                 exit 1
             else
@@ -108,7 +108,7 @@ if [ -f "$WORK_TREE/holdingsfiles.json" ]; then
 fi
 
 # Commit, and push to a remote named origin.
-if [[ $(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain) ]]; then
+if [ "$(git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" status --porcelain)" != "" ]; then
     date >"$WORK_TREE/.date"
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" add --all
     git --git-dir "$GIT_DIR" --work-tree "$WORK_TREE" commit -m "auto-commit from $(hostname) [$$]"
