@@ -38,7 +38,7 @@ import (
 )
 
 // SourceNames generated from wiki via https://git.io/f4Qyi.
-// curl -v "https://projekte.ub.uni-leipzig.de/projects/metadaten-quellen/wiki/SIDs.xml?key=s0mek3y" | xmlcutty -path /wiki_page/text | cut -f2,4 -d '|' | awk -F'|' '{print "\"" $1 ": \"" $2 "\","}'
+// curl -v "https://projekte.ub.uni-leipzig.de/projects/metadaten-quellen/wiki/SIDs.xml?key=s0mek3y" | xmlcutty -path /wiki_page/text | cut -f2,4 -d '|' | awk -F'|' '{print "\"" $1 "\": \"" $2 "\","}'
 var SourceNames = map[string]string{
 	"0":   "BSZ (SWB)",
 	"1":   "Project Gutenberg",
