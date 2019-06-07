@@ -1,18 +1,22 @@
-// WIP: move siskin:bin/indexcompare into this tool, factor out solr stuff into
-// solrutil.go.
+// span-compare renders a table with ISIL/SID counts of two indices side by
+// side. It can parse the hidden whatislive endpoint to find live, non-live
+// pairs.
 //
-// $ span-compare -a 10.1.1.7:8085/solr/biblio -b 10.1.1.15:8085/solr/biblio
-// DE-1156    13   Diss Online                         0         219277    219277
-// DE-D117    13   Diss Online                         0         219277    219277
-// DE-L152    13   Diss Online                         0         219277    219277
-// DE-14      49   Crossref                            35417291  36671073  1253782
-// DE-14      48   GBI Genios Wiso                     12712115  174470    -12537645
-// DE-14      85   Elsevier Journals (Sachsen Profil)  1359818   1397962   38144
-// DE-14      13   Diss Online                         0         219277    219277
-// DE-D275    49   Crossref                            0         32177218  32177218
-// DE-D275    48   GBI Genios Wiso                     10501192  2050930   -8450262
-// DE-Gla1    49   Crossref                            31640516  31467567  -172949
-// ...
+//   $ span-compare -a 10.1.1.7:8085/solr/biblio -b 10.1.1.15:8085/solr/biblio
+//   DE-1156    13   Diss Online                         0         219277    219277
+//   DE-D117    13   Diss Online                         0         219277    219277
+//   DE-L152    13   Diss Online                         0         219277    219277
+//   DE-14      49   Crossref                            35417291  36671073  1253782
+//   DE-14      48   GBI Genios Wiso                     12712115  174470    -12537645
+//   DE-14      85   Elsevier Journals (Sachsen Profil)  1359818   1397962   38144
+//   DE-14      13   Diss Online                         0         219277    219277
+//   DE-D275    49   Crossref                            0         32177218  32177218
+//   DE-D275    48   GBI Genios Wiso                     10501192  2050930   -8450262
+//   DE-Gla1    49   Crossref                            31640516  31467567  -172949
+//   ...
+//
+//   $ span-compare -e -t
+//   ...
 package main
 
 import (
