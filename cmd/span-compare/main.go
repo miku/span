@@ -213,6 +213,8 @@ var SourceNames = map[string]string{
 	"172": "OER aus OPAL (UB Freiberg)",
 	"173": "Wolfenbütteler Bibliographie zur Geschichte des Buchwesens",
 	"174": "Zenodo",
+	"175": "Libris-Katalog der schwedischen Nationalbibliothek",
+	"176": "Fennica-Katalog der finnischen Nationalbibliothek",
 	"200": "finc TEST",
 	"201": "Perinorm",
 }
