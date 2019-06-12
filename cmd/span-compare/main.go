@@ -15,6 +15,8 @@
 //   DE-Gla1    49   Crossref                            31640516  31467567  -172949
 //   ...
 //
+// Use hidden whatislive endpoint and render textile (for redmine):
+//
 //   $ span-compare -e -t
 //   ...
 package main
@@ -37,7 +39,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// SourceNames generated from wiki via https://git.io/f4Qyi.
+// SourceNames generated from wiki (see also https://git.io/f4Qyi).
 // curl -v "https://projekte.ub.uni-leipzig.de/projects/metadaten-quellen/wiki/SIDs.xml?key=s0mek3y" | xmlcutty -path /wiki_page/text | cut -f2,4 -d '|' | awk -F'|' '{print "\"" $1 "\": \"" $2 "\","}'
 var SourceNames = map[string]string{
 	"0":   "BSZ (SWB)",
@@ -215,6 +217,7 @@ var SourceNames = map[string]string{
 	"174": "Zenodo",
 	"175": "Libris-Katalog der schwedischen Nationalbibliothek",
 	"176": "Fennica-Katalog der finnischen Nationalbibliothek",
+	"177": "DataCite",
 	"200": "finc TEST",
 	"201": "Perinorm",
 }
