@@ -23,6 +23,7 @@ package genios
 
 import (
 	"encoding/base64"
+	"encoding/xml"
 	"fmt"
 	"regexp"
 	"sort"
@@ -56,25 +57,43 @@ const (
 	maxTitleLength  = 2048
 )
 
-// Document represents a Genios document.
+// Document was generated 2019-06-12 19:13:21 by tir on hayiti, adjusted.
 type Document struct {
-	ID               string   `xml:"ID,attr"`
-	DB               string   `xml:"DB,attr"`
-	IDNAME           string   `xml:"IDNAME,attr"`
-	ISSN             string   `xml:"ISSN"`
-	Source           string   `xml:"Source"`
-	PublicationTitle string   `xml:"Publication-Title"`
-	Title            string   `xml:"Title"`
-	Year             string   `xml:"Year"`
-	RawDate          string   `xml:"Date"`
-	Volume           string   `xml:"Volume"`
-	Issue            string   `xml:"Issue"`
-	RawAuthors       []string `xml:"Authors>Author"`
-	Language         string   `xml:"Language"`
-	Abstract         string   `xml:"Abstract"`
-	Descriptors      string   `xml:"Descriptors>Descriptor"`
+	XMLName     xml.Name `xml:"Document"`
+	Chardata    string   `xml:",chardata"`
+	ID          string   `xml:"ID,attr"`
+	IDNAME      string   `xml:"IDNAME,attr"`
+	DB          string   `xml:"DB,attr"`
+	Abstract    string   `xml:"Abstract"` // This interview deals with...
+	RawAuthors  []string `xml:"Authors>Author"`
+	Descriptors string   `xml:"Descriptors>Descriptor"`
+	RawDate     string   `xml:"Date"`         // 20050101, 20050501
+	Issue       string   `xml:"Issue"`        // 1, 2
+	ISSN        string   `xml:"ISSN"`         // 1861-1303
+	ISBN        string   `xml:"ISBN"`         // n.n.
+	Subtitle    string   `xml:"Subtitle"`     // n.n.
+	SeriesTitle string   `xml:"Series-Title"` // n.n.
+	Editors     struct {
+		Text   string `xml:",chardata"`
+		Editor string `xml:"Editor"` // n.n.
+	} `xml:"Editors"`
+	Edition          string   `xml:"Edition"`           // n.n.
+	Language         string   `xml:"Language"`          // n.n.
+	Page             string   `xml:"Page"`              // 9, 43, 69, 87, 99, 121, 1...
+	PublicationTitle string   `xml:"Publication-Title"` // International Journal of ...
+	Source           string   `xml:"Source"`            // IJAR
+	Title            string   `xml:"Title"`             // "One sows the seed, but i...
 	Text             string   `xml:"Text"`
+	Volume           string   `xml:"Volume"`          // 1
+	Year             string   `xml:"Year"`            // 2005
+	Affiliation      string   `xml:"Affiliation"`     // n.n.
+	DOI              string   `xml:"DOI"`             // n.n.
+	PersistentLink   string   `xml:"Persistent_Link"` // https://www.wiso-net.de/d...
+	Publisher        string   `xml:"Publisher"`       // Rainer Hampp Verlag
+	Available        string   `xml:"available"`       // n.n.
+	Copyright        string   `xml:"Copyright"`
 	Modules          []string `xml:"Modules>Module"`
+	XPackage         string   `xml:"X-Package"` // fachzeitschriften
 }
 
 var (
@@ -123,6 +142,10 @@ func (doc Document) Date() (time.Time, error) {
 
 // SourceAndID will probably be a unique identifier. An ID alone might not be enough.
 func (doc Document) SourceAndID() string {
+	if link := strings.TrimSpace(doc.PersistentLink); link != "" {
+		return link
+	}
+	log.Printf("%s has no persistent link, falling back", doc.FincID)
 	return fmt.Sprintf("%s__%s", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
 }
 
