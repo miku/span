@@ -39,7 +39,6 @@ install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-amsl-git.sh $RPM_BUILD_ROOT/usr/sbin
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
@@ -63,7 +62,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/lib/systemd/system/span-webhookd.service
 /usr/local/share/man/man1/span.1
 /usr/sbin/span-amsl-discovery
-/usr/sbin/span-amsl-git.sh
 /usr/sbin/span-check
 /usr/sbin/span-compare
 /usr/sbin/span-crossref-members

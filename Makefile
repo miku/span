@@ -1,6 +1,5 @@
 SHELL = /bin/bash
 TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl-discovery span-crossref-members
-SHELL_TARGETS = cmd/span-amsl-git.sh
 PKGNAME = span
 
 .PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
@@ -52,7 +51,6 @@ cover:
 deb: all
 	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
 	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/sbin
-	cp $(SHELL_TARGETS) packaging/deb/$(PKGNAME)/usr/sbin
 	mkdir -p packaging/deb/$(PKGNAME)/usr/local/share/man/man1
 	cp docs/$(PKGNAME).1 packaging/deb/$(PKGNAME)/usr/local/share/man/man1
 	mkdir -p packaging/deb/$(PKGNAME)/usr/lib/systemd/system
@@ -64,7 +62,6 @@ rpm: all
 	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
 	cp ./packaging/rpm/$(PKGNAME).spec $(HOME)/rpmbuild/SPECS
 	cp $(TARGETS) $(HOME)/rpmbuild/BUILD
-	cp $(SHELL_TARGETS) $(HOME)/rpmbuild/BUILD
 	cp docs/$(PKGNAME).1 $(HOME)/rpmbuild/BUILD
 	cp packaging/span-webhookd.service $(HOME)/rpmbuild/BUILD
 	./packaging/rpm/buildrpm.sh $(PKGNAME)
