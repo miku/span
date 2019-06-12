@@ -142,15 +142,15 @@ func (doc Document) Date() (time.Time, error) {
 
 // SourceAndID will probably be a unique identifier. An ID alone might not be enough.
 func (doc Document) SourceAndID() string {
+	return fmt.Sprintf("%s__%s", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
+}
+
+// URL returns a constructed URL at the publishers site, refs #15177.
+func (doc Document) URL() string {
 	if link := strings.TrimSpace(doc.PersistentLink); link != "" {
 		return link
 	}
 	log.Printf("%s has no persistent link, falling back", doc.FincID)
-	return fmt.Sprintf("%s__%s", strings.TrimSpace(doc.Source), strings.TrimSpace(doc.ID))
-}
-
-// URL returns a constructed URL at the publishers site.
-func (doc Document) URL() string {
 	return fmt.Sprintf("https://www.wiso-net.de/document/%s", doc.SourceAndID())
 }
 
