@@ -13,6 +13,8 @@ metadata is used for normalizing various input formats.
 is easy to deploy and has concurrency support built into the language. A basic
 scatter-gather design allowed to process millions of records fast.
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+
 ## Installation
 
     $ go get github.com/miku/span/cmd/...
