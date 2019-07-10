@@ -7,6 +7,7 @@
 //
 // Additional rules: Ansigelung, sigeltest.
 //
+// * [ ] Allow for margins, 97% correct.
 package main
 
 import (
