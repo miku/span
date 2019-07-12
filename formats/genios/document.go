@@ -150,7 +150,7 @@ func (doc Document) URL() string {
 	if link := strings.TrimSpace(doc.PersistentLink); link != "" {
 		return link
 	}
-	log.Printf("%s has no persistent link, falling back", doc.FincID)
+	log.Printf("%s has no persistent link, falling back", doc.FincID())
 	return fmt.Sprintf("https://www.wiso-net.de/document/%s", doc.SourceAndID())
 }
 
