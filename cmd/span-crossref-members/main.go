@@ -119,7 +119,13 @@ func main() {
 
 		link := fmt.Sprintf("%s?%s", *base, v.Encode())
 
-		// Why: Because an HTTP 500 appeared.
+		// Why: Because an HTTP 500 appeared, which for some reason did not persist.
+		// ...
+		// 2019/07/12 16:39:27 http://api.crossref.org/members?offset=5280&rows=20
+		// 2019/07/12 16:39:28 request failed with HTTP 500
+		// 2019/07/12 16:39:30 http://api.crossref.org/members?offset=5280&rows=20
+		// 2019/07/12 16:39:31 done: 5280/13467
+		// ...
 		var (
 			retries int
 			resp    *http.Response
