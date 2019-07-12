@@ -86,13 +86,14 @@ type MembersResponse struct {
 }
 
 var (
-	offset  = flag.Int("offset", 0, "offset")
-	rows    = flag.Int("rows", 20, "rows to fetch per request")
-	base    = flag.String("base", "http://api.crossref.org/members", "base url")
-	sleep   = flag.Duration("sleep", 1*time.Second, "time to sleep between requests")
-	email   = flag.String("email", "", "optional email for api etiquette")
-	silent  = flag.Bool("q", false, "suppress logging output")
-	version = flag.Bool("version", false, "output version")
+	offset     = flag.Int("offset", 0, "offset")
+	rows       = flag.Int("rows", 20, "rows to fetch per request")
+	base       = flag.String("base", "http://api.crossref.org/members", "base url")
+	sleep      = flag.Duration("sleep", 1*time.Second, "time to sleep between requests")
+	email      = flag.String("email", "", "optional email for api etiquette")
+	silent     = flag.Bool("q", false, "suppress logging output")
+	version    = flag.Bool("version", false, "output version")
+	retryCount = flag.Int("retry", 3, "retry count on HTTP 500 and similar errors")
 )
 
 func main() {
@@ -117,14 +118,29 @@ func main() {
 		}
 
 		link := fmt.Sprintf("%s?%s", *base, v.Encode())
-		log.Println(link)
-		resp, err := http.Get(link)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode >= 400 {
-			log.Fatalf("got HTTP %d", resp.StatusCode)
+
+		// Why: Because an HTTP 500 appeared.
+		var (
+			retries int
+			resp    *http.Response
+			err     error
+		)
+		for {
+			if retries > *retryCount {
+				log.Fatal("retry count exceeded")
+			}
+			log.Println(link)
+			resp, err = http.Get(link)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode < 400 {
+				break
+			}
+			log.Printf("request failed with HTTP %d", resp.StatusCode)
+			time.Sleep(2 * time.Second)
+			retries++
 		}
 
 		tee := io.TeeReader(resp.Body, &buf)
