@@ -123,6 +123,9 @@ func main() {
 			log.Fatal(err)
 		}
 		defer resp.Body.Close()
+		if resp.StatusCode >= 400 {
+			log.Fatalf("got HTTP %d", resp.StatusCode)
+		}
 
 		tee := io.TeeReader(resp.Body, &buf)
 
@@ -130,6 +133,7 @@ func main() {
 		dec := json.NewDecoder(tee)
 		var mr MembersResponse
 		if err := dec.Decode(&mr); err != nil {
+			log.Printf("decode failed: %s", buf.String())
 			log.Fatal(err)
 		}
 		if mr.Status != "ok" {
