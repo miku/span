@@ -71,18 +71,24 @@ func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
 	}, nil
 }
 
+var (
+	showVersion     = flag.Bool("v", false, "prints current program version")
+	kbartFile       = flag.String("f", "", "path to a single KBART file")
+	freeContentFile = flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON file")
+	batchsize       = flag.Int("b", 5000, "batch size")
+	verbose         = flag.Bool("verbose", false, "extended output")
+	debug           = flag.Bool("debug", false, "debug output")
+)
+
 func main() {
-
-	var excludeSourceIdentifiersFlags xflag.Array
-	var openAccessSourceIdentifiersFlags xflag.Array
-
-	showVersion := flag.Bool("v", false, "prints current program version")
-	kbartFile := flag.String("f", "", "path to a single KBART file")
-	freeContentFile := flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON file")
-	batchsize := flag.Int("b", 5000, "batch size")
-	verbose := flag.Bool("verbose", false, "debug output")
-	flag.Var(&excludeSourceIdentifiersFlags, "xsid", "exclude a given SID from checks, x.oa will always be false (repeatable)")
-	flag.Var(&openAccessSourceIdentifiersFlags, "oasid", "always set x.oa true for a given sid (repeatable)")
+	var (
+		excludeSourceIdentifiersFlags    xflag.Array
+		openAccessSourceIdentifiersFlags xflag.Array
+	)
+	flag.Var(&excludeSourceIdentifiersFlags, "xsid",
+		"exclude a given SID from checks, x.oa will always be false (repeatable)")
+	flag.Var(&openAccessSourceIdentifiersFlags, "oasid",
+		"always set x.oa true for a given sid (repeatable)")
 
 	flag.Parse()
 
