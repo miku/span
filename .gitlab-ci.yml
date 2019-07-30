@@ -18,6 +18,8 @@ stages:
 
 unit_tests:
   stage: test
+  before_script:
+    - go get -u github.com/jteeuwen/go-bindata/...
   script:
     - make test
   tags:
