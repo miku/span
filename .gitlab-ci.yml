@@ -2,7 +2,8 @@
 
 # The first thing is to choose what Docker image will be used to run the CI.
 # Head to the Docker Hub to choose the right image for your project.
-image: golang:1.11.3
+
+image: golang:1.12.7
 
 cache:
   paths:
@@ -12,12 +13,6 @@ cache:
     - /go/src/google.golang.org
     - /go/src/gopkg.in
 
-before_script:
-  - mkdir -p /go/src/github.com/miku /go/src/_/builds
-  - cp -r $CI_PROJECT_DIR /go/src/gitlab.com/miku/span
-  - ln -s /go/src/github.com/miku /go/src/_/builds/miku
-  - make deps
-
 stages:
   - test
 
@@ -25,4 +20,5 @@ unit_tests:
   stage: test
   script:
     - make test
-
+  tags:
+    - docker
