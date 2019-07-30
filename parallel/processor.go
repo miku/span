@@ -82,26 +82,28 @@ type TransformerFunc func(lineno int64, b []byte) ([]byte, error)
 
 // Processor can process lines in parallel.
 type Processor struct {
-	BatchSize       int
-	RecordSeparator byte
-	NumWorkers      int
-	SkipEmptyLines  bool
-	r               io.Reader
-	w               io.Writer
-	f               TransformerFunc
+	BatchSize        int
+	RecordSeparator  byte
+	NumWorkers       int
+	SkipEmptyLines   bool
+	BatchMemoryLimit int64
+	r                io.Reader
+	w                io.Writer
+	f                TransformerFunc
 }
 
 // NewProcessor creates a new line processor, which reads lines from a reader,
 // applies a function and writes results back to a writer.
 func NewProcessor(r io.Reader, w io.Writer, f TransformerFunc) *Processor {
 	return &Processor{
-		BatchSize:       10000,
-		RecordSeparator: '\n',
-		NumWorkers:      runtime.NumCPU(),
-		SkipEmptyLines:  true,
-		r:               r,
-		w:               w,
-		f:               f,
+		BatchSize:        10000,
+		RecordSeparator:  '\n',
+		NumWorkers:       runtime.NumCPU(),
+		SkipEmptyLines:   true,
+		BatchMemoryLimit: 34359738368, // 32GB
+		r:                r,
+		w:                w,
+		f:                f,
 	}
 }
 
@@ -164,6 +166,7 @@ func (p *Processor) Run() error {
 	batch := NewBytesBatchCapacity(p.BatchSize)
 	br := bufio.NewReader(p.r)
 	var i int64
+	var batchBytes int64
 
 	for {
 		b, err := br.ReadBytes(p.RecordSeparator)
@@ -177,13 +180,15 @@ func (p *Processor) Run() error {
 			continue
 		}
 		batch.Add(Record{lineno: i, value: b})
-		if batch.Size() == p.BatchSize {
+		batchBytes += int64(len(b))
+		if batch.Size() == p.BatchSize || batchBytes > p.BatchMemoryLimit {
 			// To avoid checking on each loop, we only check for worker or write errors here.
 			if wErr != nil {
 				break
 			}
 			queue <- batch.Slice()
 			batch.Reset()
+			batchBytes = 0
 		}
 		i++
 	}

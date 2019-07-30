@@ -72,12 +72,13 @@ func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
 }
 
 var (
-	showVersion     = flag.Bool("v", false, "prints current program version")
-	kbartFile       = flag.String("f", "", "path to a single KBART file")
-	freeContentFile = flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON file")
-	batchsize       = flag.Int("b", 5000, "batch size")
-	verbose         = flag.Bool("verbose", false, "extended output")
-	debug           = flag.Bool("debug", false, "debug output")
+	showVersion      = flag.Bool("v", false, "prints current program version")
+	kbartFile        = flag.String("f", "", "path to a single KBART file")
+	freeContentFile  = flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON file")
+	batchsize        = flag.Int("b", 5000, "batch size")
+	verbose          = flag.Bool("verbose", false, "extended output")
+	debug            = flag.Bool("debug", false, "debug output")
+	batchMemoryLimit = flag.Int64("m", 209715200, "memory limit per batch")
 )
 
 func main() {
@@ -175,6 +176,7 @@ func main() {
 	})
 
 	p.BatchSize = *batchsize
+	p.BatchMemoryLimit = *batchMemoryLimit
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
