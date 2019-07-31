@@ -27,6 +27,7 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"log"
 	"runtime"
 	"sync"
 )
@@ -182,6 +183,9 @@ func (p *Processor) Run() error {
 		batch.Add(Record{lineno: i, value: b})
 		batchBytes += int64(len(b))
 		if batch.Size() == p.BatchSize || batchBytes > p.BatchMemoryLimit {
+			if batchBytes > p.BatchMemoryLimit {
+				log.Printf("trim batch to %d, exceeding memory limit %d", batch.Size(), batchBytes)
+			}
 			// To avoid checking on each loop, we only check for worker or write errors here.
 			if wErr != nil {
 				break
