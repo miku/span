@@ -19,7 +19,7 @@
 
 # solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
 # solr: "http://172.18.113.15:8085/solr/#/biblio"
-solr: "http://172.18.113.7:8085/solr/#/biblio"
+solr: "http://172.18.113.15:8085/solr/#/biblio"
 
 # solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
 # solr: "http://172.18.113.24:8080/solr/biblio/" # UBL-main Gesamtimport 2018-12
@@ -27,7 +27,7 @@ solr: "http://172.18.113.7:8085/solr/#/biblio"
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
 
-ticket: "15249"
+ticket: "15377"
 
 # If set to "fail" an empty result set will be marked as failure.
 # Otherwise a empty result set will - most of the time - not be considered a violation.
@@ -39,6 +39,7 @@ allowed-keys:
     - ["source_id:48", "language", "German", "English"]
     - ["source_id:49", "format", "ElectronicArticle", "ElectronicBookPart", "ElectronicProceeding", "ElectronicResourceRemoteAccess", "eBook", "ElectronicSerial", "ElectronicJournal"]
     - ["source_id:49", "format_de15", "Book, E-Book", "Article, E-Article", "Proceeding", "Electronic Resource (Remote Access)", "Journal, E-Journal"]
+    - ["source_id:49", "format_finc", "Book, E-Book", "Article, E-Article", "Proceeding", "Website", "Journal, E-Journal"]
     - ["source_id:49", "facet_avail", "Online", "Free"]
     - ["source_id:50", "language", "German", "English", "French", "Italian", "Spanish", "Chinese", "Russian", "Modern"]
     - ["source_id:50", "finc_class_facet", "not assigned", "Ethnologie (Volks- und Völkerkunde)", "Wirtschaftswissenschaften", "Medizin", "Pädagogik", "Rechtswissenschaft", "Allgemeines", "Philosophie"]
@@ -48,6 +49,7 @@ allowed-keys:
     - ["source_id:87", "finc_class_facet", "not assigned", "Philosophie", "Mathematik", "Technik"]
     - ["source_id:80", "format", "ElectronicArticle", "ElectronicIntegratingResource"]
     - ["source_id:80", "format_de15", "Article, E-Article", "Website"]
+    - ["source_id:80", "format_finc", "Article, E-Article", "Website"]
     - ["source_id:107", "finc_class_facet", "not assigned", "Medizin"]
     - ["source_id:141", "language", "German", "English"]
     - ["source_id:162", "language", "German", "English", "French", "Italian"]
@@ -66,37 +68,44 @@ all-records:
 # Sources indexed in UBl-ai
     - ["source_id:28", "format", "ElectronicArticle"]
     - ["source_id:28", "format_de15", "Article, E-Article"]
+    - ["source_id:28", "format_finc", "Article, E-Article"]
     - ["source_id:28", "facet_avail", "Online", "Free"]
     - ["source_id:28", "access_facet", "Electronic Resources"]
     - ["source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"]
     - ["source_id:28", "finc_class_facet", "not assigned"]
     - ["source_id:34", "format", "ElectronicThesis"]
     - ["source_id:34", "format_de15", "Thesis"]
+    - ["source_id:34", "format_finc", "Thesis"]
     - ["source_id:34", "facet_avail", "Online", "Free"]
     - ["source_id:34", "access_facet", "Electronic Resources"]
     - ["source_id:34", "mega_collection", "PQDT Open"]
     - ["source_id:48", "format", "ElectronicArticle"]
     - ["source_id:48", "format_de15", "Article, E-Article"]
+    - ["source_id:48", "format_finc", "Article, E-Article"]
     - ["source_id:48", "facet_avail", "Online"]
     - ["source_id:48", "access_facet", "Electronic Resources"]
     - ["source_id:49", "facet_avail", "Online"]
     - ["source_id:49", "access_facet", "Electronic Resources"]
     - ["source_id:50", "format", "ElectronicArticle"]
     - ["source_id:50", "format_de15", "Article, E-Article"]
+    - ["source_id:50", "format_finc", "Article, E-Article"]
     - ["source_id:50", "facet_avail", "Online"]
     - ["source_id:50", "access_facet", "Electronic Resources"]
     - ["source_id:50", "mega_collection", "DeGruyter SSH"]
     - ["source_id:53", "format", "ElectronicArticle"]
     - ["source_id:53", "format_de15", "Article, E-Article"]
+    - ["source_id:53", "format_finc", "Article, E-Article"]
     - ["source_id:53", "facet_avail", "Online"]
     - ["source_id:53", "access_facet", "Electronic Resources"]
     - ["source_id:53", "mega_collection", "CEEOL Central and Eastern European Online Library"]
     - ["source_id:55", "format", "ElectronicArticle"]
     - ["source_id:55", "format_de15", "Article, E-Article"]
+    - ["source_id:55", "format_finc", "Article, E-Article"]
     - ["source_id:55", "facet_avail", "Online"]
     - ["source_id:55", "access_facet", "Electronic Resources"]
     - ["source_id:60", "format", "ElectronicArticle"]
     - ["source_id:60", "format_de15", "Article, E-Article"]
+    - ["source_id:60", "format_finc", "Article, E-Article"]
     - ["source_id:60", "facet_avail", "Online"]
     - ["source_id:60", "access_facet", "Electronic Resources"]
     - ["source_id:60", "mega_collection", "Thieme E-Journals"]
@@ -107,6 +116,7 @@ all-records:
     - ["source_id:80", "mega_collection", "Datenbank Internetquellen"]
     - ["source_id:85", "format", "ElectronicArticle"]
     - ["source_id:85", "format_de15", "Article, E-Article"]
+    - ["source_id:85", "format_finc", "Article, E-Article"]
     - ["source_id:85", "facet_avail", "Online"]
     - ["source_id:85", "access_facet", "Electronic Resources"]
     - ["source_id:85", "language", "English"]
@@ -114,17 +124,20 @@ all-records:
     - ["source_id:85", "finc_class_facet", "not assigned"]
     - ["source_id:87", "format", "ElectronicArticle"]
     - ["source_id:87", "format_de15", "Article, E-Article"]
+    - ["source_id:87", "format_finc", "Article, E-Article"]
     - ["source_id:87", "facet_avail", "Online", "Free"]
     - ["source_id:87", "access_facet", "Electronic Resources"]
     - ["source_id:87", "language", "English"]
     - ["source_id:87", "mega_collection", "sid-87-col-intjcomm"]
     - ["source_id:89", "format", "ElectronicArticle"]
     - ["source_id:89", "format_de15", "Article, E-Article"]
+    - ["source_id:89", "format_finc", "Article, E-Article"]
     - ["source_id:89", "facet_avail", "Online"]
     - ["source_id:89", "access_facet", "Electronic Resources"]
     - ["source_id:89", "mega_collection", "IEEE Xplore Library"]
     - ["source_id:101", "format", "ElectronicArticle"]
     - ["source_id:101", "format_de15", "Article, E-Article"]
+    - ["source_id:101", "format_finc", "Article, E-Article"]
     - ["source_id:101", "facet_avail", "Online"]
     - ["source_id:101", "access_facet", "Electronic Resources"]
     - ["source_id:101", "mega_collection", "Kieler Beiträge zur Filmmusikforschung"]
@@ -132,6 +145,7 @@ all-records:
     - ["source_id:101", "language", "German"]
     - ["source_id:105", "format", "ElectronicArticle"]
     - ["source_id:105", "format_de15", "Article, E-Article"]
+    - ["source_id:105", "format_finc", "Article, E-Article"]
     - ["source_id:105", "facet_avail", "Online"]
     - ["source_id:105", "access_facet", "Electronic Resources"]
     - ["source_id:105", "mega_collection", "Springer Journals"]
@@ -142,8 +156,10 @@ all-records:
     - ["source_id:126", "facet_avail", "Online"]
     - ["source_id:141", "format", "Video"]
     - ["source_id:141", "format_de15", "Video"]
+    - ["source_id:141", "format_finc", "Video"]
     - ["source_id:162", "format", "ElectronicArticle"]
     - ["source_id:162", "format_de15", "Article, E-Article"]
+    - ["source_id:162", "format_finc", "Article, E-Article"]
     - ["source_id:162", "facet_avail", "Online", "Free"]
     - ["source_id:162", "access_facet", "Electronic Resources"]
     - ["source_id:162", "mega_collection", "Gender Open"]
