@@ -35,6 +35,7 @@ require (
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
 	github.com/miku/parallel v0.0.0-20190514155252-d289185a944b // indirect
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
