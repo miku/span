@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kennygrant/sanitize"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
@@ -47,6 +48,8 @@ var (
 		"2006-xx-x",
 		"2006-xx-xx",
 	}
+
+	policy = bluemonday.UGCPolicy()
 )
 
 // PubDate represents a publication date. Typical type values are ppub and epub.
@@ -117,7 +120,7 @@ type Article struct {
 				XMLName xml.Name `xml:"title-group"`
 				Title   struct {
 					XMLName xml.Name `xml:"article-title"`
-					Value   string   `xml:",chardata"`
+					Value   string   `xml:",innerxml"`
 				}
 				Subtitle struct {
 					XMLName xml.Name `xml:"subtitle"`
@@ -312,16 +315,16 @@ func (article *Article) CombinedTitle() string {
 	group := article.Front.Article.TitleGroup
 	if group.Title.Value != "" {
 		if group.Subtitle.Value != "" {
-			return strings.TrimSpace(fmt.Sprintf("%s : %s", group.Title.Value, group.Subtitle.Value))
+			return policy.Sanitize(strings.TrimSpace(fmt.Sprintf("%s : %s", group.Title.Value, group.Subtitle.Value)))
 		}
-		return strings.TrimSpace(group.Title.Value)
+		return policy.Sanitize(strings.TrimSpace(group.Title.Value))
 	}
 	if group.Subtitle.Value != "" {
-		return strings.TrimSpace(group.Subtitle.Value)
+		return policy.Sanitize(strings.TrimSpace(group.Subtitle.Value))
 	}
 	for _, product := range article.Front.Article.Products {
 		if product.Source.Value != "" {
-			return strings.TrimSpace(sanitize.HTML(product.Source.Value))
+			return policy.Sanitize(strings.TrimSpace(sanitize.HTML(product.Source.Value)))
 		}
 	}
 	return ""
