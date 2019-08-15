@@ -38,7 +38,7 @@ SYNOPSIS
 
 `span-amsl-discovery` `-live` *URL* [`-allow-empty`] [`-verbose`]
 
-`span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`-rows` *N*] [`-q`] [`-sleep` *duration*] [`-email` *addr*]
+`span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`-rows` *N*] [`-q`] [`-sleep` *duration*]
 
 DESCRIPTION
 -----------
@@ -151,9 +151,6 @@ OPTIONS
 
 `-q`
   Suppress logging output, `span-crossref-members` only.
-
-`-email` *addr*
-  Use email address in query parameter for API etiquette, `span-crossref-members` only.
 
 `-h`
   Show usage.

@@ -90,7 +90,6 @@ var (
 	rows       = flag.Int("rows", 20, "rows to fetch per request")
 	base       = flag.String("base", "http://api.crossref.org/members", "base url")
 	sleep      = flag.Duration("sleep", 1*time.Second, "time to sleep between requests")
-	email      = flag.String("email", "", "optional email for api etiquette")
 	silent     = flag.Bool("q", false, "suppress logging output")
 	version    = flag.Bool("version", false, "output version")
 	retryCount = flag.Int("retry", 3, "retry count on HTTP 500 and similar errors")
@@ -113,9 +112,6 @@ func main() {
 		v := url.Values{}
 		v.Add("offset", fmt.Sprintf("%d", *offset))
 		v.Add("rows", fmt.Sprintf("%d", *rows))
-		if *email != "" {
-			v.Add("email", *email)
-		}
 
 		link := fmt.Sprintf("%s?%s", *base, v.Encode())
 
