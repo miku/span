@@ -252,7 +252,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	// refs #14215
 	if is.SourceID == "48" {
 		s.ISSN = []string{}
-		s.Description = ""
+		// s.Description = "" // refs #14787
 		s.Languages = []string{}
 		s.Publishers = []string{}
 		s.Fulltext = ""
