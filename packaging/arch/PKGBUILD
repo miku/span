@@ -14,7 +14,7 @@ options=('!strip' '!emptydirs')
 conflicts=("${pkgname}-bin")
 replaces=("${pkgname}-bin")
 source=("${url}/archive/v${pkgver}.tar.gz")
-sha256sums=('89241cfa57200cce5dde53741b77be4147b834fef6092e025ae3ddcb9098420e')
+sha256sums=('9d69b8a2d04160f625e5fd7800fb6161f9112aa51c124ac0c121399a551e9c96')
 _gourl='github.com/miku/span/cmd/...'
 
 prepare() {
@@ -28,7 +28,6 @@ prepare() {
 
 package() {
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-amsl-discovery" "${pkgdir}/usr/bin/${pkgname}-amsl-discovery"
-  install -Dm 775 "${srcdir}/go/src/github.com/miku/span/cmd/${pkgname}-amsl-git.sh" "${pkgdir}/usr/bin/${pkgname}-amsl-git.sh"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-check" "${pkgdir}/usr/bin/${pkgname}-check"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-compare" "${pkgdir}/usr/bin/${pkgname}-compare"
   install -Dm 775 "${srcdir}/go/src/github.com/miku/span/${pkgname}-crossref-snapshot" "${pkgdir}/usr/bin/${pkgname}-crossref-snapshot"
