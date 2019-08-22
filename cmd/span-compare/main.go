@@ -62,7 +62,7 @@ var SourceNames = map[string]string{
 	"17":  "Nationallizenzen (eBooks / Monographien)",
 	"18":  "Oxford Scholarship Online",
 	"19":  "Kubon &amp; Sagner Digital",
-	"20":  "Bibliothèque nationale de France (BnF): Gallica (Musik)",
+	"20":  "Bibliothèque nationale de France (BnF): Gallica",
 	"21":  "GBVcentral Dumps Musik",
 	"22":  "Qucosa",
 	"23":  "Hochschulschriften HSZIGR Hochschule Zittau/Görlitz",
@@ -146,6 +146,7 @@ var SourceNames = map[string]string{
 	"103": "Margaret Herrick Library",
 	"104": "WTI",
 	"105": "Springer Journals",
+	"105": "Springer Journals",
 	"106": "Primary Sources for Slavic Studies",
 	"107": "Heidelberger historische Bestände digital",
 	"108": "De Gruyter eBooks Open Access",
@@ -218,8 +219,13 @@ var SourceNames = map[string]string{
 	"175": "Libris-Katalog der schwedischen Nationalbibliothek",
 	"176": "Fennica-Katalog der finnischen Nationalbibliothek",
 	"177": "DataCite",
+	"178": "Nationalbibliothek Norwegens",
+	"179": "LISSA - LIS Scholarship Archive",
+	"180": "British National Bibliography",
+	"181": "British Library Catalogue",
 	"200": "finc TEST",
 	"201": "Perinorm",
+	"202": "Zentralinstitut für Kunstgeschichte",
 }
 
 var defaultConfigPath = path.Join(span.UserHomeDir(), ".config/span/span.json")
