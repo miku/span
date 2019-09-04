@@ -52,7 +52,7 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/kisielk/errcheck v1.2.0 // indirect
-	github.com/klauspost/compress v1.6.1 // indirect
+	github.com/klauspost/compress v1.8.1 // indirect
 	github.com/klauspost/cpuid v1.2.1 // indirect
 	github.com/klauspost/pgzip v1.2.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
@@ -62,13 +62,12 @@ require (
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
+	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
 	github.com/miku/parallel v0.0.0-20190514155252-d289185a944b // indirect
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
-	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
-	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d // indirect
 	github.com/neelance/astrewrite v0.0.0-20160511093645-99348263ae86 // indirect
@@ -122,9 +121,9 @@ require (
 	golang.org/x/build v0.0.0-20190812175533-ded33d37d0af // indirect
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/mobile v0.0.0-20190814143026-e8b3e6111d02 // indirect
-	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
+	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
 	golang.org/x/perf v0.0.0-20190620143337-7c3f2128ad9b // indirect
-	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
+	golang.org/x/sys v0.0.0-20190904005037-43c01164e931 // indirect
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20190815144358-9065c182e3b6 // indirect
 	google.golang.org/grpc v1.23.0 // indirect
