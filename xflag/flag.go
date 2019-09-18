@@ -3,8 +3,8 @@
 //   var f xflag.Array
 //   flag.Var(&f, "r", "some repeatable flag")
 //
-//   flag.Parse()
-//   for _, v := range f { ... }
+//   flag.Parse()                // $ command -r a -r b -r c
+//   for _, v := range f { ... } // []string{"a", "b", "c"}
 //
 package xflag
 
