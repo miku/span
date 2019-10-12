@@ -130,7 +130,8 @@ type Entry struct {
 	}
 }
 
-// ISSNList returns a list of unique normalized ISSN (1234-567X) from various fields.
+// ISSNList returns a list of unique, normalized ISSN (1234-567X) from various
+// entry fields.
 func (entry *Entry) ISSNList() []string {
 	issns := container.NewStringSet()
 	idfields := []string{entry.PrintIdentifier, entry.OnlineIdentifier}
