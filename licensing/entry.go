@@ -39,8 +39,8 @@ var (
 	intPattern  = regexp.MustCompile("[0-9]+")
 	issnPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9xX]`)
 
-	veryLongAgo    = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
-	farInTheFuture = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
+	veryLongTimeAgo = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
+	farInTheFuture  = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
 )
 
 // datePatterns are candidate patterns for parsing dates.
@@ -187,7 +187,7 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 // past if it is not defined. Should we stop here, if date parsing fails?
 func (entry *Entry) begin() time.Time {
 	if entry.parsed.FirstIssueDate.IsZero() {
-		entry.parsed.FirstIssueDate = veryLongAgo
+		entry.parsed.FirstIssueDate = veryLongTimeAgo
 		for _, dfmt := range datePatterns {
 			if t, err := time.Parse(dfmt.layout, entry.FirstIssueDate); err == nil {
 				entry.parsed.FirstIssueDate = t
