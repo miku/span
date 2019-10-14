@@ -22,9 +22,9 @@ import (
 type DateGranularity byte
 
 const (
-	GRANULARITY_YEAR DateGranularity = iota
-	GRANULARITY_MONTH
-	GRANULARITY_DAY
+	GranularityYear DateGranularity = iota
+	GranularityMonth
+	GranularityDay
 )
 
 var (
@@ -40,37 +40,34 @@ var (
 	issnPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9xX]`)
 )
 
-// dateWithGranularity groups layout and granularity.
-type dateWithGranularity struct {
+// datePatterns are candidate patterns for parsing dates.
+var datePatterns = []struct {
 	layout      string
 	granularity DateGranularity
-}
-
-// datePatterns are candidate patterns for parsing dates.
-var datePatterns = []dateWithGranularity{
-	{"2006-", GRANULARITY_YEAR},
-	{"2006-01-02", GRANULARITY_DAY},
-	{"2006-01-02T15:04:05Z", GRANULARITY_DAY},
-	{"2006-01-2", GRANULARITY_DAY},
-	{"2006-01", GRANULARITY_MONTH},
-	{"2006-1-02", GRANULARITY_DAY},
-	{"2006-1-2", GRANULARITY_DAY},
-	{"2006-1", GRANULARITY_MONTH},
-	{"2006-Jan-02", GRANULARITY_DAY},
-	{"2006-Jan-2", GRANULARITY_DAY},
-	{"2006-Jan", GRANULARITY_MONTH},
-	{"2006-January-02", GRANULARITY_DAY},
-	{"2006-January-2", GRANULARITY_DAY},
-	{"2006-January", GRANULARITY_MONTH},
-	{"2006-x-x", GRANULARITY_YEAR},
-	{"2006-x-xx", GRANULARITY_YEAR},
-	{"2006-x", GRANULARITY_YEAR},
-	{"2006-xx-x", GRANULARITY_YEAR},
-	{"2006-xx-xx", GRANULARITY_YEAR},
-	{"2006-xx", GRANULARITY_YEAR},
-	{"2006", GRANULARITY_YEAR},
-	{"200601", GRANULARITY_MONTH},
-	{"20060102", GRANULARITY_DAY},
+}{
+	{"2006-", GranularityYear},
+	{"2006-01-02", GranularityDay},
+	{"2006-01-02T15:04:05Z", GranularityDay},
+	{"2006-01-2", GranularityDay},
+	{"2006-01", GranularityMonth},
+	{"2006-1-02", GranularityDay},
+	{"2006-1-2", GranularityDay},
+	{"2006-1", GranularityMonth},
+	{"2006-Jan-02", GranularityDay},
+	{"2006-Jan-2", GranularityDay},
+	{"2006-Jan", GranularityMonth},
+	{"2006-January-02", GranularityDay},
+	{"2006-January-2", GranularityDay},
+	{"2006-January", GranularityMonth},
+	{"2006-x-x", GranularityYear},
+	{"2006-x-xx", GranularityYear},
+	{"2006-x", GranularityYear},
+	{"2006-xx-x", GranularityYear},
+	{"2006-xx-xx", GranularityYear},
+	{"2006-xx", GranularityYear},
+	{"2006", GranularityYear},
+	{"200601", GranularityMonth},
+	{"20060102", GranularityDay},
 }
 
 // Entry contains fields about a licensed or available journal, book, article
@@ -133,7 +130,8 @@ type Entry struct {
 // ISSNList returns a list of unique normalized ISSN (1234-567X) from various fields.
 func (entry *Entry) ISSNList() []string {
 	issns := container.NewStringSet()
-	for _, issn := range []string{entry.PrintIdentifier, entry.OnlineIdentifier} {
+	idfields := []string{entry.PrintIdentifier, entry.OnlineIdentifier}
+	for _, issn := range idfields {
 		s := NormalizeSerialNumber(issn)
 		if issnPattern.MatchString(s) {
 			issns.Add(s)
@@ -201,9 +199,9 @@ func (entry *Entry) begin() time.Time {
 func (entry *Entry) beginGranularity(g DateGranularity) time.Time {
 	t := entry.begin()
 	switch g {
-	case GRANULARITY_YEAR:
+	case GranularityYear:
 		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	case GRANULARITY_MONTH:
+	case GranularityMonth:
 		return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
 	default:
 		return t
@@ -229,9 +227,9 @@ func (entry *Entry) end() time.Time {
 func (entry *Entry) endGranularity(g DateGranularity) time.Time {
 	t := entry.end()
 	switch g {
-	case GRANULARITY_YEAR:
+	case GranularityYear:
 		return time.Date(t.Year(), 1, 1, 0, 0, 0, 0, time.UTC)
-	case GRANULARITY_MONTH:
+	case GranularityMonth:
 		return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
 	default:
 		return t
@@ -288,7 +286,7 @@ func FindSerialNumbers(s string) []string {
 // recorgnized results in an error.
 func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) {
 	if s == "" {
-		return time.Time{}, GRANULARITY_DAY, ErrInvalidDate
+		return time.Time{}, GranularityDay, ErrInvalidDate
 	}
 	for _, dfmt := range datePatterns {
 		t, err = time.Parse(dfmt.layout, s)
@@ -309,7 +307,7 @@ func getGranularity(layout string) DateGranularity {
 			return dfmt.granularity
 		}
 	}
-	return GRANULARITY_DAY
+	return GranularityDay
 }
 
 // findInt return the first int that is found in s or 0 if there is no number.
