@@ -38,6 +38,9 @@ var (
 
 	intPattern  = regexp.MustCompile("[0-9]+")
 	issnPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9xX]`)
+
+	veryLongAgo    = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
+	farInTheFuture = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
 )
 
 // datePatterns are candidate patterns for parsing dates.
@@ -181,10 +184,10 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 }
 
 // begin parses left boundary of license interval, returns a date far in the
-// past if it is not defined.
+// past if it is not defined. Should we stop here, if date parsing fails?
 func (entry *Entry) begin() time.Time {
 	if entry.parsed.FirstIssueDate.IsZero() {
-		entry.parsed.FirstIssueDate = time.Date(1, time.January, 1, 0, 0, 0, 1, time.UTC)
+		entry.parsed.FirstIssueDate = veryLongAgo
 		for _, dfmt := range datePatterns {
 			if t, err := time.Parse(dfmt.layout, entry.FirstIssueDate); err == nil {
 				entry.parsed.FirstIssueDate = t
@@ -212,7 +215,7 @@ func (entry *Entry) beginGranularity(g DateGranularity) time.Time {
 // if it is not defined.
 func (entry *Entry) end() time.Time {
 	if entry.parsed.LastIssueDate.IsZero() {
-		entry.parsed.LastIssueDate = time.Date(2364, time.January, 1, 0, 0, 0, 1, time.UTC)
+		entry.parsed.LastIssueDate = farInTheFuture
 		for _, dfmt := range datePatterns {
 			if t, err := time.Parse(dfmt.layout, entry.LastIssueDate); err == nil {
 				entry.parsed.LastIssueDate = t
