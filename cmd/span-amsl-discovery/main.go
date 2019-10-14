@@ -186,8 +186,12 @@ func main() {
 		}
 	}
 
-	// This should contain an approximation of the discovery endpoint.
-	var updates []Discovery
+	var (
+		// This should contain an approximation of the discovery endpoint.
+		updates []Discovery
+		// Mismatch, where we expected a holding file, but got none, refs #16207.
+		mismatched []Discovery
+	)
 
 	for i, mu := range mur {
 		if i%10000 == 0 {
@@ -235,6 +239,8 @@ func main() {
 				update.ProductISIL = hc.ProductISIL
 				update.ShardLabel = hc.ShardLabel
 				update.EvaluateHoldingsFileForLibrary = "yes"
+				// TODO: It might be, that we have a holdings_file_concat
+				// mention, but no holding file, later, refs #16207.
 				break
 			}
 		}
@@ -253,6 +259,9 @@ func main() {
 			continue
 		}
 
+		// Will be true, if we actually find holding files, refs #16207.
+		var resolved bool
+
 		for _, hf := range hfr {
 			if hf.ISIL != mu.ISIL {
 				continue
@@ -265,21 +274,27 @@ func main() {
 				ContentFileLabel:               update.ContentFileLabel,
 				ContentFileURI:                 update.ContentFileURI,
 				EvaluateHoldingsFileForLibrary: update.EvaluateHoldingsFileForLibrary,
-				ISIL:                           update.ISIL,
-				LinkToContentFile:              update.LinkToContentFile,
-				MegaCollection:                 update.MegaCollection,
-				ProductISIL:                    update.ProductISIL,
-				ShardLabel:                     update.ShardLabel,
-				SourceID:                       update.SourceID,
-				TechnicalCollectionID:          update.TechnicalCollectionID,
+				ISIL:                  update.ISIL,
+				LinkToContentFile:     update.LinkToContentFile,
+				MegaCollection:        update.MegaCollection,
+				ProductISIL:           update.ProductISIL,
+				ShardLabel:            update.ShardLabel,
+				SourceID:              update.SourceID,
+				TechnicalCollectionID: update.TechnicalCollectionID,
 			}
 			if hf.DokumentURI != "" {
 				ndoc.LinkToHoldingsFile = fmt.Sprintf(
 					"%s/OntoWiki/files/get?setResource=%s", *live, hf.DokumentURI)
 			}
 			updates = append(updates, ndoc)
+			resolved = true
+		}
+		if !resolved {
+			log.Printf("mismatch: %s [%s] %s", update.ISIL, update.SourceID, update.MegaCollection)
+			mismatched = append(mismatched, update)
 		}
 	}
+	log.Printf("warning: %d mismatched items", len(mismatched))
 
 	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
