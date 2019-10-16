@@ -35,13 +35,13 @@ zero-results-policy: "fail"
 
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
-allowed-keys:
-    - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger", "Munzinger KLG", "Munzinger KLfG"]
-    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
-    - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
-    - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
-    - ["source_id:88", "institution", "DE-15-FID"]
-    - ["source_id:39", "institution", "DE-15", "DE-15-FID"]
+#allowed-keys:
+#    - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger", "Munzinger KLG", "Munzinger KLfG"]
+#    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+#    - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
+#    - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
+#    - ["source_id:88", "institution", "DE-15-FID"]
+#    - ["source_id:39", "institution", "DE-15", "DE-15-FID"]
 
 # All records: [Query, Facet-Field, Value, ...] checks if all record contain
 # only the given values.
@@ -117,13 +117,3 @@ all-records:
     - ["source_id:160", "facet_avail", "Local"]
     - ["source_id:161", "facet_avail", "Online", "Free"]
     - ["source_id:163", "facet_avail", "Online", "Free"]
-
-# MinRatio: Query, Facet-Field, Value, Ratio (Percent), checks if the given
-# value appears in a given percentage of documents.
-# Sources indexed in UBL-main
-
-# MinCount: Query, Facet-Field, Value, Min Count. Checks, if the given value
-# appears at least a fixed number of times.
-# min-count:
-#     - ["source_id:89", "facet_avail", "Free", 100]
-
