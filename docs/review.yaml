@@ -1,4 +1,4 @@
-solr: "http://172.18.113.7:8085/solr/#/biblio"
+solr: "http://172.18.113.24:8080/solr/#/biblio"
 ticket: "13109"
 zero-results-policy: "fail"
 allowed-keys:
