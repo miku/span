@@ -36,12 +36,12 @@ zero-results-policy: "fail"
 # Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
 # contain only given values.
 allowed-keys:
-     - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger", "Munzinger KLG", "Munzinger KLfG"]
-     - ["source_id:30", "format", "eBook", "ElectronicArticle"]
-     - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
-     - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
-     - ["source_id:88", "institution", "DE-15-FID"]
-     - ["source_id:39", "institution", "DE-15", "DE-15-FID"]
+    - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger", "Munzinger KLG", "Munzinger KLfG"]
+    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+    - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
+    - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
+    - ["source_id:88", "institution", "DE-15-FID"]
+    - ["source_id:39", "institution", "DE-15", "DE-15-FID"]
 
 # All records: [Query, Facet-Field, Value, ...] checks if all record contain
 # only the given values.
