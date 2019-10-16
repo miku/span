@@ -22,7 +22,7 @@
 # solr: "http://172.18.113.7:8085/solr/#/biblio"
 
 # solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
-solr: "http://172.18.113.24:8080/solr/biblio/" # UBL-main Gesamtimport 2018-12
+solr: "http://172.18.113.24:8080/solr/#/biblio" # UBL-main Gesamtimport 2018-12
 
 # The ticket number of update. Set this to "NA" or anything non-numeric to
 # suppress ticket updates. We need a commit, so write or edit comments as needed.
