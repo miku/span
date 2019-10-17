@@ -1,0 +1,5 @@
+---
+solr: "https://index.ub.uni-leipzig.de/kxp/biblio"
+ticket: "16229"
+min-count:
+    - ["source_id:0", "facet_avail", "Local", 100]
