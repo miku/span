@@ -2,12 +2,6 @@
 // filters for various tags and runs all filters on every record of the input
 // to produce a stream of tagged records.
 //
-// TODO(miku): Allow to skip label attachment by inspecting a SOLR index on the
-// fly. Calculate label attachments for record, query index for doi or similar
-// id, if the preferred source is already in the index, drop the label. If the
-// unpreferred source is indexed, we cannot currently update the index, so just
-// emit a warning and do not change anything.
-//
 // $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
 //
 package main
