@@ -1,0 +1,322 @@
+# Review configuration, refs #12756.
+#
+# TODO(miku): post any error in ticket
+# TODO: maybe just use a bash script
+#
+# Proposed workflow:
+#
+# 1. Edit this file via GitLab at
+# https://git.sc.uni-leipzig.de/miku/span/blob/master/docs/review.yaml. Add,
+# edit or remove rules, update ticket number. If done, commit.
+# 2. A trigger will run an index review based on these rules.
+# 3. Find the results in your ticket, in case the ticket number was valid.
+# Note: Error reporting is currently limited (see logs).
+
+# The solr server to query, including scheme, port and core/collection, e.g.
+# "http://localhost:8983/solr/biblio". If "auto", then the current testing "ai" solr
+# server will be figured out automatically.
+# solr: "auto"
+
+# solr: "https://ai.ub.uni-leipzig.de/solr/biblio" # AI live
+# solr: "http://172.18.113.15:8085/solr/#/biblio"
+# solr: "http://172.18.113.7:8085/solr/#/biblio"
+
+# solr: "http://index.ub.uni-leipzig.de/solr/biblio" # UBL-main live
+# solr: "http://172.18.113.24:8080/solr/#/biblio" # UBL-main Gesamtimport 2018-12
+solr: "https://index.ub.uni-leipzig.de/kxp/biblio"
+
+# The ticket number of update. Set this to "NA" or anything non-numeric to
+# suppress ticket updates. We need a commit, so write or edit comments as needed.
+
+ticket: "13622"
+
+# If set to "fail" an empty result set will be marked as failure.
+# Otherwise a empty result set will - most of the time - not be considered a violation.
+zero-results-policy: "fail"
+
+# ----------------------------------------------------------------
+# Mit Stand vom 2019-10-18 sind folgende source_ids im KXP enthalten:
+# 0
+# 1
+# 3
+# 4
+# 5
+# 9
+# 10
+# 12
+# 13
+# 14
+# 15
+# 16
+# 17
+# 18
+# 19
+# 20
+# 21
+# 22
+# 24
+# 26
+# 27
+# 29
+# 30
+# 31
+# 35
+# 39
+# 40
+# 41
+# 42
+# 44
+# 47
+# 51
+# 52
+# 56
+# 57
+# 58
+# 61
+# 63
+# 64
+# 65
+# 66
+# 70
+# 71
+# 72
+# 73
+# 74
+# 75
+# 76
+# 77
+# 78
+# 79
+# 84
+# 88
+# 96
+# 99
+# 100
+# 101
+# 103
+# 106
+# 107
+# 108
+# 109
+# 113
+# 114
+# 117
+# 119
+# 124
+# 127
+# 128
+# 130
+# 131
+# 134
+# 135
+# 136
+# 142
+# 143
+# 147
+# 148
+# 150
+# 151
+# 153
+# 156
+# 157
+# 159
+# 160
+# 161
+# 163
+# 165
+# 169
+# 170
+# 171
+# 173
+# 175
+# 176
+# 178
+# 184
+
+# ----------------------------------------------------------------
+
+# Allowed keys: [Query, Facet-Field, Value, ...] checks if all values of field
+# contain only given values.
+allowed-keys:
+# mega_collection
+    - ["source_id:3", "mega_collection", "PDA Print Nielsen"]
+    - ["source_id:4", "mega_collection", "PDA eBooks EBL Schweitzer"]
+    - ["source_id:5", "mega_collection", "Naxos Music Library", "Naxos Music Library Jazz", "Naxos Music Library World"]
+    - ["source_id:9", "mega_collection", "Early Music Online"]
+    - ["source_id:10", "mega_collection", "Music Treasures Consortium"]
+    - ["source_id:12", "mega_collection", "Bayerische Staatsbibliothek Musik"]
+    - ["source_id:13", "mega_collection", "Diss online"]
+    - ["source_id:14", "mega_collection", "Répertoire International des Sources Musicales"]
+    - ["source_id:15", "mega_collection", "IMSLP (Petrucci Library)"]
+    - ["source_id:16", "mega_collection", "Elsevier E-Books"]
+    - ["source_id:18", "mega_collection", "Oxford Scholarship Online - Philosophy", "Oxford Scholarship Online - Religion", "Oxford Scholarship Online - Economics and Finance", "Oxford Scholarship Online - Music", "Oxford Scholarship Online - Political Science"]
+#    - ["source_id:19", "mega_collection", "?"]
+    - ["source_id:20", "mega_collection", "Gallica (BNF)"]
+    - ["source_id:21", "mega_collection", "GBV Musikdigitalisate"]
+    - ["source_id:22", "mega_collection", "Qucosa"]
+    - ["source_id:24", "mega_collection", "Ebook Central"]
+    - ["source_id:26", "mega_collection", "DOAB Directory of Open Access Books"]
+    - ["source_id:27", "mega_collection", "Munzinger Personen", "Munzinger / PressReader", "Munzinger Pop", "Munzinger Länder", "Munzinger", "Munzinger KLG", "Munzinger KLfG", "Munzinger Chronik"]
+    - ["source_id:29", "mega_collection", "Handwörterbuch der musikalischen Terminologie"]
+    - ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
+    - ["source_id:31", "mega_collection", "Opera in Video"]
+    - ["source_id:35", "mega_collection", "Hathi Trust"]
+    - ["source_id:39", "mega_collection", "Persée"]
+    - ["source_id:40", "mega_collection", "Dance in Video"]
+    - ["source_id:41", "mega_collection", "Classical Music in Video"]
+    - ["source_id:42", "mega_collection", "Classical Scores Library II"]
+    - ["source_id:44", "mega_collection", "Deutsches Textarchiv"]
+    - ["source_id:47", "mega_collection", "Vahlen eLibrary"]
+    - ["source_id:51", "mega_collection", "PDA Print VUB"]
+    - ["source_id:52", "mega_collection", "OECD iLibrary"]
+    - ["source_id:56", "mega_collection", "Folkwang Universität der Künste Essen"]
+    - ["source_id:57", "mega_collection", "Robert Schumann Hochschule Düsseldorf"]
+    - ["source_id:58", "mega_collection", "Hochschule für Musik und Tanz Köln"]
+    - ["source_id:61", "mega_collection", "IMF International Monetary Fund"]
+    - ["source_id:63", "mega_collection", "de Gruyter ebooks"]
+#    - ["source_id:64", "mega_collection", "?"]
+    - ["source_id:65", "mega_collection", "GVK - FID Nordeuropa"]
+#    - ["source_id:66", "mega_collection", "?"]
+    - ["source_id:70", "mega_collection", "Institut Ägyptologie"]
+    - ["source_id:71", "mega_collection", "OstDok"]
+    - ["source_id:72", "mega_collection", "Morgan & Claypool eBooks (CIS 5, 2013-2014)"]
+    - ["source_id:73", "mega_collection", "MedienwRezensionen"]
+    - ["source_id:74", "mega_collection", "Taylor & Francis eBooks EBA"]
+#    - ["source_id:75", "mega_collection", "?"]
+    - ["source_id:76", "mega_collection", "E-Books adlr"]
+    - ["source_id:77", "mega_collection", "Universitätsbibliothek Leipzig / Digitaler Porträtindex"]
+    - ["source_id:78", "mega_collection", "IZI-Datenbank"]
+#    - ["source_id:79", "mega_collection", "?"]
+    - ["source_id:84", "mega_collection", "JSTOR Open Access eBooks", "Medici.TV"]
+    - ["source_id:88", "mega_collection", "Zeitschrift Rundfunk und Geschichte"]
+    - ["source_id:96", "mega_collection", "Thieme eBooks Tiermedizin VetCenter"]
+    - ["source_id:99", "mega_collection", "Media Perspektiven"]
+    - ["source_id:100", "mega_collection", "Medienwissenschaft Berichte und Papiere"]
+#    - ["source_id:101", "mega_collection", "?"]
+    - ["source_id:103", "mega_collection", "Margaret Herrick Library"]
+    - ["source_id:106", "mega_collection", "Primary Sources / Slavic Studies"]
+#    - ["source_id:107", "mega_collection", "?"]
+    - ["source_id:108", "mega_collection", "De Gruyter eBooks Open Access"]
+    - ["source_id:109", "mega_collection", "Kunsthochschule für Medien Köln"]
+    - ["source_id:113", "mega_collection", "Loeb Classical Library"]
+    - ["source_id:114", "mega_collection", "Academic Ebooks The Arts"]
+    - ["source_id:117", "mega_collection", "UdK Berlin", "Verbundkatalog Film"]
+    - ["source_id:119", "mega_collection", "Universitätsbibliothek Frankfurt am Main", "Verbundkatalog Film"]
+    - ["source_id:124", "mega_collection", "DawsonEra PDA"]
+    - ["source_id:127", "mega_collection", "Filmuniversität Konrad Wolf Babelsberg", "Verbundkatalog Film"]
+    - ["source_id:128", "mega_collection", "McGraw-Hill Access Engineering"]
+    - ["source_id:130", "mega_collection", "VDEH"]
+    - ["source_id:131", "mega_collection", "GDMB"]
+#    - ["source_id:134", "mega_collection", "?"]
+#    - ["source_id:135", "mega_collection", "?"]
+#    - ["source_id:136", "mega_collection", "?"]
+    - ["source_id:142", "mega_collection", "Gesamtkatalog der Düsseldorfer Kulturinstitute", "Verbundkatalog Film"]
+    - ["source_id:147", "mega_collection", "Palgrave Economics & Finance Collection 2000-2013"]
+    - ["source_id:148", "mega_collection", "Bundesarchiv (Filmarchiv)", "Verbundkatalog Film"]
+    - ["source_id:150", "mega_collection", "MOnAMi Hochschulschriftenserver Mittweida"]
+    - ["source_id:151", "mega_collection", "Filmakademie Baden-Württemberg", "Verbundkatalog Film"]
+    - ["source_id:153", "mega_collection", "Internet Archive / Prelinger"]
+#    - ["source_id:156", "mega_collection", "?"]
+#    - ["source_id:157", "mega_collection", "?"]
+#    - ["source_id:159", "mega_collection", "?"]
+    - ["source_id:160", "mega_collection", "Diplomarbeiten Sportwissenschaft"]
+    - ["source_id:161", "mega_collection", "Cambridge eBooks Open Access"]
+#    - ["source_id:163", "mega_collection", "?"]
+    - ["source_id:165", "mega_collection", "Tectum eBooks"]
+    - ["source_id:169", "mega_collection", "MediathekViewWeb"]
+    - ["source_id:170", "mega_collection", "media/rep/ - Repositorium für die Medienwissenschaft"]
+    - ["source_id:171", "mega_collection", "PressReader"]
+#    - ["source_id:173", "mega_collection", "?"]
+    - ["source_id:175", "mega_collection", "Libris-Katalog der schwedischen Nationalbibliothek"]
+    - ["source_id:176", "mega_collection", "Fennica-Katalog der finnischen Nationalbibliothek"]
+    - ["source_id:178", "mega_collection", "Nationalbibliographie der norwegischen Nationalbibliothek"]
+    - ["source_id:184", "mega_collection", "Répertoire International de Littérature Musicale"]
+# andere Facetten
+    - ["source_id:30", "format", "eBook", "ElectronicArticle"]
+    - ["source_id:30", "format_de15", "Book, E-Book", "Article, E-Article"]
+    - ["source_id:30", "finc_class_facet", "not assigned", "Informatik", "Wirtschaftswissenschaften", "Medizin"]
+    - ["source_id:88", "institution", "DE-15-FID"]
+    - ["source_id:39", "institution", "DE-15", "DE-15-FID"]
+
+# All records: [Query, Facet-Field, Value, ...] checks if all record contain
+# only the given values.
+all-records:
+    - ["source_id:4", "facet_avail", "Online"]
+    - ["source_id:5", "facet_avail", "Online"]
+    - ["source_id:9", "facet_avail", "Online", "Free"]
+    - ["source_id:10", "facet_avail", "Online", "Free"]
+    - ["source_id:12", "facet_avail", "Online"]
+    - ["source_id:13", "facet_avail", "Online", "Free"]
+    - ["source_id:14", "facet_avail", "Online", "Free"]
+    - ["source_id:15", "facet_avail", "Online", "Free"]
+    - ["source_id:16", "facet_avail", "Online"]
+    - ["source_id:17", "facet_avail", "Online", "Free"]
+    - ["source_id:17", "facet_avail", "Online"]
+    - ["source_id:18", "facet_avail", "Online"]
+    - ["source_id:19", "facet_avail", "Online", "Free"]
+    - ["source_id:19", "facet_avail", "Online"]
+    - ["source_id:20", "facet_avail", "Online", "Free"]
+    - ["source_id:21", "facet_avail", "Online", "Free"]
+    - ["source_id:22", "facet_avail", "Online", "Free"]
+    - ["source_id:24", "facet_avail", "Online"]
+    - ["source_id:26", "facet_avail", "Online", "Free"]
+    - ["source_id:27", "facet_avail", "Online"]
+    - ["source_id:29", "facet_avail", "Online", "Free"]
+    - ["source_id:30", "facet_avail", "Online", "Free"]
+    - ["source_id:31", "facet_avail", "Online"]
+    - ["source_id:35", "facet_avail", "Online", "Free"]
+    - ["source_id:39", "facet_avail", "Online", "Free"]
+    - ["source_id:40", "facet_avail", "Online"]
+    - ["source_id:41", "facet_avail", "Online"]
+    - ["source_id:42", "facet_avail", "Online"]
+    - ["source_id:44", "facet_avail", "Online", "Free"]
+    - ["source_id:46", "facet_avail", "Online"]
+    - ["source_id:51", "facet_avail", "Online"]
+    - ["source_id:52", "facet_avail", "Online"]
+    - ["source_id:56", "facet_avail", "Local"]
+    - ["source_id:57", "facet_avail", "Local"]
+    - ["source_id:58", "facet_avail", "Local"]
+    - ["source_id:61", "facet_avail", "Online"]
+    - ["source_id:63", "facet_avail", "Online"]
+    - ["source_id:70", "facet_avail", "Local"]
+    - ["source_id:71", "facet_avail", "Online", "Free"]
+    - ["source_id:72", "facet_avail", "Online"]
+    - ["source_id:73", "facet_avail", "Online", "Free"]
+    - ["source_id:74", "facet_avail", "Online"]
+    - ["source_id:75", "facet_avail", "Online"]
+    - ["source_id:76", "facet_avail", "Online"]
+    - ["source_id:77", "facet_avail", "Online", "Free"]
+    - ["source_id:78", "facet_avail", "Online"]
+    - ["source_id:79", "facet_avail", "Online"]
+    - ["source_id:84", "facet_avail", "Online", "Free"]
+    - ["source_id:84", "facet_avail", "Online"]
+    - ["source_id:88", "facet_avail", "Online", "Free"]
+    - ["source_id:96", "facet_avail", "Online"]
+    - ["source_id:99", "facet_avail", "Online", "Free"]
+    - ["source_id:100", "facet_avail", "Online", "Free"]
+    - ["source_id:101", "facet_avail", "Online", "Free"]
+    - ["source_id:103", "facet_avail", "Online"]
+    - ["source_id:106", "facet_avail", "Online"]
+    - ["source_id:107", "facet_avail", "Online", "Free"]
+    - ["source_id:108", "facet_avail", "Online", "Free"]
+    - ["source_id:113", "facet_avail", "Online"]
+    - ["source_id:114", "facet_avail", "Online"]
+    - ["source_id:130", "facet_avail", "Local"]
+    - ["source_id:131", "facet_avail", "Local"]
+    - ["source_id:134", "facet_avail", "Local"]
+    - ["source_id:135", "facet_avail", "Online"]
+    - ["source_id:136", "facet_avail", "Local"]
+    - ["source_id:143", "facet_avail", "Online"]
+    - ["source_id:147", "facet_avail", "Online"]
+    - ["source_id:150", "facet_avail", "Online", "Free"]
+    - ["source_id:153", "facet_avail", "Online", "Free"]
+    - ["source_id:156", "facet_avail", "Local"]
+    - ["source_id:157", "facet_avail", "Online"]
+    - ["source_id:159", "facet_avail", "Online", "Free"]
+    - ["source_id:160", "facet_avail", "Local"]
+    - ["source_id:163", "facet_avail", "Online", "Free"]
+    - ["source_id:165", "facet_avail", "Online"]
+    - ["source_id:169", "facet_avail", "Online"]
+    - ["source_id:170", "facet_avail", "Online", "Free"]
+    - ["source_id:171", "facet_avail", "Online"]
+    - ["source_id:173", "facet_avail", "Local"]
