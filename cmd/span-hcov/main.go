@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -17,7 +18,8 @@ import (
 )
 
 var (
-	holdingsFile = flag.String("f", "", "path to holdings file in KBART format")
+	holdingsFile = flag.String("f", "", "path to holdings file in KBART format (not all CSV files will work)")
+	issnList     = flag.String("l", "", "path to ISSN list (1234-789X), one per line, empty lines ignored (overrides -f)")
 	server       = flag.String("server", "", "server url to check agains")
 )
 
@@ -25,19 +27,46 @@ func main() {
 	flag.Parse()
 	*server = solrutil.PrependHTTP(*server)
 
-	if *holdingsFile == "" {
-		log.Fatal("holdings file required")
-	}
-	f, err := os.Open(*holdingsFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
+	// List of serial numbers.
+	var hlist, ilist []string
 
-	hlist, err := holdingsSerialNumbers(f)
-	if err != nil {
-		log.Fatal(err)
+	switch {
+	case *issnList != "":
+		f, err := os.Open(*issnList)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		br := bufio.NewReader(f)
+		for {
+			line, err := br.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			hlist = append(hlist, line)
+		}
+
+	case *holdingsFile != "":
+		f, err := os.Open(*holdingsFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		hlist, err = holdingsSerialNumbers(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+	default:
+		log.Fatal("holdings file or issn list required")
 	}
+
 	ilist, err := indexSerialNumbers(*server)
 	if err != nil {
 		log.Fatal(err)
