@@ -38,6 +38,7 @@ func main() {
 		}
 		defer f.Close()
 		br := bufio.NewReader(f)
+		unique := container.NewStringSet()
 		for {
 			line, err := br.ReadString('\n')
 			if err == io.EOF {
@@ -50,9 +51,9 @@ func main() {
 			if line == "" {
 				continue
 			}
-			hlist = append(hlist, line)
+			unique.Add(line)
 		}
-
+		ilist = normalizeSerialNumbers(unique.SortedValues())
 	case *holdingsFile != "":
 		f, err := os.Open(*holdingsFile)
 		if err != nil {
