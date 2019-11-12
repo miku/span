@@ -306,24 +306,25 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
 
 	// Wrap package name in 'Genios (PACKAGENAME)'
-	var prefixedPackageNames []string
+	var packageNameVariants []string
 	for _, name := range packageNames {
-		prefixedPackageNames = append(prefixedPackageNames, fmt.Sprintf("Genios (%s)", name))
+		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Genios (%s)", name))
+		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Wiso Journals / %s", name))
 	}
 
 	// hack, to move Genios (LIT) further down
-	sort.Sort(sort.Reverse(sort.StringSlice(prefixedPackageNames)))
+	sort.Sort(sort.Reverse(sort.StringSlice(packageNameVariants)))
 
 	// Note DB name as well as package name (Wiwi, Sowi, Recht, etc.) as well
 	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
-	output.Packages = append([]string{doc.DB}, prefixedPackageNames...)
+	output.Packages = append([]string{doc.DB}, packageNameVariants...)
 
 	// 2018-06-01, Modules are added, (1) add them in addition to existing
 	// package names, later XXX: (2) remove own tags.
 	output.Packages = append(output.Packages, doc.Modules...)
 
-	if len(prefixedPackageNames) > 0 {
-		output.MegaCollections = []string{prefixedPackageNames[0]}
+	if len(packageNameVariants) > 0 {
+		output.MegaCollections = []string{packageNameVariants[0]}
 	} else {
 		// XXX: Log these somewhere.
 		log.Printf("genios: db is not associated with package: %s, using generic default", doc.DB)
