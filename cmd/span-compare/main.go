@@ -77,7 +77,7 @@ var SourceNames = map[string]string{
 	"31":  "Opera in Video (OPIV)",
 	"32":  "Test Pilsen",
 	"33":  "Test Liberec",
-	"34":  "PQDT Open",
+	"34":  "ProQuest Open Access Dissertations and Theses (PQDT Open)",
 	"35":  "Hathi Trust",
 	"36":  "HistBest System am URZ Leipzig",
 	"37":  "Solr-Fusion statisches Mapping source_id für GBV",
