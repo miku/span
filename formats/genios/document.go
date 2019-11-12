@@ -297,8 +297,15 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = Genre
 	output.Languages = doc.Languages()
 
+	// XXX: Package names changed around 11/2019, e.g. "Wiso Journals /
+	// Wirtschaftswissenschaften", "Wiso Journals", "Wiso Journals / Recht",
+	// ...
+
+	// Lookup names like AAA, BUBH, CMW, ... in https://git.io/v2ECx - a single
+	// DB may be in multiple packages.
 	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
 
+	// Wrap package name in 'Genios (PACKAGENAME)'
 	var prefixedPackageNames []string
 	for _, name := range packageNames {
 		prefixedPackageNames = append(prefixedPackageNames, fmt.Sprintf("Genios (%s)", name))
@@ -318,6 +325,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(prefixedPackageNames) > 0 {
 		output.MegaCollections = []string{prefixedPackageNames[0]}
 	} else {
+		// XXX: Log these somewhere.
 		log.Printf("genios: db is not associated with package: %s, using generic default", doc.DB)
 		output.MegaCollections = []string{fmt.Sprintf("Genios")}
 	}
