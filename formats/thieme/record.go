@@ -16,7 +16,7 @@ import (
 const (
 	SourceID       = "60"
 	Format         = "ElectronicArticle"
-	Collection     = "Thieme E-Journals"
+	Collection     = "Thieme Journals"
 	Genre          = "article"
 	DefaultRefType = "EJOUR"
 )
@@ -241,7 +241,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.SourceID = SourceID
 	output.Format = Format
-	output.MegaCollections = []string{Collection}
+	output.MegaCollections = []string{Collection, "sid-60-col-thiemejournals"}
 	output.Genre = Genre
 	output.RefType = DefaultRefType
 
