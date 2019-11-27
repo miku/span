@@ -310,6 +310,19 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, name := range packageNames {
 		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Genios (%s)", name))
 		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Wiso Journals / %s", name))
+		// Add TCID, TODO(miku): sid-48-col-wisoubl
+		switch name {
+		case "Fachzeitschriften":
+			packageNameVariants = append(packageNameVariants, "sid-48-col-wisofachzs")
+		case "Wirtschaftswissenschaften":
+			packageNameVariants = append(packageNameVariants, "sid-48-col-wisowirtschaft")
+		case "Sozialwissenschaften":
+			packageNameVariants = append(packageNameVariants, "sid-48-col-wisosozial")
+		case "Psychologie":
+			packageNameVariants = append(packageNameVariants, "sid-48-col-wisopsych")
+		case "Recht":
+			packageNameVariants = append(packageNameVariants, "sid-48-col-wisorecht")
+		}
 	}
 
 	// hack, to move Genios (LIT) further down
