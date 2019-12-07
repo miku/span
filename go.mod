@@ -79,6 +79,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // indirect
 	github.com/russross/blackfriday v2.0.0+incompatible // indirect
+	github.com/segmentio/encoding v0.1.3
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76

@@ -2,7 +2,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -12,11 +11,12 @@ import (
 	"sort"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
+
+	json "github.com/segmentio/encoding/json"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
