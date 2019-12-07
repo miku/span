@@ -271,7 +271,7 @@ func (entry *Entry) containsDate(s string) (err error) {
 	return entry.containsDateTime(t, g)
 }
 
-// NormalizeSerialNumber tries to transform the input into 1234-567X standard form.
+// NormalizeSerialNumber tries to transform the input into 1234-575X standard form.
 func NormalizeSerialNumber(s string) string {
 	s = strings.ToUpper(strings.TrimSpace(s))
 	if len(s) == 8 {
