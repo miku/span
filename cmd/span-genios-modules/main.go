@@ -41,11 +41,6 @@ type Document struct {
 	} `xml:"Modules"`
 }
 
-type Map struct {
-	sync.Mutex
-	s map[string][]string
-}
-
 func stringSliceContains(ss []string, s string) bool {
 	for _, v := range ss {
 		if v == s {
@@ -53,6 +48,12 @@ func stringSliceContains(ss []string, s string) bool {
 		}
 	}
 	return false
+}
+
+// Map maps a string key to a set of strings, atomically.
+type Map struct {
+	sync.Mutex
+	s map[string][]string
 }
 
 func (m *Map) Add(key, value string) {
