@@ -88,3 +88,8 @@ names: assets/crossref/names.ndj
 assets/crossref/names.ndj: span-crossref-members
 	span-crossref-members | jq -rc '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > $@
 
+assets/genios/dbmap.generated.json:
+	# This is here to document the command, mainly (siskin v0.78.2, 344ca56b72a99074c71e45154ba32089c4f2e015 or later).
+	taskdo GeniosLatestReloadList --kind all
+	taskcat GeniosLatestReloadList --kind all | span-genios-modules > $@
+
