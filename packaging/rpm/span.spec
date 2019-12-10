@@ -29,6 +29,7 @@ install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-genios-modules $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-hcov $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-local-data $RPM_BUILD_ROOT/usr/sbin
@@ -39,6 +40,7 @@ install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/sbin
+
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
@@ -68,6 +70,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-crossref-snapshot
 /usr/sbin/span-export
 /usr/sbin/span-freeze
+/usr/sbin/span-genios-modules
 /usr/sbin/span-hcov
 /usr/sbin/span-import
 /usr/sbin/span-local-data

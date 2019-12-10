@@ -27,7 +27,7 @@ require (
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
-	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/fatih/color v1.7.0
 	github.com/fatih/structs v1.1.0
@@ -66,7 +66,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
-	github.com/miku/parallel v0.0.0-20190514155252-d289185a944b // indirect
+	github.com/miku/parallel v0.0.0-20190514155252-d289185a944b
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d // indirect
@@ -122,7 +122,7 @@ require (
 	golang.org/x/build v0.0.0-20190812175533-ded33d37d0af // indirect
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/mobile v0.0.0-20190814143026-e8b3e6111d02 // indirect
-	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
+	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297
 	golang.org/x/perf v0.0.0-20190620143337-7c3f2128ad9b // indirect
 	golang.org/x/sys v0.0.0-20190904005037-43c01164e931 // indirect
 	golang.org/x/text v0.3.2
