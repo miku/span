@@ -3,11 +3,32 @@
 //
 // $ cat filelist | span-genios-modules
 //
-// Previous list (Aug 22, 2017) contained 659 keys.
+// Where filelist contains a list (one per line) WISO supplied RELOAD zip file,
+// e.g. xyz_WWON_reload_201911.zip.
+//
+// Previous list (Aug 22, 2017) contained 659 keys. Current list (Dec 11, 2019) 743.
 //
 // $ curl -sL https://git.io/v94aR | jq '.|keys|length'
 // 659
 //
+// Compare old to new list.
+//
+// $ comm <(curl -sL https://git.io/v94aR | jq -r '.|keys[]') <(curl -sL https://git.io/Je522 | jq -r '.|keys[]')
+//
+// Discontinued
+// ABAL ABKL ABMS ABSC AE ANP AUTO AUW AVFB BB CBS CI DZI EMAR FERT FLUI FOGR
+// HMDS HOLZ INST KE KONT LEDI LEMO MF MUM PMGC PMGI PROD SBIL STB STIF WEBR
+// WEFO WRP WUV.
+//
+// New
+// ADWM BAVE BDI BIKO BIOS BIZT BUAE BUDR BUVI CBNB CFI CHET CICE CZWD CZWE
+// DATV DBBL DEH DFVE DIPL DNV DU DUHU DVZO EAWW EBOK EGGI EIND EJ EMA EMT ERIS
+// ESP EWIS FAZB FBPG FBV FEDS FEMI FFR FG FOVO FWP GABA GEND GPGD GRIA GRIN
+// HAUF HAUT HBDM HBIF HUSS IEE IJRE IKPR IKZF IKZP IMKP IMKR IMKS IMKW INFE
+// INW IRJ JAPS JCE KAS KI KMUV KUEP LF LMW LUCE LZDI MACH MBFR MIWI MTK MU MUL
+// NOTA NV PBST PCS PHF PIR PLS PLV POTI PRTR RBIH REDL RUP SOCI SOLA SOZM SSOA
+// STUB TOPA TRT TUE VEJA VER VHAU VKU WLBU WPUS WSIP WSIS WSIW WWBW WZM ZAP
+// ZERB ZFIP ZFMF ZISU ZPTH ZQF.
 package main
 
 import (
