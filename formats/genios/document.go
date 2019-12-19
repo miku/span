@@ -360,6 +360,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Subjects = doc.Headings()
 
 	output.RefType = DefaultRefType
+	output.OpenAccess = strings.HasPrefix(doc.Available, "Open Access") // refs #15008
 
 	return output, nil
 }
