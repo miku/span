@@ -6,7 +6,7 @@
 // Where filelist contains a list (one per line) WISO supplied RELOAD zip file,
 // e.g. xyz_WWON_reload_201911.zip.
 //
-// Previous list (Aug 22, 2017) contained 659 keys. Current list (Dec 11, 2019) 743.
+// Previous list (Aug 22, 2017) contained 659 keys. Current list (Dec 11, 2019) 753.
 //
 // $ curl -sL https://git.io/v94aR | jq '.|keys|length'
 // 659
@@ -77,6 +77,7 @@ type Map struct {
 	s map[string][]string
 }
 
+// Add value to key. There will be no duplicate values.
 func (m *Map) Add(key, value string) {
 	m.Lock()
 	defer m.Unlock()
@@ -92,10 +93,12 @@ func (m *Map) Add(key, value string) {
 	}
 }
 
+// Size returns number of keys.
 func (m *Map) Size() int {
 	return len(m.s)
 }
 
+// MarshalJSON serializes map storage.
 func (m *Map) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m.s)
 }
@@ -134,6 +137,15 @@ func main() {
 				case *Document:
 					for _, moduleName := range v.Modules.Module {
 						dbmap.Add(v.DB, moduleName)
+					}
+					if strings.Contains(strings.ToLower(filename), "_fachzeitschriften_") {
+						dbmap.Add(v.DB, "@Fachzeitschriften")
+					}
+					if strings.Contains(strings.ToLower(filename), "_literaturnachweise_") {
+						dbmap.Add(v.DB, "@Literaturnachweise")
+					}
+					if strings.Contains(strings.ToLower(filename), "_ebooks_") {
+						dbmap.Add(v.DB, "@Ebooks")
 					}
 				}
 			}
