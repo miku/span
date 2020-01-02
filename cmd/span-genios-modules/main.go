@@ -103,8 +103,45 @@ func (m *Map) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m.s)
 }
 
+func Print(msg string) {
+	firstSeen := false
+	for _, line := range strings.Split(msg, "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" && !firstSeen {
+			continue
+		}
+		firstSeen = true
+		fmt.Println(line)
+	}
+}
+
 func main() {
 
+	// If stdin is empty, print help message.
+	if fi, err := os.Stdin.Stat(); err == nil && fi.Size() == 0 {
+		Print(`
+			span-genios-modules tries to generate a fresh map from database
+			name to modules (like https://git.io/v2ECx).
+
+			    $ cat filelist | span-genios-modules
+
+			Where filelist contains a list (one per line) WISO supplied RELOAD zip file,
+			e.g. xyz_WWON_reload_201911.zip.
+
+			Example:
+
+			    $ taskcat GeniosLatestReloadList | span-genios-modules > out.json
+
+			Previous list (Aug 22, 2017) contained 659 keys. Current list (Dec 11, 2019) 753.
+
+			    $ curl -sL https://git.io/v94aR | jq '. | keys | length'
+			    659
+
+			Compare old to new list (12/2019).
+
+			    $ comm <(curl -sL https://git.io/v94aR | jq -r '.|keys[]') <(curl -sL https://git.io/Je522 | jq -r '.|keys[]')`)
+		os.Exit(0)
+	}
 	dbmap := &Map{s: make(map[string][]string)}
 
 	p := parallel.NewProcessor(os.Stdin, ioutil.Discard, func(b []byte) ([]byte, error) {
