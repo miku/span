@@ -43,6 +43,7 @@ import (
 	"strings"
 	"sync"
 
+	termutil "github.com/andrew-d/go-termutil"
 	humanize "github.com/dustin/go-humanize"
 	"github.com/miku/parallel"
 	"github.com/miku/xmlstream"
@@ -118,7 +119,7 @@ func Print(msg string) {
 func main() {
 
 	// If stdin is empty, print help message.
-	if fi, err := os.Stdin.Stat(); err == nil && fi.Size() == 0 {
+	if termutil.Isatty(os.Stdin.Fd()) {
 		Print(`
 			span-genios-modules tries to generate a fresh map from database
 			name to modules (like https://git.io/v2ECx).
@@ -142,6 +143,7 @@ func main() {
 			    $ comm <(curl -sL https://git.io/v94aR | jq -r '.|keys[]') <(curl -sL https://git.io/Je522 | jq -r '.|keys[]')`)
 		os.Exit(0)
 	}
+
 	dbmap := &Map{s: make(map[string][]string)}
 
 	p := parallel.NewProcessor(os.Stdin, ioutil.Discard, func(b []byte) ([]byte, error) {

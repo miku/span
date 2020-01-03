@@ -19,6 +19,7 @@ require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/aclements/go-gg v0.0.0-20170323211221-abd1f791f5ee // indirect
 	github.com/aclements/go-moremath v0.0.0-20190506201756-286cc0be6f75 // indirect
+	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2
 	github.com/andygrunwald/go-gerrit v0.0.0-20190625080919-64931d233c2d // indirect
 	github.com/aws/aws-sdk-go v1.19.42 // indirect
 	github.com/beevik/etree v1.1.0
