@@ -1,975 +1,1280 @@
 {
   "AAA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AAS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AATG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ABAU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ABES": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ABIL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ABZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ACAS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ACQ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ADCO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ADIW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ADWM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AECO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AEQ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AEZT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AFP": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AFZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AGRI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AHGA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AHGZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AHOR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AKA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AKS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AKTS": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "AMIF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AMP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AMW": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ANKR": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ANT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AOB": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "ARAB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ASP": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ASPA": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ASSC": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ASW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AUA": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "AUB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AUBI": [
     "1WISOERBILDFZS",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AUEL": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AUIN": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AUKO": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AUMO": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AUON": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AUPR": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AUTH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AUTI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "AWCH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AWOE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "AWPA": [
     "journal_psycho",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "BA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BAA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BAMA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BANK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BAVE": [
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_recht",
     "ebooks_technik",
     "ebooks_sozi",
     "ebooks_psycho"
   ],
   "BBA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BBL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BBLO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BDI": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "BE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BEFO": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "BFUP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BGWP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BIKE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BIKO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BILA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BILN": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BIOS": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "BIWI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "BIZT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BLEC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "BLIS": [
     "ebooks_wiwi",
-    "ebooks_sozi"
+    "ebooks_sozi",
+    "@Literaturnachweise"
   ],
   "BM": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BME": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BOND": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BONL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BRAU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BRSC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "BSPI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BTME": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUAE": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Ebooks"
   ],
   "BUBH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUDR": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "BUHA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BULK": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "BUM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUMT": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BURE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUSR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BUVI": [
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_psycho",
     "ebooks_sozi",
     "ebooks_technik"
   ],
   "BUW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BVPE": [
     "journal_psycho",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BVPN": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "BW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "BWI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CAD": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CAIT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CAPI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CARD": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CASH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CATI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CAV": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CAVE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CBIL": [
     "journal_technik",
-    "1WISOERBILDFZS"
+    "1WISOERBILDFZS",
+    "@Fachzeitschriften"
   ],
   "CBNB": [
-    "ebooks_technik"
+    "ebooks_technik",
+    "@Literaturnachweise"
   ],
   "CDM": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CEAB": [
-    "ebooks_technik"
+    "ebooks_technik",
+    "@Literaturnachweise"
   ],
   "CF": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CFI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CFLA": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CFO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CGMW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CHAN": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CHET": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CHX": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CICE": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "CID": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CIOD": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CIPA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CITL": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CLIN": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CMAG": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CME": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CMW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CO": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "COWI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CP": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CT": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CW": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CWT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CYBI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "CZ": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CZWD": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "CZWE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DAE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DAR": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "DATA": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DATV": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Ebooks"
   ],
   "DBBL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DBL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DBM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DBW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DBWV": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "DD": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DDH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DDS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DEBA": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DEH": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DEI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DFI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DFVE": [
     "ebooks_psycho",
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_technik"
   ],
   "DI": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DIBA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DINM": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DIPL": [
     "ebooks_wiwi",
     "ebooks_technik",
+    "@Ebooks",
     "ebooks_recht",
     "ebooks_psycho",
     "ebooks_sozi"
   ],
   "DISK": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "DIST": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DIWR": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "DIWW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DKT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DLGM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DLT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DMS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DNK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DNV": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DQ": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DQW": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DSB": [
     "journal_recht",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "DST": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DSTZ": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "DSZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DTRS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DTZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DUHU": [
     "ebooks_sozi",
+    "@Ebooks",
     "ebooks_wiwi",
     "ebooks_recht",
     "ebooks_technik",
     "ebooks_psycho"
   ],
   "DVP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DVZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DVZB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DVZO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "DWW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
+  ],
+  "DZI": [
+    "@Literaturnachweise"
   ],
   "EA": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EAW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EAWO": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EAWW": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "EB": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EBOK": [
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_sozi",
     "ebooks_psycho",
     "ebooks_recht",
     "ebooks_technik"
   ],
   "ECON": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "ED": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EDBW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EEK": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EGGI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EIND": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EIRB": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EJ": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EJCO": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "EJOP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ELEO": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EM": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EMA": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EMRE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EMT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EMW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ENER": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ENEV": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ENRE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EPP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EPPE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EPRA": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ERBS": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ERIP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ERIS": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ERP": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ESP": [
     "journal_psycho",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ESTB": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ESTE": [
-    "ebooks_technik"
+    "ebooks_technik",
+    "@Literaturnachweise"
   ],
   "ETEC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "EU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EUFI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EUIB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EUSO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EUZW": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EVIN": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EWIS": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "EWK": [
     "journal_psycho",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "EXFO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "EXTR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FAMR": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "FAZB": [
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_technik",
     "ebooks_sozi",
     "ebooks_psycho",
     "ebooks_recht"
   ],
   "FB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FBIE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FBPG": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "FBV": [
     "ebooks_technik",
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Ebooks"
   ],
   "FEDS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FEMI": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "FEMS": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "FFR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FG": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "FH": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "FIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FIME": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FINE": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "FINR": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "FIWI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FJSB": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "FK": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "FLF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FLOW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FLW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FLWA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FLWI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FMAI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
+  ],
+  "FOGR": [
+    "@Literaturnachweise"
   ],
   "FOVO": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "FOWE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "FPP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "FS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FSA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FSE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FSEA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FSM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FUS": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FVW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "FWP": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "GA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GABA": [
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_psycho",
     "ebooks_sozi",
     "ebooks_technik"
   ],
   "GAGI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "GAST": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GDI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GDP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GEBM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GELD": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GEND": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "GEPR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GET": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GEW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GFGH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GFKM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GHR": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "GI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GITL": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "GITS": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "GJHR": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "GLIP": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "GMST": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GOP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GOV": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "GPGD": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "GRER": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GRIA": [
     "ebooks_sozi",
+    "@Ebooks",
     "ebooks_psycho",
     "ebooks_wiwi",
     "ebooks_recht",
@@ -977,1458 +1282,1926 @@
   ],
   "GRIN": [
     "ebooks_sozi",
+    "@Ebooks",
     "ebooks_wiwi",
     "ebooks_psycho",
     "ebooks_recht"
   ],
   "GUBU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GUG": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "GUIN": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GVPA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GVPR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GWP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "GWW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HANA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HAND": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HAUF": [
     "ebooks_psycho",
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_sozi",
     "ebooks_technik",
     "ebooks_recht"
   ],
   "HAUT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HBDM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HBIF": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "HBNI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HBUS": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HDJ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HDLG": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HIF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HILA": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "HLOG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HMD": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
+  ],
+  "HMDS": [
+    "@Fachzeitschriften"
   ],
   "HOE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HOR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HORA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HORS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HPRW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HREC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HSR": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "HTEC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HTH": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "HTT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HUSS": [
     "ebooks_technik",
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_recht"
   ],
   "HVM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "HWWA": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "IA": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IAA": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IAC": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IBF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ICT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IEE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IFAM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IFKP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IFMW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IFOD": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IFOK": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "IFOL": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "IFOS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IGMW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IHKK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IHSL": [
     "ebooks_wiwi",
-    "ebooks_sozi"
+    "ebooks_sozi",
+    "@Literaturnachweise"
   ],
   "IJAR": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "IJPR": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "IJRE": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "IKPR": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IKZF": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IKZP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMC": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IMKP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMKR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMKS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMKW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMMA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMMO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IMWI": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "INDB": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "INFE": [
-    "ebooks_technik"
+    "ebooks_technik",
+    "@Literaturnachweise"
   ],
   "INFO": [
-    "ebooks_technik"
+    "ebooks_technik",
+    "@Literaturnachweise"
   ],
   "INJO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "INSP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "INW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IP": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "IRJ": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "IS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ISBF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ISI": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ISR": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ITB": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ITG": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ITT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IWB": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "IWPR": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "IWT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "IX": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "JAPS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JBM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JBS": [
     "journal_psycho",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "JBWW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JCE": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
+  ],
+  "JCS": [
+    "@Fachzeitschriften"
   ],
   "JCSM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JEEM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JEF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JER": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "JFAV": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JFNS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JGSI": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "JNC": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "JOBS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JOR": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "JOS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JPV": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "JRW": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "JSPP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "JUKA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KAFU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KAS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KEM": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KEP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KFZB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KFZW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KM": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KMAG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KMUV": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "KOCA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KOEL": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "KONP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KONS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KONZ": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KOR": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KRES": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KSM": [
     "journal_recht",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KTX": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "KU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KUCH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KUEP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KUK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KURS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "KUSE": [
-    "ebooks_recht"
+    "ebooks_recht",
+    "@Literaturnachweise"
   ],
   "KUSI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "KUSO": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "KUST": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "LABO": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "LAK": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "LAPR": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "LAW": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "LB": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
+  ],
+  "LEMO": [
+    "@Fachzeitschriften"
   ],
   "LF": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "LGK": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LHMW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LI": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LKH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LMW": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "LMZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LMZA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LMZS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LOG": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LOGI": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "LP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "LUCE": [
     "ebooks_sozi",
+    "@Ebooks",
     "ebooks_wiwi",
     "ebooks_recht"
   ],
   "LZDI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MABL": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MAC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MACH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MAKR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MALE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MAMA": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MAMI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MAON": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MAR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MARC": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MAV": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MBFR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MBP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MBW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MCDB": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MCKW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MDA": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "MDR": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "MEMW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "METE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MFZB": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "MID": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MIET": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "MIND": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Literaturnachweise"
   ],
   "MIWI": [
     "ebooks_wiwi",
     "ebooks_technik",
+    "@Ebooks",
     "ebooks_psycho",
     "ebooks_sozi",
     "ebooks_recht"
   ],
   "MM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MREV": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MSR": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MT": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MTA": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "MTK": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "MTME": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MU": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "MUAR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MUB": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "MUL": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "MUTE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "NDV": [
     "journal_recht",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "NEEN": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "NEHO": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "NEUL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "NGZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "NOTA": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "NOTB": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "NPE": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "NV": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OEIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OEKO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OEKZ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OELA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OER": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OEWI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OGEM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OGR": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OMNI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ONR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "ORDO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "OWG": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "PACK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PAFO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PAPE": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "PASS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PBST": [
     "ebooks_psycho",
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_sozi",
     "ebooks_technik"
   ],
   "PC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "PCH": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PCS": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "PCW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "PDKK": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PEMA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PERI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PGE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PHAM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PHAP": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "PHF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PHM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PIR": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "PJCP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PJIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PJLS": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "PJP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PJPR": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PJSS": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "PKV": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PLM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PLS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PLV": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "PM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PMEM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
+  ],
+  "PMGC": [
+    "@Fachzeitschriften"
+  ],
+  "PMGI": [
+    "@Fachzeitschriften"
   ],
   "PMJ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "POPE": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "POPS": [
     "journal_sozi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PORT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "POTI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PP": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PPS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PRIN": [
-    "ebooks_technik"
+    "ebooks_technik",
+    "@Literaturnachweise"
   ],
   "PROC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "PROJ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PRTR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PSJ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PSS": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PSYA": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PSYC": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PSYT": [
-    "ebooks_psycho"
+    "ebooks_psycho",
+    "@Literaturnachweise"
   ],
   "PUA": [
     "journal_psycho",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PUGK": [
     "journal_sozi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "PUUM": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PVD": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "PWI": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "QE": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "QJIA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "QUAL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "QZ": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "RAAK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RAU": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "RBIH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RBS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RCUA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "REDL": [
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_recht",
     "ebooks_psycho"
   ],
   "REFA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "REGA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "REGI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "REMW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "REND": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RISK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RLH": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RTH": [
     "journal_recht",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "RTJ": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "RUP": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "SAFR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SBAN": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SBP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SBRE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
+  ],
+  "SCHE": [
+    "@Ebooks"
+  ],
+  "SCHL": [
+    "@Ebooks"
   ],
   "SCMW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "SCOP": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SHF": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "SINV": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SJB": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SLO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SMA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SMF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SOA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SOAS": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SOBE": [
     "journal_psycho",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SOC": [
     "journal_sozi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "SOCI": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SOFI": [
-    "ebooks_sozi"
+    "ebooks_sozi",
+    "@Literaturnachweise"
   ],
   "SOFO": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SOLA": [
     "ebooks_recht",
     "ebooks_technik",
+    "@Ebooks",
     "ebooks_wiwi"
   ],
   "SOLI": [
-    "ebooks_sozi"
+    "ebooks_sozi",
+    "@Literaturnachweise"
   ],
   "SOSI": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SOSY": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SOZM": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SPAO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SPAR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SPI": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "SSOA": [
-    "ebooks_sozi"
+    "ebooks_sozi",
+    "@Literaturnachweise"
   ],
   "SSP": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "STAA": [
     "journal_sozi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
+  ],
+  "STB": [
+    "@Fachzeitschriften"
   ],
   "STBG": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "STGU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "STS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "STUB": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SUG": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "SVER": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "SWW": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "TAI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TAWI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TAXI": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TDIA": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "TEC": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "TETE": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "THBE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "THEX": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "THPH": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "TIAM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TJ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TMW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TOPA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TR": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "TRE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TRT": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TRUC": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "TT": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "TUD": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "TUE": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TWA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TWNE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "TWP": [
     "journal_psycho",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "UMPS": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "UNED": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "UNTE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "UR": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "USTB": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "UTIL": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VALU": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VCNE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VD": [
     "journal_technik",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VDIA": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "VDIN": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "VEC": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VEJA": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VER": [
-    "ebooks_wiwi"
+    "ebooks_wiwi",
+    "@Ebooks"
   ],
   "VERK": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VERS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VERW": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "VHAU": [
     "ebooks_psycho",
     "ebooks_wiwi",
+    "@Ebooks",
     "ebooks_recht",
     "ebooks_sozi"
   ],
   "VIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VJH": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "VKU": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "VM": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "VOB": [
     "journal_technik",
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VRA": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VRAG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VRR": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "VST": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "VUNM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VUV": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "VV": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "VW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WAO": [
-    "ebooks_sozi"
+    "ebooks_sozi",
+    "@Literaturnachweise"
   ],
   "WAX": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "WEBE": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "WEN": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WFP": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "WIM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WIME": [
     "journal_recht",
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "WIR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WIRO": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WJ": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WLB": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "WLBU": [
     "journal_wiwi",
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "WM": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WP": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "WPSY": [
     "journal_psycho",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WPUS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WSIP": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "WSIR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WSIS": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WSIW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WTRE": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "WUB": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WUW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WUWE": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "WW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WWBW": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WWGR": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WWON": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "WWT": [
-    "journal_technik"
+    "journal_technik",
+    "@Fachzeitschriften"
   ],
   "WZM": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "XPSY": [
-    "ebooks_psycho"
+    "ebooks_psycho",
+    "@Literaturnachweise"
   ],
   "ZAAA": [
     "journal_wiwi",
     "journal_sozi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZAP": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "ZERB": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "ZFAA": [
     "journal_wiwi",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZFBF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFF": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZFGG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFGK": [
     "journal_recht",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFIP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZFKE": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFKO": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFMF": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "ZFO": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZFP": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZFR": [
     "journal_recht",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZFS": [
     "journal_psycho",
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZFT": [
     "journal_sozi",
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFWP": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZFWU": [
     "journal_wiwi",
     "journal_sozi",
-    "1WISOVLNOMSOZ"
+    "1WISOVLNOMSOZ",
+    "@Fachzeitschriften"
   ],
   "ZISU": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZKF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZM": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZNER": [
     "journal_wiwi",
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "ZOE": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZPMP": [
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZPTH": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZQF": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZRP": [
-    "journal_recht"
+    "journal_recht",
+    "@Fachzeitschriften"
   ],
   "ZSR": [
-    "journal_sozi"
+    "journal_sozi",
+    "@Fachzeitschriften"
   ],
   "ZUG": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ],
   "ZVS": [
     "journal_wiwi",
-    "journal_psycho"
+    "journal_psycho",
+    "@Fachzeitschriften"
   ],
   "ZWF": [
-    "journal_wiwi"
+    "journal_wiwi",
+    "@Fachzeitschriften"
   ]
 }
