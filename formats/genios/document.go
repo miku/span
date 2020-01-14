@@ -292,7 +292,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
 
-	output.Fulltext = doc.Text
+	output.Fulltext = "" // refs. #16743
 	output.Format = Format
 	output.Genre = Genre
 	output.Languages = doc.Languages()
