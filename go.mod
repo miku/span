@@ -30,7 +30,7 @@ require (
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0 // indirect
-	github.com/fatih/color v1.8.0
+	github.com/fatih/color v1.9.0
 	github.com/fatih/structs v1.1.0
 	github.com/francoispqt/gojay v1.2.11
 	github.com/gliderlabs/ssh v0.2.2 // indirect
@@ -53,7 +53,7 @@ require (
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/kisielk/errcheck v1.2.0 // indirect
-	github.com/klauspost/compress v1.9.5 // indirect
+	github.com/klauspost/compress v1.9.7 // indirect
 	github.com/klauspost/cpuid v1.2.2 // indirect
 	github.com/klauspost/pgzip v1.2.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
@@ -63,8 +63,6 @@ require (
 	github.com/lunixbochs/vtclean v1.0.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
-	github.com/mattn/go-colorable v0.1.4 // indirect
-	github.com/mattn/go-isatty v0.0.11 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
@@ -124,9 +122,9 @@ require (
 	golang.org/x/build v0.0.0-20190812175533-ded33d37d0af // indirect
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
 	golang.org/x/mobile v0.0.0-20190814143026-e8b3e6111d02 // indirect
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
 	golang.org/x/perf v0.0.0-20190620143337-7c3f2128ad9b // indirect
-	golang.org/x/sys v0.0.0-20191228213918-04cbcbbfeed8 // indirect
+	golang.org/x/sys v0.0.0-20200113162924-86b910548bc1 // indirect
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20190815144358-9065c182e3b6 // indirect
 	google.golang.org/grpc v1.23.0 // indirect
