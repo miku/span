@@ -131,6 +131,9 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	if len(id) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("id too long: %s", id)}
 	}
+	if len(id) == 0 {
+		return nil, span.Skip{Reason: fmt.Sprintf("no doi or identifier: %v", article)}
+	}
 	output.ID = id
 	output.RecordID = ids.DOI
 
