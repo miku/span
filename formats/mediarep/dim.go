@@ -104,13 +104,15 @@ func (r *Dim) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var date time.Time
 	var err error
 
-	layouts := []string{"2006", "2006-01", "2006-02"}
+	layouts := []string{"2006", "2006-01", "2006-01-02"}
 	for _, l := range layouts {
 		date, err = time.Parse(l, output.RawDate)
 		if err != nil {
 			continue
 		}
+		break
 	}
+
 	if date.IsZero() {
 		return nil, err
 	}
