@@ -101,10 +101,20 @@ func (r *Dim) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.EndPage = r.FieldValue("local", "source", "epage")
 	output.PageCount = r.PageCount()
 
-	date, err := time.Parse("2006", output.RawDate)
-	if err != nil {
+	var date time.Time
+	var err error
+
+	layouts := []string{"2006", "2006-01", "2006-02"}
+	for _, l := range layouts {
+		date, err = time.Parse(l, output.RawDate)
+		if err != nil {
+			continue
+		}
+	}
+	if date.IsZero() {
 		return nil, err
 	}
+
 	output.Date = date
 
 	for _, c := range r.FieldValues("dc", "creator", "") {
