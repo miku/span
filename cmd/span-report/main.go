@@ -114,7 +114,7 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 			var results []string
 
 			if w.issn == "" {
-				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, w.sid, w.c)
+				query := fmt.Sprintf(`source_id:%q AND mega_collection:%q`, w.sid, w.c)
 				results, err = index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
 					return c > 0
 				})
@@ -129,7 +129,7 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 			}
 
 			for _, issn := range results {
-				q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, w.sid, w.c, issn)
+				q := fmt.Sprintf(`source_id:%q AND mega_collection:%q AND issn:%q`, w.sid, w.c, issn)
 				count, err := index.NumFound(q)
 				if err != nil {
 					log.Fatal(err)
@@ -203,7 +203,7 @@ func main() {
 	case "basic":
 		log.Printf("basic report on %v", index)
 
-		query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, *sid, *collection)
+		query := fmt.Sprintf(`source_id:%q AND mega_collection:%q`, *sid, *collection)
 		results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
 			return c > 0
 		})
@@ -213,7 +213,7 @@ func main() {
 		log.Printf("%s [%s] contains %d ISSN", *sid, *collection, len(results))
 
 		for _, issn := range results {
-			q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, *sid, *collection, issn)
+			q := fmt.Sprintf(`source_id:%q AND mega_collection:%q AND issn:%q`, *sid, *collection, issn)
 			count, err := index.NumFound(q)
 			if err != nil {
 				log.Fatal(err)
@@ -242,7 +242,7 @@ func main() {
 				log.Fatal(err)
 			}
 			for j, c := range cs {
-				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
+				query := fmt.Sprintf(`source_id:%q AND mega_collection:%q`, sid, c)
 				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
 					return c > 0
 				})
@@ -253,7 +253,7 @@ func main() {
 					log.Printf("%d/%d %d/%d %d [%s %s]", i+1, len(sids), j+1, len(cs), len(results), sid, c)
 				}
 				for _, issn := range results {
-					q := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s" AND issn:"%s"`, sid, c, issn)
+					q := fmt.Sprintf(`source_id:%q AND mega_collection:%q AND issn:%q`, sid, c, issn)
 					count, err := index.NumFound(q)
 					if err != nil {
 						log.Fatal(err)
@@ -350,7 +350,7 @@ func main() {
 				log.Fatal(err)
 			}
 			for _, c := range cs {
-				query := fmt.Sprintf(`source_id:"%s" AND mega_collection:"%s"`, sid, c)
+				query := fmt.Sprintf(`source_id:%q AND mega_collection:%q`, sid, c)
 				results, err := index.FacetKeysFunc(query, "issn", func(s string, c int) bool {
 					return c > 0
 				})
