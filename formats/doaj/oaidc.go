@@ -130,8 +130,13 @@ func (record Record) JournalTitle() string {
 
 // ISSN returns ISSN, if available.
 func (record Record) ISSN() (issn []string) {
-	re := regexp.MustCompile(`[0-9]{4,4}-[0-9xX]{4,4}`)
+	// 10.1186/1471-230X-10-35, https://play.golang.org/p/-f0TVWQYjw5
+	re := regexp.MustCompile(`^[0-9]{4,4}-[0-9xX]{4,4}$`)
 	for _, v := range record.Metadata.Dc.Identifier {
+		v = strings.TrimSpace(v)
+		if len(v) == 8 {
+			v = v[:4] + "-" + v[4:]
+		}
 		if re.MatchString(v) {
 			issn = append(issn, v)
 		}
