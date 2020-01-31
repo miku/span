@@ -55,7 +55,8 @@ var (
 // Factory creates things.
 type Factory func() interface{}
 
-// FormatMap maps format name to pointer to format struct.
+// FormatMap maps format name to pointer to format struct. TODO(miku): That
+// looks just wrong.
 var FormatMap = map[string]Factory{
 	"ceeol":         func() interface{} { return new(ceeol.Article) },
 	"ceeol-marcxml": func() interface{} { return new(ceeol.Record) },
