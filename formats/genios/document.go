@@ -312,16 +312,23 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Wiso Journals / %s", name))
 		// Add TCID, TODO(miku): sid-48-col-wisoubl
 		switch name {
-		case "Fachzeitschriften":
+		case "Fachzeitschriften", "@Fachzeitschriften":
 			packageNameVariants = append(packageNameVariants, "sid-48-col-wisofachzs")
-		case "Wirtschaftswissenschaften":
+			fallthrough
+		case "Wirtschaftswissenschaften", "journal_wiwi":
 			packageNameVariants = append(packageNameVariants, "sid-48-col-wisowirtschaft")
-		case "Sozialwissenschaften":
+			fallthrough
+		case "Sozialwissenschaften", "journal_sozi":
 			packageNameVariants = append(packageNameVariants, "sid-48-col-wisosozial")
-		case "Psychologie":
+			fallthrough
+		case "Psychologie", "journal_psycho":
 			packageNameVariants = append(packageNameVariants, "sid-48-col-wisopsych")
-		case "Recht":
+			fallthrough
+		case "Recht", "journal_recht":
 			packageNameVariants = append(packageNameVariants, "sid-48-col-wisorecht")
+			fallthrough
+		case "Technik", "journal_technik":
+			packageNameVariants = append(packageNameVariants, "sid-48-col-wisotechnik")
 		}
 	}
 
