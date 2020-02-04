@@ -101,7 +101,7 @@ var (
 	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// dbmap maps a database name to one or more "package names"
-	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.json")
+	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.generated.json")
 	// yearPattern matches YYYY
 	yearPattern = regexp.MustCompile(`[12][0-9][0-9][0-9]`)
 )
