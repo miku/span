@@ -22,18 +22,15 @@
 package genios
 
 import (
-	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
@@ -49,15 +46,13 @@ const (
 	Genre = "article"
 	// DefaultRefType is the default ris.type.
 	DefaultRefType = "EJOUR"
-	// If no abstract is found accept this number of chars from doc.Text as Abstract.
-	textAsAbstractCutoff = 200
 	// maxAuthorLength example: document/BOND__b0604160052
 	maxAuthorLength = 200
 	minAuthorLength = 4
 	maxTitleLength  = 2048
 )
 
-// Document was generated 2019-06-12 19:13:21 by tir on hayiti, adjusted.
+// Document was generated 2019-06-12 19:13:21 by tir on hayiti, edited.
 type Document struct {
 	XMLName     xml.Name `xml:"Document"`
 	Chardata    string   `xml:",chardata"`
@@ -100,8 +95,6 @@ var (
 	rawDateReplacer = strings.NewReplacer(`"`, "", "\n", "", "\t", "")
 	// acceptedLanguages restricts the possible languages for detection.
 	acceptedLanguages = container.NewStringSet("deu", "eng")
-	// dbmap maps a database name to one or more "package names"
-	dbmap = assetutil.MustLoadStringSliceMap("assets/genios/dbmap.generated.json")
 	// yearPattern matches YYYY
 	yearPattern = regexp.MustCompile(`[12][0-9][0-9][0-9]`)
 )
@@ -150,7 +143,7 @@ func (doc Document) URL() string {
 	if link := strings.TrimSpace(doc.PersistentLink); link != "" {
 		return link
 	}
-	log.Printf("%s has no persistent link, falling back", doc.FincID())
+	log.Printf("%s has no persistent link, falling back", span.GenFincID(SourceID, doc.SourceAndID()))
 	return fmt.Sprintf("https://www.wiso-net.de/document/%s", doc.SourceAndID())
 }
 
@@ -192,7 +185,8 @@ func (doc Document) Authors() (authors []finc.Author) {
 			if len(name) < minAuthorLength {
 				continue
 			}
-			// Author substrings to filter out, this is just the tip of the iceberg.
+			// Author substrings to filter out, this is just the tip of the
+			// iceberg. TODO(martin): make this an asset.
 			clues := []string{"www.", "http:", "&quot", "part 1 of", "part 2 of",
 				"Copyright", "(c)", "All rights reserved", "he said"}
 			if stringContainsAny(name, clues) {
@@ -215,18 +209,11 @@ func (doc Document) ISSNList() []string {
 	return issns.Values()
 }
 
-// FincID uses SourceAndID as starting point.
-func (doc Document) FincID() string {
-	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.SourceAndID())))
-}
-
 // Languages returns the given and guessed languages found in abstract and
 // fulltext. Note: This is slow. Skip detection on too short strings.
 func (doc Document) Languages() []string {
 	set := container.NewStringSet()
-
 	vals := []string{doc.Title, doc.Text}
-
 	for _, s := range vals {
 		if len(s) < 20 {
 			continue
@@ -235,123 +222,53 @@ func (doc Document) Languages() []string {
 		if err != nil {
 			continue
 		}
-		if !acceptedLanguages.Contains(lang) {
-			continue
-		}
-		if lang == "und" {
+		if !acceptedLanguages.Contains(lang) || lang == "und" {
 			continue
 		}
 		set.Add(lang)
 	}
-
 	return set.Values()
 }
 
 // ToIntermediateSchema converts a genios document into an intermediate schema document.
 // Will fail/skip records with unusable dates.
-func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
-	var err error
-	output := finc.NewIntermediateSchema()
-
+func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err error) {
+	output = finc.NewIntermediateSchema()
 	output.Date, err = doc.Date()
 	if err != nil {
 		return output, span.Skip{Reason: err.Error()}
 	}
 	output.RawDate = output.Date.Format("2006-01-02")
-
 	output.Authors = doc.Authors()
-
 	output.URL = append(output.URL, doc.URL())
-
-	if isNomenNescio(doc.Abstract) {
-		cutoff := len(doc.Text)
-		if cutoff > textAsAbstractCutoff {
-			cutoff = textAsAbstractCutoff
-		}
-		output.Abstract = strings.TrimSpace(doc.Text[:cutoff])
-	} else {
+	if !isNomenNescio(doc.Abstract) {
 		output.Abstract = strings.TrimSpace(doc.Abstract)
-
 	}
-
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
 	if len(output.ArticleTitle) > maxTitleLength {
 		return output, span.Skip{Reason: fmt.Sprintf("article title too long: %d", len(output.ArticleTitle))}
 	}
-
 	// TODO(miku): Find DB names where this is relevant.
 	output.JournalTitle = strings.Replace(strings.TrimSpace(doc.PublicationTitle), "\n", " ", -1)
-
 	output.ISSN = doc.ISSNList()
-
 	if !isNomenNescio(doc.Issue) {
 		output.Issue = strings.TrimSpace(doc.Issue)
 	}
-
 	if !isNomenNescio(doc.Volume) {
 		output.Volume = strings.TrimSpace(doc.Volume)
 	}
-
 	output.Fulltext = "" // refs. #16743
 	output.Format = Format
 	output.Genre = Genre
 	output.Languages = doc.Languages()
-
-	// XXX: Package names changed around 11/2019, e.g. "Wiso Journals /
-	// Wirtschaftswissenschaften", "Wiso Journals", "Wiso Journals / Recht",
-	// ...
-
-	// Lookup names like AAA, BUBH, CMW, ... in https://git.io/v2ECx - a single
-	// DB may be in multiple packages.
-	var packageNames = dbmap.LookupDefault(doc.DB, []string{})
-
-	// Wrap package name in 'Genios (PACKAGENAME)'
-	var packageNameVariants []string
-	for _, name := range packageNames {
-		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Genios (%s)", name))
-		packageNameVariants = append(packageNameVariants, fmt.Sprintf("Wiso Journals / %s", name))
-		// Add TCID, TODO(miku): sid-48-col-wisoubl
-		switch name {
-		case "Fachzeitschriften", "@Fachzeitschriften":
-			packageNameVariants = append(packageNameVariants, "sid-48-col-wisofachzs")
-			fallthrough
-		case "Wirtschaftswissenschaften", "journal_wiwi":
-			packageNameVariants = append(packageNameVariants, "sid-48-col-wisowirtschaft")
-			fallthrough
-		case "Sozialwissenschaften", "journal_sozi":
-			packageNameVariants = append(packageNameVariants, "sid-48-col-wisosozial")
-			fallthrough
-		case "Psychologie", "journal_psycho":
-			packageNameVariants = append(packageNameVariants, "sid-48-col-wisopsych")
-			fallthrough
-		case "Recht", "journal_recht":
-			packageNameVariants = append(packageNameVariants, "sid-48-col-wisorecht")
-			fallthrough
-		case "Technik", "journal_technik":
-			packageNameVariants = append(packageNameVariants, "sid-48-col-wisotechnik")
-		}
-	}
-
-	// hack, to move Genios (LIT) further down
-	sort.Sort(sort.Reverse(sort.StringSlice(packageNameVariants)))
-
-	// Note DB name as well as package name (Wiwi, Sowi, Recht, etc.) as well
-	// as kind, which - a bit confusingly - is also package in licensing terms (FZS).
-	output.Packages = append([]string{doc.DB}, packageNameVariants...)
-
-	// 2018-06-01, Modules are added, (1) add them in addition to existing
-	// package names, later XXX: (2) remove own tags.
 	output.Packages = append(output.Packages, doc.Modules...)
-
-	if len(packageNameVariants) > 0 {
-		output.MegaCollections = []string{packageNameVariants[0]}
+	if len(output.Packages) > 0 {
+		output.MegaCollections = []string{output.Packages[0]}
 	} else {
-		// XXX: Log these somewhere.
-		log.Printf("genios: db is not associated with package: %s, using generic default", doc.DB)
+		log.Printf("genios: DB is not associated with any package: %s, falling back to generic default for mega_collection", doc.DB)
 		output.MegaCollections = []string{fmt.Sprintf("Genios")}
 	}
-
-	id := doc.FincID()
+	id := span.GenFincID(SourceID, doc.SourceAndID())
 	// 250 was a limit on memcached keys; offending key was:
 	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
 	// dTdGV1ZXJ1bmdzYmF1IMK3SW5kdXN0cmllLUVsZWt0cm9uaWsgwr\
@@ -365,9 +282,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RecordID = doc.ID
 	output.SourceID = SourceID
 	output.Subjects = doc.Headings()
-
 	output.RefType = DefaultRefType
 	output.OpenAccess = strings.HasPrefix(doc.Available, "Open Access") // refs #15008
-
 	return output, nil
 }
