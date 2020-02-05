@@ -265,6 +265,10 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 	if len(output.Packages) > 0 {
 		output.MegaCollections = []string{output.Packages[0]}
 	} else {
+		// TODO(martin): Need to fallback to "X-Package", e.g. "DZI" -- unzip -p
+		// .../mirror/gbi/konsortium_sachsen_literaturnachweise_sozialwissenschaften_DZI_reload_201911.zip
+		// konsortium_sachsen_literaturnachweise_sozialwissenschaften_DZI_reload_1_10000.xml
+		// | grep Modules && echo $? # 1
 		log.Printf("genios: DB is not associated with any package: %s, falling back to generic default for mega_collection", doc.DB)
 		output.MegaCollections = []string{fmt.Sprintf("Genios")}
 	}
