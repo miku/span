@@ -13,7 +13,7 @@
 //
 // Compare old to new list.
 //
-// $ comm <(curl -sL https://git.io/v94aR | jq -r '.|keys[]') <(curl -sL https://git.io/Je522 | jq -r '.|keys[]')
+// $ comm <(curl -sL https://git.io/JvZXw | jq -r '.|keys[]') <(curl -sL https://git.io/Je522 | jq -r '.|keys[]')
 //
 // Discontinued
 // ABAL ABKL ABMS ABSC AE ANP AUTO AUW AVFB BB CBS CI DZI EMAR FERT FLUI FOGR
