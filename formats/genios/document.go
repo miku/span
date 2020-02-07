@@ -261,6 +261,7 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 	output.Format = Format
 	output.Genre = Genre
 	output.Languages = doc.Languages()
+	// Official package designation.
 	output.Packages = append(output.Packages, doc.Modules...)
 	if len(output.Packages) > 0 {
 		output.MegaCollections = []string{output.Packages[0]}
@@ -272,7 +273,11 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 		log.Printf("genios: DB is not associated with any package: %s, falling back to generic default for mega_collection", doc.DB)
 		output.MegaCollections = []string{fmt.Sprintf("Genios")}
 	}
+	// Genios DB (for debugging)
 	output.Packages = append(output.Packages, doc.DB)
+	// This is injected from the filename. We need this to distinguish between
+	// "Fachzeitschrichten" and "Literaturnachweise".
+	output.Packages = append(output.Packages, doc.XPackage)
 	id := span.GenFincID(SourceID, doc.SourceAndID())
 	// 250 was a limit on memcached keys; offending key was:
 	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
