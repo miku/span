@@ -19,6 +19,7 @@ import (
 var (
 	live       = flag.String("live", "https://example.technology", "AMSL live base url")
 	allowEmpty = flag.Bool("allow-empty", false, "allow empty responses from api")
+	flatten    = flag.Bool("f", false, "flatten output into a TSV")
 )
 
 // Discovery API response (now defunkt).
@@ -144,7 +145,43 @@ func fetchFrom(base, kind string, r io.ReaderFrom) (int64, error) {
 	return fetchLocation(loc, r)
 }
 
+// slugifyTabs removes tabs from all fields.
+func slugifyTabs(vs []string) (result []string) {
+	for _, v := range vs {
+		c := strings.ReplaceAll(v, "\t", " ")
+		result = append(result, c)
+		if v != c {
+			log.Printf("[note] removed tab from %s", v)
+		}
+	}
+	return result
+}
+
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, `
+The generated TSV (via -f) fields are:
+
+1	ShardLabel
+2	ISIL
+3	SourceID
+4	TechnicalCollectionID
+5	MegaCollection
+6	HoldingsFileURI
+7	HoldingsFileLabel
+8	LinkToHoldingsFile
+9	EvaluateHoldingsFileForLibrary
+10	ContentFileURI
+11	ContentFileLabel
+12	LinkToContentFile
+13	ExternalLinkToContentFile
+14	ProductISIL
+15	DokumentURI
+16	DokumentLabel
+`)
+	}
 	flag.Parse()
 
 	var (
@@ -274,13 +311,13 @@ func main() {
 				ContentFileLabel:               update.ContentFileLabel,
 				ContentFileURI:                 update.ContentFileURI,
 				EvaluateHoldingsFileForLibrary: update.EvaluateHoldingsFileForLibrary,
-				ISIL:                  update.ISIL,
-				LinkToContentFile:     update.LinkToContentFile,
-				MegaCollection:        update.MegaCollection,
-				ProductISIL:           update.ProductISIL,
-				ShardLabel:            update.ShardLabel,
-				SourceID:              update.SourceID,
-				TechnicalCollectionID: update.TechnicalCollectionID,
+				ISIL:                           update.ISIL,
+				LinkToContentFile:              update.LinkToContentFile,
+				MegaCollection:                 update.MegaCollection,
+				ProductISIL:                    update.ProductISIL,
+				ShardLabel:                     update.ShardLabel,
+				SourceID:                       update.SourceID,
+				TechnicalCollectionID:          update.TechnicalCollectionID,
 			}
 			if hf.DokumentURI != "" {
 				ndoc.LinkToHoldingsFile = fmt.Sprintf(
@@ -299,7 +336,34 @@ func main() {
 	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
 
-	if err := json.NewEncoder(bw).Encode(updates); err != nil {
-		log.Fatal(err)
+	if *flatten {
+		for _, update := range updates {
+			fields := []string{
+				update.ShardLabel,
+				update.ISIL,
+				update.SourceID,
+				update.TechnicalCollectionID,
+				update.MegaCollection,
+				update.HoldingsFileURI,
+				update.HoldingsFileLabel,
+				update.LinkToHoldingsFile,
+				update.EvaluateHoldingsFileForLibrary,
+				update.ContentFileURI,
+				update.ContentFileLabel,
+				update.LinkToContentFile,
+				update.ExternalLinkToContentFile,
+				update.ProductISIL,
+				update.DokumentURI,
+				update.DokumentLabel,
+			}
+			fields = slugifyTabs(fields)
+			if _, err := io.WriteString(bw, strings.Join(fields, "\t")+"\n"); err != nil {
+				log.Fatal(err)
+			}
+		}
+	} else {
+		if err := json.NewEncoder(bw).Encode(updates); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
