@@ -26,6 +26,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math"
 	"os"
 	"path"
@@ -33,6 +34,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/miku/clam"
 	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
 
@@ -175,6 +177,7 @@ var SourceNames = map[string]string{
 var defaultConfigPath = path.Join(span.UserHomeDir(), ".config/span/span.json")
 
 var (
+	amslLiveServer   = flag.String("amsl", "", "url to live amsl api for ad-hoc source names, e.g. https://example.technology")
 	liveServer       = flag.String("a", "http://localhost:8983/solr/biblio", "live server location")
 	nonliveServer    = flag.String("b", "http://localhost:8983/solr/biblio", "non-live server location")
 	whatIsLive       = flag.Bool("e", false, "use whatislive.url to determine live and non live servers")
@@ -190,6 +193,32 @@ type ResultWriter interface {
 	WriteHeader(...string)
 	WriteFields(...interface{})
 	Err() error
+}
+
+// fetchSourceNames from AMSL, crudely via shell.
+func fetchSourceNames(amsl string) (map[string]string, error) {
+	result := make(map[string]string)
+	filename, err := clam.RunOutput(`span-amsl-discovery -live {{ live }} | jq -rc '.[]| [.sourceID, .megaCollection] | @tsv' | sort -un > {{ output }}`,
+		clam.Map{"live": amsl})
+	if err != nil {
+		return nil, nil
+	}
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	for _, line := range strings.Split(string(b), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		fields := strings.Split(line, "\t")
+		if len(fields) != 2 {
+			return nil, fmt.Errorf("expected two fields, got %d: %v", len(fields), line)
+		}
+		result[fields[0]] = fields[1]
+	}
+	return result, nil
 }
 
 // TabWriter is the simplest writer.
@@ -287,6 +316,16 @@ func renderSourceLink(tmpl string, data interface{}, text string) (string, error
 
 func main() {
 	flag.Parse()
+
+	if *amslLiveServer != "" {
+		log.Printf("fetching source names via AMSL: %s", *amslLiveServer)
+		names, err := fetchSourceNames(*amslLiveServer)
+		if err != nil {
+			log.Fatal(err)
+		}
+		SourceNames = names
+		log.Printf("fetched %d names", len(SourceNames))
+	}
 
 	if *whatIsLive {
 		// Fallback configuration.
