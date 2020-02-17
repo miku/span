@@ -1,5 +1,8 @@
 SHELL = /bin/bash
-TARGETS = span-import span-export span-tag span-redact span-check span-oa-filter span-update-labels span-crossref-snapshot span-local-data span-freeze span-review span-compare span-webhookd span-report span-hcov span-amsl-discovery span-crossref-members span-genios-modules
+TARGETS = span-import span-export span-tag span-redact span-check \
+span-oa-filter span-update-labels span-crossref-snapshot span-local-data \
+span-freeze span-review span-compare span-webhookd span-report span-hcov \
+span-amsl-discovery span-crossref-members span-genios-modules
 PKGNAME = span
 
 .PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
@@ -67,7 +70,7 @@ rpm: all
 	./packaging/rpm/buildrpm.sh $(PKGNAME)
 	cp $(HOME)/rpmbuild/RPMS/x86_64/$(PKGNAME)*.rpm .
 
-# Docs related.
+# Docs related, https://github.com/sunaku/md2man
 docs/$(PKGNAME).1: docs/$(PKGNAME).md
 	md2man-roff docs/$(PKGNAME).md > docs/$(PKGNAME).1
 
