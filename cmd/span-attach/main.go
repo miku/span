@@ -19,6 +19,49 @@ var (
 	tabConf = flag.String("c", "", "path to tabular config file (format, see: TBA)")
 )
 
+// An IntSet is a set of small, non-negative integers. Its zero value
+// represents the empty set. Space requirements for current dataset (about 300k
+// rows): about 4k per attribute value; efficient, until we do not have too
+// many values (currently around 200M, reducable by a combination of lookup and
+// iteration, e.g. over 8 rows per batch).
+type IntSet struct {
+	words []uint64
+}
+
+// ConfigTable as can be exported from AMSL or FOLIO. We could use a generic
+// in-memory db like hashicorp/go-memdb, TODO(martin): benchmark approaches.
+// For now we preindex the minimum amount of information.
+type ConfigTable struct {
+	rows []ConfigRow
+}
+
+// Append a single row to the table.
+func (t *ConfigTable) Append(row ConfigRow) {}
+
+// ConfigRow decribing a single entry (e.g. an attachment request).
+type ConfigRow struct {
+	ShardLabel                     string
+	ISIL                           string
+	SourceID                       string
+	TechnicalCollectionID          string
+	MegaCollection                 string
+	HoldingsFileURI                string
+	HoldingsFileLabel              string
+	LinkToHoldingsFile             string
+	EvaluateHoldingsFileForLibrary string
+	ContentFileURI                 string
+	ContentFileLabel               string
+	LinkToContentFile              string
+	ExternalLinkToContentFile      string
+	ProductISIL                    string
+	DokumentURI                    string
+	DokumentLabel                  string
+}
+
+// Lookup wraps data for attachment lookups.
+type Lookup struct {
+}
+
 func main() {
 	flag.Parse()
 	log.Println("attach is the new tag")
