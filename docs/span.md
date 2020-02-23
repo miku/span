@@ -83,6 +83,9 @@ OPTIONS
 `-f` *file*
   File location (ISSN list or ID,ISIL). `span-oa-filter`, `span-update-labels` only.
 
+`-f`
+  Flatten output to table. `span-amsl-discovery` only.
+
 `-fc` *file*
   File in AMSL FreeContent API format about sources, collections and their OA status, `span-oa-filter` only.
 
@@ -521,6 +524,22 @@ At the moment (Feb 2019), the following command writes a discovery API like
 JSON response to stdout:
 
 `span-amsl-discovery -live https://live.example.technology`
+
+A tabular output of the API can be generated with `-f`, like:
+
+`span-amsl-discovery -f live https://live.example.technology | head -10 | cut -f 1-5`
+
+    UBL-main        DE-1972 0       sid-0-col-zdb176dch     Digital Concert Hall
+    UBL-main        DE-Mh31 0       sid-0-col-zdb176dch     Digital Concert Hall
+    UBL-main        DE-105  0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-14   0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-15   0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-15-FID       0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-1972 0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-Bn3  0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-Brt1 0       lfer    Lizenzfreie Online-Ressourcen
+    UBL-main        DE-Ch1  0       lfer    Lizenzfreie Online-Ressourcen
+
 
 DEDUPLICATION AGAINST SOLR
 --------------------------
