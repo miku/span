@@ -110,3 +110,19 @@ DE-D174                  1
 DE-D40                   1
 dtype: int64
 ```
+
+## FOLIO setup
+
+* finc-config (data)
+* finc-select (tenants)
+* api reference: https://dev.folio.org/reference/api/
+
+Discovery database.
+
+* dual api access
+
+Filters.
+
+* join (filter and collection)
+* how to develop
+
