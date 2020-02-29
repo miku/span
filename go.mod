@@ -18,6 +18,7 @@ require (
 	github.com/klauspost/pgzip v1.2.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec

@@ -63,10 +63,12 @@ func (dec *Decoder) Decode(v interface{}) error {
 		return io.EOF
 	}
 	record := strings.Split(line, dec.Separator)
-
 	s := structs.New(v)
 	for _, f := range s.Fields() {
 		tag := f.Tag("csv")
+		if tag == "" {
+			tag = f.Tag("tsv")
+		}
 		if tag == "" || tag == "-" {
 			continue
 		}
