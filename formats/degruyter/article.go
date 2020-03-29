@@ -36,7 +36,8 @@ const (
 	// SourceID for internal bookkeeping.
 	SourceID = "50"
 	// SourceName for finc.mega_collection.
-	SourceName = "De Gruyter Journals / Social Sciences and Humanities"
+	SourceName            = "De Gruyter Journals / Social Sciences and Humanities"
+	TechnicalCollectionID = "sid-50-col-degruyterssh"
 	// Format for intermediate schema.
 	Format = "ElectronicArticle"
 )
@@ -83,7 +84,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.URL = append(output.URL, ids.URL)
 
 	output.Format = Format
-	output.MegaCollections = []string{SourceName, "sid-50-col-degruyterssh"}
+	output.MegaCollections = []string{SourceName, TechnicalCollectionID}
 	output.SourceID = SourceID
 
 	return output, nil
