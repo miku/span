@@ -13,11 +13,12 @@ import (
 )
 
 const (
-	SourceIdentifier = "53"
-	Format           = "ElectronicArticle"
-	Genre            = "article"
-	DefaultRefType   = "EJOUR"
-	Collection       = "CEEOL Central and Eastern European Online Library"
+	SourceIdentifier      = "53"
+	Format                = "ElectronicArticle"
+	Genre                 = "article"
+	DefaultRefType        = "EJOUR"
+	Collection            = "CEEOL Central and Eastern European Online Library"
+	TechnicalCollectionID = "sid-53-col-ceeol"
 )
 
 // Article from CEEOL, refs #9398.
@@ -116,7 +117,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.SourceID = SourceIdentifier
 	output.Format = Format
 	output.Genre = Genre
-	output.MegaCollections = []string{Collection}
+	output.MegaCollections = []string{Collection, TechnicalCollectionID}
 	output.RefType = DefaultRefType
 	for _, lang := range article.Languages {
 		if isocode := span.LanguageIdentifier(lang); isocode != "" {

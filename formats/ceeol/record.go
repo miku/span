@@ -297,7 +297,7 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.SourceID = SourceIdentifier
-	output.MegaCollections = []string{Collection}
+	output.MegaCollections = []string{Collection, TechnicalCollectionID}
 	output.ISSN = r.ISSN()
 	output.ISBN = r.ISBN()
 	output.Abstract = r.Abstract()
