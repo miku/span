@@ -16,11 +16,12 @@ import (
 )
 
 const (
-	SourceID       = "89"
-	Format         = "ElectronicArticle"
-	Collection     = "IEEE Xplore Library"
-	Genre          = "article"
-	DefaultRefType = "EJOUR"
+	SourceID              = "89"
+	Format                = "ElectronicArticle"
+	Collection            = "IEEE Xplore Library"
+	TechnicalCollectionID = "sid-89-col-ieee"
+	Genre                 = "article"
+	DefaultRefType        = "EJOUR"
 )
 
 var (
@@ -301,7 +302,7 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is.URL = []string{}
 
 	is.SourceID = SourceID
-	is.MegaCollections = []string{Collection}
+	is.MegaCollections = []string{Collection, TechnicalCollectionID}
 	is.Format = Format
 
 	if p.Volume.Article.Articleinfo.Amsid != "" {
