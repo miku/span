@@ -84,6 +84,7 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	if err := l.open(); err != nil {
 		return err
 	}
+	// Top level cache for (sid, collection, tcid, hfeval, hflink).
 	if l.cache == nil {
 		l.cache = make(map[string][]string)
 	}
@@ -113,6 +114,14 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 			&cr.MegaCollection, &cr.LinkToHoldingsFile, &cr.EvaluateHoldingsFileForLibrary)
 		if err != nil {
 			return err
+		}
+		switch {
+		case cr.EvaluateHoldingsFileForLibrary == "yes" && cr.LinkToHoldingsFile != "":
+			// Cache holding file as well.
+			// log.Printf("evaluate HF")
+		default:
+			// Move on, or other cases?
+			// log.Printf("ok")
 		}
 	}
 	// log.Printf("found %d rows", r)
