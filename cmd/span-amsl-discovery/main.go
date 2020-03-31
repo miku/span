@@ -4,22 +4,27 @@ package main
 
 import (
 	"bufio"
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/miku/span"
 	"github.com/sethgrid/pester"
 	log "github.com/sirupsen/logrus"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
 	live       = flag.String("live", "https://example.technology", "AMSL live base url")
 	allowEmpty = flag.Bool("allow-empty", false, "allow empty responses from api")
 	flatten    = flag.Bool("f", false, "flatten output into a TSV")
+	dbFile     = flag.String("db", "", "write data into an sqlite3 database")
 )
 
 // Discovery API response (now defunkt).
@@ -336,7 +341,8 @@ The generated TSV (via -f) fields are:
 	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
 
-	if *flatten {
+	switch {
+	case *flatten:
 		for _, update := range updates {
 			fields := []string{
 				update.ShardLabel,
@@ -361,7 +367,87 @@ The generated TSV (via -f) fields are:
 				log.Fatal(err)
 			}
 		}
-	} else {
+	case *dbFile != "":
+		createTable := `
+			create table amsl (
+				shard text not null,
+				isil text not null,
+				sid text not null,
+				tcid text not null,
+				mc text not null,
+				hfuri text,
+				hflabel text,
+				hflink text,
+				hfeval text,
+				cfuri text,
+				cflabel text,
+				cflink text,
+				cfelink text,
+				pisil text,
+				docuri text,
+				doclabel text
+			);
+
+			create index amsl_isil on amsl(isil);
+			create index amsl_isil_sid on amsl(isil, sid);
+			create index amsl_isil_sid_mc on amsl(isil, sid, mc);
+			create index amsl_mc on amsl(mc);
+			create index amsl_sid on amsl(sid);
+			create index amsl_sid_mc on amsl(sid, mc);
+			create index amsl_sid_tcid on amsl(sid, tcid);
+			create index amsl_tcid on amsl(tcid);
+		`
+		db, err := sql.Open("sqlite3", *dbFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+		_, err = db.Exec(createTable)
+		if err != nil {
+			log.Printf("%q: %s\n", err, createTable)
+			return
+		}
+		tx, err := db.Begin()
+		if err != nil {
+			log.Fatal(err)
+		}
+		stmt, err := tx.Prepare(`insert into amsl (shard, isil, sid, tcid, mc, hfuri, hflabel, hflink, hfeval, cfuri, cflabel, cflink, cfelink, pisil, docuri, doclabel)
+			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer stmt.Close()
+		started := time.Now()
+		for i, update := range updates {
+			if i%100000 == 0 {
+				log.Printf("@%d in %s", i, time.Since(started))
+			}
+			fields := []interface{}{
+				update.ShardLabel,
+				update.ISIL,
+				update.SourceID,
+				update.TechnicalCollectionID,
+				update.MegaCollection,
+				update.HoldingsFileURI,
+				update.HoldingsFileLabel,
+				update.LinkToHoldingsFile,
+				update.EvaluateHoldingsFileForLibrary,
+				update.ContentFileURI,
+				update.ContentFileLabel,
+				update.LinkToContentFile,
+				update.ExternalLinkToContentFile,
+				update.ProductISIL,
+				update.DokumentURI,
+				update.DokumentLabel,
+			}
+			_, err = stmt.Exec(fields...)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		tx.Commit()
+		log.Printf("@%d in %s", len(updates), time.Since(started))
+	default:
 		if err := json.NewEncoder(bw).Encode(updates); err != nil {
 			log.Fatal(err)
 		}
