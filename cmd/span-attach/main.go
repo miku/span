@@ -54,6 +54,10 @@ type ConfigRow struct {
 	DokumentLabel                  string
 }
 
+func cacheKey(doc *finc.IntermediateSchema) string {
+	return doc.SourceID + "@" + strings.Join(doc.MegaCollections, "@")
+}
+
 // Labeler updates an intermediate schema document.
 // We need mostly: ISIL, SourceID, MegaCollection, TechnicalCollectionID, HoldFileURI,
 // EvaluateHoldingsFileForLibrary
@@ -61,22 +65,60 @@ type Labeler struct {
 	dbFile string
 	db     *sqlx.DB
 
-	// Cache attachment results here.
-	cache map[string][]string
+	cache map[string][]ConfigRow
 }
 
-func (l *Labeler) open() error {
+// open opens the database connection, read-only.
+func (l *Labeler) open() (err error) {
 	if l.db != nil {
 		return nil
 	}
 	dsn := fmt.Sprintf("%s?ro=1", l.dbFile)
-	log.Printf("using %s", dsn)
-	db, err := sqlx.Connect("sqlite3", dsn)
+	l.db, err = sqlx.Connect("sqlite3", dsn)
 	if err != nil {
 		return err
 	}
-	l.db = db
 	return nil
+}
+
+// matchingRows returns a list of relevant rows for a given document.
+func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow, err error) {
+	if l.cache == nil {
+		l.cache = make(map[string][]ConfigRow)
+	}
+	key := cacheKey(doc)
+	if v, ok := l.cache[key]; ok {
+		return v, nil
+	}
+	// At a minimum, the sid and tcid or collection name must match.
+	q, args, err := sqlx.In(`
+		SELECT isil, sid, tcid, mc, hflink, hfeval, cflink, cfelink FROM amsl WHERE sid = ? AND (mc IN (?) OR tcid IN (?))
+	`, doc.SourceID, doc.MegaCollections, doc.MegaCollections)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := l.db.Query(q, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cr ConfigRow
+		err = rows.Scan(&cr.ISIL,
+			&cr.SourceID,
+			&cr.TechnicalCollectionID,
+			&cr.MegaCollection,
+			&cr.LinkToHoldingsFile,
+			&cr.EvaluateHoldingsFileForLibrary,
+			&cr.ContentFileURI,
+			&cr.ExternalLinkToContentFile)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, cr)
+	}
+	l.cache[key] = result
+	return result, nil
 }
 
 // Label updates document in place.
@@ -84,49 +126,11 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	if err := l.open(); err != nil {
 		return err
 	}
-	// Top level cache for (sid, collection, tcid, hfeval, hflink).
-	if l.cache == nil {
-		l.cache = make(map[string][]string)
-	}
-	key := fmt.Sprintf("%s-%s", doc.SourceID, strings.Join(doc.MegaCollections, "."))
-	if _, ok := l.cache[key]; ok {
-		// log.Printf("cache hit: %s", key)
-		// Reuse results.
-		return nil
-	}
-	q, args, err := sqlx.In(`
-		SELECT isil, sid, tcid, mc, hflink, hfeval FROM amsl
-		WHERE sid = ? AND (mc IN (?) OR tcid IN (?))
-	`, doc.SourceID, doc.MegaCollections, doc.MegaCollections)
-	if err != nil {
-		log.Println(doc)
-		return err
-	}
-	rows, err := l.db.Query(q, args...)
+	_, err := l.matchingRows(doc)
 	if err != nil {
 		return err
 	}
-	var r = 0
-	for rows.Next() {
-		r++
-		var cr ConfigRow
-		err = rows.Scan(&cr.ISIL, &cr.SourceID, &cr.TechnicalCollectionID,
-			&cr.MegaCollection, &cr.LinkToHoldingsFile, &cr.EvaluateHoldingsFileForLibrary)
-		if err != nil {
-			return err
-		}
-		switch {
-		case cr.EvaluateHoldingsFileForLibrary == "yes" && cr.LinkToHoldingsFile != "":
-			// Cache holding file as well.
-			// log.Printf("evaluate HF")
-		default:
-			// Move on, or other cases?
-			// log.Printf("ok")
-		}
-	}
-	// log.Printf("found %d rows", r)
-	l.cache[key] = []string{"fake"}
-	// log.Printf("updated cache: %d", len(l.cache))
+	// Distinguish cases, e.g. with or w/o HF.
 	return nil
 }
 
