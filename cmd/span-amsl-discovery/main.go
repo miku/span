@@ -411,8 +411,9 @@ The generated TSV (via -f) fields are:
 		if err != nil {
 			log.Fatal(err)
 		}
-		stmt, err := tx.Prepare(`insert into amsl (shard, isil, sid, tcid, mc, hfuri, hflabel, hflink, hfeval, cfuri, cflabel, cflink, cfelink, pisil, docuri, doclabel)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+		stmt, err := tx.Prepare(`insert into amsl (shard, isil, sid, tcid, mc,
+			hfuri, hflabel, hflink, hfeval, cfuri, cflabel, cflink, cfelink,
+			pisil, docuri, doclabel) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 		if err != nil {
 			log.Fatal(err)
 		}

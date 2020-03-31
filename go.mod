@@ -13,6 +13,7 @@ require (
 	github.com/goodsign/monday v0.0.0-20191222141057-7672e75c119d
 	github.com/gorilla/mux v1.7.3
 	github.com/hoisie/mustache v0.0.0-20160804235033-6375acf62c69 // indirect
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/klauspost/compress v1.9.8 // indirect
@@ -34,6 +35,7 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/testify v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
+	golang.org/x/perf v0.0.0-20200318175901-9c9101da8316
 	golang.org/x/sys v0.0.0-20200113162924-86b910548bc1 // indirect
 	golang.org/x/text v0.3.2
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
