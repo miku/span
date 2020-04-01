@@ -20,6 +20,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -55,7 +56,9 @@ type ConfigRow struct {
 }
 
 func cacheKey(doc *finc.IntermediateSchema) string {
-	return doc.SourceID + "@" + strings.Join(doc.MegaCollections, "@")
+	v := doc.MegaCollections
+	sort.Strings(v)
+	return doc.SourceID + "@" + strings.Join(v, "@")
 }
 
 // Labeler updates an intermediate schema document.
@@ -131,6 +134,8 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 		return err
 	}
 	// Distinguish cases, e.g. with or w/o HF.
+	switch {
+	}
 	return nil
 }
 
