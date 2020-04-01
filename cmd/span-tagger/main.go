@@ -97,30 +97,26 @@ func (c *HFCache) populate(hflink string) error {
 	if _, ok := c.entries[hflink]; ok {
 		return nil
 	}
-	filename := c.cacheFilename(hflink)
-	if fi, err := os.Stat(path.Dir(filename)); os.IsNotExist(err) {
-		if err := os.MkdirAll(path.Dir(filename), 0755); err != nil {
+	var (
+		filename = c.cacheFilename(hflink)
+		dir      = path.Dir(filename)
+	)
+	if fi, err := os.Stat(dir); os.IsNotExist(err) {
+		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err
 		}
 	} else if !fi.IsDir() {
-		return fmt.Errorf("expected cache directory at: %s", path.Dir(filename))
+		return fmt.Errorf("expected cache directory at: %s", dir)
 	}
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		resp, err := pester.Get(hflink)
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-		b, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		if err := atomic.WriteFile(filename, b, 0644); err != nil {
+		if err := download(hflink, filename); err != nil {
 			return err
 		}
 	}
-	h := new(kbart.Holdings)
-	zr, err := zip.OpenReader(filename)
+	var (
+		h       = new(kbart.Holdings)
+		zr, err = zip.OpenReader(filename)
+	)
 	if err == nil {
 		defer zr.Close()
 		for _, f := range zr.File {
@@ -172,6 +168,20 @@ func (c *HFCache) Covers(hflink string, doc *finc.IntermediateSchema) (ok bool, 
 	return false, nil
 }
 
+// download retrieves a link and saves its content atomically in filename.
+func download(link, filename string) error {
+	resp, err := pester.Get(link)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	return atomic.WriteFile(filename, b, 0644)
+}
+
 // cacheKey returns a key for a document, containing a subset (e.g. sid and
 // collcetions) of fields, e.g.  to be used to cache subset of the about 250k
 // rows currently in AMSL.
@@ -193,15 +203,10 @@ type Labeler struct {
 
 // open opens the database connection, read-only.
 func (l *Labeler) open() (err error) {
-	if l.db != nil {
-		return nil
+	if l.db == nil {
+		l.db, err = sqlx.Connect("sqlite3", fmt.Sprintf("%s?ro=1", l.dbFile))
 	}
-	dsn := fmt.Sprintf("%s?ro=1", l.dbFile)
-	l.db, err = sqlx.Connect("sqlite3", dsn)
-	if err != nil {
-		return err
-	}
-	return nil
+	return
 }
 
 // matchingRows returns a list of relevant rows for a given document.
@@ -279,7 +284,6 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 			return fmt.Errorf("none of the attachment modes match for %v", doc)
 		}
 	}
-
 	var keys []string
 	for k := range labels {
 		keys = append(keys, k)
@@ -316,6 +320,7 @@ func main() {
 		if err := json.Unmarshal(b, &doc); err != nil {
 			log.Fatal(err)
 		}
+		// TODO: return ISIL
 		if err := labeler.Label(&doc); err != nil {
 			log.Fatal(err)
 		}
