@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/abadojack/whatlanggo v1.0.1
+	github.com/adrg/xdg v0.2.1
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2
 	github.com/beevik/etree v1.1.0
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
