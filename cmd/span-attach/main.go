@@ -13,6 +13,7 @@
 package main
 
 import (
+	"archive/zip"
 	"bufio"
 	"crypto/sha1"
 	"encoding/json"
@@ -20,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -37,6 +37,8 @@ import (
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -105,17 +107,39 @@ func (c *HFCache) populate(hflink string) error {
 			return err
 		}
 	}
-	// Load and populate.
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 	h := new(kbart.Holdings)
-	if _, err := h.ReadFrom(f); err != nil {
-		return err
+	zr, err := zip.OpenReader(filename)
+	if err == nil {
+		defer zr.Close()
+		for _, f := range zr.File {
+			rc, err := f.Open()
+			if err != nil {
+				return err
+			}
+			if _, err := h.ReadFrom(rc); err != nil {
+				return err
+			}
+			rc.Close()
+		}
+	} else {
+		f, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if _, err := h.ReadFrom(f); err != nil {
+			return err
+		}
 	}
+	snm := h.SerialNumberMap()
 	c.entries[hflink] = h.SerialNumberMap()
+	if len(snm) == 0 {
+		log.Printf("warning: %s is maybe not a KBART file", hflink)
+	} else {
+		log.Printf("parsed %s", hflink)
+		log.Printf("parsed %d entries from %s (%d)",
+			len(c.entries[hflink]), filename, len(c.entries))
+	}
 	return nil
 }
 
@@ -219,7 +243,7 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	if err != nil {
 		return err
 	}
-	var labels []string // ISIL to attach
+	var labels = make(map[string]struct{}) // ISIL to attach
 
 	// Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
 	for _, row := range rows {
@@ -232,15 +256,21 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 				return err
 			}
 			if ok {
-				labels = append(labels, row.ISIL)
+				labels[row.ISIL] = struct{}{}
 			}
 		case row.EvaluateHoldingsFileForLibrary == "no":
-			labels = append(labels, row.ISIL)
+			labels[row.ISIL] = struct{}{}
 		case row.ContentFileURI != "":
 		default:
 			return fmt.Errorf("none of the attachment modes match for %v", doc)
 		}
 	}
+
+	var keys []string
+	for k := range labels {
+		keys = append(keys, k)
+	}
+	fmt.Printf("%s\t%s\n", doc.ID, strings.Join(keys, ", "))
 	return nil
 }
 
