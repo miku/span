@@ -1,4 +1,4 @@
-package main
+package atomic
 
 import (
 	"io/ioutil"
