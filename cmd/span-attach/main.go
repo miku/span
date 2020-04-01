@@ -203,6 +203,9 @@ func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow
 	if v, ok := l.cache[key]; ok {
 		return v, nil
 	}
+	if len(doc.MegaCollections) == 0 {
+		return result, nil
+	}
 	// At a minimum, the sid and tcid or collection name must match.
 	q, args, err := sqlx.In(`
 		SELECT isil, sid, tcid, mc, hflink, hfeval, cflink, cfelink FROM amsl WHERE sid = ? AND (mc IN (?) OR tcid IN (?))
