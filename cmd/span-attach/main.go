@@ -1,15 +1,22 @@
-// span-wip -db amsl.db < in > out
+// WIP: span-tagger will be a replacement of span-tag, with improvements:
 //
-// For each record:
+// 1. Get rid of a filterconfig JSON format, only use AMSL discovery output
+// (turned into an sqlite3 db, via span-amsl-discovery -db ...); that should
+// get rid of siskin/amsl.py, span-tag, span-freeze and the whole span/filter
+// tree.
 //
-// [ ] select rows from db (sid, mc, tcid)
-// [ ] if there is a holdingfile, and not cached, download, cache, parse and cache it
-// [ ] match against holdingfile
-// [ ] collect all ISIL and attach them (or just print id and isil)
-// [ ] parallelize by copying the database (sqlite3 is single threaded), e.g. 4x NumCPU of the like
+// 2. Allow for updated file output or just TSV of attachments (which we could
+// diff for debugging or other things).
 //
-// Also, try to get rid of span-freeze by using some locally cached files (with
-// expiry date).
+// Usage:
+//
+//     $ span-amsl-discovery -db amsl.db -live https://live.server
+//     $ taskcat AIIntermediateSchema | span-tagger -db amsl.db > tagged.ndj
+//
+// TODO:
+//
+// Single threaded 170M records, about 4 hours, thanks to caching (but only
+// about 10M/s).
 package main
 
 import (
@@ -156,7 +163,6 @@ func (c *HFCache) Covers(hflink string, doc *finc.IntermediateSchema) (ok bool, 
 				return true, nil
 			}
 		}
-		// TODO(miku): gather debug information
 	}
 	return false, nil
 }
@@ -273,6 +279,7 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	for k := range labels {
 		keys = append(keys, k)
 	}
+	sort.Strings(keys)
 	fmt.Printf("%s\t%s\n", doc.ID, strings.Join(keys, ", "))
 	return nil
 }
