@@ -14,20 +14,29 @@ package main
 
 import (
 	"bufio"
+	"crypto/sha1"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
+	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/adrg/xdg"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/sethgrid/pester"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/miku/span/atomic"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/licensing"
+	"github.com/miku/span/licensing/kbart"
 )
 
 var (
@@ -55,6 +64,82 @@ type ConfigRow struct {
 	DokumentLabel                  string
 }
 
+// HFCache wraps access to holdings files.
+type HFCache struct {
+	// entries maps a link or filename (or any identifier) to a map from ISSN
+	// to licensing entries.
+	entries map[string]map[string][]licensing.Entry
+}
+
+// cacheFilename returns the path to the locally cached version of this URL.
+func (c *HFCache) cacheFilename(hflink string) string {
+	h := sha1.New()
+	_, _ = io.WriteString(h, hflink)
+	return filepath.Join(xdg.CacheHome, "span", fmt.Sprintf("%x", h.Sum(nil)))
+}
+
+// populate fills the entries map from a given URL.
+func (c *HFCache) populate(hflink string) error {
+	if _, ok := c.entries[hflink]; ok {
+		return nil
+	}
+	filename := c.cacheFilename(hflink)
+	if fi, err := os.Stat(path.Dir(filename)); os.IsNotExist(err) {
+		if err := os.MkdirAll(path.Dir(filename), 0755); err != nil {
+			return err
+		}
+	} else if !fi.IsDir() {
+		return fmt.Errorf("expected cache directory at: %s", path.Dir(filename))
+	}
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		resp, err := pester.Get(hflink)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		if err := atomic.WriteFile(filename, b, 0644); err != nil {
+			return err
+		}
+	}
+	// Load and populate.
+	f, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	h := new(kbart.Holdings)
+	if _, err := h.ReadFrom(f); err != nil {
+		return err
+	}
+	c.entries[hflink] = h.SerialNumberMap()
+	return nil
+}
+
+// Covers returns true, if a holdings file, given by link or filename, covers
+// the document. The cache takes care of downloading the file, if necessary.
+func (c *HFCache) Covers(hflink string, doc *finc.IntermediateSchema) (ok bool, err error) {
+	if err = c.populate(hflink); err != nil {
+		return false, err
+	}
+	for _, issn := range append(doc.ISSN, doc.EISSN...) {
+		for _, entry := range c.entries[hflink][issn] {
+			err = entry.Covers(doc.RawDate, doc.Volume, doc.Issue)
+			if err == nil {
+				return true, nil
+			}
+		}
+		// TODO(miku): gather debug information
+	}
+	return false, nil
+}
+
+// cacheKey returns a key for a document, containing a subset (e.g. sid and
+// collcetions) of fields, e.g.  to be used to cache subset of the about 250k
+// rows currently in AMSL.
 func cacheKey(doc *finc.IntermediateSchema) string {
 	v := doc.MegaCollections
 	sort.Strings(v)
@@ -68,7 +153,8 @@ type Labeler struct {
 	dbFile string
 	db     *sqlx.DB
 
-	cache map[string][]ConfigRow
+	cache   map[string][]ConfigRow
+	hfcache *HFCache
 }
 
 // open opens the database connection, read-only.
@@ -129,12 +215,31 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	if err := l.open(); err != nil {
 		return err
 	}
-	_, err := l.matchingRows(doc)
+	rows, err := l.matchingRows(doc)
 	if err != nil {
 		return err
 	}
-	// Distinguish cases, e.g. with or w/o HF.
-	switch {
+	var labels []string // ISIL to attach
+
+	// Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
+	for _, row := range rows {
+		switch {
+		case row.EvaluateHoldingsFileForLibrary == "no" && row.LinkToHoldingsFile != "":
+			return fmt.Errorf("config provides holding file, but does not want to evaluate it: %v", row)
+		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "":
+			ok, err := l.hfcache.Covers(row.LinkToHoldingsFile, doc)
+			if err != nil {
+				return err
+			}
+			if ok {
+				labels = append(labels, row.ISIL)
+			}
+		case row.EvaluateHoldingsFileForLibrary == "no":
+			labels = append(labels, row.ISIL)
+		case row.ContentFileURI != "":
+		default:
+			return fmt.Errorf("none of the attachment modes match for %v", doc)
+		}
 	}
 	return nil
 }
@@ -145,7 +250,8 @@ func main() {
 		log.Fatal("we need a configuration database")
 	}
 	var (
-		labeler = &Labeler{dbFile: *dbFile}
+		hfcache = &HFCache{entries: make(map[string]map[string][]licensing.Entry)}
+		labeler = &Labeler{dbFile: *dbFile, hfcache: hfcache}
 		br      = bufio.NewReader(os.Stdin)
 		i       = 0
 		started = time.Now()
