@@ -134,7 +134,7 @@ func (c *HFCache) populate(hflink string) error {
 	snm := h.SerialNumberMap()
 	c.entries[hflink] = h.SerialNumberMap()
 	if len(snm) == 0 {
-		log.Printf("warning: %s is maybe not a KBART file", hflink)
+		log.Printf("warning: %s may not be KBART", hflink)
 	} else {
 		log.Printf("parsed %s", hflink)
 		log.Printf("parsed %d entries from %s (%d)",
