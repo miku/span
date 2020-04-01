@@ -16,7 +16,7 @@
 // TODO:
 //
 // * [ ] cover all attachment modes from https://git.io/JvdmC
-// * [ ] add testes
+// * [ ] add tests
 //
 // Performance:
 //
@@ -185,9 +185,8 @@ func cacheKey(doc *finc.IntermediateSchema) string {
 // We need mostly: ISIL, SourceID, MegaCollection, TechnicalCollectionID, HoldFileURI,
 // EvaluateHoldingsFileForLibrary
 type Labeler struct {
-	dbFile string
-	db     *sqlx.DB
-
+	dbFile  string
+	db      *sqlx.DB
 	cache   map[string][]ConfigRow
 	hfcache *HFCache
 }
@@ -215,6 +214,7 @@ func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow
 		return v, nil
 	}
 	if len(doc.MegaCollections) == 0 {
+		// TODO: Why zero?
 		return result, nil
 	}
 	// At a minimum, the sid and tcid or collection name must match.
@@ -259,7 +259,7 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	}
 	var labels = make(map[string]struct{}) // ISIL to attach
 
-	// Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
+	// TODO: Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
 	for _, row := range rows {
 		switch {
 		case row.EvaluateHoldingsFileForLibrary == "no" && row.LinkToHoldingsFile != "":
