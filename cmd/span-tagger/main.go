@@ -15,8 +15,13 @@
 //
 // TODO:
 //
+// * [ ] cover all attachment modes from https://git.io/JvdmC
+// * [ ] add testes
+//
+// Performance:
+//
 // Single threaded 170M records, about 4 hours, thanks to caching (but only
-// about 10M/s).
+// about 10M/s); 210m29.179s for 173759327 records; 13G output.
 package main
 
 import (
