@@ -107,7 +107,7 @@ var SourceNames = map[string]string{
 	"87":  "International Journal of Communication",
 	"88":  "Zeitschrift \"Rundfunk und Geschichte\"",
 	"89":  "IEEE Xplore Library",
-	"94":  "17th and 18th Century Burney Collection Newspapers",
+	"94":  "ACS Legacy Archives 1879-1995",
 	"96":  "Thieme E-Books / Tiermedizin (VetCenter)",
 	"99":  "Media Perspektiven",
 	"101": "Kieler Beiträge zur Filmmusikforschung",
@@ -170,6 +170,7 @@ var SourceNames = map[string]string{
 	"188": "GoeScholar - Publikationenserver der Georg-August-Universität Göttingen",
 	"190": "Early English Books Online EEBO",
 	"191": "MediArxiv",
+	"193": "HeBIS Verbundkatalog",
 	"201": "Perinorm (DIN-Normen)",
 	"202": "Zentralinstitut für Kunstgeschichte",
 }
