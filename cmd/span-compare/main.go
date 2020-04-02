@@ -132,6 +132,7 @@ var SourceNames = map[string]string{
 	"136": "Leipziger Städtische Bibliotheken",
 	"137": "Bundeskunsthalle Bonn",
 	"140": "Nachlässe SLUB Dresden",
+	"141": "Lynda",
 	"142": "Gesamtkatalog der Düsseldorfer Kulturinstitute (VK Film)",
 	"143": "JOVE Journal of Visualized Experiments (Biology)",
 	"145": "TIB AV-Portal",
