@@ -107,7 +107,10 @@ func (c *HFCache) populate(hflink string) error {
 	} else if !fi.IsDir() {
 		return fmt.Errorf("expected cache directory at: %s", path.Dir(filename))
 	}
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
+	if _, err := os.Stat(filename); os.IsNotExist(err) || *force {
+		if *force {
+			log.Printf("redownloading %s", hflink)
+		}
 		resp, err := pester.Get(hflink)
 		if err != nil {
 			return err
