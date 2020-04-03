@@ -42,15 +42,13 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/sethgrid/pester"
-
 	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/miku/span/atomic"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
-
+	"github.com/sethgrid/pester"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -258,7 +256,8 @@ func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow
 	return result, nil
 }
 
-// Label updates document in place.
+// Label updates document in place. This may contain hard-coded values for
+// special attachment cases.
 func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	if err := l.open(); err != nil {
 		return err
@@ -272,8 +271,39 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	// TODO: Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
 	for _, row := range rows {
 		switch {
+		case doc.SourceID == "34":
+			switch {
+			case stringsContain([]string{"DE-L152", "DE-1156", "DE-1972", "DE-Kn38"}, row.ISIL):
+				// refs #10495, a subject filter for a few hard-coded ISIL; https://git.io/JvFjE
+				if stringsOverlap(doc.Subjects, []string{"Music", "Music education"}) {
+					labels[row.ISIL] = struct{}{}
+				}
+			case row.ISIL == "DE-15-FID":
+				// refs #10495, maybe use a TSV with custom column name to use a subject list? https://git.io/JvFjd
+				if stringsOverlap(doc.Subjects, []string{"Film studies", "Information science", "Mass communication"}) {
+					labels[row.ISIL] = struct{}{}
+				}
+			}
 		case row.EvaluateHoldingsFileForLibrary == "no" && row.LinkToHoldingsFile != "":
 			return fmt.Errorf("config provides holding file, but does not want to evaluate it: %v", row)
+		case row.ExternalLinkToContentFile != "":
+			// https://git.io/JvFjx
+			ok, err := l.hfcache.Covers(row.ExternalLinkToContentFile, doc)
+			if err != nil {
+				return err
+			}
+			if ok {
+				labels[row.ISIL] = struct{}{}
+			}
+		case row.LinkToContentFile != "":
+			// https://git.io/JvFjp
+			ok, err := l.hfcache.Covers(row.LinkToContentFile, doc)
+			if err != nil {
+				return err
+			}
+			if ok {
+				labels[row.ISIL] = struct{}{}
+			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "":
 			ok, err := l.hfcache.Covers(row.LinkToHoldingsFile, doc)
 			if err != nil {
@@ -296,6 +326,29 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	sort.Strings(keys)
 	fmt.Printf("%s\t%s\n", doc.ID, strings.Join(keys, ", "))
 	return nil
+}
+
+// stringsSliceContains returns true, if value appears in a string slice.
+func stringsContain(ss []string, v string) bool {
+	for _, w := range ss {
+		if v == w {
+			return true
+		}
+	}
+	return false
+}
+
+// stringsOverlap returns true, if at least one value is in both ss and vv.
+// Inefficient.
+func stringsOverlap(ss, vv []string) bool {
+	for _, s := range ss {
+		for _, v := range vv {
+			if s == v {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func main() {
