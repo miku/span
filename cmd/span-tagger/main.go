@@ -368,8 +368,13 @@ func main() {
 		log.Fatal("we need a configuration database")
 	}
 	var (
-		hfcache = &HFCache{entries: make(map[string]map[string][]licensing.Entry)}
-		labeler = &Labeler{dbFile: *dbFile, hfcache: hfcache}
+		labeler = &Labeler{
+			dbFile: *dbFile,
+			hfcache: &HFCache{
+				// link -> issn -> rows (kbart)
+				entries: make(map[string]map[string][]licensing.Entry),
+			},
+		}
 		br      = bufio.NewReader(os.Stdin)
 		i       = 0
 		started = time.Now()
