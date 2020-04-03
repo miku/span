@@ -17,6 +17,7 @@
 //
 // * [ ] cover all attachment modes from https://git.io/JvdmC
 // * [ ] add tests
+// * [ ] logs
 //
 // Performance:
 //
@@ -224,7 +225,7 @@ func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow
 		return v, nil
 	}
 	if len(doc.MegaCollections) == 0 {
-		// TODO: Why zero?
+		// TODO: Why zero? Log this to /var/log/span.log or something.
 		return result, nil
 	}
 	// At a minimum, the sid and tcid or collection name must match.
