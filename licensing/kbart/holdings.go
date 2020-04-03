@@ -48,13 +48,13 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 // This is here for performance mostly, so we can access relevant licensing
 // entry by ISSN.  XXX: Do not replicate entries, just index into them.
 func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
-	cache := make(map[string]map[licensing.Entry]bool)
+	cache := make(map[string]map[licensing.Entry]struct{})
 	for _, e := range *h {
 		for _, issn := range e.ISSNList() {
 			if cache[issn] == nil {
-				cache[issn] = make(map[licensing.Entry]bool)
+				cache[issn] = make(map[licensing.Entry]struct{})
 			}
-			cache[issn][e] = true
+			cache[issn][e] = struct{}{}
 		}
 	}
 	// Make unique.
