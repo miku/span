@@ -110,7 +110,10 @@ func (c *HFCache) populate(hflink string) error {
 	} else if !fi.IsDir() {
 		return fmt.Errorf("expected cache directory at: %s", dir)
 	}
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
+	if _, err := os.Stat(filename); os.IsNotExist(err) || *force {
+		if *force {
+			log.Printf("redownloading %s", hflink)
+		}
 		if err := download(hflink, filename); err != nil {
 			return err
 		}
