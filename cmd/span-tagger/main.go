@@ -287,6 +287,7 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 				labels[row.ISIL] = struct{}{}
 				counter["lthf"]++
 			}
+			// TODO: add case, where we limit by both holding and content file.
 		case doc.SourceID == "34":
 			switch {
 			case stringsContain([]string{"DE-L152", "DE-1156", "DE-1972", "DE-Kn38"}, row.ISIL):
