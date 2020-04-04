@@ -272,8 +272,21 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	var labels = make(map[string]struct{}) // ISIL to attach
 
 	// TODO: Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
+	// INFO[12576] lthf => 531,701,113
+	// INFO[12576] plain => 112,694,196
+	// INFO[12576] 34-music => 3692
+	// INFO[12576] 34-DE-15-FID-film => 770
 	for _, row := range rows {
 		switch {
+		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "":
+			ok, err := l.hfcache.Covers(row.LinkToHoldingsFile, doc)
+			if err != nil {
+				return err
+			}
+			if ok {
+				labels[row.ISIL] = struct{}{}
+				counter["lthf"]++
+			}
 		case doc.SourceID == "34":
 			switch {
 			case stringsContain([]string{"DE-L152", "DE-1156", "DE-1972", "DE-Kn38"}, row.ISIL):
@@ -289,6 +302,8 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 					counter["34-DE-15-FID-film"]++
 				}
 			}
+		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile == "":
+			return fmt.Errorf("no holding file to evaluate: %v", row)
 		case row.EvaluateHoldingsFileForLibrary == "no" && row.LinkToHoldingsFile != "":
 			return fmt.Errorf("config provides holding file, but does not want to evaluate it: %v", row)
 		case row.ExternalLinkToContentFile != "":
@@ -310,15 +325,6 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 			if ok {
 				labels[row.ISIL] = struct{}{}
 				counter["ltcf"]++
-			}
-		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "":
-			ok, err := l.hfcache.Covers(row.LinkToHoldingsFile, doc)
-			if err != nil {
-				return err
-			}
-			if ok {
-				labels[row.ISIL] = struct{}{}
-				counter["lthf"]++
 			}
 		case row.EvaluateHoldingsFileForLibrary == "no":
 			labels[row.ISIL] = struct{}{}
