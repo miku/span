@@ -112,6 +112,7 @@ func (c *HFCache) populate(hflink string) error {
 	} else if !fi.IsDir() {
 		return fmt.Errorf("expected cache directory at: %s", dir)
 	}
+	// TODO: Accept links and files.
 	if _, err := os.Stat(filename); os.IsNotExist(err) || *force {
 		if *force {
 			log.Printf("redownloading %s", hflink)
@@ -155,6 +156,22 @@ func (c *HFCache) populate(hflink string) error {
 			len(c.entries[hflink]), filename, len(c.entries))
 	}
 	return nil
+}
+
+// Covered returns true, if a document is covered by all given kbart files
+// (e.g. like "and" filter in former filterconfig). TODO: Merge Covered and
+// Covers methods.
+func (c *HFCache) Covered(doc *finc.IntermediateSchema, hfs ...string) (ok bool, err error) {
+	for _, hf := range hfs {
+		ok, err := c.Covers(hf, doc)
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 // Covers returns true, if a holdings file, given by link or filename, covers
@@ -278,7 +295,27 @@ func (l *Labeler) Label(doc *finc.IntermediateSchema) error {
 	// INFO[12576] 34-DE-15-FID-film => 770
 	for _, row := range rows {
 		switch {
-		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "":
+		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile != "":
+			// Both, holding and content file need to match (AND).
+			ok, err := l.hfcache.Covered(doc, row.LinkToHoldingsFile, row.LinkToContentFile)
+			if err != nil {
+				return err
+			}
+			if ok {
+				labels[row.ISIL] = struct{}{}
+				counter["lthf+ltcf"]++
+			}
+		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.ExternalLinkToContentFile != "":
+			// Both, holding and content file need to match (AND).
+			ok, err := l.hfcache.Covered(doc, row.LinkToHoldingsFile, row.ExternalLinkToContentFile)
+			if err != nil {
+				return err
+			}
+			if ok {
+				labels[row.ISIL] = struct{}{}
+				counter["lthf+eltcf"]++
+			}
+		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile == "" && row.ExternalLinkToContentFile == "":
 			ok, err := l.hfcache.Covers(row.LinkToHoldingsFile, doc)
 			if err != nil {
 				return err
