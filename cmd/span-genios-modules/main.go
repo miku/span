@@ -122,7 +122,7 @@ func main() {
 	if termutil.Isatty(os.Stdin.Fd()) {
 		Print(`
 			span-genios-modules tries to generate a fresh map from database
-			name to modules (like https://git.io/v2ECx).
+			name to modules.
 
 			    $ cat filelist | span-genios-modules
 
@@ -133,14 +133,7 @@ func main() {
 
 			    $ taskcat GeniosLatestReloadList | span-genios-modules > out.json
 
-			Previous list (Aug 22, 2017) contained 659 keys. Current list (Dec 11, 2019) 753.
-
-			    $ curl -sL https://git.io/v94aR | jq '. | keys | length'
-			    659
-
-			Compare old to new list (12/2019).
-
-			    $ comm <(curl -sL https://git.io/v94aR | jq -r '.|keys[]') <(curl -sL https://git.io/Je522 | jq -r '.|keys[]')`)
+			Previous list (Aug 22, 2017) contained 659 keys. Current list (Dec 11, 2019) 753.`)
 		os.Exit(0)
 	}
 
