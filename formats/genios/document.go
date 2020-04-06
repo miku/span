@@ -97,6 +97,15 @@ var (
 	acceptedLanguages = container.NewStringSet("deu", "eng")
 	// yearPattern matches YYYY
 	yearPattern = regexp.MustCompile(`[12][0-9][0-9][0-9]`)
+
+	nameMap = map[string]string{
+		"fachzeitschriften":                       "sid-48-col-wisofachzs",
+		"literaturnachweise_psychologie":          "sid-48-col-wisopsych",
+		"ebooks_recht":                            "sid-48-col-wisorecht",
+		"literaturnachweise_sozialwissenschaften": "sid-48-col-wisosozial",
+		"ebooks_technik":                          "sid-48-col-wisotechnik",
+		"ebooks_wiwi":                             "sid-48-col-wisowirtschaft",
+	}
 )
 
 // Headings returns subject headings.
@@ -278,6 +287,16 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 	// This is injected from the filename. We need this to distinguish between
 	// "Fachzeitschrichten" and "Literaturnachweise".
 	output.Packages = append(output.Packages, doc.XPackage)
+
+	// Add tcid.
+	for name, tcid := range nameMap {
+		for _, pkg := range output.Packages {
+			if name == pkg {
+				output.MegaCollections = append(output.MegaCollections, tcid)
+			}
+		}
+	}
+
 	id := span.GenFincID(SourceID, doc.SourceAndID())
 	// 250 was a limit on memcached keys; offending key was:
 	// ai-48-R1JFUl9fU2NoZWliIEVsZWt0cm90ZWNobmlrIEdtYkggwr\
