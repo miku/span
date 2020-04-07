@@ -319,34 +319,36 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			kbarts = append(kbarts, SLUBEZBKBART)
 		}
 		switch {
-		case row.ISIL == "DE-15-FID" && strings.Contains(row.LinkToHoldingsFile, "FID_ISSN_Filter"):
-			// Here, the holdingfile URL contains a list of ISSN.  URI like ...
-			// discovery/metadata-usage/Dokument/FID_ISSN_Filter - but that
-			// might change. Assuming just a single file.
-			if _, ok := l.whitelistCache[DE15FIDISSNWHITELIST]; !ok {
-				// Load from file, once. One value per line.
-				resp, err := pester.Get(row.LinkToHoldingsFile)
-				if err != nil {
-					return nil, err
+		case row.ISIL == "DE-15-FID":
+			if strings.Contains(row.LinkToHoldingsFile, "FID_ISSN_Filter") {
+				// Here, the holdingfile URL contains a list of ISSN.  URI like ...
+				// discovery/metadata-usage/Dokument/FID_ISSN_Filter - but that
+				// might change. Assuming just a single file.
+				if _, ok := l.whitelistCache[DE15FIDISSNWHITELIST]; !ok {
+					// Load from file, once. One value per line.
+					resp, err := pester.Get(row.LinkToHoldingsFile)
+					if err != nil {
+						return nil, err
+					}
+					defer resp.Body.Close()
+					if l.whitelistCache == nil {
+						l.whitelistCache = make(map[string]map[string]struct{})
+					}
+					l.whitelistCache[DE15FIDISSNWHITELIST] = make(map[string]struct{})
+					if err := setFromLines(resp.Body, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
+						return nil, err
+					}
+					log.Printf("loaded whitelist of %d items from %s", len(l.whitelistCache[DE15FIDISSNWHITELIST]), row.LinkToHoldingsFile)
 				}
-				defer resp.Body.Close()
-				if l.whitelistCache == nil {
-					l.whitelistCache = make(map[string]map[string]struct{})
+				whitelist, ok := l.whitelistCache[DE15FIDISSNWHITELIST]
+				if !ok {
+					return nil, fmt.Errorf("whitelist cache broken")
 				}
-				l.whitelistCache[DE15FIDISSNWHITELIST] = make(map[string]struct{})
-				if err := setFromLines(resp.Body, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
-					return nil, err
-				}
-				log.Printf("loaded whitelist of %d items from %s", len(l.whitelistCache[DE15FIDISSNWHITELIST]), row.LinkToHoldingsFile)
-			}
-			whitelist, ok := l.whitelistCache[DE15FIDISSNWHITELIST]
-			if !ok {
-				return nil, fmt.Errorf("whitelist cache broken")
-			}
-			for _, issn := range doc.ISSNList() {
-				if _, ok := whitelist[issn]; ok {
-					labels[row.ISIL] = struct{}{}
-					counter["de-15-fid-issn-whitelist"]++
+				for _, issn := range doc.ISSNList() {
+					if _, ok := whitelist[issn]; ok {
+						labels[row.ISIL] = struct{}{}
+						counter["de-15-fid-issn-whitelist"]++
+					}
 				}
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile != "":
