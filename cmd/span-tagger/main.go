@@ -177,7 +177,7 @@ func (c *HFCache) Covered(doc *finc.IntermediateSchema, hfs ...string) (ok bool,
 		}
 		ok, err := c.Covers(hf, doc)
 		if err != nil {
-			// We exit on first miss, so it is a conjunction of all given
+			// TODO: We exit on first miss, so it is a conjunction of all given
 			// holding files. Which would probably be wrong, e.g. in the case
 			// of multiple OA holding files.
 			return false, err
