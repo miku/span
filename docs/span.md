@@ -16,6 +16,8 @@ SYNOPSIS
 
 `span-tag` [`-c` *config*, `-unfreeze` *file*, `-server` *url*, `-prefs` *prefs*] < *file*
 
+`span-tagger` [`-db` *file*, `-f`, `-v`, `-debug`] < *file*
+
 `span-export` [`-o` *output-format*] < *file*
 
 `span-check` [`-verbose`] < *file*
@@ -310,6 +312,30 @@ starts.
 The freeze tool is generic, albeit of limited utility:
 
   `curl -sL https://www.heise.de | span-freeze -b -o heise.zip`
+
+NEXT ITERATION TAGGING
+----------------------
+
+In order to simplify processing, we try to get rid of the flexible tree
+structure (of the filterconfig) and use a tabular approach turning AMSL into an
+sqlite3 database.
+
+  `span-amsl-discovery -db amsl.db -live https://live.example.technology`
+
+A new program, called `span-tagger` for the moment, can take this DB and use it
+to attach records based on the data in both the database and linked holding
+files.
+
+The queries results are cached, otherwise the process would be too slow for
+millions of records. Referenced (holding) files are downloaded into
+`$HOME/.cache/span/` (or whatever your `XDG_CACHE_HOME` is) on the fly. The
+various cases are condensed into a single `switch` statement.
+
+  `span-tagger -db amsl.db < input.is > output.is`
+
+Similar to `span-tag`, we can let the data flow into the index through pipes.
+
+  `taskcat AIIntermediateSchema | span-tagger -db amsl.db | span-export | solrbulk -server ...`
 
 INDEX REVIEWS
 -------------

@@ -11,6 +11,8 @@ schema and integration tools
 .PP
 \fB\fCspan\-tag\fR [\fB\fC\-c\fR \fIconfig\fP, \fB\fC\-unfreeze\fR \fIfile\fP, \fB\fC\-server\fR \fIurl\fP, \fB\fC\-prefs\fR \fIprefs\fP] < \fIfile\fP
 .PP
+\fB\fCspan\-tagger\fR [\fB\fC\-db\fR \fIfile\fP, \fB\fC\-f\fR, \fB\fC\-v\fR, \fB\fC\-debug\fR] < \fIfile\fP
+.PP
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-check\fR [\fB\fC\-verbose\fR] < \fIfile\fP
@@ -73,6 +75,9 @@ Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR, \fB\fCspan\-export\fR only
 .TP
 \fB\fC\-f\fR \fIfile\fP
 File location (ISSN list or ID,ISIL). \fB\fCspan\-oa\-filter\fR, \fB\fCspan\-update\-labels\fR only.
+.TP
+\fB\fC\-f\fR
+Flatten output to table. \fB\fCspan\-amsl\-discovery\fR only.
 .TP
 \fB\fC\-fc\fR \fIfile\fP
 File in AMSL FreeContent API format about sources, collections and their OA status, \fB\fCspan\-oa\-filter\fR only.
@@ -305,6 +310,28 @@ starts.
 The freeze tool is generic, albeit of limited utility:
 .IP
 \fB\fCcurl \-sL https://www.heise.de | span\-freeze \-b \-o heise.zip\fR
+.SH NEXT ITERATION TAGGING
+.PP
+In order to simplify processing, we try to get rid of the flexible tree
+structure (of the filterconfig) and use a tabular approach turning AMSL into an
+sqlite3 database.
+.IP
+\fB\fCspan\-amsl\-discovery \-db amsl.db \-live https://live.example.technology\fR
+.PP
+A new program, called \fB\fCspan\-tagger\fR for the moment, can take this DB and use it
+to attach records based on the data in both the database and linked holding
+files.
+.PP
+The queries results are cached, otherwise the process would be too slow for
+millions of records. Referenced (holding) files are downloaded into
+\fB\fC$HOME/.cache/span/\fR (or whatever your \fB\fCXDG_CACHE_HOME\fR is) on the fly. The
+various cases are condensed into a single \fB\fCswitch\fR statement.
+.IP
+\fB\fCspan\-tagger \-db amsl.db < input.is > output.is\fR
+.PP
+Similar to \fB\fCspan\-tag\fR, we can let the data flow into the index through pipes.
+.IP
+\fB\fCtaskcat AIIntermediateSchema | span\-tagger \-db amsl.db | span\-export | solrbulk \-server ...\fR
 .SH INDEX REVIEWS
 .PP
 Since 0.1.241 it is possible to run slightly automated SOLR index reviews. The
@@ -523,6 +550,25 @@ At the moment (Feb 2019), the following command writes a discovery API like
 JSON response to stdout:
 .PP
 \fB\fCspan\-amsl\-discovery \-live https://live.example.technology\fR
+.PP
+A tabular output of the API can be generated with \fB\fC\-f\fR, like:
+.PP
+\fB\fCspan\-amsl\-discovery \-f live https://live.example.technology | head \-10 | cut \-f 1\-5\fR
+.PP
+.RS
+.nf
+UBL\-main        DE\-1972 0       sid\-0\-col\-zdb176dch     Digital Concert Hall
+UBL\-main        DE\-Mh31 0       sid\-0\-col\-zdb176dch     Digital Concert Hall
+UBL\-main        DE\-105  0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-14   0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-15   0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-15\-FID       0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-1972 0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-Bn3  0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-Brt1 0       lfer    Lizenzfreie Online\-Ressourcen
+UBL\-main        DE\-Ch1  0       lfer    Lizenzfreie Online\-Ressourcen
+.fi
+.RE
 .SH DEDUPLICATION AGAINST SOLR
 .PP
 Since 0.1.285, preliminary support for deduplication (DOI) against SOLR to shorten time\-to\-index. Basically:
