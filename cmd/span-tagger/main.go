@@ -327,6 +327,9 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 					return nil, err
 				}
 				defer resp.Body.Close()
+				if l.whitelistCache == nil {
+					l.whitelistCache = make(map[string]map[string]struct{})
+				}
 				l.whitelistCache[DE15FIDISSNWHITELIST] = make(map[string]struct{})
 				if err := setFromLines(resp.Body, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
 					return nil, err
