@@ -1,6 +1,6 @@
 Summary:    Library data tools.
 Name:       span
-Version:    0.1.320
+Version:    0.1.321
 Release:    0
 License:    GPL
 ExclusiveArch:  x86_64
@@ -38,6 +38,7 @@ install -m 755 span-redact $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-report $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
+install -m 755 span-tagger $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
 install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/sbin
 
