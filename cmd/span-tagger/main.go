@@ -65,6 +65,9 @@ var (
 	counter = make(map[string]int)
 )
 
+// SLUBEZBKBART link to DE-14 KBART, to be included across all sources.
+const SLUBEZBKBART = "https://dbod.de/SLUB-EZB-KBART.zip"
+
 // ConfigRow decribing a single entry (e.g. an attachment request).
 type ConfigRow struct {
 	ShardLabel                     string
@@ -166,6 +169,9 @@ func (c *HFCache) populate(hflink string) error {
 // Covers methods.
 func (c *HFCache) Covered(doc *finc.IntermediateSchema, hfs ...string) (ok bool, err error) {
 	for _, hf := range hfs {
+		if hf == "" {
+			continue
+		}
 		ok, err := c.Covers(hf, doc)
 		if err != nil {
 			return false, err
@@ -291,16 +297,24 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 	}
 	var labels = make(map[string]struct{}) // ISIL to attach
 
-	// TODO: Distinguish cases, e.g. with or w/o HF, https://git.io/JvdmC.
+	// TODO: Distinguish and simplify cases, e.g. with or w/o HF,
+	// https://git.io/JvdmC, also log some stats.
 	// INFO[12576] lthf => 531,701,113
 	// INFO[12576] plain => 112,694,196
 	// INFO[12576] 34-music => 3692
 	// INFO[12576] 34-DE-15-FID-film => 770
 	for _, row := range rows {
+		// Fields, where KBART links might be, empty strings are just skipped.
+		kbarts := []string{row.LinkToHoldingsFile, row.LinkToContentFile, row.ExternalLinkToContentFile}
+		// DE-14 uses a KBART (probably) across all sources, so we hard code
+		// their link here. Use `-f` to force download all external files.
+		if row.ISIL == "DE-14" {
+			kbarts = append(kbarts, SLUBEZBKBART)
+		}
 		switch {
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile != "":
 			// Both, holding and content file need to match (AND).
-			ok, err := l.hfcache.Covered(doc, row.LinkToHoldingsFile, row.LinkToContentFile)
+			ok, err := l.hfcache.Covered(doc, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -310,7 +324,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.ExternalLinkToContentFile != "":
 			// Both, holding and content file need to match (AND).
-			ok, err := l.hfcache.Covered(doc, row.LinkToHoldingsFile, row.ExternalLinkToContentFile)
+			ok, err := l.hfcache.Covered(doc, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -319,7 +333,8 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				counter["lthf+eltcf"]++
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile == "" && row.ExternalLinkToContentFile == "":
-			ok, err := l.hfcache.Covers(row.LinkToHoldingsFile, doc)
+			// Both, holding and content file need to match (AND).
+			ok, err := l.hfcache.Covered(doc, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -349,7 +364,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			return nil, fmt.Errorf("config provides holding file, but does not want to evaluate it: %v", row)
 		case row.ExternalLinkToContentFile != "":
 			// https://git.io/JvFjx
-			ok, err := l.hfcache.Covers(row.ExternalLinkToContentFile, doc)
+			ok, err := l.hfcache.Covered(doc, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -359,7 +374,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			}
 		case row.LinkToContentFile != "":
 			// https://git.io/JvFjp
-			ok, err := l.hfcache.Covers(row.LinkToContentFile, doc)
+			ok, err := l.hfcache.Covered(doc, kbarts...)
 			if err != nil {
 				return nil, err
 			}
