@@ -66,7 +66,10 @@ var (
 )
 
 // SLUBEZBKBART link to DE-14 KBART, to be included across all sources.
-const SLUBEZBKBART = "https://dbod.de/SLUB-EZB-KBART.zip"
+const (
+	SLUBEZBKBART         = "https://dbod.de/SLUB-EZB-KBART.zip"
+	DE15FIDISSNWHITELIST = "DE15FIDISSNWHITELIST"
+)
 
 // ConfigRow decribing a single entry (e.g. an attachment request).
 type ConfigRow struct {
@@ -227,10 +230,11 @@ func cacheKey(doc *finc.IntermediateSchema) string {
 // We need mostly: ISIL, SourceID, MegaCollection, TechnicalCollectionID, HoldFileURI,
 // EvaluateHoldingsFileForLibrary
 type Labeler struct {
-	dbFile  string
-	db      *sqlx.DB
-	cache   map[string][]ConfigRow
-	hfcache *HFCache
+	dbFile         string
+	db             *sqlx.DB
+	cache          map[string][]ConfigRow
+	hfcache        *HFCache
+	whitelistCache map[string]map[string]struct{} // Name (e.g. DE15FIDISSNWHITELIST) -> Set (a set of ISSN)
 }
 
 // open opens the database connection, read-only.
@@ -312,6 +316,32 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			kbarts = append(kbarts, SLUBEZBKBART)
 		}
 		switch {
+		case row.ISIL == "DE-15-FID" && strings.Contains(row.LinkToHoldingsFile, "FID_ISSN_Filter"):
+			// Here, the holdingfile URL contains a list of ISSN.  URI like ...
+			// discovery/metadata-usage/Dokument/FID_ISSN_Filter - but that
+			// might change.
+			if _, ok := l.whitelistCache[DE15FIDISSNWHITELIST]; !ok {
+				// Load from file, once. One value per line.
+				f, err := os.Open(row.LinkToHoldingsFile)
+				if err != nil {
+					return nil, err
+				}
+				defer f.Close()
+				l.whitelistCache[DE15FIDISSNWHITELIST] = make(map[string]struct{})
+				if err := setFromLines(f, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
+					return nil, err
+				}
+			}
+			whitelist, ok := l.whitelistCache[DE15FIDISSNWHITELIST]
+			if !ok {
+				return nil, fmt.Errorf("whitelist cache broken")
+			}
+			for _, issn := range doc.ISSNList() {
+				if _, ok := whitelist[issn]; ok {
+					labels[row.ISIL] = struct{}{}
+					counter["de-15-fid-issn-whitelist"]++
+				}
+			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile != "":
 			// Both, holding and content file need to match (AND).
 			ok, err := l.hfcache.Covered(doc, kbarts...)
@@ -397,6 +427,23 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 	}
 	sort.Strings(keys)
 	return keys, nil
+}
+
+// setFromLines populates a set from lines in a reader.
+func setFromLines(r io.Reader, m map[string]struct{}) error {
+	br := bufio.NewReader(r)
+	for {
+		line, err := br.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		line = strings.TrimSpace(line)
+		m[line] = struct{}{}
+	}
+	return nil
 }
 
 // stringsSliceContains returns true, if value appears in a string slice.
