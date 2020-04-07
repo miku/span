@@ -66,10 +66,16 @@ var (
 	cacheHome = filepath.Join(xdg.CacheHome, "span")
 )
 
+// Conjunction of terms, or holding files.
+type Conjunction int
+
 const (
 	// SLUBEZBKBART link to DE-14 KBART, to be included across all sources.
 	SLUBEZBKBART         = "https://dbod.de/SLUB-EZB-KBART.zip"
 	DE15FIDISSNWHITELIST = "DE15FIDISSNWHITELIST"
+
+	And Conjunction = iota
+	Or
 )
 
 // ConfigRow describes a single entry (e.g. an attachment request) from AMSL.
@@ -170,23 +176,31 @@ func (c *HFCache) populate(hflink string) error {
 // Covered returns true, if a document is covered by all given kbart files
 // (e.g. like "and" filter in former filterconfig). TODO: Merge Covered and
 // Covers methods.
-func (c *HFCache) Covered(doc *finc.IntermediateSchema, hfs ...string) (ok bool, err error) {
+func (c *HFCache) Covered(doc *finc.IntermediateSchema, conj Conjunction, hfs ...string) (ok bool, err error) {
 	for _, hf := range hfs {
 		if hf == "" {
 			continue
 		}
 		ok, err := c.Covers(hf, doc)
 		if err != nil {
-			// TODO: We exit on first miss, so it is a conjunction of all given
-			// holding files. Which would probably be wrong, e.g. in the case
-			// of multiple OA holding files.
 			return false, err
 		}
-		if !ok {
+		switch {
+		// TODO: We exit on first miss, so it is a conjunction of all given
+		// holding files. Which would probably be wrong, e.g. in the case
+		// of multiple OA holding files.
+		case !ok && conj == And:
 			return false, err
+		case ok && conj == Or:
+			return true, err
 		}
 	}
-	return true, nil
+	switch {
+	case conj == And:
+		return true, nil
+	default:
+		return false, nil
+	}
 }
 
 // Covers returns true, if a holdings file, given by link or filename, covers
@@ -319,6 +333,22 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			kbarts = append(kbarts, SLUBEZBKBART)
 		}
 		switch {
+		case doc.SourceID == "34":
+			switch {
+			case stringsContain([]string{"DE-L152", "DE-1156", "DE-1972", "DE-Kn38"}, row.ISIL):
+				// refs #10495, a subject filter for a few hard-coded ISIL; https://git.io/JvFjE
+				if stringsOverlap(doc.Subjects, []string{"Music", "Music education"}) {
+					labels[row.ISIL] = struct{}{}
+					counter["34-music"]++
+				}
+			case row.ISIL == "DE-15-FID":
+				// refs #10495, maybe use a TSV with custom column name to use a subject list? https://git.io/JvFjd
+				if stringsOverlap(doc.Subjects, []string{"Film studies", "Information science", "Mass communication"}) {
+					labels[row.ISIL] = struct{}{}
+					counter["34-DE-15-FID-film"]++
+				}
+			}
+			fallthrough
 		case row.ISIL == "DE-15-FID":
 			if strings.Contains(row.LinkToHoldingsFile, "FID_ISSN_Filter") {
 				// Here, the holdingfile URL contains a list of ISSN.  URI like ...
@@ -352,8 +382,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				}
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile != "":
-			// Both, holding and content file need to match (AND).
-			ok, err := l.hfcache.Covered(doc, kbarts...)
+			ok, err := l.hfcache.Covered(doc, And, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -362,8 +391,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				counter["lthf+ltcf"]++
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.ExternalLinkToContentFile != "":
-			// Both, holding and content file need to match (AND).
-			ok, err := l.hfcache.Covered(doc, kbarts...)
+			ok, err := l.hfcache.Covered(doc, And, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -372,8 +400,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				counter["lthf+eltcf"]++
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile == "" && row.ExternalLinkToContentFile == "":
-			// Both, holding and content file need to match (AND).
-			ok, err := l.hfcache.Covered(doc, kbarts...)
+			ok, err := l.hfcache.Covered(doc, Or, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -381,29 +408,13 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				labels[row.ISIL] = struct{}{}
 				counter["lthf"]++
 			}
-			// TODO: add case, where we limit by both holding and content file.
-		case doc.SourceID == "34":
-			switch {
-			case stringsContain([]string{"DE-L152", "DE-1156", "DE-1972", "DE-Kn38"}, row.ISIL):
-				// refs #10495, a subject filter for a few hard-coded ISIL; https://git.io/JvFjE
-				if stringsOverlap(doc.Subjects, []string{"Music", "Music education"}) {
-					labels[row.ISIL] = struct{}{}
-					counter["34-music"]++
-				}
-			case row.ISIL == "DE-15-FID":
-				// refs #10495, maybe use a TSV with custom column name to use a subject list? https://git.io/JvFjd
-				if stringsOverlap(doc.Subjects, []string{"Film studies", "Information science", "Mass communication"}) {
-					labels[row.ISIL] = struct{}{}
-					counter["34-DE-15-FID-film"]++
-				}
-			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile == "":
 			return nil, fmt.Errorf("no holding file to evaluate: %v", row)
 		case row.EvaluateHoldingsFileForLibrary == "no" && row.LinkToHoldingsFile != "":
 			return nil, fmt.Errorf("config provides holding file, but does not want to evaluate it: %v", row)
 		case row.ExternalLinkToContentFile != "":
 			// https://git.io/JvFjx
-			ok, err := l.hfcache.Covered(doc, kbarts...)
+			ok, err := l.hfcache.Covered(doc, And, kbarts...)
 			if err != nil {
 				return nil, err
 			}
@@ -413,7 +424,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			}
 		case row.LinkToContentFile != "":
 			// https://git.io/JvFjp
-			ok, err := l.hfcache.Covered(doc, kbarts...)
+			ok, err := l.hfcache.Covered(doc, And, kbarts...)
 			if err != nil {
 				return nil, err
 			}
