@@ -331,6 +331,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				if err := setFromLines(resp.Body, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
 					return nil, err
 				}
+				log.Printf("loaded whitelist of %d items from %s", len(l.whitelistCache[DE15FIDISSNWHITELIST]), row.LinkToHoldingsFile)
 			}
 			whitelist, ok := l.whitelistCache[DE15FIDISSNWHITELIST]
 			if !ok {
