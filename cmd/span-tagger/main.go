@@ -62,16 +62,17 @@ var (
 	debug       = flag.Bool("debug", false, "only output id and ISIL")
 
 	// counter for cases
-	counter = make(map[string]int)
+	counter   = make(map[string]int)
+	cacheHome = filepath.Join(xdg.CacheHome, "span")
 )
 
-// SLUBEZBKBART link to DE-14 KBART, to be included across all sources.
 const (
+	// SLUBEZBKBART link to DE-14 KBART, to be included across all sources.
 	SLUBEZBKBART         = "https://dbod.de/SLUB-EZB-KBART.zip"
 	DE15FIDISSNWHITELIST = "DE15FIDISSNWHITELIST"
 )
 
-// ConfigRow decribing a single entry (e.g. an attachment request).
+// ConfigRow describes a single entry (e.g. an attachment request) from AMSL.
 type ConfigRow struct {
 	ShardLabel                     string
 	ISIL                           string
@@ -98,11 +99,11 @@ type HFCache struct {
 	entries map[string]map[string][]licensing.Entry
 }
 
-// cacheFilename returns the path to the locally cached version of this URL.
+// cacheFilename returns the path to the locally cached version of a given URL.
 func (c *HFCache) cacheFilename(hflink string) string {
 	h := sha1.New()
 	_, _ = io.WriteString(h, hflink)
-	return filepath.Join(xdg.CacheHome, "span", fmt.Sprintf("%x", h.Sum(nil)))
+	return filepath.Join(cacheHome, fmt.Sprintf("%x", h.Sum(nil)))
 }
 
 // populate fills the entries map from a given URL.
@@ -121,12 +122,11 @@ func (c *HFCache) populate(hflink string) error {
 	} else if !fi.IsDir() {
 		return fmt.Errorf("expected cache directory at: %s", dir)
 	}
-	// TODO: Accept links and files.
 	if _, err := os.Stat(filename); os.IsNotExist(err) || *force {
 		if *force {
 			log.Printf("redownloading %s", hflink)
 		}
-		if err := download(hflink, filename); err != nil {
+		if err := atomicDownload(hflink, filename); err != nil {
 			return err
 		}
 	}
@@ -177,6 +177,9 @@ func (c *HFCache) Covered(doc *finc.IntermediateSchema, hfs ...string) (ok bool,
 		}
 		ok, err := c.Covers(hf, doc)
 		if err != nil {
+			// We exit on first miss, so it is a conjunction of all given
+			// holding files. Which would probably be wrong, e.g. in the case
+			// of multiple OA holding files.
 			return false, err
 		}
 		if !ok {
@@ -203,8 +206,8 @@ func (c *HFCache) Covers(hflink string, doc *finc.IntermediateSchema) (ok bool, 
 	return false, nil
 }
 
-// download retrieves a link and saves its content atomically in filename.
-func download(link, filename string) error {
+// atomicDownload retrieves a link and saves its content atomically in filename.
+func atomicDownload(link, filename string) error {
 	resp, err := pester.Get(link)
 	if err != nil {
 		return err
