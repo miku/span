@@ -176,6 +176,7 @@ var SourceNames = map[string]string{
 	"202": "Zentralinstitut für Kunstgeschichte",
 }
 
+// TODO: move to XDG
 var defaultConfigPath = path.Join(span.UserHomeDir(), ".config/span/span.json")
 
 var (
