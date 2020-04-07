@@ -319,16 +319,16 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 		case row.ISIL == "DE-15-FID" && strings.Contains(row.LinkToHoldingsFile, "FID_ISSN_Filter"):
 			// Here, the holdingfile URL contains a list of ISSN.  URI like ...
 			// discovery/metadata-usage/Dokument/FID_ISSN_Filter - but that
-			// might change.
+			// might change. Assuming just a single file.
 			if _, ok := l.whitelistCache[DE15FIDISSNWHITELIST]; !ok {
 				// Load from file, once. One value per line.
-				f, err := os.Open(row.LinkToHoldingsFile)
+				resp, err := pester.Get(row.LinkToHoldingsFile)
 				if err != nil {
 					return nil, err
 				}
-				defer f.Close()
+				defer resp.Body.Close()
 				l.whitelistCache[DE15FIDISSNWHITELIST] = make(map[string]struct{})
-				if err := setFromLines(f, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
+				if err := setFromLines(resp.Body, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
 					return nil, err
 				}
 			}
