@@ -50,7 +50,6 @@ allowed-keys:
     - ["source_id:80", "format", "ElectronicArticle", "ElectronicIntegratingResource"]
     - ["source_id:80", "format_de15", "Article, E-Article", "Website"]
     - ["source_id:80", "format_finc", "Article, E-Article", "Website"]
-    - ["source_id:107", "finc_class_facet", "not assigned", "Medizin"]
     - ["source_id:141", "language", "German", "English"]
     - ["source_id:162", "language", "German", "English", "French", "Italian"]
     - ["source_id:162", "finc_class_facet", "not assigned", "Allgemeines", "Philosophie", "Ethnologie (Volks- und Völkerkunde)", "Pädagogik"]
