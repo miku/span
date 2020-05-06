@@ -80,6 +80,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/sbin/span-report
 /usr/sbin/span-review
 /usr/sbin/span-tag
+/usr/sbin/span-tagger
 /usr/sbin/span-update-labels
 /usr/sbin/span-webhookd
 
