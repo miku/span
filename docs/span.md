@@ -351,7 +351,7 @@ Start the webhook receiver:
 
 Or use the service shipped with the distribution packages.
 
-  `servicectl span-webhookd start`
+  `systemctl start span-webhookd.service`
 
 The service requires `/var/log/span-webhookd.log` to be writable by `daemon`.
 
