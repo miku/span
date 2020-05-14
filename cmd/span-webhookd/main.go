@@ -87,7 +87,7 @@ func (irr *IndexReviewRequest) PeekTicketNumber() (ticket string, err error) {
 
 // IndexReviewQueue takes requests for index reviews, add some buffering, so we
 // can accept a few requests at a time, although this is improbable.
-var IndexReviewQueue = make(chan IndexReviewRequest, 100)
+var IndexReviewQueue = make(chan IndexReviewRequest, 8)
 var done = make(chan bool)
 
 // Worker hangs in there, checks for any new review requests on the index
