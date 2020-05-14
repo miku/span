@@ -85,7 +85,7 @@ func (irr *IndexReviewRequest) PeekTicketNumber() (ticket string, err error) {
 	return reviewConfig.Ticket, nil
 }
 
-// IndexReviewQueue takes requests for index reviews, add come buffering, so we
+// IndexReviewQueue takes requests for index reviews, add some buffering, so we
 // can accept a few requests at a time, although this is improbable.
 var IndexReviewQueue = make(chan IndexReviewRequest, 100)
 var done = make(chan bool)
@@ -305,6 +305,7 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("successfully updated repo at %s", repo.Dir)
 
 		// We can have multiple review files, issue a request for each of them.
+		// XXX: the same file might appear multiple times.
 		for _, reviewFile := range reviewFiles {
 			rr := IndexReviewRequest{
 				ReviewConfigFile: path.Join(repo.Dir, reviewFile),
