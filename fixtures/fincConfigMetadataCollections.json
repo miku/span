@@ -1,0 +1,41 @@
+{
+  "fincConfigMetadataCollections": [
+    {
+      "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6123",
+      "label": "21st Century COE Program",
+      "description": "This is a test metadata collection",
+      "mdSource": {
+        "id": "6dd325f8-b1d5-4568-a0d7-aecf6b8d6697",
+        "name": "Cambridge University Press Journals"
+      },
+      "metadataAvailable": "yes",
+      "usageRestricted": "no",
+      "permittedFor": [
+        "DE-15",
+        "DE-14"
+      ],
+      "freeContent": "undetermined",
+      "lod": {
+        "publication": "permitted (explicit)",
+        "note": "Note for test publication"
+      },
+      "collectionId": "coe-123",
+      "facetLabel": "012.1 21st Century COE",
+      "tickets": [],
+      "contentFiles": [],
+      "solrMegaCollections": [
+        "21st Century COE Program"
+      ],
+      "selectedBy": [
+        "DE-15",
+        "DE-14"
+      ],
+      "metadata": {
+        "createdDate": "2020-05-19T02:54:35.278+0000",
+        "updatedDate": "2020-05-19T02:54:35.278+0000"
+      }
+    }
+  ],
+  "totalRecords": 1
+}
+
