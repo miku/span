@@ -1,9 +1,9 @@
-// Package config handles application configuration and location and loading of
+// Package configutil handles application configuration and location and loading of
 // various mapping files.
 //
 // Introduce new config location at /etc/span/assets/..., load data from file,
 // not from the binary itself (get rid of go-bindata).
-package config
+package configutil
 
 // Config is application configuration of span and its subcommands.
 type Config struct {

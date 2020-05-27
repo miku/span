@@ -47,22 +47,24 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/miku/span"
+	"github.com/miku/span/configutil"
 	"github.com/miku/span/reviewutil"
 	log "github.com/sirupsen/logrus"
 )
 
-// DefaultPort to listen on for gitlab hook.
-const DefaultPort = 8080
-
 var (
-	addr           = flag.String("addr", fmt.Sprintf(":%d", findConfiguredPort()), "hostport to listen on")
+	addr           = flag.String("addr", "", "hostport to listen on")
 	token          = flag.String("token", "", "gitlab auth token, if empty will use span-config")
 	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	logfile        = flag.String("logfile", "", "log to file")
-	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.yaml"), "gitlab, redmine tokens, whatislive location")
 	triggerPath    = flag.String("trigger-path", "trigger", "path trigger, {host}:{port}/{trigger-path}")
 	banner         = fmt.Sprintf(`[<>] webhookd %s`, span.AppVersion)
+
+	// Parsed configuration options.
+	config configutil.Config
 )
 
 // IndexReviewRequest contains information for run an index review.
@@ -144,17 +146,17 @@ func (r Repo) String() string {
 func (r Repo) Update() error {
 	log.Printf("updating %s", r)
 	if r.Token == "" {
-		log.Printf("warning: not gitlab.token found, checkout might fail (%s)", *spanConfigFile)
+		log.Printf("warning: no gitlab.token found, checkout might fail (%s)", *spanConfigFile)
 	}
 	if _, err := os.Stat(path.Dir(r.Dir)); os.IsNotExist(err) {
 		if err := os.MkdirAll(path.Dir(r.Dir), 0755); err != nil {
 			return err
 		}
 	}
-
-	var cmd string
-	var args []string
-
+	var (
+		cmd  string
+		args []string
+	)
 	if _, err := os.Stat(r.Dir); os.IsNotExist(err) {
 		cmd, args = "git", []string{"clone", r.AuthURL(), r.Dir}
 	} else {
@@ -293,7 +295,7 @@ func HookHandler(w http.ResponseWriter, r *http.Request) {
 		repo := Repo{
 			URL:   payload.Project.GitHttpUrl,
 			Dir:   *repoDir,
-			Token: *token,
+			Token: config.GitLabToken,
 		}
 		if err := repo.Update(); err != nil {
 			log.Println(err)
@@ -340,56 +342,9 @@ func parsePort(addr string) (int, error) {
 	return strconv.Atoi(parts[1])
 }
 
-// findGitlabToken returns the GitLab auth token, if configured. XXX: Use
-// proper config library.
-func findGitlabToken() (string, error) {
-	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		// XXX: Use a real config framework, not these hacks.
-		*spanConfigFile = "/etc/span/span.json"
-		if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-			return "", err
-		}
-	}
-	f, err := os.Open(*spanConfigFile)
-	if err != nil {
-		return "", err
-	}
-	var conf struct {
-		Token string `json:"gitlab.token"`
-	}
-	if err := json.NewDecoder(f).Decode(&conf); err != nil {
-		return "", err
-	}
-	return conf.Token, nil
-}
-
-// findConfiguredPort returns a configured port number or 8080 if none is
-// specified. XXX: Use proper config library.
-func findConfiguredPort() int {
-	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		return DefaultPort
-	}
-	f, err := os.Open(*spanConfigFile)
-	if err != nil {
-		return DefaultPort
-	}
-	var conf struct {
-		Port int `json:"port"`
-	}
-	if err := json.NewDecoder(f).Decode(&conf); err != nil {
-		return DefaultPort
-	}
-	if conf.Port == 0 {
-		conf.Port = DefaultPort
-	}
-	return conf.Port
-}
-
 func main() {
 	flag.Parse()
-
 	log.Println(banner)
-
 	if *logfile != "" {
 		f, err := os.OpenFile(*logfile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
@@ -398,39 +353,43 @@ func main() {
 		defer f.Close()
 		log.SetOutput(f)
 	}
-
 	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
 		span.AppVersion, *addr)
 
-	// Fallback configuration, since daemon home is /usr/sbin.
-	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		*spanConfigFile = "/etc/span/span.json"
-	}
-	// XXX: Use a real framework like go-ucfg or globalconf.
-	if _, err := os.Stat(*spanConfigFile); os.IsNotExist(err) {
-		log.Fatal("no configuration found, put one into /etc/span/span.json")
-	}
-	log.Printf("using fallback configuration from %s", *spanConfigFile)
-
 	var err error
-
-	if *token == "" {
-		*token, err = findGitlabToken()
+	err = cleanenv.ReadConfig(*spanConfigFile, &config)
+	if err != nil {
+		err = cleanenv.ReadConfig("/etc/span/span.yaml", &config)
 		if err != nil {
-			log.Printf("gitlab token not configured, might be an issue")
+			log.Fatalf("failed to read config from: %s and /etc/span/span.yaml", *spanConfigFile)
 		}
 	}
+	// Keep flag compatibility.
+	if *token != "" {
+		config.GitLabToken = *token
+	}
+	// Keep flag compatibility.
+	if *addr != "" {
+		config.WebhookdHostPort = *addr
+	}
+	// Dump config.
+	b, err := json.Marshal(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("using config: %s", string(b))
 
+	// Setup handlers.
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
 	r.HandleFunc(fmt.Sprintf("/%s", *triggerPath), HookHandler)
 	http.Handle("/", r)
 
-	port, err := parsePort(*addr)
+	// Log all listening interfaces.
+	port, err := parsePort(config.WebhookdHostPort)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
 		log.Fatal(err)
@@ -441,6 +400,7 @@ func main() {
 		}
 	}
 
+	// Start background worker.
 	go Worker(done)
 	log.Println("use CTRL-C to gracefully stop server")
 
@@ -455,5 +415,5 @@ func main() {
 		}
 	}()
 
-	log.Fatal(http.ListenAndServe(*addr, r))
+	log.Fatal(http.ListenAndServe(config.WebhookdHostPort, r))
 }
