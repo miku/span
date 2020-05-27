@@ -203,9 +203,8 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 						l.whitelistCache[DE15FIDISSNWHITELIST].Size(),
 						row.LinkToHoldingsFile)
 				}
-				ss := l.whitelistCache[DE15FIDISSNWHITELIST]
 				for _, issn := range doc.ISSNList() {
-					if ss.Contains(issn) {
+					if l.whitelistCache[DE15FIDISSNWHITELIST].Contains(issn) {
 						labels.Add(row.ISIL)
 					}
 				}
