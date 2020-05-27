@@ -26,7 +26,7 @@ import (
 type Holdings []licensing.Entry
 
 // ReadFrom create holdings struct from a reader. Expects tab separated content with
-// a single header row.
+// a single header row. TODO: This is not exactly what ReadFrom is for.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 	var wc span.WriteCounter
 	dec := tsv.NewDecoder(io.TeeReader(r, &wc))
@@ -46,7 +46,7 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 
 // SerialNumberMap creates a map from ISSN to associated licensing entries.
 // This is here for performance mostly, so we can access relevant licensing
-// entry by ISSN.  XXX: Do not replicate entries, just index into them.
+// entry by ISSN. TODO: Do not replicate entries, just index into them.
 func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 	cache := make(map[string]map[licensing.Entry]struct{})
 	for _, e := range *h {
@@ -118,8 +118,8 @@ func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
 	return result
 }
 
-// Filter finds entries with certain characteristics. This will be slow for KBART
-// files with thousands of entries.
+// Filter finds entries with certain characteristics. This will be very slow
+// for KBART files with thousands of entries.
 func (h *Holdings) Filter(f func(licensing.Entry) bool) (result []licensing.Entry) {
 	cache := make(map[licensing.Entry]bool)
 	for _, e := range *h {

@@ -133,8 +133,10 @@ type Entry struct {
 // ISSNList returns a list of unique, normalized ISSN (1234-567X) from various
 // entry fields.
 func (entry *Entry) ISSNList() []string {
-	issns := container.NewStringSet()
-	idfields := []string{entry.PrintIdentifier, entry.OnlineIdentifier}
+	var (
+		issns    = container.NewStringSet()
+		idfields = []string{entry.PrintIdentifier, entry.OnlineIdentifier}
+	)
 	for _, issn := range idfields {
 		s := NormalizeSerialNumber(issn)
 		if issnPattern.MatchString(s) {
@@ -156,14 +158,13 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 	if err != nil {
 		return err
 	}
-	// XXX: Containment and embargo should be one thing, maybe.
+	// TODO: Containment and embargo should be one thing, maybe.
 	if err := entry.containsDateTime(t, g); err != nil {
 		return err
 	}
 	if err := Embargo(entry.Embargo).Compatible(t); err != nil {
 		return err
 	}
-
 	if entry.parsed.FirstIssueDate.Year() == t.Year() {
 		if entry.FirstVolume != "" && volume != "" && findInt(volume) < findInt(entry.FirstVolume) {
 			return ErrBeforeFirstVolume
@@ -172,7 +173,6 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 			return ErrBeforeFirstIssue
 		}
 	}
-
 	if entry.parsed.LastIssueDate.Year() == t.Year() {
 		if entry.LastVolume != "" && volume != "" && findInt(volume) > findInt(entry.LastVolume) {
 			return ErrAfterLastVolume
