@@ -1,9 +1,7 @@
 package tagging
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"path/filepath"
 	"sort"
@@ -11,8 +9,10 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/jmoiron/sqlx"
+	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
+	"github.com/miku/span/misc"
 	"github.com/sethgrid/pester"
 )
 
@@ -49,15 +49,16 @@ type Labeler struct {
 	dbFile string // sqlite filename
 	db     *sqlx.DB
 
-	cache          map[string][]ConfigRow
-	hfcache        *HFCache
-	whitelistCache map[string]map[string]struct{} // Name (e.g. DE15FIDISSNWHITELIST) -> Set (a set of ISSN)
+	cache          map[string][]ConfigRow          // cache for prefiltering rows from database
+	hfcache        *HFCache                        // holding file cache
+	whitelistCache map[string]*container.StringSet // Name (e.g. DE15FIDISSNWHITELIST) -> Set (e.g. a set of ISSN)
 
+	// Returns a unique key for a given document usable as cache key.
 	cacheKeyFunc func(doc *finc.IntermediateSchema) string
 }
 
-// New returns a initialized labeler using a relational AMSL representation
-// (sqlite). Will fail here, if database cannot be opened.
+// New returns a initialized labeler using a relational AMSL representation in
+// an sqlite3 file. Will fail here, if database cannot be opened.
 func New(dbFile string) (*Labeler, error) {
 	db, err := sqlx.Connect("sqlite3", fmt.Sprintf("%s?ro=1", dbFile))
 	if err != nil {
@@ -83,8 +84,11 @@ func New(dbFile string) (*Labeler, error) {
 // matchingRows returns a list of relevant rows for a given document. This is a
 // prefilter (going from 200K+ rows 10s of rows).
 func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow, err error) {
-	key := l.cacheKeyFunc(doc)
-	if v, ok := l.cache[key]; ok {
+	var (
+		key   = l.cacheKeyFunc(doc)
+		v, ok = l.cache[key]
+	)
+	if ok {
 		return v, nil
 	}
 	if len(doc.MegaCollections) == 0 {
@@ -122,15 +126,20 @@ func (l *Labeler) matchingRows(doc *finc.IntermediateSchema) (result []ConfigRow
 	return result, nil
 }
 
-// Label updates document in place. This may contain hard-coded values for
-// special attachment cases.
+// Labels returns a list of ISIL that are interested in this document.
 func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
-	rows, err := l.matchingRows(doc)
+	var (
+		labels    = container.NewStringSet()
+		rows, err = l.matchingRows(doc)
+	)
 	if err != nil {
 		return nil, err
 	}
-	var labels = make(map[string]struct{}) // ISIL to attach
-
+	var (
+		subjectsMusic = []string{"Music", "Music education"}
+		subjectsFilm  = []string{"Film studies", "Information science", "Mass communication"}
+		isilSet10495  = container.NewStringSet("DE-L152", "DE-1156", "DE-1972", "DE-Kn38")
+	)
 	// TODO: Distinguish and simplify cases, e.g. with or w/o HF,
 	// https://git.io/JvdmC, also log some stats.
 	// INFO[12576] lthf => 531,701,113
@@ -139,7 +148,11 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 	// INFO[12576] 34-DE-15-FID-film => 770
 	for _, row := range rows {
 		// Fields, where KBART links might be, empty strings are just skipped.
-		kbarts := []string{row.LinkToHoldingsFile, row.LinkToContentFile, row.ExternalLinkToContentFile}
+		kbarts := []string{
+			row.LinkToHoldingsFile,
+			row.LinkToContentFile,
+			row.ExternalLinkToContentFile,
+		}
 		// DE-14 uses a KBART (probably) across all sources, so we hard code
 		// their link here. Use `-f` to force download all external files.
 		if row.ISIL == "DE-14" {
@@ -149,20 +162,22 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 		case row.ISIL == "DE-15" && row.TechnicalCollectionID == "sid-48-col-wisoubl":
 			for _, name := range doc.Packages {
 				if _, ok := UBLWISOPROFILE[name]; ok {
-					labels[row.ISIL] = struct{}{}
+					labels.Add(row.ISIL)
 				}
 			}
 		case doc.SourceID == "34":
 			switch {
-			case stringsContain([]string{"DE-L152", "DE-1156", "DE-1972", "DE-Kn38"}, row.ISIL):
-				// refs #10495, a subject filter for a few hard-coded ISIL; https://git.io/JvFjE
-				if stringsOverlap(doc.Subjects, []string{"Music", "Music education"}) {
-					labels[row.ISIL] = struct{}{}
+			case isilSet10495.Contains(row.ISIL):
+				// refs #10495, a subject filter for a few hard-coded ISIL;
+				// https://git.io/JvFjE
+				if misc.Overlap(doc.Subjects, subjectsMusic) {
+					labels.Add(row.ISIL)
 				}
 			case row.ISIL == "DE-15-FID":
-				// refs #10495, maybe use a TSV with custom column name to use a subject list? https://git.io/JvFjd
-				if stringsOverlap(doc.Subjects, []string{"Film studies", "Information science", "Mass communication"}) {
-					labels[row.ISIL] = struct{}{}
+				// refs #10495, maybe use a TSV with custom column name to use
+				// a subject list? https://git.io/JvFjd
+				if misc.Overlap(doc.Subjects, subjectsFilm) {
+					labels.Add(row.ISIL)
 				}
 			}
 		case row.ISIL == "DE-15-FID":
@@ -178,21 +193,20 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 					}
 					defer resp.Body.Close()
 					if l.whitelistCache == nil {
-						l.whitelistCache = make(map[string]map[string]struct{})
+						ss, err := container.NewStringSetReader(resp.Body)
+						if err != nil {
+							return nil, err
+						}
+						l.whitelistCache[DE15FIDISSNWHITELIST] = ss
 					}
-					l.whitelistCache[DE15FIDISSNWHITELIST] = make(map[string]struct{})
-					if err := setFromLines(resp.Body, l.whitelistCache[DE15FIDISSNWHITELIST]); err != nil {
-						return nil, err
-					}
-					log.Printf("loaded whitelist of %d items from %s", len(l.whitelistCache[DE15FIDISSNWHITELIST]), row.LinkToHoldingsFile)
+					log.Printf("loaded whitelist of %d items from %s",
+						l.whitelistCache[DE15FIDISSNWHITELIST].Size(),
+						row.LinkToHoldingsFile)
 				}
-				whitelist, ok := l.whitelistCache[DE15FIDISSNWHITELIST]
-				if !ok {
-					return nil, fmt.Errorf("whitelist cache broken")
-				}
+				ss := l.whitelistCache[DE15FIDISSNWHITELIST]
 				for _, issn := range doc.ISSNList() {
-					if _, ok := whitelist[issn]; ok {
-						labels[row.ISIL] = struct{}{}
+					if ss.Contains(issn) {
+						labels.Add(row.ISIL)
 					}
 				}
 			}
@@ -202,7 +216,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				return nil, err
 			}
 			if ok {
-				labels[row.ISIL] = struct{}{}
+				labels.Add(row.ISIL)
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.ExternalLinkToContentFile != "":
 			ok, err := l.hfcache.Covered(doc, And, kbarts...)
@@ -210,7 +224,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				return nil, err
 			}
 			if ok {
-				labels[row.ISIL] = struct{}{}
+				labels.Add(row.ISIL)
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile != "" && row.LinkToContentFile == "" && row.ExternalLinkToContentFile == "":
 			ok, err := l.hfcache.Covered(doc, Or, kbarts...)
@@ -218,7 +232,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				return nil, err
 			}
 			if ok {
-				labels[row.ISIL] = struct{}{}
+				labels.Add(row.ISIL)
 			}
 		case row.EvaluateHoldingsFileForLibrary == "yes" && row.LinkToHoldingsFile == "":
 			return nil, fmt.Errorf("no holding file to evaluate: %v", row)
@@ -231,7 +245,7 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				return nil, err
 			}
 			if ok {
-				labels[row.ISIL] = struct{}{}
+				labels.Add(row.ISIL)
 			}
 		case row.LinkToContentFile != "":
 			// https://git.io/JvFjp
@@ -240,59 +254,14 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				return nil, err
 			}
 			if ok {
-				labels[row.ISIL] = struct{}{}
+				labels.Add(row.ISIL)
 			}
 		case row.EvaluateHoldingsFileForLibrary == "no":
-			labels[row.ISIL] = struct{}{}
+			labels.Add(row.ISIL)
 		case row.ContentFileURI != "":
 		default:
 			return nil, fmt.Errorf("none of the attachment modes match for %v", doc)
 		}
 	}
-	var keys []string
-	for k := range labels {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return keys, nil
-}
-
-// stringsSliceContains returns true, if value appears in a string slice.
-func stringsContain(ss []string, v string) bool {
-	for _, w := range ss {
-		if v == w {
-			return true
-		}
-	}
-	return false
-}
-
-// stringsOverlap returns true, if at least one value is in both ss and vv.
-// Inefficient.
-func stringsOverlap(ss, vv []string) bool {
-	for _, s := range ss {
-		for _, v := range vv {
-			if s == v {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// setFromLines populates a set from lines in a reader.
-func setFromLines(r io.Reader, m map[string]struct{}) error {
-	br := bufio.NewReader(r)
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-		line = strings.TrimSpace(line)
-		m[line] = struct{}{}
-	}
-	return nil
+	return labels.SortedValues(), nil
 }

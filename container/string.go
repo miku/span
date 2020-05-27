@@ -22,9 +22,12 @@
 package container
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
+	"strings"
 )
 
 // StringMap provides defaults for string map lookups with defaults.
@@ -68,6 +71,27 @@ func NewStringSet(s ...string) *StringSet {
 		ss.Add(item)
 	}
 	return ss
+}
+
+// NewStringSetReader reads from reader linewise, each line corresponding to
+// one item in set.
+func NewStringSetReader(r io.Reader) (*StringSet, error) {
+	var (
+		ss = &StringSet{Set: make(map[string]struct{})}
+		br = bufio.NewReader(r)
+	)
+	for {
+		line, err := br.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		line = strings.TrimSpace(line)
+		ss.Add(line)
+	}
+	return ss, nil
 }
 
 // Add adds a string to a set, returns true if added, false it it already existed (noop).
