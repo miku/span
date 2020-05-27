@@ -88,14 +88,3 @@ altogether. There is lots of work done in prototypes, which explore how fast
 and how reliable we can rewrite documents in a production server.
 
 Ideally, a cron job or trigger regularly checks and ensures compliance.
-
-```shell
-$ span-r12n -c config.json -server 10.1.1.100:8080/solr/biblio
-```
-
-This bot-oriented design has been in parts inspired by the [fatcat RFC](http://fatcat.wiki/).
-
-Since August 2018, the [finc indices](https://finc.info) track the
-`last_updated` date of documents, which can help with fast checks on newly
-indexed records.
-
