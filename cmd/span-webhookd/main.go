@@ -210,6 +210,7 @@ func main() {
 	log.Printf("starting GitLab webhook receiver (%s) on %s ... (settings/integrations)",
 		span.AppVersion, *addr)
 
+	// Try to find and read config file.
 	var err error
 	err = cleanenv.ReadConfig(*spanConfigFile, &config)
 	if err != nil {
@@ -222,11 +223,9 @@ func main() {
 	if *token != "" {
 		config.GitLabToken = *token
 	}
-	// Keep flag compatibility.
 	if *addr != "" {
 		config.WebhookdHostPort = *addr
 	}
-	// Keep flag compatibility.
 	if *repoDir != "" {
 		config.GitLabCloneDir = *repoDir
 	}
@@ -261,8 +260,9 @@ func main() {
 
 	// Start background worker.
 	go Worker(done)
-	log.Println("use CTRL-C to gracefully stop server")
 
+	// Handle SIGINT.
+	log.Println("use CTRL-C to gracefully stop server")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
@@ -274,5 +274,6 @@ func main() {
 		}
 	}()
 
+	// Start server.
 	log.Fatal(http.ListenAndServe(config.WebhookdHostPort, r))
 }
