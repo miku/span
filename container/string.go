@@ -47,7 +47,7 @@ func (m StringMap) LookupDefault(key, def string) string {
 	return val
 }
 
-// StringMap provides defaults for string map lookups.
+// StringSliceMap provides defaults for string map lookups.
 type StringSliceMap map[string][]string
 
 // LookupDefault with default value.
@@ -95,18 +95,10 @@ func NewStringSetReader(r io.Reader) (*StringSet, error) {
 }
 
 // Add adds a string to a set, returns true if added, false it it already existed (noop).
-func (set *StringSet) Add(s string) bool {
-	_, found := set.Set[s]
-	set.Set[s] = struct{}{}
-	return !found // False if it existed already
-}
-
-// AddAll adds adds a set of string to a set.
-func (set *StringSet) AddAll(s ...string) bool {
-	for _, item := range s {
-		set.Set[item] = struct{}{}
+func (set *StringSet) Add(ss ...string) {
+	for _, s := range ss {
+		set.Set[s] = struct{}{}
 	}
-	return true
 }
 
 // Contains returns true if given string is in the set, false otherwise.
