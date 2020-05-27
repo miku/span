@@ -18,11 +18,12 @@
 // * [ ] cover all attachment modes from https://git.io/JvdmC
 // * [ ] add tests
 // * [ ] logs
+// * [ ] make main a very short function
 //
 // Performance:
 //
 // Single threaded 170M records, about 4 hours, thanks to caching (but only
-// about 10M/s); 210m29.179s for 173759327 records; 13G output.
+// about 10MB/s); 210m29.179s for 173759327 records; 13G output.
 package main
 
 import (
@@ -79,10 +80,10 @@ func main() {
 		br      = bufio.NewReader(os.Stdin)
 		i       = 0
 		started = time.Now()
+		bw      = bufio.NewWriter(os.Stdout)
+		enc     = json.NewEncoder(bw)
 	)
-	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
-	enc := json.NewEncoder(bw)
 	for {
 		if i%10000 == 0 {
 			log.Printf("%d %0.2f", i, float64(i)/time.Since(started).Seconds())
@@ -98,7 +99,6 @@ func main() {
 		if err := json.Unmarshal(b, &doc); err != nil {
 			log.Fatal(err)
 		}
-		// TODO: return ISIL
 		labels, err := labeler.Labels(&doc)
 		if err != nil {
 			log.Fatal(err)
