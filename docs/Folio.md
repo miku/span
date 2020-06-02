@@ -83,3 +83,12 @@ Two records.
 > HTTP header, auth, login.
 
 * X-OKAPI-HEADER
+
+# Auth
+
+```shell
+$ curl --dump-header okapi.txt --request POST \
+    --url https://xyz.folio.finc.info/bl-users/login \
+    --header 'content-type: application/json' \
+    --header 'x-okapi-tenant: de_15' --data '{"sername": "xyz", "password": "xyz"}'
+```
