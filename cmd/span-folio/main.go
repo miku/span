@@ -53,8 +53,8 @@ var (
 
 func main() {
 	flag.Parse()
-
 	// Acquire token.
+	// TODO.
 
 	// Fetch data.
 	client := pester.New()
