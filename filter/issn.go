@@ -67,11 +67,11 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			if issns.Size() == 0 {
 				log.Printf("issn: warning: no ISSNs found on line: %s", line)
 			}
-			f.Values.AddAll(issns.Values()...)
+			f.Values.Add(issns.Values()...)
 		}
 	}
 	// Add any ISSN given as string in configuration.
-	f.Values.AddAll(s.ISSN.Values...)
+	f.Values.Add(s.ISSN.Values...)
 	log.Printf("issn: collected %d ISSN", f.Values.Size())
 	return nil
 }
