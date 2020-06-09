@@ -41,7 +41,7 @@ func (api *API) Authenticate(username, password string) (token string, err error
 		return token, err
 	}
 	body := bytes.NewReader(payloadBytes)
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/bl-users/login"), body)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/bl-users/login", api.Base), body)
 	if err != nil {
 		return token, err
 	}
