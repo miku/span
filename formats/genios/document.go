@@ -251,7 +251,8 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 	output.Authors = doc.Authors()
 	output.URL = append(output.URL, doc.URL())
 	if !isNomenNescio(doc.Abstract) {
-		output.Abstract = strings.TrimSpace(doc.Abstract)
+		// Allow up to 150 chars from abstract.
+		output.Abstract = span.TruncateString(strings.TrimSpace(doc.Abstract), 150)
 	}
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
 	if len(output.ArticleTitle) > maxTitleLength {

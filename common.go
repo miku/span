@@ -99,3 +99,11 @@ func UserHomeDir() string {
 	}
 	return os.Getenv("HOME")
 }
+
+// TruncateString truncates a string to given length.
+func TruncateString(s string, l int) string {
+	if len(s) < l || l < 0 {
+		return s
+	}
+	return s[:l]
+}
