@@ -53,6 +53,7 @@ type Solr5Vufind3 struct {
 	PublishDate          []string `json:"publishDate,omitempty"`
 	Physical             []string `json:"physical,omitempty"`
 	Description          string   `json:"description"`
+	Collections          []string `json:"collection"` // index/wiki/Kollektionsfacette
 
 	ContainerIssue     string `json:"container_issue,omitempty"`
 	ContainerStartPage string `json:"container_start_page,omitempty"`
@@ -98,7 +99,16 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.ISSN = is.ISSNList()
 	s.ISBN = is.ISBNList()
 	s.Edition = is.Edition
-	s.MegaCollections = is.MegaCollections
+	for _, name := range is.MegaCollections {
+		// As per 2020-06-30 try to keep tcids (sid-...) in SOLR collection
+		// field, and labels in SOLR mega_collection. Except with crossref
+		// (49), where we do not have tcids (yet).
+		if strings.HasPrefix(name, "sid-") || is.SourceID == "49" {
+			s.Collections = append(s.Collections, name)
+		} else {
+			s.MegaCollections = append(s.MegaCollections, name)
+		}
+	}
 	s.PublishDateSort = is.Date.Year()
 	s.PublishDate = []string{is.Date.Format("2006-01-02")}
 	s.Publishers = is.Publishers
