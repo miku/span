@@ -1,3 +1,7 @@
+// Package tagging is a rewrite of span-tag for applying licensing information
+// of intermediate schema data. While span-tag uses a declarative approach (a
+// JSON configuration), this package tries to express things in code; maybe
+// uglier, less declarative, but more flexible, in the best case.
 package tagging
 
 import (

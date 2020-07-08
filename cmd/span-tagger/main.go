@@ -18,7 +18,7 @@
 // * [ ] cover all attachment modes from https://git.io/JvdmC
 // * [ ] add tests
 // * [ ] logs
-// * [ ] make main a very short function
+// * [ ] make main short
 //
 // Performance:
 //
