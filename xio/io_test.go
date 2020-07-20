@@ -1,4 +1,4 @@
-package span
+package xio
 
 import (
 	"bytes"
@@ -69,7 +69,7 @@ func TestFileReader(t *testing.T) {
 
 func TestZipContentReader(t *testing.T) {
 	var buf bytes.Buffer
-	_, err := io.Copy(&buf, &ZipContentReader{Filename: "fixtures/z.zip"})
+	_, err := io.Copy(&buf, &ZipContentReader{Filename: "../fixtures/z.zip"})
 	if err != nil {
 		t.Errorf(err.Error())
 	}

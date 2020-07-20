@@ -3,8 +3,8 @@ package filter
 import (
 	"encoding/json"
 
-	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/xio"
 )
 
 // DOIFilter allows records with a given DOI. Can be used in conjuction with
@@ -35,7 +35,7 @@ func (f *DOIFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 	if s.DOI.File != "" {
-		lines, err := span.ReadLines(s.DOI.File)
+		lines, err := xio.ReadLines(s.DOI.File)
 		if err != nil {
 			return err
 		}

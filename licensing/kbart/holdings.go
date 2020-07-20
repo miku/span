@@ -15,9 +15,9 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/miku/span"
 	"github.com/miku/span/encoding/tsv"
 	"github.com/miku/span/licensing"
+	"github.com/miku/span/xio"
 )
 
 // Holdings contains a list of entries about licenced or available content. In
@@ -28,7 +28,7 @@ type Holdings []licensing.Entry
 // ReadFrom create holdings struct from a reader. Expects tab separated content with
 // a single header row. TODO: This is not exactly what ReadFrom is for.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
-	var wc span.WriteCounter
+	var wc xio.WriteCounter
 	dec := tsv.NewDecoder(io.TeeReader(r, &wc))
 	for {
 		var entry licensing.Entry

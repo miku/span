@@ -1,4 +1,6 @@
 // Package tagging implements helper functions for attaching ISIL to records.
+// This is a "v2" reimplementation, aimed at reducing from friction while
+// adding support for FOLIO.
 //
 // Example output, tag vs tagger.
 //

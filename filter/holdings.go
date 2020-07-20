@@ -9,10 +9,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
+	"github.com/miku/span/xio"
 )
 
 // CacheValue groups holdings and cache for fast lookups.
@@ -63,7 +63,7 @@ func (c *HoldingsCache) putFile(filename string) error {
 		log.Printf("[holdings] read: %s", filename)
 		return c.register(filename, file)
 	}
-	r := &span.ZipContentReader{Filename: filename}
+	r := &xio.ZipContentReader{Filename: filename}
 	log.Printf("[holdings] read (zip): %s", filename)
 	return c.register(filename, r)
 }
@@ -71,7 +71,7 @@ func (c *HoldingsCache) putFile(filename string) error {
 // putLink parses a holding file from a link and adds it to the cache.
 func (c *HoldingsCache) putLink(link string) error {
 	log.Printf("[holdings] fetch: %s", link)
-	return c.register(link, &span.ZipOrPlainLinkReader{Link: link})
+	return c.register(link, &xio.ZipOrPlainLinkReader{Link: link})
 }
 
 // Cache caches holdings information.

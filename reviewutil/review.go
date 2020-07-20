@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/miku/span"
+	"github.com/miku/span/xio"
 	"github.com/sethgrid/pester"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -30,7 +30,7 @@ func (rc *ReviewConfig) ReadFrom(r io.Reader) (n int64, err error) {
 	if rc == nil {
 		rc = &ReviewConfig{}
 	}
-	readerCounter := span.NewReaderCounter(r)
+	readerCounter := xio.NewReaderCounter(r)
 	if err = yaml.NewDecoder(readerCounter).Decode(rc); err != nil {
 		return 0, err
 	}

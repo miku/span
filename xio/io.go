@@ -1,4 +1,4 @@
-package span
+package xio
 
 import (
 	"archive/zip"

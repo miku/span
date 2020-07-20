@@ -9,6 +9,7 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/xio"
 )
 
 // ISSNFilter allows records with a certain ISSN.
@@ -42,7 +43,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	f.Values = container.NewStringSet()
 
 	if s.ISSN.Link != "" {
-		slink := span.SavedLink{Link: s.ISSN.Link}
+		slink := xio.SavedLink{Link: s.ISSN.Link}
 		filename, err := slink.Save()
 		if err != nil {
 			return err
@@ -52,7 +53,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	}
 
 	if s.ISSN.File != "" {
-		lines, err := span.ReadLines(s.ISSN.File)
+		lines, err := xio.ReadLines(s.ISSN.File)
 		if err != nil {
 			return err
 		}

@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/miku/span"
+	"github.com/miku/span/xio"
 	"github.com/sethgrid/pester"
 	log "github.com/sirupsen/logrus"
 
@@ -94,7 +94,7 @@ func SeparatedFields(s, sep string) (result []string) {
 
 // readFrom decodes data from reader into value, returning bytes read.
 func readFrom(r io.Reader, v interface{}) (int64, error) {
-	rc := span.NewReaderCounter(r)
+	rc := xio.NewReaderCounter(r)
 	if err := json.NewDecoder(rc).Decode(v); err != nil {
 		return 0, err
 	}

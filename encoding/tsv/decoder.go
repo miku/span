@@ -13,25 +13,25 @@ import (
 	"strings"
 
 	"github.com/fatih/structs"
-	"github.com/miku/span"
+	"github.com/miku/span/xio"
 )
 
 // A Decoder reads and decodes TSV rows from an input stream.
 type Decoder struct {
-	Header    []string         // Column names.
-	Separator string           // Field separator.
-	r         *span.SkipReader // The underlying reader.
+	Header    []string        // Column names.
+	Separator string          // Field separator.
+	r         *xio.SkipReader // The underlying reader.
 	once      sync.Once
 }
 
 // NewDecoder returns a new decoder with tab as field separator.
 func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{r: span.NewSkipReader(bufio.NewReader(r)), Separator: "\t"}
+	return &Decoder{r: xio.NewSkipReader(bufio.NewReader(r)), Separator: "\t"}
 }
 
 // NewDecoderSeparator creates a new decoder with a given separator.
 func NewDecoderSeparator(r io.Reader, sep string) *Decoder {
-	return &Decoder{r: span.NewSkipReader(bufio.NewReader(r)), Separator: sep}
+	return &Decoder{r: xio.NewSkipReader(bufio.NewReader(r)), Separator: sep}
 }
 
 // readHeader attempts to read the first row and store the column names. If the
