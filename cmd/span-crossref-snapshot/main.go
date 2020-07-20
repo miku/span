@@ -24,9 +24,9 @@ import (
 
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
-	"github.com/miku/span"
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
+	"github.com/miku/span/xio"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -128,7 +128,7 @@ func main() {
 			log.Fatal(err)
 		}
 		defer file.Close()
-		if err := span.LoadSet(file, excludes); err != nil {
+		if err := xio.LoadSet(file, excludes); err != nil {
 			log.Fatal(err)
 		}
 		log.Debugf("excludes: %d", len(excludes))
