@@ -13,6 +13,7 @@ import (
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
+	"github.com/miku/span/xio"
 )
 
 // Conjunction of terms, or holding files.
@@ -62,7 +63,7 @@ func (c *HFCache) populate(hflink string) error {
 		if c.forceDownload {
 			log.Printf("redownloading %s", hflink)
 		}
-		if err := AtomicDownload(hflink, filename); err != nil {
+		if err := xio.AtomicDownload(hflink, filename); err != nil {
 			return err
 		}
 	}

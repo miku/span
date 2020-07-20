@@ -12,6 +12,9 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	spanatomic "github.com/miku/span/atomic"
+	"github.com/sethgrid/pester"
 )
 
 // ReaderCounter counts the number of bytes read.
@@ -309,4 +312,19 @@ func (w *WriteCounter) Write(p []byte) (int, error) {
 // Count returns the number of bytes written.
 func (w *WriteCounter) Count() uint64 {
 	return atomic.LoadUint64(&w.count)
+}
+
+// AtomicDownload retrieves a link and saves its content atomically in
+// filename. TODO(martin): should live in an io related package.
+func AtomicDownload(link, filename string) error {
+	resp, err := pester.Get(link)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	return spanatomic.WriteFile(filename, b, 0644)
 }
