@@ -70,7 +70,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 	if *dbFile == "" {
-		log.Fatal("we need a configuration database")
+		log.Fatal("we need a configuration database, use: span-amsl-discovery -db ...")
 	}
 	labeler, err := tagging.New(*dbFile)
 	if err != nil {
