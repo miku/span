@@ -195,7 +195,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("[span-tag] unfrooze filterconfig to: %s", filterconfig)
+		log.Printf("[span-tag] unfroze filterconfig to: %s", filterconfig)
 		defer os.RemoveAll(dir)
 		*config = filterconfig
 	}
