@@ -27,6 +27,7 @@ func New() *API {
 	}
 }
 
+// Authenticate via username and password.
 func (api *API) Authenticate(username, password string) (token string, err error) {
 	type Payload struct {
 		Username string `json:"username"`
@@ -61,5 +62,4 @@ func (api *API) Authenticate(username, password string) (token string, err error
 		return token, fmt.Errorf("empty token")
 	}
 	return token, nil
-
 }
