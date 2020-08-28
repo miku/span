@@ -27,6 +27,7 @@ func New() *API {
 	}
 }
 
+// Authenticate retrieves a login token given username and plain password.
 func (api *API) Authenticate(username, password string) (token string, err error) {
 	type Payload struct {
 		Username string `json:"username"`
@@ -47,6 +48,7 @@ func (api *API) Authenticate(username, password string) (token string, err error
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Okapi-Tenant", "de_15")
+	req.Header.Set("Accept", "application/json")
 	resp, err := api.Client.Do(req)
 	if err != nil {
 		return token, err
