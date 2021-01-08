@@ -45,6 +45,7 @@ var (
 	server               = flag.String("server", "", "if not empty, query SOLR to deduplicate on-the-fly")
 	prefs                = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred source id first, for deduplication")
 	ignoreSameIdentifier = flag.Bool("isi", false, "when doing deduplication, ignore matches in index with the same id")
+	dropDangling         = flag.Bool("D", false, "drop dangling documents that do not have any isil attached")
 )
 
 // SelectResponse with reduced fields.
@@ -238,9 +239,12 @@ func main() {
 		if err := json.Unmarshal(b, &is); err != nil {
 			return b, err
 		}
-
 		tagged := tagger.Tag(is)
-
+		// We can save some space in the index, when we drop records w/o any
+		// isil attached.
+		if *dropDangling && len(tagged.Labels) == 0 {
+			return nil, nil
+		}
 		// Deduplicate against a SOLR.
 		if *server != "" {
 			droppable, err := DroppableLabels(tagged)
@@ -256,7 +260,6 @@ func main() {
 				}
 			}
 		}
-
 		bb, err := json.Marshal(tagged)
 		if err != nil {
 			return bb, err
