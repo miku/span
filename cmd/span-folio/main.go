@@ -32,15 +32,34 @@
 // 15      DokumentURI
 // 16      DokumentLabel
 //
+// Notes:
+// {
+//   "errors": [
+//     {
+//       "message": "Error verifying user existence: Error looking up user at url http://okapi-app-service-erm-staging:9130/users?query=username==user Expected status code 200, got 400 :function count_estimate(unknown) does not exist",
+//       "type": "error",
+//       "code": "username.incorrect",
+//       "parameters": [
+//         {
+//           "key": "username",
+//           "value": "user"
+//         }
+//       ]
+//     }
+//   ]
+// }
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"github.com/sethgrid/pester"
@@ -53,6 +72,39 @@ var (
 
 func main() {
 	flag.Parse()
+
+	loginURL := "https://okapi.erm.staging.folio.finc.info/bl-users/login"
+
+	var body bytes.Buffer
+	enc := json.NewEncoder(&body)
+	err := enc.Encode(struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}{
+		"user", "xxxx",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	req, err := http.NewRequest("POST", loginURL, &body)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Okapi-Tenant", "de_15")
+	req.Header.Set("Accept", "application/json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp, err := pester.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("%v on %s", resp.StatusCode, loginURL)
+	if _, err := io.Copy(os.Stderr, resp.Body); err != nil {
+		log.Fatal(err)
+	}
+
+	if resp.StatusCode >= 400 {
+		log.Fatal("stop")
+	}
 	// Acquire token.
 	// TODO.
 
@@ -61,13 +113,13 @@ func main() {
 	v := url.Values{}
 	v.Add("query", `(selectedBy=("DIKU-01" or "DE-15")`)
 	link := fmt.Sprintf("%s?%s", *muFolio, v.Encode())
-	req, err := http.NewRequest("GET", link, nil)
+	req, err = http.NewRequest("GET", link, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 	req.Header.Set("X-Okapi-Tenant", "de_15")
 	req.Header.Set("X-Okapi-Token", "xyz")
-	resp, err := client.Do(req)
+	resp, err = client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}

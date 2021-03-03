@@ -293,7 +293,8 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 	for name, tcid := range nameMap {
 		for _, pkg := range output.Packages {
 			if name == pkg {
-				output.MegaCollections = append(output.MegaCollections, tcid)
+				// output.MegaCollections = append(output.MegaCollections, tcid)
+				output.Packages = append(output.Packages, tcid)
 			}
 		}
 	}

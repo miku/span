@@ -110,7 +110,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		}
 	}
 	s.PublishDateSort = is.Date.Year()
-	s.PublishDate = []string{is.Date.Format("2006-01-02")}
+	s.PublishDate = []string{is.Date.Format("2006")} // refs #18608
 	s.Publishers = is.Publishers
 	if withFullrecord {
 		s.RecordType = IntermediateSchemaRecordType
