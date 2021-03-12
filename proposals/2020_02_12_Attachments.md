@@ -1,6 +1,6 @@
 # Attachments
 
-Currently, `kbart.Holdings` can be loaded (e.g. from a file), which allows
+Currently, `kbart.Holdings` can be loaded (e.g. from a file), which allows to
 derive some helper indices, such as `h.SerialNumberMap` which allows to find
 the relevant entry for an ISSN.
 

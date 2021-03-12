@@ -63,5 +63,4 @@ func (api *API) Authenticate(username, password string) (token string, err error
 		return token, fmt.Errorf("empty token")
 	}
 	return token, nil
-
 }
