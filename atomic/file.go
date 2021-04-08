@@ -6,7 +6,7 @@ import (
 	"path"
 )
 
-// WriteFileAtomic writes the data to a temp file and atomically move if everything else succeeds.
+// WriteFile writes the data to a temp file and atomically move if everything else succeeds.
 func WriteFile(filename string, data []byte, perm os.FileMode) error {
 	dir, name := path.Split(filename)
 	f, err := ioutil.TempFile(dir, name)
