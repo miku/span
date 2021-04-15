@@ -29,9 +29,9 @@ import (
 	"github.com/miku/span/solrutil"
 )
 
-// LOW_PRIO number, something that is larger than the number of data sources
+// LowPrio number, something that is larger than the number of data sources
 // currently.
-const LOW_PRIO = 9999
+const LowPrio = 9999
 
 var (
 	config               = flag.String("c", "", "JSON config file for filters")
@@ -90,7 +90,7 @@ func preferencePosition(sid string) int {
 			return pos
 		}
 	}
-	return LOW_PRIO // Or anything higher than the number of sources.
+	return LowPrio // Or anything higher than the number of sources.
 }
 
 // DroppableLabels returns a list of labels, that can be dropped with regard to
@@ -111,23 +111,21 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 		return labels, err
 	}
 	defer resp.Body.Close()
-	var sr SelectResponse
-
-	// Keep response for debugging.
-	var buf bytes.Buffer
-	tee := io.TeeReader(resp.Body, &buf)
-
+	var (
+		sr  SelectResponse
+		buf bytes.Buffer // Keep response for debugging.
+		tee = io.TeeReader(resp.Body, &buf)
+	)
 	if err := json.NewDecoder(tee).Decode(&sr); err != nil {
 		log.Printf("[%s] failed link: %s", is.ID, link)
 		log.Printf("[%s] failed response: %s", is.ID, buf.String())
 		return labels, err
 	}
-	// Ignored merely counts the number of docs, that had the same id in the index, for logging.
+	// ignored merely counts the number of docs, that had the same id in the index, for logging
 	var ignored int
 	for _, label := range is.Labels {
 		// For each label (ISIL), see, whether any match in SOLR has the same
 		// label (ISIL) as well.
-
 		for _, doc := range sr.Response.Docs {
 			if *ignoreSameIdentifier && doc.ID == is.ID {
 				ignored++
@@ -163,18 +161,14 @@ func removeEach(ss []string, drop []string) (result []string) {
 }
 
 func main() {
-
 	flag.Parse()
-
 	if *version {
 		fmt.Println(span.AppVersion)
 		os.Exit(0)
 	}
-
 	if *config == "" && *unfreeze == "" {
 		log.Fatal("config file required")
 	}
-
 	if *cpuProfile != "" {
 		file, err := os.Create(*cpuProfile)
 		if err != nil {
@@ -183,14 +177,14 @@ func main() {
 		pprof.StartCPUProfile(file)
 		defer pprof.StopCPUProfile()
 	}
-
 	if *server != "" {
 		*server = solrutil.PrependHTTP(*server)
 	}
-
-	// The configuration forest.
-	var tagger filter.Tagger
-
+	var (
+		// The configuration forest.
+		tagger filter.Tagger
+		reader io.Reader = os.Stdin
+	)
 	if *unfreeze != "" {
 		dir, filterconfig, err := span.UnfreezeFilterConfig(*unfreeze)
 		if err != nil {
@@ -200,7 +194,6 @@ func main() {
 		defer os.RemoveAll(dir)
 		*config = filterconfig
 	}
-
 	// Test, if we are given JSON directly.
 	err := json.Unmarshal([]byte(*config), &tagger)
 	if err != nil {
@@ -214,12 +207,8 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
-
-	var reader io.Reader = os.Stdin
-
 	if flag.NArg() > 0 {
 		var files []io.Reader
 		for _, filename := range flag.Args() {
@@ -232,7 +221,6 @@ func main() {
 		}
 		reader = io.MultiReader(files...)
 	}
-
 	// Processing function, tagging documents.
 	procfunc := func(_ int64, b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
@@ -267,12 +255,9 @@ func main() {
 		bb = append(bb, '\n')
 		return bb, nil
 	}
-
 	p := parallel.NewProcessor(bufio.NewReader(reader), w, procfunc)
-
 	p.NumWorkers = *numWorkers
 	p.BatchSize = *size
-
 	if err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
