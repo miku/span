@@ -103,9 +103,10 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		// As per 2020-06-30 try to keep tcids (sid-...) in SOLR collection
 		// field, and labels in SOLR mega_collection. Except with crossref
 		// (49), where we do not have tcids (yet).
-		if strings.HasPrefix(name, "sid-") || is.SourceID == "49" {
+		if strings.HasPrefix(name, "sid-") {
 			s.Collections = append(s.Collections, name)
 		} else {
+			// refs. #18495
 			s.MegaCollections = append(s.MegaCollections, name)
 		}
 	}
