@@ -102,7 +102,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	for _, name := range is.MegaCollections {
 		// As per 2020-06-30 try to keep tcids (sid-...) in SOLR collection
 		// field, and labels in SOLR mega_collection. Except with crossref
-		// (49), where we do not have tcids (yet).
+		// (49), where we do not have tcids (yet). As of 2021-04-20, we want
+		// [49] collection names in solr mega collections.
 		if strings.HasPrefix(name, "sid-") {
 			s.Collections = append(s.Collections, name)
 		} else {
