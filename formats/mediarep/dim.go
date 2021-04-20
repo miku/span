@@ -11,7 +11,7 @@ import (
 
 // Dim was generated 2018-10-02 14:55:51 by tir on sol.
 type Dim struct {
-	XMLName xml.Name `xml:"Record"`
+	XMLName xml.Name `xml:"record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
 		Text       string   `xml:",chardata"`

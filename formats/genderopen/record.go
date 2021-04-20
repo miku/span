@@ -19,7 +19,7 @@ var bookTitlePattern = regexp.MustCompile(`([^:]*):([^\(]*)`)
 
 // Record was generated 2019-06-06 16:38:16 by tir on sol.
 type Record struct {
-	XMLName xml.Name `xml:"Record"`
+	XMLName xml.Name `xml:"record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
 		Text       string   `xml:",chardata"`
