@@ -32,7 +32,7 @@ var LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.js
 
 // Record was generated 2018-02-15 13:37:41 by tir on hayiti.
 type Record struct {
-	XMLName xml.Name `xml:"Record"`
+	XMLName xml.Name `xml:"record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
 		Text       string `xml:",chardata"`
