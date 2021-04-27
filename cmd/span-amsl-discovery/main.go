@@ -163,8 +163,8 @@ func slugifyTabs(vs []string) (result []string) {
 }
 
 func prependSchema(s string) string {
-	if !strings.HasPrefix(s, "http") {
-		return fmt.Sprintf("http://%s", s)
+	if !strings.HasPrefix(s, "https") {
+		return fmt.Sprintf("https://%s", s)
 	}
 	return s
 }
