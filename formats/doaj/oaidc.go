@@ -16,7 +16,7 @@ import (
 
 // Record was generated 2019-03-07 22:40:57 by tir on hayiti.
 type Record struct {
-	XMLName xml.Name `xml:"Record"`
+	XMLName xml.Name `xml:"record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
 		Text       string   `xml:",chardata"`

@@ -20,7 +20,7 @@ const (
 
 // DublicCoreRecord is a sketch for highwire XML.
 type DublicCoreRecord struct {
-	XMLName xml.Name `xml:"Record"`
+	XMLName xml.Name `xml:"record"`
 	Header  struct {
 		Status     string   `xml:"status,attr"`
 		Identifier string   `xml:"identifier"`

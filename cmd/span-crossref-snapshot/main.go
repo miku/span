@@ -30,7 +30,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// fallback awk script is used, if the filterline executable is not found.
+// fallback awk script is used, if the filterline executable is not found
 var fallback = `
 #!/bin/bash
 LIST="$1" LC_ALL=C awk '
@@ -201,6 +201,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer os.Remove(output)
 
 	// External tools and fallbacks for stage 3. comp, decomp, filterline.
 	comp, decomp := `gzip -c`, `gunzip -c`
@@ -253,6 +254,32 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := os.Rename(output, *outputFile); err != nil {
-		log.Fatal(err)
+		// assume "invalid cross-device link"
+		if err := CopyFile(*outputFile, output, 0644); err != nil {
+			log.Fatal(err)
+		}
+		os.Remove(output)
 	}
+}
+
+// CopyFile copies the contents from src to dst using io.Copy.  If dst does not
+// exist, CopyFile creates it with permissions perm; otherwise CopyFile
+// truncates it before writing. From: https://codereview.appspot.com/152180043
+func CopyFile(dst, src string, perm os.FileMode) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	if err != nil {
+		return
+	}
+	defer func() {
+		if e := out.Close(); e != nil {
+			err = e
+		}
+	}()
+	_, err = io.Copy(out, in)
+	return
 }

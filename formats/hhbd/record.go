@@ -34,7 +34,7 @@ func uniqueStrings(s []string) (result []string) {
 
 // Record was generated 2017-12-22 16:25:34 by tir on apollo.
 type Record struct {
-	XMLName xml.Name `xml:"Record"`
+	XMLName xml.Name `xml:"record"`
 	Text    string   `xml:",chardata"`
 	Header  struct {
 		Text       string `xml:",chardata"`
