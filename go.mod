@@ -1,6 +1,6 @@
 module github.com/miku/span
 
-go 1.12
+go 1.16
 
 require (
 	github.com/abadojack/whatlanggo v1.0.1
