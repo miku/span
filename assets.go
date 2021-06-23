@@ -1,3 +1,6 @@
-//go:generate go get -u github.com/jteeuwen/go-bindata/...
-//go:generate go-bindata -o assetutil/bindata.go -pkg assetutil assets/...
 package span
+
+import "embed"
+
+//go:embed assets
+var Static embed.FS

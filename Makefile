@@ -8,30 +8,24 @@ PKGNAME = span
 .PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
-test: assets deps
+test: deps
 	go get github.com/kylelemons/godebug/pretty
 	go get github.com/kr/pretty
 	go test ./...
 
-all: assets deps $(TARGETS)
-
-assets: assetutil/bindata.go
-
-assetutil/bindata.go:
-	go generate
+all: deps $(TARGETS)
 
 deps:
 	go get -v ./...
 
 $(TARGETS): %: cmd/%/main.go
-	go build -ldflags=-linkmode=external -o $@ $<
+	go build -ldflags="-w -s -linkmode=external" -o $@ $<
 
 clean:
 	rm -f $(TARGETS)
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
-	rm -f assetutil/bindata.go
 
 # Code quality and performance.
 lint:

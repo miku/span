@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/miku/span"
 	"github.com/miku/span/container"
 )
 
@@ -57,8 +58,8 @@ func (r RegexpMap) LookupDefault(s, def string) string {
 // MustLoadRegexpMap loads the content of a given asset path into a RegexpMap. It
 // will panic, if the asset path is not found and if the patterns found in the
 // file cannot be compiled.
-func MustLoadRegexpMap(ap string) RegexpMap {
-	b, err := Asset(ap)
+func MustLoadRegexpMap(path string) RegexpMap {
+	b, err := span.Static.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +78,7 @@ func MustLoadRegexpMap(ap string) RegexpMap {
 func MustLoadStringSet(paths ...string) *container.StringSet {
 	s := container.NewStringSet()
 	for _, path := range paths {
-		b, err := Asset(path)
+		b, err := span.Static.ReadFile(path)
 		if err != nil {
 			panic(err)
 		}
@@ -104,7 +105,7 @@ func MustLoadStringSet(paths ...string) *container.StringSet {
 // container.StringMap. This function will panic, if the asset cannot be found
 // or the JSON is erroneous.
 func MustLoadStringMap(path string) container.StringMap {
-	b, err := Asset(path)
+	b, err := span.Static.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +121,7 @@ func MustLoadStringMap(path string) container.StringMap {
 // a container.StringSliceMap. This function will halt the world, if it is
 // called with an invalid argument.
 func MustLoadStringSliceMap(path string) container.StringSliceMap {
-	b, err := Asset(path)
+	b, err := span.Static.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
