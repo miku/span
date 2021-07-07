@@ -1,7 +1,7 @@
 package filter
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"strings"
 
 	log "github.com/sirupsen/logrus"

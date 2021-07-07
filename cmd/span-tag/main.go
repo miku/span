@@ -9,7 +9,7 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"

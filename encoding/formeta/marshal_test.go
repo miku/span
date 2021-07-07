@@ -1,7 +1,7 @@
 package formeta
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"testing"
 	"time"
 )

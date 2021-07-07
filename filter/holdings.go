@@ -2,7 +2,7 @@ package filter
 
 import (
 	"archive/zip"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"io"
 	"os"
 	"strings"

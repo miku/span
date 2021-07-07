@@ -3,7 +3,7 @@
 package quality
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"errors"
 	"fmt"
 	"net/url"

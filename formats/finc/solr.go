@@ -2,7 +2,7 @@
 package finc
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 	"strings"
 

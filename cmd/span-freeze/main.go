@@ -13,7 +13,7 @@ package main
 import (
 	"archive/zip"
 	"crypto/sha1"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"

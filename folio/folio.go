@@ -2,7 +2,7 @@ package folio
 
 import (
 	"bytes"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 	"net/http"
 

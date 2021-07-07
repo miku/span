@@ -23,7 +23,7 @@ package container
 
 import (
 	"bufio"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 	"io"
 	"sort"

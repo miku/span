@@ -5,7 +5,7 @@ package main
 import (
 	"bufio"
 	"database/sql"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"

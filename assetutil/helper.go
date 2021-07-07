@@ -24,7 +24,7 @@ package assetutil
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"io"
 	"regexp"
 	"strings"

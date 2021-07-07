@@ -2,7 +2,7 @@ package reviewutil
 
 import (
 	"bytes"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"

@@ -2,7 +2,7 @@
 package solrutil
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"

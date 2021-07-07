@@ -34,7 +34,7 @@ package main
 import (
 	"archive/zip"
 	"bytes"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
