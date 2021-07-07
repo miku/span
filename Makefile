@@ -24,7 +24,7 @@ deps:
 	go get -v ./...
 
 $(TARGETS): %: cmd/%/main.go
-	go build -ldflags=-linkmode=external -o $@ $<
+	go build -ldflags="-w -s -linkmode=external" -o $@ $<
 
 clean:
 	rm -f $(TARGETS)
