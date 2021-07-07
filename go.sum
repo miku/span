@@ -78,8 +78,6 @@ github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4 h1:JnVsYEQzhEcOspy
 github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4/go.mod h1:RL5+WRxWTAXqqCi9i+eZlHrUtO7AQujUqWi+xMohmc4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/segmentio/encoding v0.1.8 h1:kCTskIbhR+hubyRMflF8pTQU8Ky5Yf9MzIPgLL1AhSc=
-github.com/segmentio/encoding v0.1.8/go.mod h1:RWhr02uzMB9gQC1x+MfYxedtmBibb9cZ6Vv9VxRSSbw=
 github.com/segmentio/encoding v0.2.19 h1:Kshkmoz080qvUtdtakR8Bjk2sIlLS8wSvijFMEHRGow=
 github.com/segmentio/encoding v0.2.19/go.mod h1:7E68jTSWMnNoYhHi1JbLd7NBSB6XfE4vzqhR88hDBQc=
 github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0 h1:X9XMOYjxEfAYSy3xK1DzO5dMkkWhs9E9UCcS1IERx2k=
