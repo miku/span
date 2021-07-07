@@ -32,7 +32,6 @@
 package main
 
 import (
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"net"
@@ -45,6 +44,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/gorilla/mux"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -60,7 +61,7 @@ var (
 	token          = flag.String("token", "", "gitlab auth token, if empty will use span-config")
 	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	logfile        = flag.String("logfile", "", "log to file")
-	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.yaml"), "gitlab, redmine tokens, whatislive location")
+	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	triggerPath    = flag.String("trigger-path", "trigger", "path trigger, {host}:{port}/{trigger-path}")
 	banner         = fmt.Sprintf(`[<>] webhookd %s`, span.AppVersion)
 
@@ -214,9 +215,9 @@ func main() {
 	var err error
 	err = cleanenv.ReadConfig(*spanConfigFile, &config)
 	if err != nil {
-		err = cleanenv.ReadConfig("/etc/span/span.yaml", &config)
+		err = cleanenv.ReadConfig("/etc/span/span.json", &config)
 		if err != nil {
-			log.Fatalf("failed to read config from: %s and /etc/span/span.yaml", *spanConfigFile)
+			log.Fatalf("failed to read config from: %s and /etc/span/span.json", *spanConfigFile)
 		}
 	}
 	// Keep flag compatibility.
