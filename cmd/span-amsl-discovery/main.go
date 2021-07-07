@@ -5,7 +5,7 @@ package main
 import (
 	"bufio"
 	"database/sql"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -162,6 +162,13 @@ func slugifyTabs(vs []string) (result []string) {
 	return result
 }
 
+func prependSchema(s string) string {
+	if !strings.HasPrefix(s, "https") {
+		return fmt.Sprintf("https://%s", s)
+	}
+	return s
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
@@ -195,6 +202,7 @@ The generated TSV (via -f) fields are:
 		hfr HoldingsFilesResponse
 		cfr ContentFilesResponse
 	)
+	*live = prependSchema(*live)
 
 	// Where we get the data from.
 	fetchlist := []struct {

@@ -3,7 +3,7 @@ package main
 
 import (
 	"encoding"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"

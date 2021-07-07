@@ -16,7 +16,7 @@
 package filter
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 
 	"github.com/miku/span/formats/finc"

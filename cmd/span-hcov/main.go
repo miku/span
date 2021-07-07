@@ -3,7 +3,7 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"

@@ -19,6 +19,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/klauspost/compress v1.9.8 // indirect
+	github.com/klauspost/cpuid/v2 v2.0.8 // indirect
 	github.com/klauspost/pgzip v1.2.1
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
@@ -30,7 +31,7 @@ require (
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
-	github.com/segmentio/encoding v0.1.8
+	github.com/segmentio/encoding v0.2.19
 	github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.4.2

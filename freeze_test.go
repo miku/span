@@ -1,7 +1,7 @@
 package span
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"io/ioutil"
 	"os"
 	"reflect"

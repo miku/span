@@ -1,7 +1,7 @@
 package solrutil
 
 import (
-	"encoding/json"
+	"github.com/segmentio/encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
