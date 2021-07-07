@@ -11,8 +11,9 @@ func DetectLang3(text string) (string, error) {
 	return whatlanggo.LangToString(whatlanggo.Detect(text).Lang), nil
 }
 
-// LanguageIdentifier returns the three letter identifier from any string.
-// All data from http://www-01.sil.org/iso639-3/codes.asp.
+// LanguageIdentifier returns the three letter identifier from a variety of
+// language name notations. Returns the empty string, if nothing matches. All
+// data from http://www-01.sil.org/iso639-3/codes.asp.
 func LanguageIdentifier(s string) string {
 	s = strings.TrimSpace(s)
 	switch len(s) {
