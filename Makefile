@@ -12,6 +12,7 @@ test: deps
 	go get github.com/kylelemons/godebug/pretty
 	go get github.com/kr/pretty
 	go test ./...
+	go mod tidy
 
 all: deps $(TARGETS)
 
