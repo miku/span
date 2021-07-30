@@ -1,8 +1,10 @@
 package dblp
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/miku/span"
@@ -57,6 +59,10 @@ type Article struct {
 	Booktitle string `xml:"booktitle"` // Logical Methods in Comput...
 }
 
+func (article *Article) ID() string {
+	return fmt.Sprintf("ai-210-%s", base64.RawURLEncoding.EncodeToString([]byte(article.Key)))
+}
+
 // ToIntermediateSchema converts DBLP article to intermediate schema.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
@@ -68,9 +74,25 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	if err != nil {
 		return nil, span.Skip{Reason: fmt.Sprintf("unparsable date: %s", article.Year)}
 	}
+	output.MegaCollections = []string{"DBLP", "sid-210-coll-dblp"}
+	output.SourceID = "210"
+	output.ID = article.ID()
 	output.RawDate = output.Date.Format("2006-01-02")
-	output.ArticleTitle = article.Title.Text
 	output.Volume = article.Volume
+	switch {
+	case strings.HasPrefix(article.URL, "http"):
+		output.ArticleTitle = article.Title.Text
+		output.URL = []string{article.URL}
+	case strings.HasPrefix(article.URL, "db/journals"):
+		output.ArticleTitle = article.Title.Text
+		output.URL = []string{fmt.Sprintf("https://dblp.org/%s", article.URL)}
+	case strings.HasPrefix(article.URL, "db/conf"):
+		output.ArticleTitle = article.Title.Text
+		output.URL = []string{fmt.Sprintf("https://dblp.org/%s", article.URL)}
+	case strings.HasPrefix(article.URL, "db/books"):
+		output.BookTitle = article.Title.Text
+		output.URL = []string{fmt.Sprintf("https://dblp.org/%s", article.URL)}
+	}
 	if article.Publisher != "" {
 		output.Publishers = []string{article.Publisher}
 	}
