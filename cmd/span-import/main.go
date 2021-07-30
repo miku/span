@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding"
 	"flag"
 	"fmt"
@@ -12,10 +13,6 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"sort"
-
-	"github.com/segmentio/encoding/json"
-
-	"bufio"
 
 	"github.com/lytics/logrus"
 	"github.com/miku/span"
@@ -41,6 +38,8 @@ import (
 	"github.com/miku/span/formats/zvdd"
 	"github.com/miku/span/parallel"
 	"github.com/miku/xmlstream"
+	"github.com/segmentio/encoding/json"
+	"golang.org/x/net/html/charset"
 )
 
 var (
@@ -90,15 +89,16 @@ type IntermediateSchemaer interface {
 }
 
 // processXML converts XML based formats, given a format name. It reads XML as
-// stream and converts record them to an intermediate // schema (at the
-// moment).
+// stream and converts record them to an intermediate schema (at the moment).
 func processXML(r io.Reader, w io.Writer, name string) error {
 	if _, ok := FormatMap[name]; !ok {
 		return fmt.Errorf("unknown format name: %s", name)
 	}
 	obj := FormatMap[name]()
 	scanner := xmlstream.NewScanner(bufio.NewReader(r), obj)
-	scanner.Decoder.Strict = false // Errors of the invalid character entity kind are common.
+	// errors like invalid character entities happen, also ISO-8859, ...
+	scanner.Decoder.Strict = false
+	scanner.Decoder.CharsetReader = charset.NewReaderLabel
 	for scanner.Scan() {
 		tag := scanner.Element()
 		converter, ok := tag.(IntermediateSchemaer)
