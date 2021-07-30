@@ -3,7 +3,6 @@ package main
 
 import (
 	"encoding"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -14,12 +13,15 @@ import (
 	"runtime/pprof"
 	"sort"
 
+	"github.com/segmentio/encoding/json"
+
 	"bufio"
 
 	"github.com/lytics/logrus"
 	"github.com/miku/span"
 	"github.com/miku/span/formats/ceeol"
 	"github.com/miku/span/formats/crossref"
+	"github.com/miku/span/formats/dblp"
 	"github.com/miku/span/formats/degruyter"
 	"github.com/miku/span/formats/doaj"
 	"github.com/miku/span/formats/dummy"
@@ -60,10 +62,11 @@ var FormatMap = map[string]Factory{
 	"ceeol":         func() interface{} { return new(ceeol.Article) },
 	"ceeol-marcxml": func() interface{} { return new(ceeol.Record) },
 	"crossref":      func() interface{} { return new(crossref.Document) },
+	"dblp":          func() interface{} { return new(dblp.Article) },
 	"degruyter":     func() interface{} { return new(degruyter.Article) },
-	"doaj-oai":      func() interface{} { return new(doaj.Record) },
-	"doaj-legacy":   func() interface{} { return new(doaj.Response) },
 	"doaj":          func() interface{} { return new(doaj.ArticleV1) },
+	"doaj-legacy":   func() interface{} { return new(doaj.Response) },
+	"doaj-oai":      func() interface{} { return new(doaj.Record) },
 	"dummy":         func() interface{} { return new(dummy.Example) },
 	"genderopen":    func() interface{} { return new(genderopen.Record) },
 	"genios":        func() interface{} { return new(genios.Document) },
@@ -249,7 +252,7 @@ func main() {
 	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm",
 		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms",
 		"olms-mets", "ssoar", "genderopen", "mediarep-dim",
-		"ceeol-marcxml", "doaj-oai":
+		"ceeol-marcxml", "doaj-oai", "dblp":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
