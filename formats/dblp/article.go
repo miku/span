@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -65,11 +66,14 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	}
 	output.Date, err = time.Parse("2006", article.Year)
 	if err != nil {
-		return nil, fmt.Errorf("unparsable date: %s", article.Year)
+		return nil, span.Skip{Reason: fmt.Sprintf("unparsable date: %s", article.Year)}
 	}
+	output.RawDate = output.Date.Format("2006-01-02")
 	output.ArticleTitle = article.Title.Text
 	output.Volume = article.Volume
-	output.Publishers = []string{article.Publisher}
+	if article.Publisher != "" {
+		output.Publishers = []string{article.Publisher}
+	}
 	output.Issue = article.Number
 	return output, nil
 }
