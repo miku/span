@@ -20,7 +20,7 @@ require (
 	github.com/klauspost/compress v1.13.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.8 // indirect
 	github.com/klauspost/pgzip v1.2.5
-	github.com/kr/pretty v0.2.1 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
@@ -37,7 +37,6 @@ require (
 	golang.org/x/net v0.0.0-20210716203947-853a461950ff
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	golang.org/x/text v0.3.6
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
