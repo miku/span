@@ -93,6 +93,11 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		output.BookTitle = article.Title.Text
 		output.URL = []string{fmt.Sprintf("https://dblp.org/%s", article.URL)}
 	}
+	for _, extra := range article.Ee {
+		if strings.HasPrefix(extra.Text, "http") {
+			output.URL = append(output.URL, extra.Text)
+		}
+	}
 	if article.Publisher != "" {
 		output.Publishers = []string{article.Publisher}
 	}
