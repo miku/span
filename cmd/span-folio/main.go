@@ -52,7 +52,6 @@ package main
 
 import (
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -62,15 +61,19 @@ import (
 	"os"
 	"strings"
 
+	"github.com/miku/span/xflag"
+	"github.com/segmentio/encoding/json"
+
 	"github.com/sethgrid/pester"
 )
 
-var (
-	muFolio = flag.String("folio", "https://example.com/finc-config/metadata-collections", "folio endpoint") // Maybe 100K at once.
-	// TODO: Add config file location, also: unify config file handling.
-)
+// TODO: Add config file location, also: unify config file handling.
+
+var muFolio = flag.String("folio", "https://example.com/finc-config/metadata-collections", "folio endpoint") // Maybe 100K at once.
 
 func main() {
+	var u xflag.UserPassword
+	flag.Var(&u, "u", "user:password for api")
 	flag.Parse()
 
 	loginURL := "https://okapi.erm.staging.folio.finc.info/bl-users/login"
@@ -81,7 +84,7 @@ func main() {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}{
-		"user", "xxxx",
+		u.User, u.Password,
 	})
 	if err != nil {
 		log.Fatal(err)
