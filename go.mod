@@ -17,13 +17,10 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.2.5
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/kennygrant/sanitize v1.2.4
-	github.com/klauspost/compress v1.13.1 // indirect
-	github.com/klauspost/cpuid/v2 v2.0.8 // indirect
+	github.com/klauspost/compress v1.13.3 // indirect
 	github.com/klauspost/pgzip v1.2.5
-	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
-	github.com/mattn/go-isatty v0.0.13 // indirect
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/microcosm-cc/bluemonday v1.0.15
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
 	github.com/miku/parallel v0.0.0-20210205192328-1a799ab70294
@@ -34,10 +31,8 @@ require (
 	github.com/sethgrid/pester v1.1.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.8.1
-	golang.org/x/net v0.0.0-20210716203947-853a461950ff
-	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
+	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
 	golang.org/x/text v0.3.6
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
-	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )
