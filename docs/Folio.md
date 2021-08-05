@@ -5,6 +5,12 @@
 * CQL match all
 * account locked
 
+## Notes
+
+* multi-tenant
+* finc-config, finc-select
+* Q4/21 testing
+
 ## 404 vs 502
 
 First yields 404, second 502.
