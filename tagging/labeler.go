@@ -149,7 +149,6 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 	// INFO[12576] lthf => 531,701,113
 	// INFO[12576] plain => 112,694,196
 	// INFO[12576] 34-music => 3692
-	// INFO[12576] 34-DE-15-FID-film => 770
 	for _, row := range rows {
 		// Fields, where KBART links might be, empty strings are just skipped.
 		kbarts := []string{
@@ -177,14 +176,14 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 				if misc.Overlap(doc.Subjects, subjectsMusic) {
 					labels.Add(row.ISIL)
 				}
-			case row.ISIL == "DE-15-FID":
+			case row.ISIL == "FID-MEDIEN-DE-15":
 				// refs #10495, maybe use a TSV with custom column name to use
 				// a subject list? https://git.io/JvFjd
 				if misc.Overlap(doc.Subjects, subjectsFilm) {
 					labels.Add(row.ISIL)
 				}
 			}
-		case row.ISIL == "DE-15-FID":
+		case row.ISIL == "FID-MEDIEN-DE-15":
 			if strings.Contains(row.LinkToHoldingsFile, "FID_ISSN_Filter") {
 				// Here, the holdingfile URL contains a list of ISSN.  URI like ...
 				// discovery/metadata-usage/Dokument/FID_ISSN_Filter - but that
