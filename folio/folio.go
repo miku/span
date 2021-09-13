@@ -95,3 +95,27 @@ func (api *API) MetadataCollections(cqlQuery string) ([]byte, error) {
 	// TODO: parse response
 	return ioutil.ReadAll(resp.Body)
 }
+
+type Response struct {
+	FincConfigMetadataCollections []struct {
+		CollectionId string `json:"collectionId"`
+		Description  string `json:"description"`
+		FreeContent  string `json:"freeContent"`
+		ID           string `json:"id"`
+		Label        string `json:"label"`
+		Lod          struct {
+			Note        string `json:"note"`
+			Publication string `json:"publication"`
+		} `json:"lod"`
+		MdSource struct {
+			Id   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"mdSource"`
+		MetadataAvailable   string   `json:"metadataAvailable"`
+		PermittedFor        []string `json:"permittedFor"`
+		SelectedBy          []string `json:"selectedBy"`
+		SolrMegaCollections []string `json:"solrMegaCollections"`
+		UsageRestricted     string   `json:"usageRestricted"`
+	} `json:"fincConfigMetadataCollections"`
+	TotalRecords int64 `json:"totalRecords"`
+}
