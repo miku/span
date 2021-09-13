@@ -5,9 +5,8 @@
 // Get metadata collections per ISIL, each "fincConfigMetadataCollections",
 // "FilterToCollections", "Filter".
 //
-// Tenant specific filter. The "finc-select" is special views. Whitelist,
-// blacklist filter. EZB holdings is a whitelist. Blacklist predatory journals.
-// Filter. How does a filter rule.
+// Tenant specific filter. Whitelist, blacklist filter. EZB holdings is a
+// whitelist. Blacklist predatory journals.
 //
 // Every filter on each collection. Workflow field (testing, approved).
 //
