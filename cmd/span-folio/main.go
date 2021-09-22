@@ -5,9 +5,8 @@
 // Get metadata collections per ISIL, each "fincConfigMetadataCollections",
 // "FilterToCollections", "Filter".
 //
-// Tenant specific filter. The "finc-select" is special views. Whitelist,
-// blacklist filter. EZB holdings is a whitelist. Blacklist predatory journals.
-// Filter. How does a filter rule.
+// Tenant specific filter. Whitelist, blacklist filter. EZB holdings is a
+// whitelist. Blacklist predatory journals.
 //
 // Every filter on each collection. Workflow field (testing, approved).
 //
@@ -52,7 +51,6 @@ package main
 
 import (
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -62,15 +60,19 @@ import (
 	"os"
 	"strings"
 
+	"github.com/miku/span/xflag"
+	"github.com/segmentio/encoding/json"
+
 	"github.com/sethgrid/pester"
 )
 
-var (
-	muFolio = flag.String("folio", "https://example.com/finc-config/metadata-collections", "folio endpoint") // Maybe 100K at once.
-	// TODO: Add config file location, also: unify config file handling.
-)
+// TODO: Add config file location, also: unify config file handling.
+
+var muFolio = flag.String("folio", "https://example.com/finc-config/metadata-collections", "folio endpoint") // Maybe 100K at once.
 
 func main() {
+	var u xflag.UserPassword
+	flag.Var(&u, "u", "user:password for api")
 	flag.Parse()
 
 	loginURL := "https://okapi.erm.staging.folio.finc.info/bl-users/login"
@@ -81,7 +83,7 @@ func main() {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}{
-		"user", "xxxx",
+		u.User, u.Password,
 	})
 	if err != nil {
 		log.Fatal(err)

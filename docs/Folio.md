@@ -1,25 +1,27 @@
 # FOLIO
 
-## Questions
+* [https://www.folio.org/](https://www.folio.org/)
+* project name: "ERM migration"
 
-* CQL match all
-* account locked
+Relevant docs:
 
-## 404 vs 502
+* [https://s3.amazonaws.com/foliodocs/api/mod-finc-config/p/fincConfigMetadataCollections.html](https://s3.amazonaws.com/foliodocs/api/mod-finc-config/p/fincConfigMetadataCollections.html)
+* [https://github.com/folio-org/mod-finc-config](https://github.com/folio-org/mod-finc-config)
 
-First yields 404, second 502.
+CQL:
+
+> Contextual Query Language (CQL). It was previously known as Common Query Language, and that is not to be confused with the OGC language of the same name.
+
+* [https://www.loc.gov/standards/sru/cql/](https://www.loc.gov/standards/sru/cql/)
+
+Examples:
 
 ```
 $ curl -v 'https://zzzz.folio.finc.info/finc-config/metadata-collections?query=(selectedBy=("DE-15"))'
-```
-
-```
 $ curl -v 'https://zzzz.folio.finc.info/finc-config/metadata-collections?query=(selectedBy=("DIKU-01" or "DE-15"))'
 ```
 
-Project name: ERM migration.
-
-## Example response
+Example response:
 
 ```
 {
@@ -84,7 +86,7 @@ Two records.
 
 * X-OKAPI-HEADER
 
-# Auth
+Auth, request token.
 
 ```shell
 $ curl --dump-header okapi.txt --request POST \
