@@ -3,26 +3,34 @@ package folio
 import (
 	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
 	"testing"
 )
 
-func TestBasic(t *testing.T) {
+func TestAuthenticate(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(400)
-		w.Write([]byte("body"))
+		if r.URL.Path != "/bl-users/login" {
+			t.Fatalf("unexpected URL: %s", r.URL.Path)
+		}
+		b, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			t.Fatalf("cannot dump request")
+		}
+		t.Logf("server got request: %v", string(b))
+		w.Header().Add("X-OKAPI-TOKEN", "12345678")
 	}))
+	t.Logf("test server: %v", ts.URL)
 	defer func() {
 		ts.Close()
 	}()
-	req, err := http.NewRequest(http.MethodGet, ts.URL, nil)
-	if err != nil {
-		t.Fatalf("req: %v", err)
+	api := &API{
+		Base: ts.URL,
 	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatalf("do: %v", err)
+	if api.Token != "" {
+		t.Fatalf("expected empty token, got %v", api.Token)
 	}
-	if resp.StatusCode != 202 {
-		t.Fatalf("got %v, want %v", resp.StatusCode, 202)
+	err := api.Authenticate("admin", "admin")
+	if err != nil {
+		t.Fatalf("failed with: %v", err)
 	}
 }
