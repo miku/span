@@ -2,9 +2,10 @@
 package finc
 
 import (
-	"github.com/segmentio/encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/container"
@@ -21,6 +22,7 @@ type Solr5Vufind3 struct {
 	AuthorSort           string   `json:"author_sort,omitempty"`
 	SecondaryAuthors     []string `json:"author2,omitempty"`
 	Allfields            string   `json:"allfields,omitempty"`
+	DOI                  []string `json:"doi_str_mv,omitempty"` // recommended via https://vufind.org/wiki/development:architecture:solr_index_schema
 	Edition              string   `json:"edition,omitempty"`
 	FacetAvail           []string `json:"facet_avail"`
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
@@ -137,6 +139,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	// refs. #8709
 	if is.DOI != "" {
+		s.DOI = []string{is.DOI}
 		containsDOI := false
 		for _, u := range s.URL {
 			if strings.Contains(u, "doi") {
