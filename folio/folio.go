@@ -1,3 +1,5 @@
+// Package folio add support for a minimal subset of the FOLIO library
+// platform API.
 package folio
 
 import (
@@ -7,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"time"
 
@@ -28,7 +31,7 @@ type API struct {
 	Base   string
 	Tenant string // e.g. "de_15"
 	Client Doer
-	Token  string // will be populated by API.Authenticate(...)
+	Token  string
 }
 
 func New() *API {
@@ -79,7 +82,7 @@ func (api *API) Authenticate(username, password string) (err error) {
 	if resp.StatusCode != 201 {
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Printf("failed to read body: %v", err)
+			log.Printf("[ee] failed to read body: %v", err)
 		} else {
 			log.Println(string(b))
 		}
@@ -122,7 +125,10 @@ func (api *API) MetadataCollections(opts MetadataCollectionsOpts) (*MetadataColl
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("api returned: %v", resp.Status)
+		b, _ := httputil.DumpResponse(resp, true)
+		log.Printf("[ee] --------\n%s\n", string(b))
+		log.Println("[ee] --------")
+		return nil, fmt.Errorf("[ee] api returned: %v", resp.Status)
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, err
