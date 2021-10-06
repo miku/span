@@ -132,34 +132,47 @@ func (api *API) MetadataCollections(opts MetadataCollectionsOpts) (*MetadataColl
 
 // MetadataCollectionsResponse collects zero, one or more collection entries obtained from the API.
 type MetadataCollectionsResponse struct {
-	FincConfigMetadataCollections []struct {
-		CollectionId string        `json:"collectionId"`
-		ContentFiles []interface{} `json:"contentFiles"`
-		Description  string        `json:"description"`
-		FacetLabel   string        `json:"facetLabel"`
-		FreeContent  string        `json:"freeContent"`
-		Id           string        `json:"id"`
-		Label        string        `json:"label"`
-		Lod          struct {
-			Note        string `json:"note"`
-			Publication string `json:"publication"`
-		} `json:"lod"`
-		MdSource struct {
-			Id   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"mdSource"`
-		Metadata struct {
-			CreatedDate string `json:"createdDate"`
-			UpdatedDate string `json:"updatedDate"`
-		} `json:"metadata"`
-		MetadataAvailable   string        `json:"metadataAvailable"`
-		PermittedFor        []string      `json:"permittedFor"`
-		SelectedBy          []string      `json:"selectedBy"`
-		SolrMegaCollections []string      `json:"solrMegaCollections"`
-		Tickets             []interface{} `json:"tickets"`
-		UsageRestricted     string        `json:"usageRestricted"`
-	} `json:"fincConfigMetadataCollections"`
-	TotalRecords int64 `json:"totalRecords"`
+	FincConfigMetadataCollections []FincConfigMetadataCollection `json:"fincConfigMetadataCollections"`
+	TotalRecords                  int64                          `json:"totalRecords"`
+}
+
+// FincConfigMetadataCollection is a single configuration entry.
+type FincConfigMetadataCollection struct {
+	CollectionId      string        `json:"collectionId"`
+	ContentFilesValue []interface{} `json:"contentFiles"`
+	Description       string        `json:"description"`
+	FacetLabel        string        `json:"facetLabel"`
+	FreeContent       string        `json:"freeContent"`
+	Id                string        `json:"id"`
+	Label             string        `json:"label"`
+	Lod               struct {
+		Note        string `json:"note"`
+		Publication string `json:"publication"`
+	} `json:"lod"`
+	MdSource struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"mdSource"`
+	Metadata struct {
+		CreatedDate string `json:"createdDate"`
+		UpdatedDate string `json:"updatedDate"`
+	} `json:"metadata"`
+	MetadataAvailable   string        `json:"metadataAvailable"`
+	PermittedFor        []string      `json:"permittedFor"`
+	SelectedBy          []string      `json:"selectedBy"`
+	SolrMegaCollections []string      `json:"solrMegaCollections"`
+	Tickets             []interface{} `json:"tickets"`
+	UsageRestricted     string        `json:"usageRestricted"`
+}
+
+func (c *FincConfigMetadataCollection) ContentFiles() (result []string) {
+	for _, v := range c.ContentFilesValue {
+		switch w := v.(type) {
+		case string:
+			result = append(result, w)
+		}
+	}
+	return
 }
 
 // LoginResponse for bl-users/login, used to obtain auth tokens.
