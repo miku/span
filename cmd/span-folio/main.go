@@ -75,7 +75,11 @@ func main() {
 		Tenant: *tenant,
 		Client: pester.New(),
 	}
+	if userPass.User == "" || userPass.Password == "" {
+		log.Fatal("incomplete credentials")
+	}
 	if err := api.Authenticate(userPass.User, userPass.Password); err != nil {
 		log.Fatal(err)
 	}
+	log.Println(api.Token)
 }

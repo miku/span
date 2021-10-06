@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"time"
 
@@ -21,7 +21,9 @@ type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }
 
-// API wraps a few common operations, like auth token acquisition.
+// API wraps a few high level operations of a small part of the FOLIO API, e.g.
+// authentication and metadata lookups. This types carries some state, e.g. in
+// form of the auth token obtained after authentication.
 type API struct {
 	Base   string
 	Tenant string // e.g. "de_15"
@@ -37,15 +39,19 @@ func New() *API {
 	}
 }
 
-// Authenticate retrieves a login token given username and plain password. This
-// method returns the token and also sets it on the api client to be used for
-// subsequent requests.
-func (api *API) Authenticate(username, password string) (err error) {
+// ensureClient sets up a default http client, if none has been set.
+func (api *API) ensureClient() {
 	if api.Client == nil {
 		api.Client = &http.Client{
 			Timeout: 30 * time.Second,
 		}
 	}
+}
+
+// Authenticate retrieves a login token given username and plain password. The
+// token is stored and used for any subsequent request.
+func (api *API) Authenticate(username, password string) (err error) {
+	api.ensureClient()
 	var data = struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -62,23 +68,25 @@ func (api *API) Authenticate(username, password string) (err error) {
 	if err != nil {
 		return err
 	}
+	log.Printf("%s", req.URL)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Okapi-Tenant", api.Tenant)
-	b, err := httputil.DumpRequest(req, true)
-	if err != nil {
-		return err
-	}
-	log.Println(string(b))
 	resp, err := api.Client.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		return fmt.Errorf("failed with %v", resp.Status)
+	if resp.StatusCode != 201 {
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Printf("failed to read body: %v", err)
+		} else {
+			log.Println(string(b))
+		}
+		return fmt.Errorf("failed with %v (expected HTTP 201)", resp.Status)
 	}
-	token := resp.Header.Get("x-okapi-token")
+	token := resp.Header.Get("x-okapi-token") // we only care about the token, here
 	if token == "" {
 		return ErrEmptyToken
 	}
@@ -141,6 +149,66 @@ type Response struct {
 		UsageRestricted     string        `json:"usageRestricted"`
 	} `json:"fincConfigMetadataCollections"`
 	TotalRecords int64 `json:"totalRecords"`
+}
+
+// LoginResponse for bl-users/login, used to obtain auth tokens.
+type LoginResponse struct {
+	PatronGroup struct {
+		Desc     string `json:"desc"`
+		Group    string `json:"group"`
+		Id       string `json:"id"`
+		Metadata struct {
+			CreatedDate string `json:"createdDate"`
+			UpdatedDate string `json:"updatedDate"`
+		} `json:"metadata"`
+	} `json:"patronGroup"`
+	Permissions struct {
+		Id       string `json:"id"`
+		Metadata struct {
+			CreatedByUserId string `json:"createdByUserId"`
+			CreatedDate     string `json:"createdDate"`
+			UpdatedByUserId string `json:"updatedByUserId"`
+			UpdatedDate     string `json:"updatedDate"`
+		} `json:"metadata"`
+		Permissions []string `json:"permissions"`
+		UserId      string   `json:"userId"`
+	} `json:"permissions"`
+	ProxiesFor        []interface{} `json:"proxiesFor"`
+	ServicePointsUser struct {
+		Id       string `json:"id"`
+		Metadata struct {
+			CreatedByUserId string `json:"createdByUserId"`
+			CreatedDate     string `json:"createdDate"`
+			UpdatedByUserId string `json:"updatedByUserId"`
+			UpdatedDate     string `json:"updatedDate"`
+		} `json:"metadata"`
+		ServicePoints    []interface{} `json:"servicePoints"`
+		ServicePointsIds []interface{} `json:"servicePointsIds"`
+		UserId           string        `json:"userId"`
+	} `json:"servicePointsUser"`
+	User struct {
+		Active      bool          `json:"active"`
+		CreatedDate string        `json:"createdDate"`
+		Departments []interface{} `json:"departments"`
+		Id          string        `json:"id"`
+		Metadata    struct {
+			CreatedByUserId string `json:"createdByUserId"`
+			CreatedDate     string `json:"createdDate"`
+			UpdatedByUserId string `json:"updatedByUserId"`
+			UpdatedDate     string `json:"updatedDate"`
+		} `json:"metadata"`
+		PatronGroup string `json:"patronGroup"`
+		Personal    struct {
+			Addresses              []interface{} `json:"addresses"`
+			Email                  string        `json:"email"`
+			FirstName              string        `json:"firstName"`
+			LastName               string        `json:"lastName"`
+			PreferredContactTypeId string        `json:"preferredContactTypeId"`
+		} `json:"personal"`
+		ProxyFor    []interface{} `json:"proxyFor"`
+		UpdatedDate string        `json:"updatedDate"`
+		Username    string        `json:"username"`
+	} `json:"user"`
 }
 
 // Example response
