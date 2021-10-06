@@ -68,7 +68,6 @@ func (api *API) Authenticate(username, password string) (err error) {
 	if err != nil {
 		return err
 	}
-	log.Printf("%s", req.URL)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Okapi-Tenant", api.Tenant)
@@ -94,9 +93,21 @@ func (api *API) Authenticate(username, password string) (err error) {
 	return nil
 }
 
-func (api *API) MetadataCollections(cqlQuery string) (*Response, error) {
-	var v = url.Values{}
-	v.Add("query", cqlQuery) // (selectedBy=("DIKU-01" or "DE-15")
+// MetadataCollectionsOpts collections options for the metadata collections
+// API. Not complete.
+type MetadataCollectionsOpts struct {
+	CQL   string
+	Limit int
+}
+
+// MetadataCollections queries for collection and attachment information.
+func (api *API) MetadataCollections(opts MetadataCollectionsOpts) (*MetadataCollectionsResponse, error) {
+	var (
+		v        = url.Values{}
+		response MetadataCollectionsResponse
+	)
+	v.Add("query", opts.CQL)                      // (selectedBy=("DIKU-01" or "DE-15")
+	v.Add("limit", fmt.Sprintf("%d", opts.Limit)) // https://s3.amazonaws.com/foliodocs/api/mod-finc-config/p/fincConfigMetadataCollections.html#finc_config_metadata_collections_get
 	link := fmt.Sprintf("%s/finc-config/metadata-collections?%s", api.Base, v.Encode())
 	req, err := http.NewRequest("GET", link, nil)
 	if err != nil {
@@ -113,14 +124,14 @@ func (api *API) MetadataCollections(cqlQuery string) (*Response, error) {
 	if resp.StatusCode >= 400 {
 		return nil, fmt.Errorf("api returned: %v", resp.Status)
 	}
-	var response Response
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, err
 	}
 	return &response, nil
 }
 
-type Response struct {
+// MetadataCollectionsResponse collects zero, one or more collection entries obtained from the API.
+type MetadataCollectionsResponse struct {
 	FincConfigMetadataCollections []struct {
 		CollectionId string        `json:"collectionId"`
 		ContentFiles []interface{} `json:"contentFiles"`

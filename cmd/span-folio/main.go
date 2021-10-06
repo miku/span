@@ -50,7 +50,9 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/miku/span/folio"
@@ -81,5 +83,18 @@ func main() {
 	if err := api.Authenticate(userPass.User, userPass.Password); err != nil {
 		log.Fatal(err)
 	}
-	log.Println(api.Token)
+	log.Println("[ok] auth")
+	opts := folio.MetadataCollectionsOpts{
+		CQL:   `(selectedBy=("DE-15"))`,
+		Limit: 1000000,
+	}
+	resp, err := api.MetadataCollections(opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+	b, err := json.Marshal(resp)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(b))
 }
