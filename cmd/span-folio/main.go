@@ -71,7 +71,7 @@ var (
 	muFolio   = flag.String("folio", "https://okapi.erm.staging.folio.finc.info", "folio endpoint")
 	tenant    = flag.String("tenant", "de_15", "folio tenant")
 	limit     = flag.Int("limit", 100000, "limit for lists")
-	cqlQuery  = flag.String("cql", `(selectedBy=("DE-15"))`, "cql query")
+	cqlQuery  = flag.String("cql", `(selectedBy=("*"))`, `cql query, e.g. (selectedBy=("DE-15")`)
 	rawOutput = flag.Bool("r", false, "raw output")
 	userPass  xflag.UserPassword
 )
