@@ -50,10 +50,16 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
+	"os"
+	"strings"
+	"text/tabwriter"
 
 	"github.com/miku/span/folio"
+	"github.com/miku/span/strutil"
 	"github.com/miku/span/xflag"
 	"github.com/sethgrid/pester"
 )
@@ -62,9 +68,12 @@ import (
 // https://okapi.testing.dev.folio.finc.info
 
 var (
-	muFolio  = flag.String("folio", "https://okapi.erm.staging.folio.finc.info", "folio endpoint") // Maybe 100K at once.
-	tenant   = flag.String("tenant", "de_15", "folio tenant")
-	userPass xflag.UserPassword
+	muFolio   = flag.String("folio", "https://okapi.erm.staging.folio.finc.info", "folio endpoint")
+	tenant    = flag.String("tenant", "de_15", "folio tenant")
+	limit     = flag.Int("limit", 100000, "limit for lists")
+	cqlQuery  = flag.String("cql", `(selectedBy=("DE-15"))`, "cql query")
+	rawOutput = flag.Bool("r", false, "raw output")
+	userPass  xflag.UserPassword
 )
 
 func main() {
@@ -81,5 +90,32 @@ func main() {
 	if err := api.Authenticate(userPass.User, userPass.Password); err != nil {
 		log.Fatal(err)
 	}
-	log.Println(api.Token)
+	log.Println("[ok] auth")
+	opts := folio.MetadataCollectionsOpts{
+		CQL:   *cqlQuery,
+		Limit: *limit,
+	}
+	resp, err := api.MetadataCollections(opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+	switch {
+	case *rawOutput:
+		for _, v := range resp.FincConfigMetadataCollections {
+			b, err := json.Marshal(v)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(string(b))
+		}
+	default:
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
+		defer w.Flush()
+		for _, entry := range resp.FincConfigMetadataCollections {
+			fmt.Fprintf(w, "%s\t%s\t%s\n",
+				strutil.Truncate(entry.Label, 40),
+				strutil.Truncate(strings.Join(entry.SolrMegaCollections, ", "), 40),
+				strutil.Truncate(entry.MdSource.Name, 40))
+		}
+	}
 }

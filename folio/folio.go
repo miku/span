@@ -1,3 +1,5 @@
+// Package folio add support for a minimal subset of the FOLIO library
+// platform API.
 package folio
 
 import (
@@ -7,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"time"
 
@@ -28,7 +31,7 @@ type API struct {
 	Base   string
 	Tenant string // e.g. "de_15"
 	Client Doer
-	Token  string // will be populated by API.Authenticate(...)
+	Token  string
 }
 
 func New() *API {
@@ -68,7 +71,6 @@ func (api *API) Authenticate(username, password string) (err error) {
 	if err != nil {
 		return err
 	}
-	log.Printf("%s", req.URL)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Okapi-Tenant", api.Tenant)
@@ -80,7 +82,7 @@ func (api *API) Authenticate(username, password string) (err error) {
 	if resp.StatusCode != 201 {
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Printf("failed to read body: %v", err)
+			log.Printf("[ee] failed to read body: %v", err)
 		} else {
 			log.Println(string(b))
 		}
@@ -94,9 +96,21 @@ func (api *API) Authenticate(username, password string) (err error) {
 	return nil
 }
 
-func (api *API) MetadataCollections(cqlQuery string) (*Response, error) {
-	var v = url.Values{}
-	v.Add("query", cqlQuery) // (selectedBy=("DIKU-01" or "DE-15")
+// MetadataCollectionsOpts collections options for the metadata collections
+// API. Not complete.
+type MetadataCollectionsOpts struct {
+	CQL   string
+	Limit int
+}
+
+// MetadataCollections queries for collection and attachment information.
+func (api *API) MetadataCollections(opts MetadataCollectionsOpts) (*MetadataCollectionsResponse, error) {
+	var (
+		v        = url.Values{}
+		response MetadataCollectionsResponse
+	)
+	v.Add("query", opts.CQL)                      // (selectedBy=("DIKU-01" or "DE-15")
+	v.Add("limit", fmt.Sprintf("%d", opts.Limit)) // https://s3.amazonaws.com/foliodocs/api/mod-finc-config/p/fincConfigMetadataCollections.html#finc_config_metadata_collections_get
 	link := fmt.Sprintf("%s/finc-config/metadata-collections?%s", api.Base, v.Encode())
 	req, err := http.NewRequest("GET", link, nil)
 	if err != nil {
@@ -111,44 +125,60 @@ func (api *API) MetadataCollections(cqlQuery string) (*Response, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("api returned: %v", resp.Status)
+		b, _ := httputil.DumpResponse(resp, true)
+		log.Printf("[ee] --------\n%s\n", string(b))
+		log.Println("[ee] --------")
+		return nil, fmt.Errorf("[ee] api returned: %v", resp.Status)
 	}
-	var response Response
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
 		return nil, err
 	}
 	return &response, nil
 }
 
-type Response struct {
-	FincConfigMetadataCollections []struct {
-		CollectionId string        `json:"collectionId"`
-		ContentFiles []interface{} `json:"contentFiles"`
-		Description  string        `json:"description"`
-		FacetLabel   string        `json:"facetLabel"`
-		FreeContent  string        `json:"freeContent"`
-		Id           string        `json:"id"`
-		Label        string        `json:"label"`
-		Lod          struct {
-			Note        string `json:"note"`
-			Publication string `json:"publication"`
-		} `json:"lod"`
-		MdSource struct {
-			Id   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"mdSource"`
-		Metadata struct {
-			CreatedDate string `json:"createdDate"`
-			UpdatedDate string `json:"updatedDate"`
-		} `json:"metadata"`
-		MetadataAvailable   string        `json:"metadataAvailable"`
-		PermittedFor        []string      `json:"permittedFor"`
-		SelectedBy          []string      `json:"selectedBy"`
-		SolrMegaCollections []string      `json:"solrMegaCollections"`
-		Tickets             []interface{} `json:"tickets"`
-		UsageRestricted     string        `json:"usageRestricted"`
-	} `json:"fincConfigMetadataCollections"`
-	TotalRecords int64 `json:"totalRecords"`
+// MetadataCollectionsResponse collects zero, one or more collection entries obtained from the API.
+type MetadataCollectionsResponse struct {
+	FincConfigMetadataCollections []FincConfigMetadataCollection `json:"fincConfigMetadataCollections"`
+	TotalRecords                  int64                          `json:"totalRecords"`
+}
+
+// FincConfigMetadataCollection is a single configuration entry.
+type FincConfigMetadataCollection struct {
+	CollectionId      string        `json:"collectionId"`
+	ContentFilesValue []interface{} `json:"contentFiles"`
+	Description       string        `json:"description"`
+	FacetLabel        string        `json:"facetLabel"`
+	FreeContent       string        `json:"freeContent"`
+	Id                string        `json:"id"`
+	Label             string        `json:"label"`
+	Lod               struct {
+		Note        string `json:"note"`
+		Publication string `json:"publication"`
+	} `json:"lod"`
+	MdSource struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"mdSource"`
+	Metadata struct {
+		CreatedDate string `json:"createdDate"`
+		UpdatedDate string `json:"updatedDate"`
+	} `json:"metadata"`
+	MetadataAvailable   string        `json:"metadataAvailable"`
+	PermittedFor        []string      `json:"permittedFor"`
+	SelectedBy          []string      `json:"selectedBy"`
+	SolrMegaCollections []string      `json:"solrMegaCollections"`
+	Tickets             []interface{} `json:"tickets"`
+	UsageRestricted     string        `json:"usageRestricted"`
+}
+
+func (c *FincConfigMetadataCollection) ContentFiles() (result []string) {
+	for _, v := range c.ContentFilesValue {
+		switch w := v.(type) {
+		case string:
+			result = append(result, w)
+		}
+	}
+	return
 }
 
 // LoginResponse for bl-users/login, used to obtain auth tokens.
