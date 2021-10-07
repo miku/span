@@ -12,7 +12,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -21,6 +20,8 @@ import (
 	"os/exec"
 	"runtime/pprof"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
@@ -80,7 +81,6 @@ func writeFields(w io.Writer, sep string, values ...interface{}) (int, error) {
 
 func main() {
 	flag.Parse()
-
 	if *verbose {
 		log.SetLevel(log.DebugLevel)
 	}
@@ -100,9 +100,10 @@ func main() {
 	if *outputFile == "" {
 		log.Fatal("output filename required")
 	}
-
-	// Read file or compressed file.
-	var reader io.Reader
+	var (
+		reader   io.Reader
+		excludes = make(map[string]struct{})
+	)
 
 	f, err := os.Open(flag.Arg(0))
 	if err != nil {
@@ -110,7 +111,6 @@ func main() {
 	}
 	defer f.Close()
 	reader = f
-
 	if *compressed {
 		g, err := gzip.NewReader(f)
 		if err != nil {
@@ -119,9 +119,6 @@ func main() {
 		defer g.Close()
 		reader = g
 	}
-
-	excludes := make(map[string]struct{})
-
 	if *excludeFile != "" {
 		file, err := os.Open(*excludeFile)
 		if err != nil {
@@ -134,24 +131,26 @@ func main() {
 		log.Debugf("excludes: %d", len(excludes))
 	}
 
+	// Stage 1: Extract minimum amount of information from the raw data, write to tempfile.
 	log.WithFields(log.Fields{
 		"prefix":       "stage 1",
 		"input":        f.Name(),
 		"excludesFile": *excludeFile,
 		"excludes":     len(excludes),
 	}).Info("preparing extraction")
-
-	// Stage 1: Extract minimum amount of information from the raw data, write to tempfile.
 	tf, err := ioutil.TempFile("", "span-crossref-snapshot-")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	br := bufio.NewReader(reader)
-	bw := bufio.NewWriter(tf)
-
-	p := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
-		var doc crossref.Document
+	var (
+		br = bufio.NewReader(reader)
+		bw = bufio.NewWriter(tf)
+	)
+	pp := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
+		var (
+			doc crossref.Document
+			buf bytes.Buffer
+		)
 		if err := json.Unmarshal(b, &doc); err != nil {
 			return nil, err
 		}
@@ -162,21 +161,17 @@ func main() {
 		if _, ok := excludes[doc.DOI]; ok {
 			return nil, nil
 		}
-		var buf bytes.Buffer
 		if _, err := writeFields(&buf, "\t", lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
 			return nil, err
 		}
 		return buf.Bytes(), nil
 	})
-
-	p.BatchSize = *batchsize
-
+	pp.BatchSize = *batchsize
 	log.WithFields(log.Fields{
 		"prefix":    "stage 1",
 		"batchsize": *batchsize,
 	}).Info("starting extraction")
-
-	if err := p.Run(); err != nil {
+	if err := pp.Run(); err != nil {
 		log.Fatal(err)
 	}
 	if err := bw.Flush(); err != nil {
@@ -191,12 +186,10 @@ func main() {
 	// document date, DOI).
 	fastsort := `LC_ALL=C sort -S20%`
 	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
-
 	log.WithFields(log.Fields{
 		"prefix":    "stage 2",
 		"batchsize": *batchsize,
 	}).Info("identifying relevant records")
-
 	output, err := clam.RunOutput(cmd, clam.Map{"f": fastsort, "input": tf.Name()})
 	if err != nil {
 		log.Fatal(err)
@@ -230,19 +223,17 @@ func main() {
 		filterline = tf.Name()
 	}
 
+	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
 	log.WithFields(log.Fields{
 		"prefix":     "stage 3",
 		"comp":       comp,
 		"decomp":     decomp,
 		"filterline": filterline,
 	}).Info("extract relevant records")
-
-	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
 	cmd = `{{ filterline }} {{ L }} {{ F }} > {{ output }}`
 	if *compressed {
 		cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
 	}
-
 	output, err = clam.RunOutput(cmd, clam.Map{
 		"L":          output,
 		"F":          f.Name(),
@@ -254,7 +245,6 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := os.Rename(output, *outputFile); err != nil {
-		// assume "invalid cross-device link"
 		if err := CopyFile(*outputFile, output, 0644); err != nil {
 			log.Fatal(err)
 		}
