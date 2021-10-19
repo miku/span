@@ -26,7 +26,7 @@ require (
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-colorable v0.1.10 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8
-	github.com/microcosm-cc/bluemonday v1.0.15
+	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
 	github.com/miku/parallel v0.0.0-20210205192328-1a799ab70294
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
