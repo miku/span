@@ -35,7 +35,9 @@
 // {
 //   "errors": [
 //     {
-//       "message": "Error verifying user existence: Error looking up user at url http://okapi-app-service-erm-staging:9130/users?query=username==user Expected status code 200, got 400 :function count_estimate(unknown) does not exist",
+//       "message": "Error verifying user existence:
+//                      Error looking up user at url http://okapi-app-service-erm-staging:9130/users?query=username==user
+//                      Expected status code 200, got 400 :function count_estimate(unknown) does not exist",
 //       "type": "error",
 //       "code": "username.incorrect",
 //       "parameters": [
