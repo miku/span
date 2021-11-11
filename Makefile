@@ -9,11 +9,11 @@ PKGNAME = span
 .PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
-test: deps
-	go get github.com/kylelemons/godebug/pretty
-	go get github.com/kr/pretty
-	go test ./...
-	go mod tidy
+test:
+	# go get github.com/kylelemons/godebug/pretty
+	# go get github.com/kr/pretty
+	go test -v -cover ./...
+	# go mod tidy
 
 all: deps $(TARGETS)
 
