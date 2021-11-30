@@ -49,6 +49,27 @@
 //     }
 //   ]
 // }
+//
+// Current AMSL db schema.
+//
+// CREATE TABLE amsl (
+//                                 shard text not null,
+//                                 isil text not null,
+//                                 sid text not null,
+//                                 tcid text not null,
+//                                 mc text not null,
+//                                 hfuri text,
+//                                 hflabel text,
+//                                 hflink text,
+//                                 hfeval text,
+//                                 cfuri text,
+//                                 cflabel text,
+//                                 cflink text,
+//                                 cfelink text,
+//                                 pisil text,
+//                                 docuri text,
+//                                 doclabel text
+//                         );
 package main
 
 import (
