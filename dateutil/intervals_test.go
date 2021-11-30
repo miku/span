@@ -14,6 +14,34 @@ func TestMakeIntervalFunc(t *testing.T) {
 		numIntervals int
 	}{
 		{
+			padLeft:      padLMinute,
+			padRight:     padRMinute,
+			start:        MustParse("2000-01-01 10:30"),
+			end:          MustParse("2000-01-01 12:00"),
+			numIntervals: 90,
+		},
+		{
+			padLeft:      padLMinute,
+			padRight:     padRMinute,
+			start:        MustParse("2000-01-01 10:30:30"),
+			end:          MustParse("2000-01-01 12:00:30"),
+			numIntervals: 91,
+		},
+		{
+			padLeft:      padLHour,
+			padRight:     padRHour,
+			start:        MustParse("2000-01-01 10:00"),
+			end:          MustParse("2000-01-01 12:00"),
+			numIntervals: 2,
+		},
+		{
+			padLeft:      padLHour,
+			padRight:     padRHour,
+			start:        MustParse("2000-01-01 10:30"),
+			end:          MustParse("2000-01-01 12:00"),
+			numIntervals: 2,
+		},
+		{
 			padLeft:      padLDay,
 			padRight:     padRDay,
 			start:        MustParse("2000-01-01"),
@@ -35,18 +63,11 @@ func TestMakeIntervalFunc(t *testing.T) {
 			numIntervals: 366,
 		},
 		{
-			padLeft:      padLHour,
-			padRight:     padRHour,
-			start:        MustParse("2000-01-01 10:00"),
-			end:          MustParse("2000-01-01 12:00"),
-			numIntervals: 2,
-		},
-		{
-			padLeft:      padLHour,
-			padRight:     padRHour,
-			start:        MustParse("2000-01-01 10:30"),
-			end:          MustParse("2000-01-01 12:00"),
-			numIntervals: 2,
+			padLeft:      padLWeek,
+			padRight:     padRWeek,
+			start:        MustParse("2000-01-01"),
+			end:          MustParse("2001-01-01"),
+			numIntervals: 54,
 		},
 		{
 			padLeft:      padLMonth,
@@ -57,11 +78,14 @@ func TestMakeIntervalFunc(t *testing.T) {
 		},
 	}
 	for i, c := range cases {
-		f := makeIntervalFunc(c.padLeft, c.padRight)
-		ivs := f(c.start, c.end)
+		var (
+			f   = makeIntervalFunc(c.padLeft, c.padRight)
+			ivs = f(c.start, c.end)
+		)
 		t.Logf("[%d] start: %v, end: %v", i, c.start, c.end)
 		switch len(ivs) {
 		case 0:
+			t.Logf("[%d] []", i)
 		case 1:
 			t.Logf("[%d] [%v]", i, ivs[0])
 		case 2:

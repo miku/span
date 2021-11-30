@@ -1,16 +1,35 @@
-// Package dateutil provides interval handling and a custom flag.
+// Package dateutil provides interval handling.
 package dateutil
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/araddon/dateparse"
 	"github.com/jinzhu/now"
 )
 
+// Interval groups start and end.
+type Interval struct {
+	Start time.Time
+	End   time.Time
+}
+
+func (iv Interval) String() string {
+	return fmt.Sprintf("%s %s", iv.Start.Format(time.RFC3339), iv.End.Format(time.RFC3339))
+}
+
+type (
+	// padFunc allows to move a given time back and forth.
+	padFunc func(t time.Time) time.Time
+	// intervalFunc takes a start and endtime and returns a number of
+	// intervals. How intervals are generated is flexible.
+	intervalFunc func(s, e time.Time) []Interval
+)
+
 var (
 	// EveryMinute will chop up a timespan into 60s intervals;
-	// https://english.stackexchange.com/questions/3091/weekly-daily-hourly-minutely.
+	// https://english.stackexchange.com/q/3091/222
 	EveryMinute = makeIntervalFunc(padLMinute, padRMinute)
 	Hourly      = makeIntervalFunc(padLHour, padRHour)
 	Daily       = makeIntervalFunc(padLDay, padRDay)
@@ -27,20 +46,6 @@ var (
 	padRWeek   = func(t time.Time) time.Time { return now.With(t).EndOfWeek() }
 	padLMonth  = func(t time.Time) time.Time { return now.With(t).BeginningOfMonth() }
 	padRMonth  = func(t time.Time) time.Time { return now.With(t).EndOfMonth() }
-)
-
-// Interval groups start and end.
-type Interval struct {
-	Start time.Time
-	End   time.Time
-}
-
-type (
-	// padFunc allows to move a given time back and forth.
-	padFunc func(t time.Time) time.Time
-	// intervalFunc takes a start and endtime and returns a number of
-	// intervals. How intervals are generated is flexible.
-	intervalFunc func(s, e time.Time) []Interval
 )
 
 // makeIntervalFunc is a helper to create daily, weekly and other intervals.
