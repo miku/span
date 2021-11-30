@@ -7,6 +7,7 @@ require (
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/adrg/xdg v0.3.4
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2
+	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/beevik/etree v1.1.0
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
 	github.com/dustin/go-humanize v1.0.0
@@ -16,6 +17,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hoisie/mustache v0.0.0-20160804235033-6375acf62c69 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.2.5
+	github.com/jinzhu/now v1.1.3
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4
@@ -23,6 +25,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/klauspost/pgzip v1.2.5
 	github.com/kr/pretty v0.3.0 // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-colorable v0.1.10 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8
