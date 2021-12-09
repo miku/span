@@ -1,13 +1,12 @@
 package atomic
 
 import (
+	"compress/gzip"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
-
-	gzip "github.com/klauspost/pgzip"
 )
 
 // Compress and return path to compressed file.
@@ -16,18 +15,17 @@ func Compress(filename string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer tf.Close()
 	zw := gzip.NewWriter(tf)
 	f, err := os.Open(filename)
 	if err != nil {
 		return "", err
 	}
+	defer f.Close()
 	if _, err := io.Copy(zw, f); err != nil {
 		return "", err
 	}
 	if err := zw.Flush(); err != nil {
-		return "", err
-	}
-	if err := tf.Close(); err != nil {
 		return "", err
 	}
 	return tf.Name(), nil
