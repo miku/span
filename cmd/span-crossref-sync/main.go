@@ -264,6 +264,7 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
+	"github.com/miku/span/atomic"
 	"github.com/miku/span/atomicfile"
 	"github.com/miku/span/dateutil"
 	"github.com/miku/span/xflag"
@@ -451,7 +452,7 @@ func main() {
 		}
 	default:
 		for _, iv := range ivs {
-			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json",
+			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json.gz",
 				*apiFilter,
 				iv.Start.Format("2006-01-02"),
 				iv.End.Format("2006-01-02")))
@@ -464,6 +465,13 @@ func main() {
 					log.Fatal(err)
 				}
 				if err := cacheFile.Close(); err != nil {
+					log.Fatal(err)
+				}
+				compressed, err := atomic.Compress(cachePath)
+				if err != nil {
+					log.Fatal(err)
+				}
+				if err := os.Rename(compressed, cachePath); err != nil {
 					log.Fatal(err)
 				}
 				log.Printf("synced to %s", cachePath)
