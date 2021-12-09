@@ -25,7 +25,7 @@ func Compress(filename string) (string, error) {
 	if _, err := io.Copy(zw, f); err != nil {
 		return "", err
 	}
-	if err := zw.Flush(); err != nil {
+	if err := zw.Close(); err != nil {
 		return "", err
 	}
 	return tf.Name(), nil
