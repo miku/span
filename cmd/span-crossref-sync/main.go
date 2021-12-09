@@ -471,7 +471,7 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				if err := os.Rename(compressed, cachePath); err != nil {
+				if err := atomic.Move(compressed, cachePath); err != nil {
 					log.Fatal(err)
 				}
 				log.Printf("synced to %s", cachePath)

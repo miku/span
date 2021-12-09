@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 
 	gzip "github.com/klauspost/pgzip"
 )
@@ -57,4 +58,49 @@ func WriteFile(filename string, data []byte, perm os.FileMode) error {
 		os.Remove(f.Name())
 	}
 	return err
+}
+
+// Move moves a file from a source path to a destination path
+// This must be used across the codebase for compatibility with Docker volumes
+// and Golang (fixes Invalid cross-device link when using os.Rename)
+func Move(src, dst string) error {
+	sabs, err := filepath.Abs(src)
+	if err != nil {
+		return err
+	}
+	dabs, err := filepath.Abs(dst)
+	if err != nil {
+		return err
+	}
+	if sabs == dabs {
+		return nil
+	}
+	inf, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer inf.Close()
+	dstDir := filepath.Dir(dst)
+	if !exists(dstDir) {
+		err = os.MkdirAll(dstDir, 0775)
+		if err != nil {
+			return err
+		}
+	}
+	of, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer of.Close()
+	_, err = io.Copy(of, inf)
+	if err != nil {
+		return err
+	}
+	return os.Remove(src)
+}
+
+// exists returns whether or not a file or path exists
+func exists(name string) bool {
+	_, err := os.Stat(name)
+	return !os.IsNotExist(err)
 }
