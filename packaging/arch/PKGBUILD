@@ -3,7 +3,7 @@
 # TODO(miku): Simplify asset handling, make everything simply go-get-able.
 
 pkgname=span
-pkgver=0.1.331
+pkgver=0.1.332
 pkgrel=0
 pkgdesc="Project FINC intermediate schema tools."
 arch=('i686' 'x86_64')
