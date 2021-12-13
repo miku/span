@@ -420,9 +420,9 @@ func main() {
 	}
 	client := pester.New()
 	client.Backoff = pester.ExponentialBackoff
-	client.MaxRetries = 5
+	client.MaxRetries = 10
 	client.RetryOnHTTP429 = true
-	client.Timeout = 30 * time.Second
+	client.Timeout = 60 * time.Second
 	var (
 		sync = &Sync{
 			ApiEndpoint: *apiEndpoint,
