@@ -372,8 +372,14 @@ OUTER:
 		}
 		seen = seen + int64(len(wr.Message.Items))
 		if s.Verbose {
-			log.Printf("status: %s, total: %d, seen: %d, cursor: %s",
-				wr.Status, wr.Message.TotalResults, seen, wr.Message.NextCursor)
+			var pct float64
+			if wr.Message.TotalResults == 0 {
+				pct = 0.0
+			} else {
+				pct = float64(seen) / float64(wr.Message.TotalResults)
+			}
+			log.Printf("status: %s, total: %d, seen: %d (%0.2f), cursor: %s",
+				wr.Status, wr.Message.TotalResults, seen, pct, wr.Message.NextCursor)
 		}
 		switch s.Mode {
 		case "t", "tabs":
