@@ -282,6 +282,8 @@ var (
 	debug       = flag.Bool("debug", false, "print out intervals")
 	verbose     = flag.Bool("verbose", false, "be verbose")
 	outputFile  = flag.String("o", "", "output filename (stdout, otherwise)")
+	timeout     = flag.Duration("t", 60*time.Second, "connectiont timeout")
+	maxRetries  = flag.Int("x", 10, "max retries")
 	mode        = flag.String("mode", "t", "t=tabs, s=sync")
 
 	syncStart xflag.Date = xflag.Date{Time: dateutil.MustParse("2021-01-01")}
@@ -359,14 +361,14 @@ OUTER:
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode >= 400 {
-			return fmt.Errorf("api failed with HTTP %d", resp.StatusCode)
+			return fmt.Errorf("HTTP %d", resp.StatusCode)
 		}
 		var wr WorksResponse
 		if err := json.NewDecoder(resp.Body).Decode(&wr); err != nil {
-			return err
+			return fmt.Errorf("decode: %v", err)
 		}
 		if wr.Status != "ok" {
-			return fmt.Errorf("api failed: %s", wr.Status)
+			return fmt.Errorf("crossref api failed: %s", wr.Status)
 		}
 		seen = seen + int64(len(wr.Message.Items))
 		if s.Verbose {
@@ -420,9 +422,9 @@ func main() {
 	}
 	client := pester.New()
 	client.Backoff = pester.ExponentialBackoff
-	client.MaxRetries = 10
+	client.MaxRetries = *maxRetries
 	client.RetryOnHTTP429 = true
-	client.Timeout = 60 * time.Second
+	client.Timeout = *timeout
 	var (
 		sync = &Sync{
 			ApiEndpoint: *apiEndpoint,
