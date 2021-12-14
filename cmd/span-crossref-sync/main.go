@@ -458,11 +458,11 @@ func main() {
 				*apiFilter,
 				iv.Start.Format("2006-01-02"),
 				iv.End.Format("2006-01-02")))
-			cacheFile, err := atomicfile.New(cachePath, 0644)
-			if err != nil {
-				log.Fatal(err)
-			}
 			if _, err := os.Stat(cachePath); os.IsNotExist(err) {
+				cacheFile, err := atomicfile.New(cachePath, 0644)
+				if err != nil {
+					log.Fatal(err)
+				}
 				if err = sync.writeWindow(cacheFile, iv.Start, iv.End); err != nil {
 					log.Fatal(err)
 				}
