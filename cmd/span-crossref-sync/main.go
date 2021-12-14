@@ -481,6 +481,7 @@ func main() {
 			if err := cleanup(); err != nil {
 				log.Fatalf("cleanup: %v", err)
 			}
+			os.Exit(1)
 		}()
 		for _, iv := range ivs {
 			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json.gz",
