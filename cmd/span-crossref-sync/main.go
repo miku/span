@@ -256,11 +256,14 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/adrg/xdg"
@@ -459,6 +462,20 @@ func main() {
 			fmt.Println(iv)
 		}
 	default:
+		defer func() {
+			err := filepath.Walk(*cacheDir, func(path string, info fs.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				if !strings.Contains(path, "-tmp-") {
+					return nil
+				}
+				return os.Remove(path)
+			})
+			if err != nil {
+				log.Fatalf("cleanup: %v", err)
+			}
+		}()
 		for _, iv := range ivs {
 			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json.gz",
 				*apiFilter,
