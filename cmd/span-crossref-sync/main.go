@@ -261,6 +261,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"path"
 	"path/filepath"
 	"strings"
@@ -462,8 +463,8 @@ func main() {
 			fmt.Println(iv)
 		}
 	default:
-		defer func() {
-			err := filepath.Walk(*cacheDir, func(path string, info fs.FileInfo, err error) error {
+		cleanup := func() error {
+			return filepath.Walk(*cacheDir, func(path string, info fs.FileInfo, err error) error {
 				if err != nil {
 					return err
 				}
@@ -472,7 +473,12 @@ func main() {
 				}
 				return os.Remove(path)
 			})
-			if err != nil {
+		}
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt)
+		go func() {
+			<-c
+			if err := cleanup(); err != nil {
 				log.Fatalf("cleanup: %v", err)
 			}
 		}()
