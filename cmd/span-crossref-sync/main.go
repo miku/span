@@ -311,6 +311,7 @@ type Sync struct {
 	Client      Doer
 	Verbose     bool
 	Mode        string
+	MaxRetries  int
 }
 
 // WorksResponse, stripped of the actual messages, as we only need the status
@@ -347,7 +348,10 @@ func (s *Sync) writeWindow(w io.Writer, f, u time.Time) error {
 	if s.ApiEmail != "" {
 		vs.Add("mailto", s.ApiEmail)
 	}
-	var seen int64
+	var (
+		seen int64
+		i    int
+	)
 OUTER:
 	for {
 		link := fmt.Sprintf("%s?%s", s.ApiEndpoint, vs.Encode())
@@ -369,7 +373,14 @@ OUTER:
 		}
 		var wr WorksResponse
 		if err := json.NewDecoder(resp.Body).Decode(&wr); err != nil {
-			return fmt.Errorf("decode: %v", err)
+			if i < s.MaxRetries {
+				i++
+				log.Printf("decode: %v", err)
+				continue
+			} else {
+				// 2021/12/14 18:15:08 decode: unexpected EOF
+				return fmt.Errorf("decode: %v", err)
+			}
 		}
 		if wr.Status != "ok" {
 			return fmt.Errorf("crossref api failed: %s", wr.Status)
@@ -417,6 +428,7 @@ OUTER:
 		default:
 			return fmt.Errorf("use tab or sync mode")
 		}
+		i = 0
 	}
 	return nil
 }
@@ -445,6 +457,7 @@ func main() {
 			Client:      client,
 			Verbose:     *verbose,
 			Mode:        *mode,
+			MaxRetries:  *maxRetries,
 		}
 		ivs = dateutil.Daily(syncStart.Time, syncEnd.Time)
 	)
