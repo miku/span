@@ -378,6 +378,7 @@ OUTER:
 				log.Printf("decode: %v", err)
 				continue
 			} else {
+				// total: 10493829, seen: 3120000 (29.73%)
 				// 2021/12/14 18:15:08 decode: unexpected EOF
 				return fmt.Errorf("decode: %v", err)
 			}
