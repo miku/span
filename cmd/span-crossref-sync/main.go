@@ -430,6 +430,14 @@ OUTER:
 		default:
 			return fmt.Errorf("use tab or sync mode")
 		}
+		// status: ok, total: 55818, seen: 47818 (85.67%)
+		// We had repeated requests, with seemingly a new cursor, but no new
+		// messages and seen < total; we assume, we have got all we could and
+		// move on.
+		if len(wr.Message.Items) == 0 {
+			log.Printf("no more messages, assuming done total: %d, seen: %s", wr.Message.TotalResults, seen)
+			break
+		}
 		i = 0
 	}
 	return nil
