@@ -433,10 +433,9 @@ OUTER:
 		// status: ok, total: 55818, seen: 47818 (85.67%)
 		// We had repeated requests, with seemingly a new cursor, but no new
 		// messages and seen < total; we assume, we have got all we could and
-		// move on.
+		// move on. Note: this may be a temporary glitch; rather retry.
 		if len(wr.Message.Items) == 0 {
-			log.Printf("no more messages, assuming done total: %d, seen: %s", wr.Message.TotalResults, seen)
-			break
+			log.Printf("no more messages, consider restart; total: %d, seen: %s", wr.Message.TotalResults, seen)
 		}
 		i = 0
 	}
