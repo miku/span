@@ -376,6 +376,7 @@ OUTER:
 			if i < s.MaxRetries {
 				i++
 				log.Printf("decode: %v", err)
+				log.Printf("[%d] retrying", i)
 				continue
 			} else {
 				// total: 10493829, seen: 3120000 (29.73%)
