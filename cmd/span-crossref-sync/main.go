@@ -277,7 +277,7 @@ import (
 
 var (
 	cacheDir    = flag.String("c", path.Join(xdg.CacheHome, "span/crossref-sync"), "cache directory")
-	apiEndpoint = flag.String("w", "https://api.crossref.org/works", "works api")
+	apiEndpoint = flag.String("a", "https://api.crossref.org/works", "works api")
 	apiFilter   = flag.String("f", "index", "filter")
 	apiEmail    = flag.String("m", "martin.czygan@uni-leipzig.de", "email address")
 	numRows     = flag.Int("r", 1000, "number of docs per request")
@@ -442,6 +442,18 @@ OUTER:
 	return nil
 }
 
+func cleanup() error {
+	return filepath.Walk(*cacheDir, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !strings.Contains(path, "-tmp-") {
+			return nil
+		}
+		return os.Remove(path)
+	})
+}
+
 func main() {
 	flag.Var(&syncStart, "s", "start date for harvest")
 	flag.Var(&syncEnd, "e", "end date for harvest")
@@ -485,17 +497,6 @@ func main() {
 			fmt.Println(iv)
 		}
 	default:
-		cleanup := func() error {
-			return filepath.Walk(*cacheDir, func(path string, info fs.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				if !strings.Contains(path, "-tmp-") {
-					return nil
-				}
-				return os.Remove(path)
-			})
-		}
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
 		go func() {
@@ -532,7 +533,6 @@ func main() {
 			} else {
 				log.Printf("already synced: %s", cachePath)
 			}
-			// Copy over to combined file.
 			f, err := os.Open(cachePath)
 			if err != nil {
 				log.Fatal(err)
