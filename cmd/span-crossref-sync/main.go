@@ -435,7 +435,7 @@ OUTER:
 		// messages and seen < total; we assume, we have got all we could and
 		// move on. Note: this may be a temporary glitch; rather retry.
 		if len(wr.Message.Items) == 0 {
-			log.Printf("no more messages, consider restart; total: %d, seen: %s", wr.Message.TotalResults, seen)
+			log.Printf("no more messages, consider restart; total: %d, seen: %d", wr.Message.TotalResults, seen)
 		}
 		i = 0
 	}
