@@ -435,7 +435,12 @@ OUTER:
 		// messages and seen < total; we assume, we have got all we could and
 		// move on. Note: this may be a temporary glitch; rather retry.
 		if len(wr.Message.Items) == 0 {
-			log.Printf("no more messages, consider restart; total: %d, seen: %d", wr.Message.TotalResults, seen)
+			if wr.Message.TotalResults-seen < int64(0.1*float64(wr.Message.TotalResults)) {
+				log.Printf("assuming ok to skip - seen: %d, total: %d", seen, wr.Message.TotalResults)
+				break
+			} else {
+				return fmt.Errorf("no more messages, consider restart; total: %d, seen: %d", wr.Message.TotalResults, seen)
+			}
 		}
 		i = 0
 	}
