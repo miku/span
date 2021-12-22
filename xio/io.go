@@ -17,27 +17,27 @@ import (
 	"github.com/sethgrid/pester"
 )
 
-// ReaderCounter counts the number of bytes read.
-type ReaderCounter struct {
+// CountReader counts the number of bytes read.
+type CountReader struct {
 	count int64
 	r     io.Reader
 }
 
-// NewReaderCounter function for create new ReaderCounter.
-func NewReaderCounter(r io.Reader) *ReaderCounter {
-	return &ReaderCounter{r: r}
+// NewCountReader function for create new ReaderCounter.
+func NewCountReader(r io.Reader) *CountReader {
+	return &CountReader{r: r}
 }
 
 // Read keeps count.
-func (counter *ReaderCounter) Read(buf []byte) (int, error) {
-	n, err := counter.r.Read(buf)
-	atomic.AddInt64(&counter.count, int64(n))
+func (c *CountReader) Read(buf []byte) (int, error) {
+	n, err := c.r.Read(buf)
+	atomic.AddInt64(&c.count, int64(n))
 	return n, err
 }
 
 // Count function returns bytes read so far.
-func (counter *ReaderCounter) Count() int64 {
-	return atomic.LoadInt64(&counter.count)
+func (c *CountReader) Count() int64 {
+	return atomic.LoadInt64(&c.count)
 }
 
 // LinkReader implements io.Reader for a URL.

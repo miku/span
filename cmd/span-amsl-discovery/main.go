@@ -5,13 +5,14 @@ package main
 import (
 	"bufio"
 	"database/sql"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/xio"
 	"github.com/sethgrid/pester"
@@ -94,11 +95,11 @@ func SeparatedFields(s, sep string) (result []string) {
 
 // readFrom decodes data from reader into value, returning bytes read.
 func readFrom(r io.Reader, v interface{}) (int64, error) {
-	rc := xio.NewReaderCounter(r)
-	if err := json.NewDecoder(rc).Decode(v); err != nil {
+	cr := xio.NewCountReader(r)
+	if err := json.NewDecoder(cr).Decode(v); err != nil {
 		return 0, err
 	}
-	return rc.Count(), nil
+	return cr.Count(), nil
 }
 
 // MetadataUsageResponse group many metadata usage items.

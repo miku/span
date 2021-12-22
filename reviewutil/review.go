@@ -2,12 +2,13 @@ package reviewutil
 
 import (
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/xio"
 	"github.com/sethgrid/pester"
@@ -30,11 +31,11 @@ func (rc *ReviewConfig) ReadFrom(r io.Reader) (n int64, err error) {
 	if rc == nil {
 		rc = &ReviewConfig{}
 	}
-	readerCounter := xio.NewReaderCounter(r)
-	if err = yaml.NewDecoder(readerCounter).Decode(rc); err != nil {
+	rctr := xio.NewCountReader(r)
+	if err = yaml.NewDecoder(rctr).Decode(rc); err != nil {
 		return 0, err
 	}
-	return readerCounter.Count(), nil
+	return rctr.Count(), nil
 }
 
 type Redmine struct {
