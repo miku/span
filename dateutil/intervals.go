@@ -9,12 +9,22 @@ import (
 	"github.com/jinzhu/now"
 )
 
+// MustParse will panic on an unparsable date string.
+func MustParse(value string) time.Time {
+	t, err := dateparse.ParseStrict(value)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
 // Interval groups start and end.
 type Interval struct {
 	Start time.Time
 	End   time.Time
 }
 
+// String renders an interval.
 func (iv Interval) String() string {
 	return fmt.Sprintf("%s %s", iv.Start.Format(time.RFC3339), iv.End.Format(time.RFC3339))
 }
@@ -34,6 +44,7 @@ var (
 	Hourly      = makeIntervalFunc(padLHour, padRHour)
 	Daily       = makeIntervalFunc(padLDay, padRDay)
 	Weekly      = makeIntervalFunc(padLWeek, padRWeek)
+	Biweekly    = makeIntervalFunc(padLBiweek, padRBiweek)
 	Monthly     = makeIntervalFunc(padLMonth, padRMonth)
 
 	padLMinute = func(t time.Time) time.Time { return now.With(t).BeginningOfMinute() }
@@ -44,6 +55,8 @@ var (
 	padRDay    = func(t time.Time) time.Time { return now.With(t).EndOfDay() }
 	padLWeek   = func(t time.Time) time.Time { return now.With(t).BeginningOfWeek() }
 	padRWeek   = func(t time.Time) time.Time { return now.With(t).EndOfWeek() }
+	padLBiweek = func(t time.Time) time.Time { return now.With(t).BeginningOfWeek() }
+	padRBiweek = func(t time.Time) time.Time { return now.With(t.Add((168 + 24) * time.Hour)).EndOfWeek() }
 	padLMonth  = func(t time.Time) time.Time { return now.With(t).BeginningOfMonth() }
 	padRMonth  = func(t time.Time) time.Time { return now.With(t).EndOfMonth() }
 )
@@ -51,34 +64,24 @@ var (
 // makeIntervalFunc is a helper to create daily, weekly and other intervals.
 // Given two shiftFuncs (to mark the beginning of an interval and the end), we
 // return a function, that will allow us to generate intervals.
-// TODO: We only need right pad, no?
 func makeIntervalFunc(padLeft, padRight padFunc) intervalFunc {
-	return func(s, e time.Time) (result []Interval) {
-		if e.Before(s) || e.Equal(s) {
+	return func(start, end time.Time) (result []Interval) {
+		if end.Before(start) || end.Equal(start) {
 			return
 		}
-		e = e.Add(-1 * time.Second)
+		end = end.Add(-1 * time.Second)
 		var (
-			l time.Time = s
+			l time.Time = start
 			r time.Time
 		)
 		for {
 			r = padRight(l)
 			result = append(result, Interval{l, r})
 			l = padLeft(r.Add(1 * time.Second))
-			if l.After(e) {
+			if l.After(end) {
 				break
 			}
 		}
 		return result
 	}
-}
-
-// MustParse will panic on an unparsable date string.
-func MustParse(value string) time.Time {
-	t, err := dateparse.ParseStrict(value)
-	if err != nil {
-		panic(err)
-	}
-	return t
 }

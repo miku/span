@@ -76,6 +76,13 @@ func TestMakeIntervalFunc(t *testing.T) {
 			end:          MustParse("2000-01-01 12:00"),
 			numIntervals: 1,
 		},
+		{
+			padLeft:      padLBiweek,
+			padRight:     padRBiweek,
+			start:        MustParse("2000-01-01 00:00"),
+			end:          MustParse("2000-01-20 00:00"),
+			numIntervals: 2,
+		},
 	}
 	for i, c := range cases {
 		var (
