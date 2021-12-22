@@ -1,12 +1,10 @@
-package atomicfile_test
+package atomic
 
 import (
 	"bytes"
 	"io/ioutil"
 	"os"
 	"testing"
-
-	"github.com/miku/span/atomicfile"
 )
 
 func test(t *testing.T, dir, prefix string) {
@@ -23,7 +21,7 @@ func test(t *testing.T, dir, prefix string) {
 	}
 
 	defer os.Remove(name)
-	f, err := atomicfile.New(name, os.FileMode(0666))
+	f, err := New(name, os.FileMode(0666))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,7 +63,7 @@ func TestAbort(t *testing.T) {
 	}
 	defer os.Remove(name)
 
-	f, err := atomicfile.New(name, os.FileMode(0666))
+	f, err := New(name, os.FileMode(0666))
 	if err != nil {
 		t.Fatal(err)
 	}

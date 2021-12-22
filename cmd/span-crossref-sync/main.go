@@ -269,7 +269,6 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/miku/span/atomic"
-	"github.com/miku/span/atomicfile"
 	"github.com/miku/span/dateutil"
 	"github.com/miku/span/xflag"
 	"github.com/sethgrid/pester"
@@ -489,7 +488,7 @@ func main() {
 	)
 	var w io.Writer = os.Stdout
 	if *outputFile != "" {
-		f, err := atomicfile.New(*outputFile, 0644)
+		f, err := atomic.New(*outputFile, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -517,7 +516,7 @@ func main() {
 				iv.Start.Format("2006-01-02"),
 				iv.End.Format("2006-01-02")))
 			if _, err := os.Stat(cachePath); os.IsNotExist(err) {
-				cacheFile, err := atomicfile.New(cachePath, 0644)
+				cacheFile, err := atomic.New(cachePath, 0644)
 				if err != nil {
 					log.Fatal(err)
 				}
