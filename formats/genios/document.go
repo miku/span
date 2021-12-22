@@ -33,6 +33,7 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/strutil"
 )
 
 const (
@@ -252,7 +253,7 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 	output.URL = append(output.URL, doc.URL())
 	if !isNomenNescio(doc.Abstract) {
 		// Allow up to 150 chars from abstract.
-		output.Abstract = span.TruncateString(strings.TrimSpace(doc.Abstract), 150)
+		output.Abstract = strutil.Truncate(strings.TrimSpace(doc.Abstract), 150)
 	}
 	output.ArticleTitle = strings.TrimSpace(doc.Title)
 	if len(output.ArticleTitle) > maxTitleLength {

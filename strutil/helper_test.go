@@ -1,4 +1,4 @@
-package span
+package strutil
 
 import "testing"
 

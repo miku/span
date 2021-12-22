@@ -25,11 +25,9 @@ package span
 
 import (
 	"fmt"
-	"html"
 	"os"
 	"regexp"
 	"runtime"
-	"strings"
 )
 
 const (
@@ -54,11 +52,6 @@ func (s Skip) Error() string {
 	return fmt.Sprintf("SKIP %s", s.Reason)
 }
 
-// UnescapeTrim unescapes HTML character references and trims the space of a given string.
-func UnescapeTrim(s string) string {
-	return strings.TrimSpace(html.UnescapeString(s))
-}
-
 // UserHomeDir returns the home directory of the user.
 func UserHomeDir() string {
 	if runtime.GOOS == "windows" {
@@ -69,12 +62,4 @@ func UserHomeDir() string {
 		return home
 	}
 	return os.Getenv("HOME")
-}
-
-// TruncateString truncates a string to given length.
-func TruncateString(s string, l int) string {
-	if len(s) < l || l < 0 {
-		return s
-	}
-	return s[:l]
 }

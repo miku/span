@@ -33,6 +33,7 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/strutil"
 )
 
 const (
@@ -176,8 +177,8 @@ func (pi *PageInfo) PageCount() int {
 func (doc *Document) Authors() (authors []finc.Author) {
 	for _, ra := range doc.Author {
 		authors = append(authors, finc.Author{
-			FirstName: AuthorReplacer.Replace(span.UnescapeTrim(ra.Given)),
-			LastName:  AuthorReplacer.Replace(span.UnescapeTrim(ra.Family)),
+			FirstName: AuthorReplacer.Replace(strutil.UnescapeTrim(ra.Given)),
+			LastName:  AuthorReplacer.Replace(strutil.UnescapeTrim(ra.Family)),
 		})
 	}
 	return authors
@@ -239,12 +240,12 @@ func (d *DateField) Date() (t time.Time, err error) {
 func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
 		if len(doc.Subtitle) > 0 {
-			return span.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, " "), strings.Join(doc.Subtitle, " ")))
+			return strutil.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, " "), strings.Join(doc.Subtitle, " ")))
 		}
-		return span.UnescapeTrim(strings.Join(doc.Title, " "))
+		return strutil.UnescapeTrim(strings.Join(doc.Title, " "))
 	}
 	if len(doc.Subtitle) > 0 {
-		return span.UnescapeTrim(strings.Join(doc.Subtitle, " "))
+		return strutil.UnescapeTrim(strings.Join(doc.Subtitle, " "))
 	}
 	return ""
 }
@@ -252,7 +253,7 @@ func (doc *Document) CombinedTitle() string {
 // FindShortTitle returns the first main title only.
 func (doc *Document) FindShortTitle() (s string) {
 	if len(doc.Title) > 0 {
-		s = span.UnescapeTrim(doc.Title[0])
+		s = strutil.UnescapeTrim(doc.Title[0])
 	}
 	return
 }
@@ -337,7 +338,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Volume = strings.TrimLeft(doc.Volume, "0")
 
 	if len(doc.ContainerTitle) > 0 {
-		output.JournalTitle = span.UnescapeTrim(doc.ContainerTitle[0])
+		output.JournalTitle = strutil.UnescapeTrim(doc.ContainerTitle[0])
 	} else {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.ID)}
 	}
@@ -348,7 +349,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	if len(doc.Subtitle) > 0 {
-		output.ArticleSubtitle = span.UnescapeTrim(doc.Subtitle[0])
+		output.ArticleSubtitle = strutil.UnescapeTrim(doc.Subtitle[0])
 	}
 
 	output.Authors = doc.Authors()
@@ -381,7 +382,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if doc.Publisher == "" {
 		output.MegaCollections = []string{fmt.Sprintf("X-U (CrossRef)")}
 	} else {
-		publisher := span.UnescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
+		publisher := strutil.UnescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
 		output.MegaCollections = []string{fmt.Sprintf("%s (CrossRef)", publisher)}
 	}
 
