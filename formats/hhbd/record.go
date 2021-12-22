@@ -132,10 +132,10 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	// XXX: Guess.
 	if len(record.Metadata.Dc.Ispartof) > 0 {
 		// XXX: Don't just take the first, find the most suitable value.
-		output.Format = Formats.LookupDefault(record.Metadata.Dc.Ispartof[0].Text, "Manuscript")
+		output.Format = Formats.Lookup(record.Metadata.Dc.Ispartof[0].Text, "Manuscript")
 	}
-	output.Genre = Genres.LookupDefault(record.Metadata.Dc.Type.Text, "unknown")
-	output.RefType = RefTypes.LookupDefault(record.Metadata.Dc.Type.Text, "GEN")
+	output.Genre = Genres.Lookup(record.Metadata.Dc.Type.Text, "unknown")
+	output.RefType = RefTypes.Lookup(record.Metadata.Dc.Type.Text, "GEN")
 
 	// Date.
 	date, err := record.date()

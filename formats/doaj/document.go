@@ -247,7 +247,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	languages := container.NewStringSet()
 	for _, l := range doc.Index.Language {
-		languages.Add(LanguageMap.LookupDefault(l, "und"))
+		languages.Add(LanguageMap.Lookup(l, "und"))
 	}
 	output.Languages = languages.Values()
 

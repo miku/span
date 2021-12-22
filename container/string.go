@@ -23,23 +23,22 @@ package container
 
 import (
 	"bufio"
-	"github.com/segmentio/encoding/json"
 	"fmt"
 	"io"
 	"sort"
 	"strings"
 )
 
-// StringMap provides defaults for string map lookups with defaults.
-type StringMap map[string]string
+// MapDefault provides defaults for string map lookups with defaults.
+type MapDefault map[string]string
 
-func (m StringMap) UnmarshalJSON(data []byte) error {
-	m = make(StringMap)
-	return json.Unmarshal(data, &m)
-}
+// func (m MapDefault) UnmarshalJSON(data []byte) error {
+// 	m = make(MapDefault)
+// 	return json.Unmarshal(data, &m)
+// }
 
-// LookupDefault map with a default value.
-func (m StringMap) LookupDefault(key, def string) string {
+// Lookup map with a default value.
+func (m MapDefault) Lookup(key, def string) string {
 	val, ok := m[key]
 	if !ok {
 		return def
@@ -47,11 +46,11 @@ func (m StringMap) LookupDefault(key, def string) string {
 	return val
 }
 
-// StringSliceMap provides defaults for string map lookups.
-type StringSliceMap map[string][]string
+// MapSliceDefault provides defaults for string map lookups.
+type MapSliceDefault map[string][]string
 
-// LookupDefault with default value.
-func (m StringSliceMap) LookupDefault(key string, def []string) []string {
+// Lookup with default value.
+func (m MapSliceDefault) Lookup(key string, def []string) []string {
 	val, ok := m[key]
 	if !ok {
 		return def

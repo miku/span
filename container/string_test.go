@@ -7,30 +7,30 @@ import (
 
 func TestStringMap(t *testing.T) {
 	var (
-		m = make(StringMap)
+		m = make(MapDefault)
 		a = "a"
 		b = "b"
 	)
 	m["a"] = a
-	if v := m.LookupDefault("a", b); v != a {
+	if v := m.Lookup("a", b); v != a {
 		t.Errorf("got %v, want %v", v, a)
 	}
-	if v := m.LookupDefault("b", b); v != b {
+	if v := m.Lookup("b", b); v != b {
 		t.Errorf("got %v, want %s", v, b)
 	}
 }
 
 func TestStringSliceMap(t *testing.T) {
 	var (
-		m = make(StringSliceMap)
+		m = make(MapSliceDefault)
 		a = []string{"a"}
 		b = []string{"b"}
 	)
 	m["a"] = a
-	if v := m.LookupDefault("a", b); !reflect.DeepEqual(v, a) {
+	if v := m.Lookup("a", b); !reflect.DeepEqual(v, a) {
 		t.Errorf("got %v, want %v", v, a)
 	}
-	if v := m.LookupDefault("b", b); !reflect.DeepEqual(v, b) {
+	if v := m.Lookup("b", b); !reflect.DeepEqual(v, b) {
 		t.Errorf("got %v, want %v", v, b)
 	}
 }

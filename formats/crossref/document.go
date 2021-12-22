@@ -323,13 +323,13 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
-	output.Format = Formats.LookupDefault(doc.Type, DefaultFormat)
-	output.Genre = Genres.LookupDefault(doc.Type, "unknown")
+	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
+	output.Genre = Genres.Lookup(doc.Type, "unknown")
 	output.ISSN = doc.ISSN
 	output.Issue = strings.TrimLeft(doc.Issue, "0")
 	output.Languages = doc.FindLanguages()
 	output.Publishers = append(output.Publishers, doc.Publisher)
-	output.RefType = RefTypes.LookupDefault(doc.Type, "GEN")
+	output.RefType = RefTypes.Lookup(doc.Type, "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subject
 	output.Type = doc.Type

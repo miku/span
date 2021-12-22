@@ -238,7 +238,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	languages := container.NewStringSet()
 	for _, l := range record.Metadata.Dc.Language {
-		languages.Add(LanguageMap.LookupDefault(l, "und"))
+		languages.Add(LanguageMap.Lookup(l, "und"))
 	}
 	output.Languages = languages.Values()
 	output.Format = "ElectronicArticle"

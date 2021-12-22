@@ -24,10 +24,11 @@ package assetutil
 import (
 	"bufio"
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span"
 	"github.com/miku/span/container"
@@ -104,7 +105,7 @@ func MustLoadStringSet(paths ...string) *container.StringSet {
 // MustLoadStringMap loads a JSON file from an asset path and parses it into a
 // container.StringMap. This function will panic, if the asset cannot be found
 // or the JSON is erroneous.
-func MustLoadStringMap(path string) container.StringMap {
+func MustLoadStringMap(path string) container.MapDefault {
 	b, err := span.Static.ReadFile(path)
 	if err != nil {
 		panic(err)
@@ -114,13 +115,13 @@ func MustLoadStringMap(path string) container.StringMap {
 	if err != nil {
 		panic(err)
 	}
-	return container.StringMap(d)
+	return container.MapDefault(d)
 }
 
 // MustLoadStringSliceMap loads a JSON file from an asset path and parses it into
 // a container.StringSliceMap. This function will halt the world, if it is
 // called with an invalid argument.
-func MustLoadStringSliceMap(path string) container.StringSliceMap {
+func MustLoadStringSliceMap(path string) container.MapSliceDefault {
 	b, err := span.Static.ReadFile(path)
 	if err != nil {
 		panic(err)
@@ -130,5 +131,5 @@ func MustLoadStringSliceMap(path string) container.StringSliceMap {
 	if err != nil {
 		panic(err)
 	}
-	return container.StringSliceMap(d)
+	return container.MapSliceDefault(d)
 }

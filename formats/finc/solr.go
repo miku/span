@@ -154,7 +154,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 
 	classes := container.NewStringSet()
 	for _, s := range is.Subjects {
-		for _, class := range SubjectMapping.LookupDefault(s, []string{}) {
+		for _, class := range SubjectMapping.Lookup(s, []string{}) {
 			classes.Add(class)
 		}
 	}
@@ -180,7 +180,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	}
 
 	for _, lang := range is.Languages {
-		s.Languages = append(s.Languages, LanguageMap.LookupDefault(lang, lang))
+		s.Languages = append(s.Languages, LanguageMap.Lookup(lang, lang))
 	}
 
 	// TODO(miku): What's with author_corp_ref, https://goo.gl/sx1s3r
@@ -223,21 +223,21 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.BranchNrw = s.AccessFacet // refs #11605
 
 	// Site specific formats, TODO: fix this now.
-	s.FormatDe105 = []string{FormatDe105.LookupDefault(is.Format, "")}
-	s.FormatDe14 = []string{FormatDe14.LookupDefault(is.Format, "")}
-	s.FormatDe15 = []string{FormatDe15.LookupDefault(is.Format, "")}
-	s.FormatDe520 = []string{FormatDe520.LookupDefault(is.Format, "")}
-	s.FormatDe540 = []string{FormatDe540.LookupDefault(is.Format, "")}
-	s.FormatDeCh1 = []string{FormatDeCh1.LookupDefault(is.Format, "")}
-	s.FormatDed117 = []string{FormatDed117.LookupDefault(is.Format, "")}
-	s.FormatDeGla1 = []string{FormatDeGla1.LookupDefault(is.Format, "")}
-	s.FormatDel152 = []string{FormatDel152.LookupDefault(is.Format, "")}
-	s.FormatDel189 = []string{FormatDel189.LookupDefault(is.Format, "")}
-	s.FormatDeZi4 = []string{FormatDeZi4.LookupDefault(is.Format, "")}
-	s.FormatDeZwi2 = []string{FormatDeZwi2.LookupDefault(is.Format, "")}
-	s.FormatNrw = []string{FormatNrw.LookupDefault(is.Format, "")}
+	s.FormatDe105 = []string{FormatDe105.Lookup(is.Format, "")}
+	s.FormatDe14 = []string{FormatDe14.Lookup(is.Format, "")}
+	s.FormatDe15 = []string{FormatDe15.Lookup(is.Format, "")}
+	s.FormatDe520 = []string{FormatDe520.Lookup(is.Format, "")}
+	s.FormatDe540 = []string{FormatDe540.Lookup(is.Format, "")}
+	s.FormatDeCh1 = []string{FormatDeCh1.Lookup(is.Format, "")}
+	s.FormatDed117 = []string{FormatDed117.Lookup(is.Format, "")}
+	s.FormatDeGla1 = []string{FormatDeGla1.Lookup(is.Format, "")}
+	s.FormatDel152 = []string{FormatDel152.Lookup(is.Format, "")}
+	s.FormatDel189 = []string{FormatDel189.Lookup(is.Format, "")}
+	s.FormatDeZi4 = []string{FormatDeZi4.Lookup(is.Format, "")}
+	s.FormatDeZwi2 = []string{FormatDeZwi2.Lookup(is.Format, "")}
+	s.FormatNrw = []string{FormatNrw.Lookup(is.Format, "")}
 	// TODO(miku): Is this correct?
-	s.FormatFinc = []string{FormatFinc.LookupDefault(is.Format, "")}
+	s.FormatFinc = []string{FormatFinc.Lookup(is.Format, "")}
 
 	s.ContainerVolume = is.Volume
 	s.ContainerIssue = is.Issue
