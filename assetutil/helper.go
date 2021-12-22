@@ -76,6 +76,7 @@ func MustLoadRegexpMap(path string) RegexpMap {
 	return remap
 }
 
+// MustLoadStringSet load one or more paths containing lines into a string set.
 func MustLoadStringSet(paths ...string) *container.StringSet {
 	s := container.NewStringSet()
 	for _, path := range paths {
