@@ -249,6 +249,12 @@
 // 2021-12-06   963811
 // 2021-12-07   875561
 //
+// 56h + many for a complete, best-effort sync
+//
+// real    3371m25.182s
+// user    316m40.040s
+// sys     38m59.419s
+//
 package main
 
 import (
