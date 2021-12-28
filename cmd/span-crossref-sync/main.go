@@ -255,6 +255,7 @@
 // user    316m40.040s
 // sys     38m59.419s
 //
+// ~193G compressed; 168535960+ docs; 128470579+ unique DOI; need to run the raw files through span-crossref-snapshot
 package main
 
 import (
