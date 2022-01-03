@@ -107,7 +107,6 @@ func main() {
 		reader   io.Reader
 		excludes = make(map[string]struct{})
 	)
-
 	f, err := os.Open(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
@@ -151,13 +150,18 @@ func main() {
 	)
 	pp := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
 		var (
-			doc crossref.Document
+			// This was a crossref.Document, but we only need a few fields.
+			doc struct {
+				DOI       string
+				Deposited crossref.DateField `json:"deposited"`
+				Indexed   crossref.DateField `json:"indexed"`
+			}
 			buf bytes.Buffer
 		)
 		if err := json.Unmarshal(b, &doc); err != nil {
 			return nil, err
 		}
-		date, err := doc.Deposited.Date()
+		date, err := doc.Indexed.Date()
 		if err != nil {
 			return nil, err
 		}
