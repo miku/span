@@ -10,6 +10,9 @@
 // 2017/07/24 18:29:30 stage 3: 2m34.23537293s
 //
 // $ span-crossref-snapshot -z crossref.ndj.gz -o out.ndj.gz
+//
+// TODO: externalize decompression, which seems to slow things down; only about
+// 10K docs/s when running parallel.
 package main
 
 import (
