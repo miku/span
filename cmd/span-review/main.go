@@ -12,7 +12,6 @@ package main
 
 import (
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -22,10 +21,13 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/segmentio/encoding/json"
+
 	"github.com/fatih/color"
 	"github.com/miku/span"
 	"github.com/miku/span/reviewutil"
 	"github.com/miku/span/solrutil"
+	"github.com/miku/span/xio"
 	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -163,7 +165,7 @@ var (
 	textile        = flag.Bool("t", false, "emit a textile table to stdout")
 	ascii          = flag.Bool("a", false, "emit ascii table to stdout")
 	reviewFile     = flag.String("c", "", "path to review.yaml file containing test cases, e.g. https://git.io/fh5Zh")
-	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	spanConfigFile = flag.String("span-config", path.Join(xio.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	ticket         = flag.String("ticket", "", "post result to redmine, overrides review.yaml, requires redmine.baseurl and redmine.apitoken configured in span-config")
 	noCollapse     = flag.Bool("C", false, "do not collapse details")
 )

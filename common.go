@@ -25,9 +25,6 @@ package span
 
 import (
 	"fmt"
-	"os"
-	"regexp"
-	"runtime"
 )
 
 const (
@@ -39,9 +36,6 @@ const (
 	KeyLengthLimit = 250
 )
 
-// ISSNPattern is a regular expression matching standard ISSN.
-var ISSNPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9X]`)
-
 // Skip marks records to skip.
 type Skip struct {
 	Reason string
@@ -49,17 +43,5 @@ type Skip struct {
 
 // Error returns the reason for skipping.
 func (s Skip) Error() string {
-	return fmt.Sprintf("SKIP %s", s.Reason)
-}
-
-// UserHomeDir returns the home directory of the user.
-func UserHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
+	return fmt.Sprintf("[skip] %s", s.Reason)
 }

@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -354,4 +355,16 @@ func LoadSet(r io.Reader, m map[string]struct{}) error {
 		m[strings.TrimSpace(v)] = struct{}{}
 	}
 	return nil
+}
+
+// UserHomeDir returns the home directory of the user.
+func UserHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+	return os.Getenv("HOME")
 }

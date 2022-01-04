@@ -53,6 +53,7 @@ import (
 	"github.com/miku/span/configutil"
 	"github.com/miku/span/gitlab"
 	"github.com/miku/span/reviewutil"
+	"github.com/miku/span/xio"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -61,7 +62,7 @@ var (
 	token          = flag.String("token", "", "gitlab auth token, if empty will use span-config")
 	repoDir        = flag.String("repo-dir", path.Join(os.TempDir(), "span-webhookd/span"), "local repo clone path")
 	logfile        = flag.String("logfile", "", "log to file")
-	spanConfigFile = flag.String("span-config", path.Join(span.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
+	spanConfigFile = flag.String("span-config", path.Join(xio.UserHomeDir(), ".config/span/span.json"), "gitlab, redmine tokens, whatislive location")
 	triggerPath    = flag.String("trigger-path", "trigger", "path trigger, {host}:{port}/{trigger-path}")
 	banner         = fmt.Sprintf(`[<>] webhookd %s`, span.AppVersion)
 

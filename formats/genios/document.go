@@ -213,7 +213,7 @@ func (doc Document) Authors() (authors []finc.Author) {
 // ISSNList returns a list of ISSN.
 func (doc Document) ISSNList() []string {
 	issns := container.NewStringSet()
-	for _, s := range span.ISSNPattern.FindAllString(doc.ISSN, -1) {
+	for _, s := range strutil.ISSNPattern.FindAllString(doc.ISSN, -1) {
 		issns.Add(s)
 	}
 	return issns.Values()

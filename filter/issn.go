@@ -1,14 +1,15 @@
 package filter
 
 import (
-	"github.com/segmentio/encoding/json"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/miku/span"
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/strutil"
 	"github.com/miku/span/xio"
 )
 
@@ -62,7 +63,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			line = strings.ToUpper(line)
 			// Sniff ISSNs.
 			issns := container.NewStringSet()
-			for _, s := range span.ISSNPattern.FindAllString(line, -1) {
+			for _, s := range strutil.ISSNPattern.FindAllString(line, -1) {
 				issns.Add(s)
 			}
 			if issns.Size() == 0 {

@@ -3,7 +3,6 @@
 package quality
 
 import (
-	"github.com/segmentio/encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -12,8 +11,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/segmentio/encoding/json"
+
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/strutil"
 )
 
 var (
@@ -336,7 +338,7 @@ func TestHasURL(is finc.IntermediateSchema) error {
 // TestCanonicalISSN checks for the canonical ISSN format 1234-567X.
 func TestCanonicalISSN(is finc.IntermediateSchema) error {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
-		if !span.ISSNPattern.MatchString(issn) {
+		if !strutil.ISSNPattern.MatchString(issn) {
 			return Issue{Err: ErrNonCanonicalISSN, Record: is}
 		}
 	}

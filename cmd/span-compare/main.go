@@ -35,8 +35,8 @@ import (
 	"text/template"
 
 	"github.com/miku/clam"
-	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
+	"github.com/miku/span/xio"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -176,7 +176,7 @@ var SourceNames = map[string]string{
 }
 
 // TODO: move to XDG
-var defaultConfigPath = path.Join(span.UserHomeDir(), ".config/span/span.json")
+var defaultConfigPath = path.Join(xio.UserHomeDir(), ".config/span/span.json")
 
 var (
 	amslLiveServer   = flag.String("amsl", "", "url to live amsl api for ad-hoc source names, e.g. https://example.technology")
