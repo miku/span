@@ -1,9 +1,26 @@
 SHELL = /bin/bash
-TARGETS = span-import span-export span-tag span-redact span-check \
-span-oa-filter span-update-labels span-crossref-snapshot span-local-data \
-span-freeze span-review span-compare span-webhookd span-report span-hcov \
-span-amsl-discovery span-crossref-members span-genios-modules span-tagger \
-span-folio span-crossref-sync
+TARGETS = span-check \
+		  span-compare \
+		  span-crossref-snapshot \
+		  span-export \
+		  span-freeze \
+		  span-hcov \
+		  span-import \
+		  span-local-data \
+		  span-oa-filter \
+		  span-redact \
+		  span-report \
+		  span-review \
+		  span-tag \
+		  span-update-labels \
+		  span-webhookd \
+          span-amsl-discovery \
+          span-crossref-members \
+          span-crossref-sync \
+          span-folio \
+          span-genios-modules \
+          span-tagger
+
 PKGNAME = span
 
 .PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
