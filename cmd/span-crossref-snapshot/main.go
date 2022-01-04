@@ -1,4 +1,4 @@
-// Given as single (gzip compressed) file with crossref works API messages,
+// Given as single file with crossref works API messages,
 // create a potentially smaller file, which contains only the most recent
 // version of each document.
 //
@@ -29,6 +29,7 @@ import (
 
 	"github.com/segmentio/encoding/json"
 
+	"github.com/klauspost/compress/zstd"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
 	"github.com/miku/span/formats/crossref"
@@ -55,30 +56,31 @@ LIST="$1" LC_ALL=C awk '
 `
 
 var (
-	excludeFile = flag.String("x", "", "a list of DOI to further ignore")
-	outputFile  = flag.String("o", "", "output file")
-	compressed  = flag.Bool("z", false, "input is gzip compressed")
-	batchsize   = flag.Int("b", 40000, "batch size")
-	cpuProfile  = flag.String("cpuprofile", "", "write cpuprofile to file")
-	verbose     = flag.Bool("verbose", false, "be verbose")
+	excludeFile     = flag.String("x", "", "a list of DOI to further ignore")
+	outputFile      = flag.String("o", "", "output file")
+	compressed      = flag.Bool("z", false, "input file is compressed (see: -compress-program)")
+	batchsize       = flag.Int("b", 40000, "batch size")
+	compressProgram = flag.String("compress-program", "zstd", "compress program")
+	cpuProfile      = flag.String("cpuprofile", "", "write cpuprofile to file")
+	verbose         = flag.Bool("verbose", false, "be verbose")
 )
 
 // writeFields writes a variable number of values separated by sep to a given
 // writer. Returns bytes written and error.
 func writeFields(w io.Writer, sep string, values ...interface{}) (int, error) {
-	var ss []string
-	for _, v := range values {
+	var ss = make([]string, len(values))
+	for i, v := range values {
 		switch v.(type) {
 		case int, int8, int16, int32, int64:
-			ss = append(ss, fmt.Sprintf("%d", v))
+			ss[i] = fmt.Sprintf("%d", v)
 		case uint, uint8, uint16, uint32, uint64:
-			ss = append(ss, fmt.Sprintf("%d", v))
+			ss[i] = fmt.Sprintf("%d", v)
 		case float32, float64:
-			ss = append(ss, fmt.Sprintf("%f", v))
+			ss[i] = fmt.Sprintf("%f", v)
 		case fmt.Stringer:
-			ss = append(ss, fmt.Sprintf("%s", v))
+			ss[i] = fmt.Sprintf("%s", v)
 		default:
-			ss = append(ss, fmt.Sprintf("%v", v))
+			ss[i] = fmt.Sprintf("%v", v)
 		}
 	}
 	s := fmt.Sprintln(strings.Join(ss, sep))
@@ -100,29 +102,40 @@ func main() {
 		}
 		defer pprof.StopCPUProfile()
 	}
-	if flag.NArg() == 0 {
-		log.Fatal("input file required")
-	}
-	if *outputFile == "" {
-		log.Fatal("output filename required")
-	}
 	var (
 		reader   io.Reader
 		excludes = make(map[string]struct{})
 	)
+	if flag.NArg() == 0 {
+		log.Fatal("input file required")
+	}
 	f, err := os.Open(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	reader = f
-	if *compressed {
+	switch {
+	case *compressed && (*compressProgram == "gzip" || *compressProgram == "pigz"):
 		g, err := gzip.NewReader(f)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer g.Close()
 		reader = g
+	case *compressed && *compressProgram == "zstd":
+		g, err := zstd.NewReader(f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer g.Close()
+		reader = g
+	case *compressed:
+		log.Fatal("only gzip and zstd supported currently")
+	default:
+		reader = f
+	}
+	if *outputFile == "" {
+		log.Fatal("output filename required")
 	}
 	if *excludeFile != "" {
 		file, err := os.Open(*excludeFile)
@@ -135,11 +148,9 @@ func main() {
 		}
 		log.Debugf("excludes: %d", len(excludes))
 	}
-
 	// Stage 1: Extract minimum amount of information from the raw data, write to tempfile.
 	log.WithFields(log.Fields{
 		"prefix":       "stage 1",
-		"input":        f.Name(),
 		"excludesFile": *excludeFile,
 		"excludes":     len(excludes),
 	}).Info("preparing extraction")
@@ -190,7 +201,6 @@ func main() {
 	if err := tf.Close(); err != nil {
 		log.Fatal(err)
 	}
-
 	// Stage 2: Identify relevant records. Sort by DOI (3), then date reversed (2);
 	// then unique by DOI (3). Should keep the entry of the last update (filename,
 	// document date, DOI).
@@ -205,12 +215,8 @@ func main() {
 		log.Fatal(err)
 	}
 	defer os.Remove(output)
-
 	// External tools and fallbacks for stage 3. comp, decomp, filterline.
-	comp, decomp := `gzip -c`, `gunzip -c`
-	if _, err := exec.LookPath("unpigz"); err == nil {
-		comp, decomp = `pigz -c`, `unpigz -c`
-	}
+	comp, decomp := fmt.Sprintf(`%s -c`, *compressProgram), fmt.Sprintf(`%s -d -c`, *compressProgram)
 	filterline := `filterline`
 	if _, err := exec.LookPath("filterline"); err != nil {
 		if _, err := exec.LookPath("awk"); err != nil {
@@ -232,7 +238,6 @@ func main() {
 		defer os.Remove(tf.Name())
 		filterline = tf.Name()
 	}
-
 	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
 	log.WithFields(log.Fields{
 		"prefix":     "stage 3",
@@ -242,7 +247,11 @@ func main() {
 	}).Info("extract relevant records")
 	cmd = `{{ filterline }} {{ L }} {{ F }} > {{ output }}`
 	if *compressed {
-		cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
+		if *compressProgram == "zstd" {
+			cmd = `{{ filterline }} {{ L }} <({{ decomp -T0 }} {{ F }}) | {{ comp -T0 }} > {{ output }}`
+		} else {
+			cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
+		}
 	}
 	output, err = clam.RunOutput(cmd, clam.Map{
 		"L":          output,
