@@ -274,6 +274,8 @@ import (
 	"strings"
 	"time"
 
+	gzip "github.com/klauspost/pgzip"
+
 	"github.com/adrg/xdg"
 	"github.com/miku/span/atomic"
 	"github.com/miku/span/dateutil"
@@ -548,7 +550,14 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			if _, err := io.Copy(w, f); err != nil {
+			gz, err := gzip.NewReader(f)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if _, err := io.Copy(w, gz); err != nil {
+				log.Fatal(err)
+			}
+			if err := gz.Close(); err != nil {
 				log.Fatal(err)
 			}
 			if err := f.Close(); err != nil {
