@@ -247,9 +247,10 @@ func main() {
 	}).Info("extract relevant records")
 	cmd = `{{ filterline }} {{ L }} {{ F }} > {{ output }}`
 	if *compressed {
-		if *compressProgram == "zstd" {
-			cmd = `{{ filterline }} {{ L }} <({{ decomp -T0 }} {{ F }}) | {{ comp -T0 }} > {{ output }}`
-		} else {
+		switch *compressProgram {
+		case "zstd":
+			cmd = `{{ filterline }} {{ L }} <({{ decomp }} -T0 {{ F }}) | {{ comp }} -T0 > {{ output }}`
+		default:
 			cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
 		}
 	}
