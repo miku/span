@@ -3,7 +3,7 @@ module github.com/miku/span
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v0.4.1 // indirect
+	github.com/BurntSushi/toml v1.0.0 // indirect
 	github.com/abadojack/whatlanggo v1.0.1
 	github.com/adrg/xdg v0.4.0
 	github.com/andrew-d/go-termutil v0.0.0-20150726205930-009166a695a2
@@ -21,25 +21,24 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4
-	github.com/klauspost/compress v1.13.6
+	github.com/klauspost/compress v1.14.2
 	github.com/klauspost/pgzip v1.2.5
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-sqlite3 v1.14.9
-	github.com/microcosm-cc/bluemonday v1.0.16
+	github.com/mattn/go-sqlite3 v1.14.11
+	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/miku/clam v0.0.0-20150701134247-8054bf3dfcec
 	github.com/miku/parallel v0.0.0-20210205192328-1a799ab70294
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/olebedev/config v0.0.0-20190528211619-364964f3a8e4
-	github.com/segmentio/asm v1.1.3 // indirect
-	github.com/segmentio/encoding v0.3.2
-	github.com/sethgrid/pester v1.1.0
+	github.com/segmentio/encoding v0.3.3
+	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.8.1
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
