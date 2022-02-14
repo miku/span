@@ -473,7 +473,7 @@ func main() {
 	flag.Parse()
 	if _, err := os.Stat(*cacheDir); os.IsNotExist(err) {
 		if err := os.MkdirAll(*cacheDir, 0755); err != nil {
-			log.Fatal(err)
+			log.Fatalf("mkdir: %v", err)
 		}
 	}
 	client := pester.New()
@@ -499,7 +499,7 @@ func main() {
 	if *outputFile != "" {
 		f, err := atomic.New(*outputFile, 0644)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("file: %v", err)
 		}
 		defer f.Close()
 		w = f
@@ -524,6 +524,9 @@ func main() {
 				*apiFilter,
 				iv.Start.Format("2006-01-02"),
 				iv.End.Format("2006-01-02")))
+			if *verbose {
+				log.Printf("cache path: %v", cachePath)
+			}
 			if _, err := os.Stat(cachePath); os.IsNotExist(err) {
 				cacheFile, err := atomic.New(cachePath, 0644)
 				if err != nil {
@@ -548,20 +551,20 @@ func main() {
 			}
 			f, err := os.Open(cachePath)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("open: %v", err)
 			}
 			gz, err := gzip.NewReader(f)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("gzip: %v", err)
 			}
 			if _, err := io.Copy(w, gz); err != nil {
-				log.Fatal(err)
+				log.Fatalf("copy: %v", err) // might come from corrupt gzip file
 			}
 			if err := gz.Close(); err != nil {
-				log.Fatal(err)
+				log.Fatalf("close: %v", err)
 			}
 			if err := f.Close(); err != nil {
-				log.Fatal(err)
+				log.Fatalf("close: %v", err)
 			}
 		}
 	}
