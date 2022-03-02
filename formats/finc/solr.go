@@ -36,7 +36,9 @@ type Solr5Vufind3 struct {
 	Imprint              string   `json:"imprint,omitempty"`
 	ImprintStrMv         []string `json:"imprint_str_mv,omitempty"`
 	ISSN                 []string `json:"issn,omitempty"`
+	ISSNStrMv            []string `json:"issn_str_mv,omitempty"` // refs. #21393
 	ISBN                 []string `json:"isbn,omitempty"`
+	ISBNStrMv            []string `json:"isbn_str_mv,omitempty"` // refs. #21393
 	Languages            []string `json:"language,omitempty"`
 	MegaCollections      []string `json:"mega_collection,omitempty"`
 	PublishDateSort      int      `json:"publishDateSort,omitempty"`
@@ -99,7 +101,9 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.Imprint = is.Imprint()
 	s.ImprintStrMv = []string{s.Imprint}
 	s.ISSN = is.ISSNList()
+	s.ISSNStrMv = s.ISSN
 	s.ISBN = is.ISBNList()
+	s.ISBNStrMv = s.ISBN
 	s.Edition = is.Edition
 	for _, name := range is.MegaCollections {
 		// As per 2020-06-30 try to keep tcids (sid-...) in SOLR collection
