@@ -23,7 +23,7 @@ TARGETS = span-check \
 
 PKGNAME = span
 
-.PHONY: all assets bench clean clean-docs cloc deb deps imports lint members names rpm test vet
+.PHONY: all assets bench clean clean-docs cloc deb imports lint members names rpm test vet
 
 # http://docs.travis-ci.com/user/languages/go/#Default-Test-Script
 test:
@@ -32,10 +32,7 @@ test:
 	go test -v -cover ./...
 	# go mod tidy
 
-all: deps $(TARGETS)
-
-deps:
-	go get -v ./...
+all: $(TARGETS)
 
 $(TARGETS): %: cmd/%/main.go
 	go build -ldflags="-w -s -linkmode=external" -o $@ $<
