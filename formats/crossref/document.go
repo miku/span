@@ -239,9 +239,10 @@ func (d *DateField) Date() (t time.Time, err error) {
 // CombinedTitle returns a longish title.
 func (doc *Document) CombinedTitle() string {
 	if len(doc.Title) > 0 {
-		if len(doc.Subtitle) > 0 {
-			return strutil.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, " "), strings.Join(doc.Subtitle, " ")))
-		}
+		// TODO: remove this finally; refs. #21429
+		// if len(doc.Subtitle) > 0 {
+		// 	return strutil.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, " "), strings.Join(doc.Subtitle, " ")))
+		// }
 		return strutil.UnescapeTrim(strings.Join(doc.Title, " "))
 	}
 	if len(doc.Subtitle) > 0 {
