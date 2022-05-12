@@ -304,7 +304,7 @@ var (
 	bNewline = []byte("\n")
 )
 
-// Doer is abstracts https://pkg.go.dev/net/http#Client.Do.
+// Doer abstracts https://pkg.go.dev/net/http#Client.Do.
 type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }
@@ -493,7 +493,7 @@ func main() {
 			Mode:        *mode,
 			MaxRetries:  *maxRetries,
 		}
-		ivs = dateutil.Daily(syncStart.Time, syncEnd.Time)
+		ivs = dateutil.Weekly(syncStart.Time, syncEnd.Time)
 	)
 	var w io.Writer = os.Stdout
 	if *outputFile != "" {
