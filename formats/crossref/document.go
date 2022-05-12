@@ -238,17 +238,21 @@ func (d *DateField) Date() (t time.Time, err error) {
 
 // CombinedTitle returns a longish title.
 func (doc *Document) CombinedTitle() string {
-	if len(doc.Title) > 0 {
-		// TODO: remove this finally; refs. #21429
-		// if len(doc.Subtitle) > 0 {
-		// 	return strutil.UnescapeTrim(fmt.Sprintf("%s : %s", strings.Join(doc.Title, " "), strings.Join(doc.Subtitle, " ")))
-		// }
-		return strutil.UnescapeTrim(strings.Join(doc.Title, " "))
+	switch {
+	case len(doc.Title) > 0:
+		// refs. #21429
+		t := strutil.UnescapeTrim(strings.Join(doc.Title, " "))
+		if len(doc.Subtitle) > 0 && !strings.Contains(t, doc.Subtitle[0]) && !strings.Contains(t, ":") {
+			st := strutil.UnescapeTrim(strings.Join(doc.Subtitle, " "))
+			return fmt.Sprintf("%s : %s", t, st)
+		}
+		return t
+	case len(doc.Subtitle) > 0:
+		st := strutil.UnescapeTrim(strings.Join(doc.Subtitle, " "))
+		return st
+	default:
+		return ""
 	}
-	if len(doc.Subtitle) > 0 {
-		return strutil.UnescapeTrim(strings.Join(doc.Subtitle, " "))
-	}
-	return ""
 }
 
 // FindShortTitle returns the first main title only.

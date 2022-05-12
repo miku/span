@@ -33,7 +33,7 @@ func TestDocumentCombinedTitle(t *testing.T) {
 				Title:    []string{"Hello", "Sub"},
 				Subtitle: []string{"Sub"},
 			},
-			result: "Hello : Sub",
+			result: "Hello Sub",
 		},
 	}
 	for _, c := range cases {
