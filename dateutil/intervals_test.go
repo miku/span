@@ -7,8 +7,8 @@ import (
 
 func TestMakeIntervalFunc(t *testing.T) {
 	var cases = []struct {
-		padLeft      padFunc
-		padRight     padFunc
+		padLeft      PadFunc
+		padRight     PadFunc
 		start        time.Time
 		end          time.Time
 		numIntervals int

@@ -274,9 +274,8 @@ import (
 	"strings"
 	"time"
 
-	gzip "github.com/klauspost/pgzip"
-
 	"github.com/adrg/xdg"
+	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/span/atomic"
 	"github.com/miku/span/dateutil"
 	"github.com/miku/span/xflag"
@@ -297,6 +296,7 @@ var (
 	timeout     = flag.Duration("t", 60*time.Second, "connectiont timeout")
 	maxRetries  = flag.Int("x", 10, "max retries")
 	mode        = flag.String("mode", "t", "t=tabs, s=sync")
+	intervals   = flag.String("i", "d", "intervals: d=daily, w=weekly, m=monthly")
 
 	syncStart xflag.Date = xflag.Date{Time: dateutil.MustParse("2021-01-01")}
 	syncEnd   xflag.Date = xflag.Date{Time: time.Now().UTC().Add(-24 * time.Hour)}
@@ -493,8 +493,18 @@ func main() {
 			Mode:        *mode,
 			MaxRetries:  *maxRetries,
 		}
-		ivs = dateutil.Daily(syncStart.Time, syncEnd.Time)
+		ivs []dateutil.Interval
 	)
+	switch *intervals {
+	case "d", "D", "daily":
+		ivs = dateutil.Daily(syncStart.Time, syncEnd.Time)
+	case "w", "W", "weekly":
+		ivs = dateutil.Weekly(syncStart.Time, syncEnd.Time)
+	case "m", "M", "monthly":
+		ivs = dateutil.Monthly(syncStart.Time, syncEnd.Time)
+	default:
+		log.Println("invalid interval")
+	}
 	var w io.Writer = os.Stdout
 	if *outputFile != "" {
 		f, err := atomic.New(*outputFile, 0644)

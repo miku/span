@@ -30,11 +30,11 @@ func (iv Interval) String() string {
 }
 
 type (
-	// padFunc allows to move a given time back and forth.
-	padFunc func(t time.Time) time.Time
-	// intervalFunc takes a start and endtime and returns a number of
+	// PadFunc allows to move a given time back and forth.
+	PadFunc func(t time.Time) time.Time
+	// IntervalFunc takes a start and endtime and returns a number of
 	// intervals. How intervals are generated is flexible.
-	intervalFunc func(s, e time.Time) []Interval
+	IntervalFunc func(s, e time.Time) []Interval
 )
 
 var (
@@ -64,7 +64,7 @@ var (
 // makeIntervalFunc is a helper to create daily, weekly and other intervals.
 // Given two shiftFuncs (to mark the beginning of an interval and the end), we
 // return a function, that will allow us to generate intervals.
-func makeIntervalFunc(padLeft, padRight padFunc) intervalFunc {
+func makeIntervalFunc(padLeft, padRight PadFunc) IntervalFunc {
 	return func(start, end time.Time) (result []Interval) {
 		if end.Before(start) || end.Equal(start) {
 			return
