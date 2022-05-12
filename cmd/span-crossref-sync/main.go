@@ -493,7 +493,7 @@ func main() {
 			Mode:        *mode,
 			MaxRetries:  *maxRetries,
 		}
-		ivs = dateutil.Weekly(syncStart.Time, syncEnd.Time)
+		ivs = dateutil.Daily(syncStart.Time, syncEnd.Time)
 	)
 	var w io.Writer = os.Stdout
 	if *outputFile != "" {
