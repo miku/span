@@ -275,11 +275,13 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
-	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/span/atomic"
 	"github.com/miku/span/dateutil"
 	"github.com/miku/span/xflag"
 	"github.com/sethgrid/pester"
+
+	"github.com/klauspost/compress/zstd"
+	gzip "github.com/klauspost/pgzip"
 )
 
 var (
@@ -564,15 +566,25 @@ func main() {
 			if err != nil {
 				log.Fatalf("open: %v", err)
 			}
-			gz, err := gzip.NewReader(f)
-			if err != nil {
-				log.Fatalf("gzip: %v", err)
+			var rc io.ReadCloser
+			switch {
+			case *compressProgram == "zstd":
+				dec, err := zstd.NewReader(f)
+				if err != nil {
+					log.Fatal(err)
+				}
+				rc = dec.IOReadCloser()
+			default:
+				rc, err = gzip.NewReader(f)
+				if err != nil {
+					log.Fatalf("gzip: %v", err)
+				}
 			}
-			if _, err := io.Copy(w, gz); err != nil {
-				log.Fatalf("copy: %v", err) // might come from corrupt gzip file
+			if _, err := io.Copy(w, rc); err != nil {
+				log.Fatalf("copy: %v", err)
 			}
-			if err := gz.Close(); err != nil {
-				log.Fatalf("close: %v", err)
+			if err := rc.Close(); err != nil {
+				log.Fatalf("compress close: %v", err)
 			}
 			if err := f.Close(); err != nil {
 				log.Fatalf("close: %v", err)
