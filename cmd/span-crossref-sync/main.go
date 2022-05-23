@@ -283,20 +283,21 @@ import (
 )
 
 var (
-	cacheDir    = flag.String("c", path.Join(xdg.CacheHome, "span/crossref-sync"), "cache directory")
-	apiEndpoint = flag.String("a", "https://api.crossref.org/works", "works api")
-	apiFilter   = flag.String("f", "index", "filter")
-	apiEmail    = flag.String("m", "martin.czygan@uni-leipzig.de", "email address")
-	numRows     = flag.Int("r", 1000, "number of docs per request")
-	userAgent   = flag.String("ua", "span-crossref-sync/dev (https://github.com/miku/span)", "user agent string")
-	modeCount   = flag.Bool("C", false, "just sum up all total results values")
-	debug       = flag.Bool("debug", false, "print out intervals")
-	verbose     = flag.Bool("verbose", false, "be verbose")
-	outputFile  = flag.String("o", "", "output filename (stdout, otherwise)")
-	timeout     = flag.Duration("t", 60*time.Second, "connectiont timeout")
-	maxRetries  = flag.Int("x", 10, "max retries")
-	mode        = flag.String("mode", "t", "t=tabs, s=sync")
-	intervals   = flag.String("i", "d", "intervals: d=daily, w=weekly, m=monthly")
+	cacheDir        = flag.String("c", path.Join(xdg.CacheHome, "span/crossref-sync"), "cache directory")
+	apiEndpoint     = flag.String("a", "https://api.crossref.org/works", "works api")
+	apiFilter       = flag.String("f", "index", "filter")
+	apiEmail        = flag.String("m", "martin.czygan@uni-leipzig.de", "email address")
+	numRows         = flag.Int("r", 1000, "number of docs per request")
+	userAgent       = flag.String("ua", "span-crossref-sync/dev (https://github.com/miku/span)", "user agent string")
+	modeCount       = flag.Bool("C", false, "just sum up all total results values")
+	debug           = flag.Bool("debug", false, "print out intervals")
+	verbose         = flag.Bool("verbose", false, "be verbose")
+	outputFile      = flag.String("o", "", "output filename (stdout, otherwise)")
+	timeout         = flag.Duration("t", 60*time.Second, "connectiont timeout")
+	maxRetries      = flag.Int("x", 10, "max retries")
+	mode            = flag.String("mode", "t", "t=tabs, s=sync")
+	intervals       = flag.String("i", "d", "intervals: d=daily, w=weekly, m=monthly")
+	compressProgram = flag.String("p", "gzip", "compress program: gzip or zstd")
 
 	syncStart xflag.Date = xflag.Date{Time: dateutil.MustParse("2021-01-01")}
 	syncEnd   xflag.Date = xflag.Date{Time: time.Now().UTC().Add(-24 * time.Hour)}
@@ -548,7 +549,7 @@ func main() {
 				if err := cacheFile.Close(); err != nil {
 					log.Fatal(err)
 				}
-				compressed, err := atomic.Compress(cachePath)
+				compressed, err := atomic.CompressType(cachePath, *compressProgram)
 				if err != nil {
 					log.Fatal(err)
 				}

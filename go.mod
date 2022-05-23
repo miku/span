@@ -21,7 +21,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/kennygrant/sanitize v1.2.4
-	github.com/klauspost/compress v1.14.2
+	github.com/klauspost/compress v1.15.4
 	github.com/klauspost/pgzip v1.2.5
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024

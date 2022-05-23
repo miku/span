@@ -1,13 +1,15 @@
 package atomic
 
 import (
-	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/klauspost/compress/zstd"
+	gzip "github.com/klauspost/pgzip"
 )
 
 // File behaves like os.File, but does an atomic rename operation at Close.
@@ -57,26 +59,39 @@ func (f *File) Abort() error {
 	return nil
 }
 
-// Compress and return path to compressed file.
-func Compress(filename string) (string, error) {
+func CompressType(filename string, ty string) (string, error) {
 	tf, err := ioutil.TempFile("", "span-atomic-")
 	if err != nil {
 		return "", err
 	}
 	defer tf.Close()
-	zw := gzip.NewWriter(tf)
+	var w io.WriteCloser
+	switch {
+	case ty == "zstd":
+		w, err = zstd.NewWriter(tf)
+		if err != nil {
+			return "", err
+		}
+	default:
+		w = gzip.NewWriter(tf)
+	}
 	f, err := os.Open(filename)
 	if err != nil {
 		return "", err
 	}
 	defer f.Close()
-	if _, err := io.Copy(zw, f); err != nil {
+	if _, err := io.Copy(w, f); err != nil {
 		return "", err
 	}
-	if err := zw.Close(); err != nil {
+	if err := w.Close(); err != nil {
 		return "", err
 	}
 	return tf.Name(), nil
+}
+
+// Compress and return path to compressed file.
+func Compress(filename string) (string, error) {
+	return CompressType(filename, "gzip")
 }
 
 // WriteFile writes the data to a temp file and atomically move if everything else succeeds.
