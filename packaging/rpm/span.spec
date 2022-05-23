@@ -21,26 +21,27 @@ Library data tools.
 
 %install
 
-mkdir -p $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-check $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-compare $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-export $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-freeze $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-genios-modules $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-hcov $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-import $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-local-data $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-redact $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-report $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-review $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-tag $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-tagger $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/sbin
-install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/sbin
+mkdir -p $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-check $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-crossref-sync $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-export $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-freeze $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-genios-modules $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-hcov $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-import $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-local-data $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-report $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-review $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-tagger $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/local/bin
 
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
