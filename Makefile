@@ -2,6 +2,7 @@ SHELL = /bin/bash
 TARGETS = span-check \
 		  span-compare \
 		  span-crossref-snapshot \
+		  span-crossref-sync \
 		  span-export \
 		  span-freeze \
 		  span-hcov \

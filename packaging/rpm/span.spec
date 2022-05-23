@@ -64,25 +64,26 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 /usr/lib/systemd/system/span-webhookd.service
 /usr/local/share/man/man1/span.1
-/usr/sbin/span-amsl-discovery
-/usr/sbin/span-check
-/usr/sbin/span-compare
-/usr/sbin/span-crossref-members
-/usr/sbin/span-crossref-snapshot
-/usr/sbin/span-export
-/usr/sbin/span-freeze
-/usr/sbin/span-genios-modules
-/usr/sbin/span-hcov
-/usr/sbin/span-import
-/usr/sbin/span-local-data
-/usr/sbin/span-oa-filter
-/usr/sbin/span-redact
-/usr/sbin/span-report
-/usr/sbin/span-review
-/usr/sbin/span-tag
-/usr/sbin/span-tagger
-/usr/sbin/span-update-labels
-/usr/sbin/span-webhookd
+/usr/local/bin/span-amsl-discovery
+/usr/local/bin/span-check
+/usr/local/bin/span-compare
+/usr/local/bin/span-crossref-members
+/usr/local/bin/span-crossref-snapshot
+/usr/local/bin/span-crossref-sync
+/usr/local/bin/span-export
+/usr/local/bin/span-freeze
+/usr/local/bin/span-genios-modules
+/usr/local/bin/span-hcov
+/usr/local/bin/span-import
+/usr/local/bin/span-local-data
+/usr/local/bin/span-oa-filter
+/usr/local/bin/span-redact
+/usr/local/bin/span-report
+/usr/local/bin/span-review
+/usr/local/bin/span-tag
+/usr/local/bin/span-tagger
+/usr/local/bin/span-update-labels
+/usr/local/bin/span-webhookd
 
 %attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
