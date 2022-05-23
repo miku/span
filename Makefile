@@ -63,8 +63,8 @@ cover:
 
 # Packaging related.
 deb: all
-	mkdir -p packaging/deb/$(PKGNAME)/usr/sbin
-	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/sbin
+	mkdir -p packaging/deb/$(PKGNAME)/usr/local/bin
+	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/local/bin
 	mkdir -p packaging/deb/$(PKGNAME)/usr/local/share/man/man1
 	cp docs/$(PKGNAME).1 packaging/deb/$(PKGNAME)/usr/local/share/man/man1
 	mkdir -p packaging/deb/$(PKGNAME)/usr/lib/systemd/system
