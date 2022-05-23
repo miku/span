@@ -533,10 +533,18 @@ func main() {
 			os.Exit(1)
 		}()
 		for _, iv := range ivs {
-			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json.gz",
+			var ext string
+			switch {
+			case *compressProgram == "zstd":
+				ext = "zst"
+			default:
+				ext = "gz"
+			}
+			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json.%s",
 				*apiFilter,
 				iv.Start.Format("2006-01-02"),
-				iv.End.Format("2006-01-02")))
+				iv.End.Format("2006-01-02"),
+				ext))
 			if *verbose {
 				log.Printf("cache path: %v", cachePath)
 			}
@@ -571,7 +579,7 @@ func main() {
 			case *compressProgram == "zstd":
 				dec, err := zstd.NewReader(f)
 				if err != nil {
-					log.Fatal(err)
+					log.Fatalf("zstd: %v", err)
 				}
 				rc = dec.IOReadCloser()
 			default:
