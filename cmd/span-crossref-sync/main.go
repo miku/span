@@ -300,6 +300,7 @@ var (
 	mode            = flag.String("mode", "t", "t=tabs, s=sync")
 	intervals       = flag.String("i", "d", "intervals: d=daily, w=weekly, m=monthly")
 	compressProgram = flag.String("p", "gzip", "compress program: gzip or zstd")
+	prefix          = flag.String("P", "default-", "a tag to distinguish between different runs, filename prefix")
 
 	syncStart xflag.Date = xflag.Date{Time: dateutil.MustParse("2021-01-01")}
 	syncEnd   xflag.Date = xflag.Date{Time: time.Now().UTC().Add(-24 * time.Hour)}
@@ -540,7 +541,8 @@ func main() {
 			default:
 				ext = "gz"
 			}
-			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s-%s-%s.json.%s",
+			cachePath := path.Join(*cacheDir, fmt.Sprintf("%s%s-%s-%s.json.%s",
+				*prefix,
 				*apiFilter,
 				iv.Start.Format("2006-01-02"),
 				iv.End.Format("2006-01-02"),
