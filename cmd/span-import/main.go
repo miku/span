@@ -46,6 +46,7 @@ var (
 	name        = flag.String("i", "", "input format name")
 	list        = flag.Bool("list", false, "list input formats")
 	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
+	batchSize   = flag.Int("b", 10000, "batch size")
 	showVersion = flag.Bool("v", false, "prints current program version")
 	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to file")
 	memProfile  = flag.String("memprofile", "", "write heap profile to file (go tool pprof -png --alloc_objects program mem.pprof > mem.png)")
@@ -147,6 +148,7 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 		bb = append(bb, '\n')
 		return bb, nil
 	})
+	p.BatchSize = *batchSize
 	return p.RunWorkers(*numWorkers)
 }
 

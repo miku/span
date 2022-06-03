@@ -71,7 +71,7 @@ OPTIONS
   More output. `span-check` only.
 
 `-b` *N*
-  Batch size. `span-tag`, `span-check`, `span-export`, `span-crossref-snapshot` only.
+  Batch size. `span-tag`, `span-check`, `span-import`, `span-export`, `span-crossref-snapshot` only.
 
 `-w` *N*
   Number of workers (defaults to CPU count). `span-tag`, `span-check`, `span-export` only.
