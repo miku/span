@@ -1,6 +1,6 @@
 Summary:    Library data tools.
 Name:       span
-Version:    0.1.337
+Version:    0.1.338
 Release:    0
 License:    GPL
 ExclusiveArch:  x86_64
@@ -28,6 +28,7 @@ install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-sync $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-doisniffer $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-genios-modules $RPM_BUILD_ROOT/usr/local/bin
@@ -71,6 +72,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/bin/span-crossref-members
 /usr/local/bin/span-crossref-snapshot
 /usr/local/bin/span-crossref-sync
+/usr/local/bin/span-doisniffer
 /usr/local/bin/span-export
 /usr/local/bin/span-freeze
 /usr/local/bin/span-genios-modules
