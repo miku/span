@@ -55,8 +55,7 @@ See: manual [source](https://github.com/miku/span/blob/master/docs/span.md).
 
 ## Performance
 
-Processing 150M JSON documents regularly and fast requires a bit of care. In
-the best case no complete processing of the data should take more than two
+In the best case no complete processing of the data should take more than two
 hours or run slower than 20000 records/s. The most expensive part is the JSON
 [serialization](https://raw.githubusercontent.com/miku/span/master/docs/span-import.0.1.253.png),
 but we keep JSON for now for the sake of readability. Experiments with faster
@@ -66,6 +65,11 @@ should be the next measure to improve performance.
 Most tools that work on lines will try to use as many workers as CPU cores.
 Except for `span-tag` - which needs to keep all holdings data in memory - all
 tools work well in a low-memory environment.
+
+More cores can help (but returns may diminsh): On a 64 core [2021
+Xeon](https://ark.intel.com/content/www/de/de/ark/products/215274/intel-xeon-gold-6326-processor-24m-cache-2-90-ghz.html),
+we find that e.g. `span-export` can process (decompression, deserialization,
+conversion, serialization, compression) on average 130000 JSON documents/s.
 
 ![](docs/scatter.png)
 
