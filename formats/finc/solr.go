@@ -41,6 +41,8 @@ type Solr5Vufind3 struct {
 	ISBNStrMv            []string `json:"isbn_str_mv,omitempty"` // refs. #21393
 	Languages            []string `json:"language,omitempty"`
 	MegaCollections      []string `json:"mega_collection,omitempty"`
+	MatchStr             string   `json:"match_str"`    // do not omit, refs. #21403#note-15
+	MatchStrMv           []string `json:"match_str_mv"` // do not omit, refs. #21403#note-15
 	PublishDateSort      int      `json:"publishDateSort,omitempty"`
 	Publishers           []string `json:"publisher,omitempty"`
 	RecordID             string   `json:"record_id,omitempty"`
