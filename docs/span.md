@@ -42,6 +42,9 @@ SYNOPSIS
 
 `span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`-rows` *N*] [`-q`] [`-sleep` *duration*]
 
+`span-crossref-sync` [`-P` *prefix*] [`-i` *interval] [`-p` *compress-program*] [`-s` *date*] [`-e` *date*]
+
+
 DESCRIPTION
 -----------
 
@@ -53,6 +56,8 @@ https://github.com/ubleipzig/intermediateschema
 
 OPTIONS
 -------
+
+This section is correct, but incomplete. Consult `-h` for further flags.
 
 `-i` *format*
   Input format. `span-import` only.
