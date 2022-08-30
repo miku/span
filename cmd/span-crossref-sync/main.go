@@ -3,6 +3,9 @@
 // This can run independently of other conversion processes, e.g. in a daily
 // cron job. Processes that need this data can manually find files or create a
 // snapshot.
+//
+// Data point: A collection of daily api snapshots from 2022-01-01 until
+// 2022-08-30 contains 166M documents (1.1T uncompressed).
 package main
 
 import (
