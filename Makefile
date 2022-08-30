@@ -19,7 +19,6 @@ TARGETS = span-check \
           span-crossref-members \
           span-crossref-sync \
           span-folio \
-          span-genios-modules \
           span-tagger
 
 PKGNAME = span
