@@ -54,7 +54,7 @@ var (
 	quiet           = flag.Bool("q", false, "do not emit any output, do not write to a file, just sync")
 
 	syncStart xflag.Date = xflag.Date{Time: dateutil.MustParse("2021-01-01")}
-	syncEnd   xflag.Date = xflag.Date{Time: time.Now().UTC().Add(-24 * time.Hour)}
+	syncEnd   xflag.Date = xflag.Date{Time: time.Now().Add(-24 * time.Hour)}
 
 	bNewline = []byte("\n")
 )
