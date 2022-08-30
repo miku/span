@@ -17,7 +17,7 @@ scatter-gather design allowed to process millions of records fast.
 
 ## Installation
 
-    $ go get github.com/miku/span/cmd/...
+    $ go install github.com/miku/span/cmd/...@latest
 
 Span has frequent [releases](https://github.com/miku/span/releases), although
 not all versions will be packaged as deb or rpm.
@@ -47,7 +47,8 @@ the help of a small library called
 [parallel](https://github.com/miku/parallel). Since Winter 2017, the
 [zek](https://github.com/miku/zek) struct generator takes care of the initial
 screening of sources serialized as XML - making the process of mapping new data
-sources easier.
+sources easier. Since about 2018, the span tools have seen mostly small fixes
+and additions.
 
 ## Documentation
 
@@ -69,9 +70,11 @@ tools work well in a low-memory environment.
 More cores can help (but returns may diminsh): On a 64 core [2021
 Xeon](https://ark.intel.com/content/www/de/de/ark/products/215274/intel-xeon-gold-6326-processor-24m-cache-2-90-ghz.html),
 we find that e.g. `span-export` can process (decompression, deserialization,
-conversion, serialization, compression) on average 130000 JSON documents/s.
+conversion, serialization, compression) on average 130000 JSON documents/s. The
+final pipeline stage (from normalized data to deduplicated and indexed data)
+seems to take about three hours.
 
-![](docs/scatter.png)
+![](docs/htop.png)
 
 ## Integration
 
