@@ -43,7 +43,7 @@ type Solr5Vufind3 struct {
 	MegaCollections      []string `json:"mega_collection,omitempty"`
 	MatchStr             string   `json:"match_str"`    // do not omit, refs. #21403#note-15
 	MatchStrMv           []string `json:"match_str_mv"` // do not omit, refs. #21403#note-15
-	PublishDateSort      int      `json:"publishDateSort,omitempty"`
+	PublishDateSort      string   `json:"publishDateSort,omitempty"`
 	Publishers           []string `json:"publisher,omitempty"`
 	RecordID             string   `json:"record_id,omitempty"`
 	RecordType           string   `json:"recordtype,omitempty"`
@@ -119,7 +119,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 			s.MegaCollections = append(s.MegaCollections, name)
 		}
 	}
-	s.PublishDateSort = is.Date.Year()
+	s.PublishDateSort = fmt.Sprintf("%d", is.Date.Year())
 	s.PublishDate = []string{is.Date.Format("2006")} // refs #18608
 	s.Publishers = is.Publishers
 	if withFullrecord {
