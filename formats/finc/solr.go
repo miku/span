@@ -281,6 +281,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	}
 
 	s.Footnotes = is.Footnotes
+	s.MatchStr = ""
+	s.MatchStrMv = []string{}
 
 	return nil
 }
