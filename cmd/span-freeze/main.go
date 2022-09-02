@@ -13,7 +13,6 @@ package main
 import (
 	"archive/zip"
 	"crypto/sha1"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -22,6 +21,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/dchest/safefile"
 	log "github.com/sirupsen/logrus"
@@ -108,12 +109,12 @@ func main() {
 		mapping[u] = name
 
 		resp, err := http.Get(u)
-		if err != nil {
+		if err != nil || resp.StatusCode >= 400 {
 			if *bestEffort {
 				log.Printf("[%04d %s] %v", i, u, err)
 				continue
 			} else {
-				log.Fatal(err)
+				log.Fatalf("failed to fetch resource (%d): err", resp.StatusCode)
 			}
 		}
 		defer resp.Body.Close()
