@@ -15,6 +15,11 @@ scatter-gather design allowed to process millions of records fast.
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
+While span has a few independent tools (like fetching or compacting
+[crossref](https://www.crossref.org/) feeds), it is mostly used inside
+[siskin](https://github.com/ubleipzig/siskin), a set of tasks to build an
+aggregated index.
+
 ## Installation
 
     $ go install github.com/miku/span/cmd/...@latest
