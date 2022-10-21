@@ -1,8 +1,8 @@
 // Package span implements common functions.
 //
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+//	Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
+//	                  The Finc Authors, http://finc.info
+//	                  Martin Czygan, <martin.czygan@uni-leipzig.de>
 //
 // This file is part of some open source application.
 //
@@ -20,7 +20,6 @@
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 //
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
 package span
 
 import (
@@ -30,7 +29,7 @@ import (
 
 const (
 	// AppVersion of span package. Commandline tools will show this on -v.
-	AppVersion = "0.1.342"
+	AppVersion = "0.1.343"
 	// KeyLengthLimit was a limit imposed by the memcached protocol, which
 	// was used for blob storage until Q1 2017. We switched the key-value
 	// store, so this limit is somewhat obsolete.
