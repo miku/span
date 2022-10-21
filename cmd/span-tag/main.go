@@ -3,13 +3,11 @@
 // to produce a stream of tagged records.
 //
 // $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
-//
 package main
 
 import (
 	"bufio"
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -20,11 +18,13 @@ import (
 	"runtime/pprof"
 	"strings"
 
+	json "github.com/segmentio/encoding/json"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/misc"
 	"github.com/miku/span/parallel"
 	"github.com/miku/span/solrutil"
 )
@@ -67,16 +67,6 @@ type SelectResponse struct {
 		QTime  int64
 		Status int64 `json:"status"`
 	} `json:"responseHeader"`
-}
-
-// stringSliceContains returns true, if a given string is contained in a slice.
-func stringSliceContains(ss []string, s string) bool {
-	for _, v := range ss {
-		if v == s {
-			return true
-		}
-	}
-	return false
 }
 
 // preferencePosition returns the position of a given preference as int.
@@ -131,7 +121,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				ignored++
 				continue
 			}
-			if !stringSliceContains(doc.Institution, label) {
+			if !misc.StringSliceContains(doc.Institution, label) {
 				continue
 			}
 			// The document (is) might be already in the index (same or other source).
@@ -148,16 +138,6 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 		log.Printf("[%s] ignored %d docs", is.ID, ignored)
 	}
 	return labels, nil
-}
-
-// removeEach returns a new slice with element not in a drop list.
-func removeEach(ss []string, drop []string) (result []string) {
-	for _, s := range ss {
-		if !stringSliceContains(drop, s) {
-			result = append(result, s)
-		}
-	}
-	return
 }
 
 func main() {
@@ -241,7 +221,7 @@ func main() {
 			}
 			if len(droppable) > 0 {
 				before := len(tagged.Labels)
-				tagged.Labels = removeEach(tagged.Labels, droppable)
+				tagged.Labels = misc.RemoveEach(tagged.Labels, droppable)
 				if *verbose {
 					log.Printf("[%s] from %d to %d labels: %s",
 						is.ID, before, len(tagged.Labels), tagged.Labels)
