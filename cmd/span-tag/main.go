@@ -24,9 +24,9 @@ import (
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/misc"
 	"github.com/miku/span/parallel"
 	"github.com/miku/span/solrutil"
+	"github.com/miku/span/strutil"
 )
 
 // LowPrio number, something that is larger than the number of data sources
@@ -121,7 +121,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				ignored++
 				continue
 			}
-			if !misc.StringSliceContains(doc.Institution, label) {
+			if !strutil.StringSliceContains(doc.Institution, label) {
 				continue
 			}
 			// The document (is) might be already in the index (same or other source).
@@ -221,7 +221,7 @@ func main() {
 			}
 			if len(droppable) > 0 {
 				before := len(tagged.Labels)
-				tagged.Labels = misc.RemoveEach(tagged.Labels, droppable)
+				tagged.Labels = strutil.RemoveEach(tagged.Labels, droppable)
 				if *verbose {
 					log.Printf("[%s] from %d to %d labels: %s",
 						is.ID, before, len(tagged.Labels), tagged.Labels)

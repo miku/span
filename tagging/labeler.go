@@ -16,7 +16,7 @@ import (
 	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
-	"github.com/miku/span/misc"
+	"github.com/miku/span/strutil"
 	"github.com/sethgrid/pester"
 )
 
@@ -173,13 +173,13 @@ func (l *Labeler) Labels(doc *finc.IntermediateSchema) ([]string, error) {
 			case isilSet10495.Contains(row.ISIL):
 				// refs #10495, a subject filter for a few hard-coded ISIL;
 				// https://git.io/JvFjE
-				if misc.Overlap(doc.Subjects, subjectsMusic) {
+				if strutil.Overlap(doc.Subjects, subjectsMusic) {
 					labels.Add(row.ISIL)
 				}
 			case row.ISIL == "FID-MEDIEN-DE-15":
 				// refs #10495, maybe use a TSV with custom column name to use
 				// a subject list? https://git.io/JvFjd
-				if misc.Overlap(doc.Subjects, subjectsFilm) {
+				if strutil.Overlap(doc.Subjects, subjectsFilm) {
 					labels.Add(row.ISIL)
 				}
 			}
