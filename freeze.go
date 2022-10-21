@@ -3,12 +3,13 @@ package span
 import (
 	"archive/zip"
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	json "github.com/segmentio/encoding/json"
 )
 
 // UnfreezeFilterConfig takes the name of a zipfile (from span-freeze) and
@@ -17,58 +18,64 @@ import (
 // filterconfig have then been replaced by absolute path on the file system.
 // Cleanup of temporary directory is responsibility of caller.
 func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
-	dir, err = ioutil.TempDir("", "span-tag-unfreeze-")
-	if err != nil {
-		return dir, "", err
+	var (
+		r        *zip.ReadCloser
+		rc       io.ReadCloser
+		ff       *os.File
+		mappings = make(map[string]string)
+		b        []byte
+	)
+	if dir, err = ioutil.TempDir("", "span-tag-unfreeze-"); err != nil {
+		return
 	}
-	r, err := zip.OpenReader(frozenfile)
-	if err != nil {
-		return dir, "", err
+	if r, err = zip.OpenReader(frozenfile); err != nil {
+		return
 	}
 	defer r.Close()
-
-	var mappings = make(map[string]string)
-	if err := os.MkdirAll(filepath.Join(dir, "files"), 0777); err != nil {
-		return dir, "", err
+	if err = os.MkdirAll(filepath.Join(dir, "files"), 0777); err != nil {
+		return
 	}
-
 	for _, f := range r.File {
-		rc, err := f.Open()
-		if err != nil {
-			return dir, "", err
+		if rc, err = f.Open(); err != nil {
+			return
 		}
-		ff, err := os.Create(filepath.Join(dir, f.Name))
-		if err != nil {
-			return dir, "", err
+		if ff, err = os.Create(filepath.Join(dir, f.Name)); err != nil {
+			return
 		}
-		var buf bytes.Buffer
-		tr := io.TeeReader(rc, &buf)
-		if _, err := io.Copy(ff, tr); err != nil {
-			return dir, "", err
-		}
-		rc.Close()
-		ff.Close()
-
 		if f.Name == "mapping.json" {
-			if err := json.NewDecoder(&buf).Decode(&mappings); err != nil {
-				return dir, "", err
+			var (
+				buf bytes.Buffer
+				tr  = io.TeeReader(rc, &buf)
+			)
+			if _, err = io.Copy(ff, tr); err != nil {
+				return
+			}
+			if err = json.NewDecoder(&buf).Decode(&mappings); err != nil {
+				return
+			}
+		} else {
+			if _, err = io.Copy(ff, rc); err != nil {
+				return
 			}
 		}
+		if err = rc.Close(); err != nil {
+			return
+		}
+		if err = ff.Close(); err != nil {
+			return
+		}
 	}
-
-	blobfile := filepath.Join(dir, "blob")
-	b, err := ioutil.ReadFile(blobfile)
-	if err != nil {
-		return dir, "", err
+	blob = filepath.Join(dir, "blob")
+	if b, err = ioutil.ReadFile(blob); err != nil {
+		return
 	}
-
 	for url, file := range mappings {
 		value := []byte(fmt.Sprintf(`%q`, url))
 		replacement := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
 		b = bytes.Replace(b, value, replacement, -1)
 	}
-	if err := ioutil.WriteFile(blobfile, b, 0777); err != nil {
-		return dir, "", err
+	if err = ioutil.WriteFile(blob, b, 0777); err != nil {
+		return
 	}
-	return dir, blobfile, nil
+	return dir, blob, nil
 }
