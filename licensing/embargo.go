@@ -50,15 +50,15 @@ var (
 // the standard. The embargo statement has three parts: type, length, and units.
 // These three parts are written in that order in a single string with no spaces.
 //
-//   * Type: All embargoes involve a "moving wall", a point in time expressed relative to
-//           the present (e.g., "12 months ago"). If access to the journal begins at the moving
-//           wall, the embargo type is "R". If access ends at the moving wall, then the
-//           embargo type is "P".
-//   * Length: An integer expressing the length of the embargo
-//   * Units: The units for the number in the "length" field: "D" for days, "M" for months,
-//            and "Y" for years. For simplicity, "365D" will always be equivalent to one year,
-//            and "30D" will always be equivalent to one month, even in leap years and months
-//            that do not have 30 days.
+//   - Type: All embargoes involve a "moving wall", a point in time expressed relative to
+//     the present (e.g., "12 months ago"). If access to the journal begins at the moving
+//     wall, the embargo type is "R". If access ends at the moving wall, then the
+//     embargo type is "P".
+//   - Length: An integer expressing the length of the embargo
+//   - Units: The units for the number in the "length" field: "D" for days, "M" for months,
+//     and "Y" for years. For simplicity, "365D" will always be equivalent to one year,
+//     and "30D" will always be equivalent to one month, even in leap years and months
+//     that do not have 30 days.
 //
 // The "units" field also indicates the granularity of the embargo, that is, how
 // frequently the moving wall "moves". For example, a newspaper database may
@@ -77,10 +77,10 @@ var (
 //
 // Below are some common embargoes expressed according to this syntax:
 //
-//   * Access to all content, except the current calendar year: P1Y
-//   * Access to all content in the previous and current calendar years: R2Y
-//   * Access to all content from exactly 6 months ago to the present: R180D
-//   * Access to all content, except the past 6 calendar months: P6M
+//   - Access to all content, except the current calendar year: P1Y
+//   - Access to all content in the previous and current calendar years: R2Y
+//   - Access to all content from exactly 6 months ago to the present: R180D
+//   - Access to all content, except the past 6 calendar months: P6M
 //
 // In the case where there is an embargo at both the beginning and end of a
 // coverage range, then two embargo statements should be concatenated, the
@@ -97,8 +97,7 @@ func (embargo Embargo) Duration() (dur time.Duration, err error) {
 	if len(e) == 0 {
 		return
 	}
-
-	var parts = embargoPattern.FindStringSubmatch(e)
+	parts := embargoPattern.FindStringSubmatch(e)
 	if len(parts) == 0 {
 		return dur, ErrInvalidEmbargo
 	}
@@ -109,7 +108,6 @@ func (embargo Embargo) Duration() (dur time.Duration, err error) {
 	if err != nil {
 		return dur, ErrInvalidEmbargo
 	}
-
 	switch parts[3] {
 	case "D":
 		return time.Duration(i) * Day, nil
