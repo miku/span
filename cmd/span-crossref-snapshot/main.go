@@ -191,7 +191,8 @@ func main() {
 		if _, err := writeFields(buf, "\t", lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
 			return nil, err
 		}
-		return buf.Bytes(), nil
+		result := buf.Bytes()
+		return result, nil
 	})
 	pp.BatchSize = *batchsize
 	log.WithFields(log.Fields{
