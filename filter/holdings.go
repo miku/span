@@ -2,10 +2,11 @@ package filter
 
 import (
 	"archive/zip"
-	"github.com/segmentio/encoding/json"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 
 	log "github.com/sirupsen/logrus"
 
@@ -115,6 +116,10 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 	for _, fn := range s.Holdings.Filenames {
+		// TODO: we may want to support file:///a/b.txt and /a/b.txt here, too.
+		if strings.HasPrefix(fn, "file://") {
+			fn = strings.Replace(fn, "file://", "", 1)
+		}
 		if err := Cache.putFile(fn); err != nil {
 			return err
 		}
@@ -141,10 +146,8 @@ func (f *HoldingsFilter) UnmarshalJSON(p []byte) error {
 			f.Names = append(f.Names, link)
 		}
 	}
-
 	f.Verbose = s.Holdings.Verbose
 	f.CompareByTitle = s.Holdings.CompareByTitle
-
 	if f.CachedValues == nil {
 		f.CachedValues = make(map[string]*CacheValue)
 	}

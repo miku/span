@@ -71,6 +71,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 	}
 	for url, file := range mappings {
 		value := []byte(fmt.Sprintf(`%q`, url))
+		// Debian is fine w/ file://, but fedora not?
 		replacement := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
 		b = bytes.Replace(b, value, replacement, -1)
 	}
