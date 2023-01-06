@@ -23,7 +23,6 @@ import (
 	"os/exec"
 	"runtime/pprof"
 	"strings"
-	"sync"
 
 	"github.com/segmentio/encoding/json"
 
@@ -61,12 +60,6 @@ var (
 	compressProgram = flag.String("compress-program", "zstd", "compress program")
 	cpuProfile      = flag.String("cpuprofile", "", "write cpuprofile to file")
 	verbose         = flag.Bool("verbose", false, "be verbose")
-
-	bufPool = sync.Pool{
-		New: func() interface{} {
-			return new(bytes.Buffer)
-		},
-	}
 )
 
 // writeFields writes a variable number of values separated by sep to a given
@@ -174,10 +167,8 @@ func main() {
 				Deposited crossref.DateField `json:"deposited"`
 				Indexed   crossref.DateField `json:"indexed"`
 			}
-			buf = bufPool.Get().(*bytes.Buffer)
+			buf bytes.Buffer
 		)
-		buf.Reset()
-		defer bufPool.Put(buf)
 		if err := json.Unmarshal(b, &doc); err != nil {
 			return nil, err
 		}
@@ -188,11 +179,10 @@ func main() {
 		if _, ok := excludes[doc.DOI]; ok {
 			return nil, nil
 		}
-		if _, err := writeFields(buf, "\t", lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
+		if _, err := writeFields(&buf, "\t", lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
 			return nil, err
 		}
-		result := buf.Bytes()
-		return result, nil
+		return buf.Bytes(), nil
 	})
 	pp.BatchSize = *batchsize
 	log.WithFields(log.Fields{
