@@ -6,6 +6,17 @@
 //
 // Data point: A collection of daily api snapshots from 2022-01-01 until
 // 2022-08-30 contains 166M documents (1.1T uncompressed).
+//
+// TODO(martin): handle occasional 404
+// 2023/02/02 14:04:14 status: ok, total: 1316624, seen: 367000 (27.87%), cursor: DnF1ZXJ5VGhlbkZldGNoBgAAAAAnjbiZFmxkam1HbkpnUWxxbWlCMkxwREpMSFEAAAAADMpFhBZ5OGlTOGc0elJObTlaMjFJeWtWZ1FnAAAAABWDU7wWTzVoX2ZEVS1SWnE4ZHBtX2VLZ2NNZwAAAAAT9w7zFi14
+// RFJYanphVGUyczg3YnAzem5lTXcAAAAAElEcwRZ6YXBHd0pGN1NCcWIycDVybnplUmhnAAAAACeNuJoWbGRqbUduSmdRbHFtaUIyTHBESkxIUQ==
+// 2023/02/02 14:04:14 https://api.crossref.org/works?cursor=DnF1ZXJ5VGhlbkZldGNoBgAAAAAnjbiZFmxkam1HbkpnUWxxbWlCMkxwREpMSFEAAAAADMpFhBZ5OGlTOGc0elJObTlaMjFJeWtWZ1FnAAAAABWDU7wWTzVoX2ZEVS1SWnE4ZHBtX2VLZ2NNZwAAAAAT9w7zFi14RFJYanphVGUyczg3YnAze
+// m5lTXcAAAAAElEcwRZ6YXBHd0pGN1NCcWIycDVybnplUmhnAAAAACeNuJoWbGRqbUduSmdRbHFtaUIyTHBESkxIUQ%3D%3D
+// 2023/02/02 14:19:26 decode: unexpected EOF
+// 2023/02/02 14:19:26 [1] retrying
+// 2023/02/02 14:19:26 https://api.crossref.org/works?cursor=DnF1ZXJ5VGhlbkZldGNoBgAAAAAnjbiZFmxkam1HbkpnUWxxbWlCMkxwREpMSFEAAAAADMpFhBZ5OGlTOGc0elJObTlaMjFJeWtWZ1FnAAAAABWDU7wWTzVoX2ZEVS1SWnE4ZHBtX2VLZ2NNZwAAAAAT9w7zFi14RFJYanphVGUyczg3YnAze
+// m5lTXcAAAAAElEcwRZ6YXBHd0pGN1NCcWIycDVybnplUmhnAAAAACeNuJoWbGRqbUduSmdRbHFtaUIyTHBESkxIUQ%3D%3D
+// 2023/02/02 14:19:27 HTTP 404
 package main
 
 import (
