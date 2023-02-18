@@ -36,8 +36,8 @@ require (
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.9.0
-	golang.org/x/net v0.1.0
-	golang.org/x/text v0.4.0
+	golang.org/x/net v0.7.0
+	golang.org/x/text v0.7.0
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
 )
