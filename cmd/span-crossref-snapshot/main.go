@@ -60,6 +60,7 @@ var (
 	compressProgram = flag.String("compress-program", "zstd", "compress program")
 	cpuProfile      = flag.String("cpuprofile", "", "write cpuprofile to file")
 	verbose         = flag.Bool("verbose", false, "be verbose")
+	pathFile        = flag.String("f", "", "path to a file naming all inputs files to be considered, one file per line")
 )
 
 // writeFields writes a variable number of values separated by sep to a given
@@ -100,27 +101,56 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 	var (
-		reader   io.Reader
-		excludes = make(map[string]struct{})
+		r, reader io.Reader
+		f         *os.File
+		err       error
+		excludes  = make(map[string]struct{})
 	)
-	if flag.NArg() == 0 {
+	switch {
+	case *pathFile != "":
+		log.Fatal("not yet implemented")
+		// b, err := ioutil.ReadFile(*pathFile)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// s := string(b)
+		// var readers []io.Reader
+		// for _, line := range strings.Split(s, "\n") {
+		// 	line = strings.TrimSpace(line)
+		// 	if len(line) == 0 || strings.HasPrefix(line, "#") {
+		// 		continue
+		// 	}
+		// 	f, err := os.Open(line)
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// 	defer f.Close()
+		// 	readers = append(readers, f)
+		// }
+		// log.Printf("path-list: will read from %d files", len(readers))
+		// r = io.MultiReader(readers...)
+	case flag.NArg() == 0:
 		log.Fatal("input file required")
+	case flag.NArg() == 1:
+		f, err = os.Open(flag.Arg(0))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+		r = f
+	default:
+		log.Fatal("no input specified")
 	}
-	f, err := os.Open(flag.Arg(0))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
 	switch {
 	case *compressed && (*compressProgram == "gzip" || *compressProgram == "pigz"):
-		g, err := gzip.NewReader(f)
+		g, err := gzip.NewReader(r)
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer g.Close()
 		reader = g
 	case *compressed && *compressProgram == "zstd":
-		g, err := zstd.NewReader(f)
+		g, err := zstd.NewReader(r)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -129,7 +159,7 @@ func main() {
 	case *compressed:
 		log.Fatal("only gzip and zstd supported currently")
 	default:
-		reader = f
+		reader = r
 	}
 	if *outputFile == "" {
 		log.Fatal("output filename required")
@@ -251,6 +281,9 @@ func main() {
 			cmd = `{{ filterline }} {{ L }} <({{ decomp }} {{ F }}) | {{ comp }} > {{ output }}`
 		}
 	}
+	// TODO: need to have a filesystem entry that would allow to have a "union"
+	// like view over multiple files;
+	// https://unix.stackexchange.com/q/748123/376.
 	output, err = clam.RunOutput(cmd, clam.Map{
 		"L":          output,
 		"F":          f.Name(),
