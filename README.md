@@ -52,8 +52,12 @@ the help of a small library called
 [parallel](https://github.com/miku/parallel). Since Winter 2017, the
 [zek](https://github.com/miku/zek) struct generator takes care of the initial
 screening of sources serialized as XML - making the process of mapping new data
-sources easier. Since about 2018, the span tools have seen mostly small fixes
-and additions.
+sources easier.
+
+Since about 2018, the span tools have seen mostly small fixes and additions.
+Notable, since 2021, the previous scripts used to fetch daily metadata updates
+from [crossref](https://api.crossref.org) has been put into a standalone tool, `span-crossref-sync`, which
+merely adds some retry logic and consistent file naming to the API harvest.
 
 ## Documentation
 
@@ -62,7 +66,8 @@ See: manual [source](https://github.com/miku/span/blob/master/docs/span.md).
 ## Performance
 
 In the best case no complete processing of the data should take more than two
-hours or run slower than 20000 records/s. The most expensive part is the JSON
+hours or run slower than 20000 records/s. The most expensive part currently
+seems to be the JSON
 [serialization](https://raw.githubusercontent.com/miku/span/master/docs/span-import.0.1.253.png),
 but we keep JSON for now for the sake of readability. Experiments with faster
 JSON serializers and msgpack have been encouraging, a faster serialization
@@ -76,7 +81,7 @@ More cores can help (but returns may diminsh): On a 64 core [2021
 Xeon](https://ark.intel.com/content/www/de/de/ark/products/215274/intel-xeon-gold-6326-processor-24m-cache-2-90-ghz.html),
 we find that e.g. `span-export` can process (decompression, deserialization,
 conversion, serialization, compression) on average 130000 JSON documents/s. The
-final pipeline stage (from normalized data to deduplicated and indexed data)
+final pipeline stage (from normalized data to deduplicated and indexable data)
 seems to take about three hours.
 
 ![](docs/htop.png)
