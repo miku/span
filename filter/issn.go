@@ -42,7 +42,12 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		return err
 	}
 	f.Values = container.NewStringSet()
-
+	// workaround as span-freeze replacing urls with "file://" protocol and
+	// http.Get does not recognize that protocol
+	if strings.HasPrefix(s.ISSN.Link, "file://") {
+		s.ISSN.File = s.ISSN.Link[7:]
+		s.ISSN.Link = ""
+	}
 	if s.ISSN.Link != "" {
 		slink := xio.SavedLink{Link: s.ISSN.Link}
 		filename, err := slink.Save()
@@ -52,7 +57,6 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 		defer slink.Remove()
 		s.ISSN.File = filename
 	}
-
 	if s.ISSN.File != "" {
 		lines, err := xio.ReadLines(s.ISSN.File)
 		if err != nil {
