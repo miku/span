@@ -1,4 +1,7 @@
 // span-export creates various destination formats, mostly for SOLR.
+//
+// >> drop: access_facet;
+// >> recordtype => record_format
 package main
 
 import (

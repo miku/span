@@ -3,6 +3,8 @@
 // to produce a stream of tagged records.
 //
 // $ span-tag -c '{"DE-15": {"any": {}}}' < input.ldj > output.ldj
+//
+// FincClassFacet: https://git.sc.uni-leipzig.de/ubl/finc/fincmarcimport
 package main
 
 import (
