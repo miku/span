@@ -225,8 +225,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.AuthorSort = strings.ToLower(authors[0])
 	}
 
-	s.AccessFacet = AIAccessFacet
-	s.BranchNrw = s.AccessFacet // refs #11605
+	s.AccessFacet = AIAccessFacet // TODO: drop this field
+	s.BranchNrw = s.AccessFacet   // refs #11605
 
 	// Site specific formats, TODO: fix this now.
 	s.FormatDe105 = []string{FormatDe105.Lookup(is.Format, "")}
