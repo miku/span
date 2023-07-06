@@ -2,13 +2,13 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"strings"
 
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
+	json "github.com/segmentio/encoding/json"
 )
 
 func tabularize(lineno int64, p []byte) ([]byte, error) {
