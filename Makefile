@@ -1,9 +1,15 @@
 SHELL = /bin/bash
-TARGETS = span-check \
+TARGETS = \
+          span-amsl-discovery \
+		  span-check \
 		  span-compare \
+          span-crossref-members \
 		  span-crossref-snapshot \
+          span-crossref-sync \
+		  span-crossref-table \
 		  span-doisniffer \
 		  span-export \
+          span-folio \
 		  span-freeze \
 		  span-hcov \
 		  span-import \
@@ -13,13 +19,9 @@ TARGETS = span-check \
 		  span-report \
 		  span-review \
 		  span-tag \
+          span-tagger \
 		  span-update-labels \
-		  span-webhookd \
-          span-amsl-discovery \
-          span-crossref-members \
-          span-crossref-sync \
-          span-folio \
-          span-tagger
+		  span-webhookd
 
 PKGNAME = span
 

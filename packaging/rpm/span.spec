@@ -28,6 +28,7 @@ install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-sync $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-crossref-table $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-doisniffer $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/local/bin
