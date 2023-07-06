@@ -2,11 +2,14 @@
 package main
 
 import (
+	"bytes"
+	"crypto/md5"
 	"flag"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"runtime"
-	"strings"
 
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
@@ -19,20 +22,21 @@ var (
 )
 
 func tabularize(lineno int64, p []byte) ([]byte, error) {
-	var doc crossref.Document
-	if err := json.Unmarshal(p, &doc); err != nil {
+	var (
+		doc crossref.Document
+		h   = md5.New()
+		dec = json.NewDecoder(io.TeeReader(bytes.NewReader(p), h))
+	)
+	if err := dec.Decode(&doc); err != nil {
 		log.Printf("skipping failed line %d: %v", lineno, string(p))
 		return nil, nil
 	}
-	fields := []string{
-		doc.DOI,
-		doc.Created.DateTime,
-		doc.Deposited.DateTime,
-		doc.Indexed.DateTime,
-		doc.Member,
-		"\n",
-	}
-	return []byte(strings.Join(fields, "\t")), nil
+	return []byte(doc.DOI + "\t" +
+		doc.Created.DateTime + "\t" +
+		doc.Deposited.DateTime + "\t" +
+		doc.Indexed.DateTime + "\t" +
+		doc.Member + "\t" +
+		fmt.Sprintf("%x", h.Sum(nil)) + "\n"), nil
 }
 
 func main() {
