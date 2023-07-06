@@ -72,6 +72,7 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/bin/span-crossref-members
 /usr/local/bin/span-crossref-snapshot
 /usr/local/bin/span-crossref-sync
+/usr/local/bin/span-crossref-table
 /usr/local/bin/span-doisniffer
 /usr/local/bin/span-export
 /usr/local/bin/span-freeze
