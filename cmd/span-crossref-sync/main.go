@@ -1,33 +1,22 @@
-// span-crossref-sync download caches raw crossref messages from the works api.
+// span-crossref-sync download caches raw crossref messages from the crossref
+// works API.
 //
 // Example usage:
 //
-//			$ span-crossref-sync -p zstd \               # compress program
-//			                     -P feed-1- \            # file prefix
-//			                     -i d \                  # interval (daily)
-//		                         -verbose \              # verbose
-//			                     -t 30m \                # timeout
-//		                         -s 2022-01-01 \         # start
-//			                     -e 2023-05-01 \         # end
-//			                     -c /data/finc/crossref/ # cache dir
-//	                                                     | zstd -c -T0 >> /tmp/1234.xyz
+//		$ span-crossref-sync -p zstd \               # compress program
+//	                         -P feed-1- \            # file prefix
+//	                         -i d \                  # interval (daily)
+//	                         -verbose \              # verbose
+//	                         -t 30m \                # timeout
+//	                         -s 2022-01-01 \         # start
+//	                         -e 2023-05-01 \         # end
+//	                         -c /data/finc/crossref/ # cache dir
 //
 // This can run independently of other conversion processes, e.g. in a daily
 // cron job. Processes that need this data can manually find files or create a
 // snapshot.
 //
 // Data point: https://github.com/miku/filterline#data-point-crossref-snapshot
-//
-// TODO(martin): handle occasional 404
-// 2023/02/02 14:04:14 status: ok, total: 1316624, seen: 367000 (27.87%), cursor: DnF1ZXJ5VGhl...
-// RFJYanphVGUyczg3YnAzem5lTXcAAAAAElEcwRZ6YXBHd0pGN1NCcWIycDVybnplUmhnAAAAACeNuJoWbGRqbUduSmd...
-// 2023/02/02 14:04:14 https://api.crossref.org/works?cursor=DnF1ZXJ5VGhlbkZldGNoBgAAAAAnjbiZF...
-// m5lTXcAAAAAElEcwRZ6YXBHd0pGN1NCcWIycDVybnplUmhnAAAAACeNuJoWbGRqbUduSmdRbHFtaUIyTHBESkxIUQ%3...
-// 2023/02/02 14:19:26 decode: unexpected EOF
-// 2023/02/02 14:19:26 [1] retrying
-// 2023/02/02 14:19:26 https://api.crossref.org/works?cursor=DnF1ZXJ5VGhlbkZldGNoBgAAAAAnjbiZF...
-// m5lTXcAAAAAElEcwRZ6YXBHd0pGN1NCcWIycDVybnplUmhnAAAAACeNuJoWbGRqbUduSmdRbHFtaUIyTHBESkxIUQ%3...
-// 2023/02/02 14:19:27 HTTP 404
 package main
 
 import (
