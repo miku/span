@@ -3,14 +3,14 @@
 //
 // Example usage:
 //
-//		$ span-crossref-sync -p zstd \               # compress program
-//	                         -P feed-1- \            # file prefix
-//	                         -i d \                  # interval (daily)
-//	                         -verbose \              # verbose
-//	                         -t 30m \                # timeout
-//	                         -s 2022-01-01 \         # start
-//	                         -e 2023-05-01 \         # end
-//	                         -c /data/finc/crossref/ # cache dir
+//	$ span-crossref-sync -p zstd \               # compress program
+//	  -P feed-1- \            # file prefix
+//	  -i d \                  # interval (daily)
+//	  -verbose \              # verbose
+//	  -t 30m \                # timeout
+//	  -s 2022-01-01 \         # start
+//	  -e 2023-05-01 \         # end
+//	  -c /data/finc/crossref/ # cache dir
 //
 // This can run independently of other conversion processes, e.g. in a daily
 // cron job. Processes that need this data can manually find files or create a
