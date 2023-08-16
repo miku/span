@@ -24,6 +24,7 @@ TARGETS = \
 		  span-webhookd
 
 PKGNAME = span
+MAKEFLAGS := --jobs=$(shell nproc)
 
 .PHONY: all assets bench clean clean-docs cloc deb imports lint members names rpm test vet
 
