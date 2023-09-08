@@ -12,12 +12,11 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/fatih/structs v1.1.0
 	github.com/goodsign/monday v1.0.1
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/gorilla/mux v1.8.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jinzhu/now v1.1.5
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/klauspost/compress v1.16.7
 	github.com/klauspost/pgzip v1.2.6
@@ -36,8 +35,8 @@ require (
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/net v0.14.0
-	golang.org/x/text v0.12.0
+	golang.org/x/net v0.15.0
+	golang.org/x/text v0.13.0
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
 )
