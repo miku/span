@@ -15,7 +15,6 @@ import (
 // VuFind 3. Same as Solr5Vufind3v12, but with fullrecord field, refs. #8031.
 // TODO(martin): add support for classfinc.toml
 type Solr5Vufind3 struct {
-	AccessFacet          string   `json:"access_facet,omitempty"`
 	AuthorFacet          []string `json:"author_facet,omitempty"`
 	AuthorCorporate      []string `json:"author_corporate,omitempty"`
 	Authors              []string `json:"author,omitempty"`
@@ -224,9 +223,6 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		s.Authors = authors
 		s.AuthorSort = strings.ToLower(authors[0])
 	}
-
-	s.AccessFacet = AIAccessFacet // TODO: drop this field
-	s.BranchNrw = s.AccessFacet   // refs #11605
 
 	// Site specific formats, TODO: fix this now.
 	s.FormatDe105 = []string{FormatDe105.Lookup(is.Format, "")}
