@@ -17,9 +17,8 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jinzhu/now v1.1.5
 	github.com/jmoiron/sqlx v1.3.5
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/kennygrant/sanitize v1.2.4
-	github.com/klauspost/compress v1.16.7
+	github.com/klauspost/compress v1.17.0
 	github.com/klauspost/pgzip v1.2.6
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
@@ -36,8 +35,8 @@ require (
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/net v0.14.0
-	golang.org/x/text v0.12.0
+	golang.org/x/net v0.15.0
+	golang.org/x/text v0.13.0
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
 )
