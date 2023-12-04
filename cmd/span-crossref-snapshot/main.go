@@ -10,6 +10,37 @@
 // 2017/07/24 18:29:30 stage 3: 2m34.23537293s
 //
 // $ span-crossref-snapshot -z crossref.ndj.gz -o out.ndj.gz
+//
+// Anecdata. We started the new "span-crossref-sync" based workflow in
+// 2022-05-30 and have been requesting daily slices from crossref since
+// 2022-01-01. As of 2023-12-04 we downloaded 701 files (zstd compressed).
+//
+//	               sz
+//	count         701
+//	mean   2816941417
+//	std    2175766872
+//	min             0
+//	25%    1138093994
+//	50%    2739488108
+//	75%    4058532166
+//	max   13751449046
+//
+// Median daily shipment of about 2.7GB. If we only consider days on which we
+// actually saw data, that number increases to about 3GB.
+//
+//	               sz
+//	count         636
+//	mean   3104836373
+//	std    2079246455
+//	min           573
+//	25%    1541247728
+//	50%    2998517796
+//	75%    4150155730
+//	max   13751449046
+//
+// At most 13GB per day. Total sum of downloaded data is 1.796TB compressed
+// (3); if we recompress with (19) we get around 1.3TB of raw data, or 8.07TiB
+// uncompressed.
 package main
 
 import (
