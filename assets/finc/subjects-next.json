@@ -1,0 +1,868 @@
+{
+  "Accounting": [
+    "economics"
+  ],
+  "Acoustics and Ultrasonics": [],
+  "Advanced and Specialised Nursing": [
+    "medicine"
+  ],
+  "Aerospace Engineering": [],
+  "Ageing": [
+    "medicine"
+  ],
+  "Agricultural and Biological Sciences (miscellaneous)": [],
+  "Agricultural and Biological Sciences(all)": [],
+  "Agronomy and Crop Science": [],
+  "Algebra and Number Theory": [
+    "science-mathematics"
+  ],
+  "Analysis": [
+    "science-mathematics"
+  ],
+  "Analytical Chemistry": [],
+  "Anatomy": [
+    "medicine"
+  ],
+  "Anesthesiology and Pain Medicine": [
+    "medicine"
+  ],
+  "Animal Science and Zoology": [
+    "science-biology"
+  ],
+  "Anthropology": [
+    "ethnology"
+  ],
+  "Applied Mathematics": [
+    "science-mathematics"
+  ],
+  "Applied Microbiology and Biotechnology": [
+    "science-biology"
+  ],
+  "Applied Psychology": [
+    "psychology"
+  ],
+  "Aquatic Science": [
+    "science-biology"
+  ],
+  "Archaeology": [],
+  "Architecture": [],
+  "Artificial Intelligence": [
+    "science-computerscience"
+  ],
+  "Arts and Humanities (miscellaneous)": [
+    "finearts"
+  ],
+  "Arts and Humanities(all)": [
+    "finearts"
+  ],
+  "Assessment and Diagnosis": [
+    "medicine"
+  ],
+  "Astronomy and Astrophysics": [],
+  "Atmospheric Science": [],
+  "Atomic and Molecular Physics, and Optics": [],
+  "Automotive Engineering": [],
+  "Behavioral Neuroscience": [
+    "medicine"
+  ],
+  "Biochemistry": [],
+  "Biochemistry, Genetics and Molecular Biology (miscellaneous)": [
+    "science-biology"
+  ],
+  "Biochemistry, Genetics and Molecular Biology(all)": [
+    "science-biology"
+  ],
+  "Biochemistry, medical": [
+    "science-biology"
+  ],
+  "Bioengineering": [
+    "science-biology"
+  ],
+  "Biological Psychiatry": [
+    "science-biology",
+    "psychology"
+  ],
+  "Biomaterials": [
+    "science-biology"
+  ],
+  "Biomedical Engineering": [
+    "science-biology",
+    "medicine"
+  ],
+  "Biophysics": [
+    "science-biology"
+  ],
+  "Biotechnology": [
+    "science-biology"
+  ],
+  "Building and Construction": [],
+  "Business and International Management": [
+    "economics"
+  ],
+  "Business, Management and Accounting (miscellaneous)": [
+    "economics"
+  ],
+  "Business, Management and Accounting(all)": [
+    "economics"
+  ],
+  "Cancer Research": [
+    "medicine"
+  ],
+  "Cardiology and Cardiovascular Medicine": [
+    "medicine"
+  ],
+  "Care Planning": [
+    "medicine"
+  ],
+  "Catalysis": [],
+  "Cell Biology": [
+    "science-biology"
+  ],
+  "Cellular and Molecular Neuroscience": [
+    "science-biology",
+    "psychology"
+  ],
+  "Ceramics and Composites": [],
+  "Chemical Engineering (miscellaneous)": [],
+  "Chemical Engineering(all)": [],
+  "Chemical Health and Safety": [
+    "medicine"
+  ],
+  "Chemistry (miscellaneous)": [],
+  "Chemistry(all)": [],
+  "Chiropractics": [
+    "medicine"
+  ],
+  "Civil and Structural Engineering": [],
+  "Classics": [
+    "philosophy"
+  ],
+  "Clinical Biochemistry": [
+    "medicine",
+    "science-biology"
+  ],
+  "Clinical Neurology": [
+    "medicine",
+    "science-biology"
+  ],
+  "Clinical Psychology": [
+    "medicine",
+    "science-biology",
+    "psychology"
+  ],
+  "Cognitive Neuroscience": [
+    "medicine",
+    "science-biology",
+    "psychology"
+  ],
+  "Colloid and Surface Chemistry": [],
+  "Communication": [
+    "philosophy"
+  ],
+  "Community and Home Care": [
+    "general"
+  ],
+  "Complementary and alternative medicine": [
+    "medicine"
+  ],
+  "Complementary and Manual Therapy": [
+    "medicine"
+  ],
+  "Computational Mathematics": [
+    "science-mathematics"
+  ],
+  "Computational Mechanics": [],
+  "Computational Theory and Mathematics": [
+    "science-mathematics"
+  ],
+  "Computer Graphics and Computer-Aided Design": [
+    "science-computerscience"
+  ],
+  "Computer Networks and Communications": [
+    "science-computerscience"
+  ],
+  "Computer Science (miscellaneous)": [
+    "science-computerscience"
+  ],
+  "Computer Science Applications": [
+    "science-computerscience"
+  ],
+  "Computer Science(all)": [
+    "science-computerscience"
+  ],
+  "Computer Vision and Pattern Recognition": [
+    "science-computerscience"
+  ],
+  "Computers in Earth Sciences": [
+    "science-computerscience",
+    "geography",
+    "science-geology"
+  ],
+  "Condensed Matter Physics": [],
+  "Conservation": [
+    "general"
+  ],
+  "Control and Optimization": [
+    "science-mathematics"
+  ],
+  "Control and Systems Engineering": [],
+  "Critical Care and Intensive Care Medicine": [
+    "medicine"
+  ],
+  "Critical Care": [
+    "medicine"
+  ],
+  "Cultural Studies": [
+    "general"
+  ],
+  "Decision Sciences (miscellaneous)": [
+    "science-mathematics"
+  ],
+  "Decision Sciences(all)": [
+    "science-mathematics"
+  ],
+  "Demography": [
+    "general"
+  ],
+  "Dental Assisting": [
+    "medicine"
+  ],
+  "Dental Hygiene": [
+    "medicine"
+  ],
+  "Dentistry (miscellaneous)": [
+    "medicine"
+  ],
+  "Dentistry(all)": [
+    "medicine"
+  ],
+  "Dermatology": [
+    "medicine"
+  ],
+  "Development": [
+    "general"
+  ],
+  "Developmental and Educational Psychology": [
+    "science-biology",
+    "psychology"
+  ],
+  "Developmental Biology": [
+    "science-biology"
+  ],
+  "Developmental Neuroscience": [
+    "science-biology",
+    "psychology"
+  ],
+  "Discrete Mathematics and Combinatorics": [
+    "science-mathematics",
+    "science-computerscience"
+  ],
+  "Drug Discovery": [],
+  "Drug guides": [],
+  "Earth and Planetary Sciences (miscellaneous)": [
+    "science-geology",
+    "geography"
+  ],
+  "Earth and Planetary Sciences(all)": [
+    "science-geology",
+    "geography"
+  ],
+  "Earth-Surface Processes": [
+    "science-geology",
+    "geography"
+  ],
+  "Ecological Modelling": [
+    "science-geology",
+    "geography"
+  ],
+  "Ecology": [
+    "geography"
+  ],
+  "Ecology, Evolution, Behavior and Systematics": [
+    "geography"
+  ],
+  "Economic Geology": [
+    "geography",
+    "economics"
+  ],
+  "Economics and Econometrics": [
+    "economics"
+  ],
+  "Economics, Econometrics and Finance (miscellaneous)": [
+    "economics"
+  ],
+  "Economics, Econometrics and Finance(all)": [
+    "economics"
+  ],
+  "Education": [
+    "education"
+  ],
+  "Electrical and Electronic Engineering": [
+    "science-mathematics"
+  ],
+  "Electrochemistry": [],
+  "Electronic, Optical and Magnetic Materials": [],
+  "Embryology": [
+    "medicine",
+    "science-biology"
+  ],
+  "Emergency Medicine": [
+    "medicine"
+  ],
+  "Emergency": [
+    "medicine"
+  ],
+  "Endocrine and Autonomic Systems": [
+    "medicine"
+  ],
+  "Endocrinology": [
+    "medicine"
+  ],
+  "Endocrinology, Diabetes and Metabolism": [
+    "medicine"
+  ],
+  "Energy (miscellaneous)": [],
+  "Energy Engineering and Power Technology": [],
+  "Energy(all)": [],
+  "Engineering (miscellaneous)": [],
+  "Engineering(all)": [],
+  "Environmental Chemistry": [],
+  "Environmental Engineering": [
+    "geography",
+    "science-biology"
+  ],
+  "Environmental Science (miscellaneous)": [
+    "geography",
+    "science-biology"
+  ],
+  "Environmental Science(all)": [
+    "geography",
+    "science-biology"
+  ],
+  "Epidemiology": [
+    "medicine"
+  ],
+  "Equine": [
+    "science-biology"
+  ],
+  "Experimental and Cognitive Psychology": [
+    "psychology"
+  ],
+  "Family Practice": [
+    "general",
+    "psychology"
+  ],
+  "Filtration and Separation": [],
+  "Finance": [
+    "economics"
+  ],
+  "Fluid Flow and Transfer Processes": [],
+  "Food Animals": [],
+  "Food Science": [],
+  "Forestry": [],
+  "Fuel Technology": [],
+  "Fundamentals and skills": [
+    "education"
+  ],
+  "Gastroenterology": [
+    "medicine"
+  ],
+  "Gender Studies": [
+    "general",
+    "philosophy"
+  ],
+  "General": [
+    "general"
+  ],
+  "Genetics": [
+    "science-biology"
+  ],
+  "Genetics(clinical)": [
+    "science-biology",
+    "medicine"
+  ],
+  "Geochemistry and Petrology": [
+    "science-geology",
+    "geography"
+  ],
+  "Geography, Planning and Development": [
+    "geography"
+  ],
+  "Geology": [
+    "science-geology"
+  ],
+  "Geometry and Topology": [
+    "science-mathematics"
+  ],
+  "Geophysics": [
+    "science-geology",
+    "geography"
+  ],
+  "Geotechnical Engineering and Engineering Geology": [
+    "science-geology",
+    "geography"
+  ],
+  "Geriatrics and Gerontology": [
+    "medicine"
+  ],
+  "Gerontology": [
+    "medicine"
+  ],
+  "Global and Planetary Change": [
+    "science-geology",
+    "geography"
+  ],
+  "Hardware and Architecture": [],
+  "Health Informatics": [
+    "medicine",
+    "science-computerscience"
+  ],
+  "Health Information Management": [
+    "medicine",
+    "science-computerscience"
+  ],
+  "Health Policy": [
+    "medicine"
+  ],
+  "Health Professions (miscellaneous)": [
+    "medicine"
+  ],
+  "Health Professions(all)": [
+    "medicine"
+  ],
+  "Health(social science)": [
+    "medicine"
+  ],
+  "Health, Toxicology and Mutagenesis": [
+    "medicine"
+  ],
+  "Hematology": [
+    "medicine"
+  ],
+  "Hepatology": [
+    "medicine"
+  ],
+  "Histology": [
+    "science-biology"
+  ],
+  "History and Philosophy of Science": [
+    "history",
+    "philosophy"
+  ],
+  "History": [
+    "history"
+  ],
+  "Horticulture": [],
+  "Human Factors and Ergonomics": [
+    "general"
+  ],
+  "Human-Computer Interaction": [
+    "science-computerscience"
+  ],
+  "Immunology and Allergy": [
+    "medicine"
+  ],
+  "Immunology and Microbiology (miscellaneous)": [
+    "medicine"
+  ],
+  "Immunology and Microbiology(all)": [
+    "medicine"
+  ],
+  "Immunology": [
+    "medicine"
+  ],
+  "Industrial and Manufacturing Engineering": [],
+  "Industrial relations": [],
+  "Infectious Diseases": [
+    "medicine"
+  ],
+  "Information Systems and Management": [
+    "science-computerscience"
+  ],
+  "Information Systems": [
+    "science-computerscience"
+  ],
+  "Inorganic Chemistry": [],
+  "Insect Science": [
+    "science-biology"
+  ],
+  "Instrumentation": [
+    "general"
+  ],
+  "Internal Medicine": [
+    "medicine"
+  ],
+  "Issues, ethics and legal aspects": [
+    "law"
+  ],
+  "Language and Linguistics": [
+    "philology"
+  ],
+  "Law": [
+    "law"
+  ],
+  "Leadership and Management": [
+    "economics"
+  ],
+  "Library and Information Sciences": [
+    "general"
+  ],
+  "Life-span and Life-course Studies": [
+    "medicine"
+  ],
+  "Linguistics and Language": [
+    "philology"
+  ],
+  "Literature and Literary Theory": [
+    "philology"
+  ],
+  "Logic": [
+    "science-mathematics"
+  ],
+  "LPN and LVN": [
+    "medicine"
+  ],
+  "Management Information Systems": [
+    "economics"
+  ],
+  "Management of Technology and Innovation": [
+    "economics"
+  ],
+  "Management Science and Operations Research": [
+    "economics"
+  ],
+  "Management, Monitoring, Policy and Law": [
+    "economics"
+  ],
+  "Marketing": [
+    "economics"
+  ],
+  "Materials Chemistry": [],
+  "Materials Science (miscellaneous)": [],
+  "Materials Science(all)": [],
+  "Maternity and Midwifery": [
+    "medicine"
+  ],
+  "Mathematical Physics": [
+    "science-mathematics"
+  ],
+  "Mathematics (miscellaneous)": [
+    "science-mathematics"
+  ],
+  "Mathematics(all)": [
+    "science-mathematics"
+  ],
+  "Mechanical Engineering": [],
+  "Mechanics of Materials": [],
+  "Media Technology": [
+    "general"
+  ],
+  "Medical Laboratory Technology": [
+    "medicine"
+  ],
+  "Medical–Surgical": [
+    "medicine"
+  ],
+  "Medicine (miscellaneous)": [
+    "medicine"
+  ],
+  "Medicine(all)": [
+    "medicine"
+  ],
+  "Metals and Alloys": [],
+  "Microbiology (medical)": [
+    "science-biology"
+  ],
+  "Microbiology": [
+    "science-biology"
+  ],
+  "Modelling and Simulation": [],
+  "Molecular Biology": [
+    "science-biology"
+  ],
+  "Molecular Medicine": [
+    "medicine"
+  ],
+  "Museology": [
+    "general"
+  ],
+  "Music": [
+    "music"
+  ],
+  "Nature and Landscape Conservation": [
+    "geography",
+    "science-biology"
+  ],
+  "Nephrology": [
+    "medicine"
+  ],
+  "Neurology": [
+    "medicine"
+  ],
+  "Neuropsychology and Physiological Psychology": [
+    "medicine",
+    "psychology"
+  ],
+  "Neuroscience (miscellaneous)": [
+    "medicine"
+  ],
+  "Neuroscience(all)": [
+    "medicine"
+  ],
+  "Nuclear and High Energy Physics": [],
+  "Nuclear Energy and Engineering": [],
+  "Numerical Analysis": [
+    "science-mathematics"
+  ],
+  "Nurse Assisting": [
+    "medicine"
+  ],
+  "Nursing (miscellaneous)": [
+    "medicine"
+  ],
+  "Nursing(all)": [
+    "medicine"
+  ],
+  "Nutrition and Dietetics": [
+    "medicine"
+  ],
+  "Obstetrics and Gynaecology": [
+    "medicine"
+  ],
+  "Occupational Therapy": [
+    "medicine"
+  ],
+  "Ocean Engineering": [
+    "science"
+  ],
+  "Oceanography": [
+    "science"
+  ],
+  "Oncology": [
+    "medicine"
+  ],
+  "Oncology(nursing)": [
+    "medicine"
+  ],
+  "Ophthalmology": [
+    "medicine"
+  ],
+  "Optometry": [
+    "medicine"
+  ],
+  "Oral Surgery": [
+    "medicine"
+  ],
+  "Organic Chemistry": [],
+  "Organizational Behavior and Human Resource Management": [
+    "economics"
+  ],
+  "Orthodontics": [
+    "medicine"
+  ],
+  "Orthopedics and Sports Medicine": [
+    "medicine"
+  ],
+  "Otorhinolaryngology": [
+    "medicine"
+  ],
+  "Palaeontology": [
+    "science-geology"
+  ],
+  "Parasitology": [
+    "medicine"
+  ],
+  "Pathology and Forensic Medicine": [
+    "medicine"
+  ],
+  "Pediatrics": [
+    "medicine"
+  ],
+  "Pediatrics, Perinatology, and Child Health": [
+    "medicine"
+  ],
+  "Periodontics": [
+    "medicine"
+  ],
+  "Pharmaceutical Science": [],
+  "Pharmacology (medical)": [],
+  "Pharmacology (nursing)": [],
+  "Pharmacology": [],
+  "Pharmacology, Toxicology and Pharmaceutics (miscellaneous)": [],
+  "Pharmacology, Toxicology and Pharmaceutics(all)": [],
+  "Pharmacy": [],
+  "Philosophy": [
+    "philosophy"
+  ],
+  "Phychiatric Mental Health": [
+    "medicine",
+    "psychology"
+  ],
+  "Physical and Theoretical Chemistry": [],
+  "Physical Therapy, Sports Therapy and Rehabilitation": [
+    "medicine"
+  ],
+  "Physics and Astronomy (miscellaneous)": [],
+  "Physics and Astronomy(all)": [],
+  "Physiology (medical)": [
+    "science-biology"
+  ],
+  "Physiology": [
+    "science-biology"
+  ],
+  "Plant Science": [
+    "science-biology"
+  ],
+  "Podiatry": [
+    "medicine"
+  ],
+  "Political Science and International Relations": [],
+  "Pollution": [
+    "geography"
+  ],
+  "Polymers and Plastics": [],
+  "Process Chemistry and Technology": [],
+  "Psychiatry and Mental health": [
+    "medicine",
+    "psychology"
+  ],
+  "Psychology (miscellaneous)": [
+    "psychology"
+  ],
+  "Psychology(all)": [
+    "psychology"
+  ],
+  "Public Administration": [
+    "general"
+  ],
+  "Public Health, Environmental and Occupational Health": [
+    "medicine"
+  ],
+  "Pulmonary and Respiratory Medicine": [
+    "medicine"
+  ],
+  "Radiation": [],
+  "Radiological and Ultrasound Technology": [
+    "medicine"
+  ],
+  "Radiology Nuclear Medicine and imaging": [
+    "medicine"
+  ],
+  "Rehabilitation": [
+    "medicine"
+  ],
+  "Religious studies": [
+    "religion"
+  ],
+  "Renewable Energy, Sustainability and the Environment": [
+    "geography"
+  ],
+  "Reproductive Medicine": [
+    "medicine"
+  ],
+  "Research and Theory": [
+    "general"
+  ],
+  "Review and Exam Preparation": [
+    "general"
+  ],
+  "Reviews and References, Medical": [
+    "medicine"
+  ],
+  "Rheumatology": [
+    "medicine"
+  ],
+  "Safety Research": [
+    "general"
+  ],
+  "Safety, Risk, Reliability and Quality": [
+    "general"
+  ],
+  "Sensory Systems": [],
+  "Signal Processing": [],
+  "Small Animals": [
+    "science-biology"
+  ],
+  "Social Psychology": [
+    "psychology"
+  ],
+  "Social Sciences (miscellaneous)": [
+    "general"
+  ],
+  "Social Sciences(all)": [
+    "general"
+  ],
+  "Sociology and Political Science": [],
+  "Software": [
+    "science-computerscience"
+  ],
+  "Soil Science": [],
+  "Space and Planetary Science": [],
+  "Spectroscopy": [],
+  "Speech and Hearing": [
+    "general"
+  ],
+  "Statistical and Nonlinear Physics": [],
+  "Statistics and Probability": [
+    "science-mathematics"
+  ],
+  "Statistics, Probability and Uncertainty": [
+    "science-mathematics"
+  ],
+  "Strategy and Management": [
+    "economics"
+  ],
+  "Stratigraphy": [
+    "geography",
+    "science-geology"
+  ],
+  "Structural Biology": [
+    "science-biology"
+  ],
+  "Surfaces and Interfaces": [
+    "general"
+  ],
+  "Surfaces, Coatings and Films": [
+    "general"
+  ],
+  "Surgery": [
+    "medicine"
+  ],
+  "Theoretical Computer Science": [
+    "science-computerscience"
+  ],
+  "Tourism, Leisure and Hospitality Management": [
+    "general"
+  ],
+  "Toxicology": [],
+  "Transplantation": [
+    "medicine"
+  ],
+  "Transportation": [
+    "general"
+  ],
+  "Urban Studies": [
+    "geography"
+  ],
+  "Urology": [
+    "medicine"
+  ],
+  "veterinary (miscalleneous)": [
+    "medicine"
+  ],
+  "veterinary(all)": [
+    "medicine"
+  ],
+  "Virology": [
+    "medicine"
+  ],
+  "Visual Arts and Performing Arts": [
+    "finearts"
+  ],
+  "Waste Management and Disposal": [
+    "geography"
+  ],
+  "Water Science and Technology": [
+    "geography"
+  ]
+}
