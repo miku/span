@@ -2,7 +2,8 @@
 
 ## Crossref-to-Finc
 
-Mapping crossref subjects to finc classification.
+Mapping crossref subjects to finc classification. 250 already mapped, 78
+subject not mapped yet.
 
 ### 2023-12-07 already mapped
 
