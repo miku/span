@@ -25,6 +25,7 @@ type Solr5Vufind3 struct {
 	Edition              string   `json:"edition,omitempty"`
 	FacetAvail           []string `json:"facet_avail"`
 	FincClassFacet       []string `json:"finc_class_facet,omitempty"`
+	FincClassFacetMv     []string `json:"fincclass_facet_txtF_mv,omitempty"` // refs #25035, #17265
 	Footnotes            []string `json:"footnote,omitempty"`
 	Formats              []string `json:"format,omitempty"`
 	Fullrecord           string   `json:"fullrecord,omitempty"`
