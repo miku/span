@@ -61,7 +61,7 @@ var (
 	outputFile      = flag.String("o", "", "output filename (stdout, otherwise)")
 	timeout         = flag.Duration("t", 60*time.Second, "connectiont timeout")
 	maxRetries      = flag.Int("x", 10, "max retries")
-	mode            = flag.String("mode", "t", "t=tabs, s=sync")
+	mode            = flag.String("mode", "s", "t=tabs, s=sync")
 	intervals       = flag.String("i", "d", "intervals: d=daily, w=weekly, m=monthly")
 	compressProgram = flag.String("p", "gzip", "compress program: gzip or zstd")
 	prefix          = flag.String("P", "default-", "a tag to distinguish between different runs, filename prefix")
