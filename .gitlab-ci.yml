@@ -3,7 +3,7 @@
 # The first thing is to choose what Docker image will be used to run the CI.
 # Head to the Docker Hub to choose the right image for your project.
 
-image: golang:1.16.6
+image: golang:1.21.5
 
 cache:
   paths:
