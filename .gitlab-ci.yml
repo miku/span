@@ -21,6 +21,7 @@ unit_tests:
   before_script:
     - go version
   script:
+    - HTTP_PROXY=proxy.uni-leipzig.de:3128 HTTPS_PROXY=proxy.uni-leipzig.de:3128 curl -v https://heise.de > /dev/null
     - HTTP_PROXY=proxy.uni-leipzig.de:3128 HTTPS_PROXY=proxy.uni-leipzig.de:3128 make test
   tags:
     - docker
