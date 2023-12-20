@@ -3,15 +3,15 @@
 # The first thing is to choose what Docker image will be used to run the CI.
 # Head to the Docker Hub to choose the right image for your project.
 
-image: golang:1.21.5
+image: golang:1.21.4
 
-cache:
-  paths:
-    - /apt-cache
-    - /go/src/github.com
-    - /go/src/golang.org
-    - /go/src/google.golang.org
-    - /go/src/gopkg.in
+# cache:
+#   paths:
+#     - /apt-cache
+#     - /go/src/github.com
+#     - /go/src/golang.org
+#     - /go/src/google.golang.org
+#     - /go/src/gopkg.in
 
 stages:
   - test
@@ -21,6 +21,6 @@ unit_tests:
   before_script:
     - go version
   script:
-    - make test
+    - HTTP_PROXY=proxy.uni-leipzig.de:3128 HTTPS_PROXY=proxy.uni-leipzig.de:3128 make test
   tags:
     - docker
