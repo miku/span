@@ -58,13 +58,14 @@ type Article struct {
 	jats.Article
 }
 
-// Identifiers returns the doi and the dependent url and recordID in a struct.
-// Records from this source do not need a DOI necessarily.
+// Identifiers returns identifiers.
 func (article *Article) Identifiers() (jats.Identifiers, error) {
-	locator := article.Front.Article.SelfURI.Value
-
-	doi := DOIPattern.FindString(locator)
-	id := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(locator)))
+	doi, err := article.DOI()
+	if err != nil {
+		return jats.Identifiers{}, err
+	}
+	locator := fmt.Sprintf("https://doi.org/%s", doi)
+	id := fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doi)))
 	return jats.Identifiers{DOI: doi, URL: locator, ID: id}, nil
 }
 
