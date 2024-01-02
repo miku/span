@@ -30,6 +30,7 @@ import (
 	"github.com/miku/span/formats/highwire"
 	"github.com/miku/span/formats/ieee"
 	"github.com/miku/span/formats/imslp"
+	"github.com/miku/span/formats/ios"
 	"github.com/miku/span/formats/jstor"
 	"github.com/miku/span/formats/mediarep"
 	"github.com/miku/span/formats/olms"
@@ -73,6 +74,7 @@ var FormatMap = map[string]Factory{
 	"hhbd":          func() interface{} { return new(hhbd.Record) },
 	"highwire":      func() interface{} { return new(highwire.Record) },
 	"ieee":          func() interface{} { return new(ieee.Publication) },
+	"ios":           func() interface{} { return new(ios.Article) },
 	"imslp":         func() interface{} { return new(imslp.Data) },
 	"jstor":         func() interface{} { return new(jstor.Article) },
 	"mediarep-dim":  func() interface{} { return new(mediarep.Dim) },
@@ -251,14 +253,35 @@ func main() {
 
 	switch *name {
 	// XXX: Configure this in one place.
-	case "highwire", "ceeol", "ieee", "genios", "jstor", "thieme-tm",
-		"zvdd", "degruyter", "zvdd-mets", "hhbd", "thieme-nlm", "olms",
-		"olms-mets", "ssoar", "genderopen", "mediarep-dim",
-		"ceeol-marcxml", "doaj-oai", "dblp":
+	case
+		"ceeol",
+		"ceeol-marcxml",
+		"dblp",
+		"degruyter",
+		"doaj-oai",
+		"genderopen",
+		"genios",
+		"hhbd",
+		"highwire",
+		"ieee",
+		"ios",
+		"jstor",
+		"mediarep-dim",
+		"olms",
+		"olms-mets",
+		"ssoar",
+		"thieme-nlm",
+		"thieme-tm",
+		"zvdd",
+		"zvdd-mets":
 		if err := processXML(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
-	case "doaj", "doaj-api", "crossref", "dummy":
+	case
+		"crossref",
+		"doaj",
+		"doaj-api",
+		"dummy":
 		if err := processJSON(reader, w, *name); err != nil {
 			log.Fatal(err)
 		}
