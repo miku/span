@@ -69,18 +69,6 @@ func (article *Article) Identifiers() (jats.Identifiers, error) {
 	return jats.Identifiers{DOI: doi, URL: locator, ID: id}, nil
 }
 
-// Authors returns the authors as slice.
-func (article *Article) Authors() []finc.Author {
-	var authors []finc.Author
-	group := article.Front.Article.ContribGroup
-	for _, contrib := range group.Contrib {
-		authors = append(authors, finc.Author{
-			LastName:  contrib.StringName.Surname.Value,
-			FirstName: contrib.StringName.GivenNames.Value})
-	}
-	return authors
-}
-
 // Languages returns a list of language in 3-letter format.
 func (article *Article) Languages() []string {
 	set := container.NewStringSet()

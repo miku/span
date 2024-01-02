@@ -49,7 +49,7 @@ var (
 		"2006-xx-xx",
 	}
 
-	policy = bluemonday.UGCPolicy()
+	policy = bluemonday.StrictPolicy()
 )
 
 // PubDate represents a publication date. Typical type values are ppub and epub.
@@ -255,13 +255,8 @@ type Article struct {
 		}
 	}
 	Body struct {
-		XMLName xml.Name `xml:"body"`
-		Section struct {
-			XMLName xml.Name `xml:"sec"`
-			Type    string   `xml:"sec-type,attr"`
-			Value   string   `xml:",innerxml"`
-		}
-	}
+		Value string `xml:",innerxml"`
+	} `xml:"body"`
 }
 
 // DOI is a convenience shortcut to get the DOI.
@@ -449,7 +444,7 @@ func (article *Article) Languages() []string {
 	vals := []string{
 		article.Front.Article.Abstract.Value,
 		article.Front.Article.TranslatedAbstract.Title.Value,
-		article.Body.Section.Value,
+		string(article.Body.Value),
 	}
 
 	for _, s := range vals {
@@ -487,7 +482,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Abstract = strings.TrimSpace(string(article.Front.Article.Abstract.Value))
 	output.ArticleTitle = article.CombinedTitle()
 	output.Authors = article.Authors()
-	output.Fulltext = strings.TrimSpace(article.Body.Section.Value)
+	output.Fulltext = policy.Sanitize(strings.TrimSpace(string(article.Body.Value)))
 	if output.Abstract == "" && output.Fulltext != "" {
 		output.Abstract = clipString(output.Fulltext, 200)
 	}
