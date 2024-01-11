@@ -1,16 +1,17 @@
-// span-crossref-sync download caches raw crossref messages from the crossref
-// works API.
+// span-crossref-sync downloads and caches raw crossref messages from the
+// crossref works API: https://www.crossref.org/documentation/retrieve-metadata/rest-api/
 //
 // Example usage:
 //
-//	$ span-crossref-sync -p zstd \ # compress program
-//	  -P feed-1- \                 # file prefix
-//	  -i d \                       # interval (daily)
-//	  -verbose \                   # verbose
-//	  -t 30m \                     # timeout
-//	  -s 2022-01-01 \              # start
-//	  -e 2023-05-01 \              # end
-//	  -c /data/finc/crossref/      # cache dir
+//		$ span-crossref-sync \
+//	      -p zstd \                    # compress program
+//		  -P feed-1- \                 # file prefix (to separate different runs)
+//		  -i d \                       # interval (daily)
+//		  -verbose \                   # verbose
+//		  -t 30m \                     # timeout
+//		  -s 2022-01-01 \              # start
+//		  -e 2023-05-01 \              # end (default: yesterday)
+//		  -c /data/finc/crossref/      # cache dir
 //
 // Space requirements: One day yields about 1M update docs, or a ~2GB
 // compressed file. A year equates to about 800G of compressed data.
