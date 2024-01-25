@@ -47,6 +47,7 @@ type Solr5Vufind3 struct {
 	Publishers           []string `json:"publisher,omitempty"`
 	RecordID             string   `json:"record_id,omitempty"`
 	RecordType           string   `json:"recordtype,omitempty"`
+	RecordFormat         string   `json:"record_format,omitempty"`
 	Series               []string `json:"series,omitempty"`
 	SourceID             string   `json:"source_id,omitempty"`
 	Subtitle             string   `json:"title_sub,omitempty"`
@@ -127,6 +128,8 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	} else {
 		s.RecordType = AIRecordType
 	}
+	// refs #22746, #21605
+	s.RecordFormat = s.RecordType
 
 	if is.JournalTitle != "" {
 		s.Series = append(s.Series, is.JournalTitle)
