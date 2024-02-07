@@ -1,4 +1,5 @@
-// Sniff out DOI from JSON document, optionally update docs with found DOI.
+// Sniff out DOI from a VuFind SOLR JSON document, optionally update docs with
+// found DOI, cf. https://github.com/slub/labe/tree/efee6a8e062b66cb154b922fcaaf7d16f15d02b2/go/ckit#doisniffer
 package main
 
 import (

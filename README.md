@@ -54,7 +54,7 @@ the help of a small library called
 screening of sources serialized as XML - making the process of mapping new data
 sources easier.
 
-Since about 2018, the span tools have seen mostly small fixes and additions.
+Since about 2018 (0.1.211), the span tools have seen mostly small fixes and additions.
 Notable, since 2021, the previous scripts used to fetch daily metadata updates
 from [crossref](https://api.crossref.org) has been put into a standalone tool, `span-crossref-sync`, which
 merely adds some retry logic and consistent file naming to the API harvest.
