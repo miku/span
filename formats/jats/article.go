@@ -17,8 +17,8 @@ import (
 )
 
 var (
-	errNoDOI          = errors.New("DOI is missing")
-	errNotImplemented = errors.New("not implemented")
+	ErrNoDOI          = errors.New("DOI is missing")
+	ErrNotImplemented = errors.New("not implemented")
 )
 
 var (
@@ -267,7 +267,7 @@ func (article *Article) DOI() (s string, err error) {
 			return id.Value, nil
 		}
 	}
-	return s, errNoDOI
+	return s, ErrNoDOI
 }
 
 // identifiers is a helper struct.
@@ -280,7 +280,7 @@ type Identifiers struct {
 // identifiers returns the doi and the dependent url and recordID in a struct.
 // It is an error, if there is no DOI.
 func (article *Article) Identifiers() (Identifiers, error) {
-	return Identifiers{}, errNotImplemented
+	return Identifiers{}, ErrNotImplemented
 }
 
 // Authors returns the authors as slice.

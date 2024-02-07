@@ -25,6 +25,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 
@@ -87,6 +88,10 @@ func (article *Article) Languages() []string {
 // couple of content-dependent choices here.
 func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output, err := article.Article.ToIntermediateSchema()
+	if err == jats.ErrNoDOI {
+		log.Printf("record w/o DOI: %v", article.Front.Article.ID)
+		return nil, nil
+	}
 	if err != nil {
 		return output, err
 	}
