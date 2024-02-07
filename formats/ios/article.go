@@ -96,6 +96,10 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		return output, err
 	}
 	ids, err := article.Identifiers()
+	if err == jats.ErrNoDOI {
+		log.Printf("record w/o DOI: %v", article.Front.Article.ID)
+		return nil, nil
+	}
 	if err != nil {
 		return output, err
 	}
