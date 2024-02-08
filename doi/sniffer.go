@@ -59,7 +59,7 @@ func NewSniffer(r io.Reader, w io.Writer) *Sniffer {
 	}
 }
 
-// Run sniffs out DOI and eventually update document in place.
+// Run sniffs out DOI and eventually updates a document in place.
 func (s *Sniffer) Run() error {
 	pp := parallel.NewProcessor(s.Reader, s.Writer, func(p []byte) ([]byte, error) {
 		var (
