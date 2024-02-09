@@ -3,15 +3,15 @@
 //
 // Example usage:
 //
-//		$ span-crossref-sync \
-//	      -p zstd \                    # compress program
-//		  -P feed-1- \                 # file prefix (to separate different runs)
-//		  -i d \                       # interval (daily)
-//		  -verbose \                   # verbose
-//		  -t 30m \                     # timeout
-//		  -s 2022-01-01 \              # start
-//		  -e 2023-05-01 \              # end (default: yesterday)
-//		  -c /data/finc/crossref/      # cache dir
+//	   $ span-crossref-sync \
+//		         -p zstd \                    # compress program
+//		         -P feed-1- \                 # file prefix (to separate different runs)
+//		         -i d \                       # interval (daily)
+//		         -verbose \                   # verbose
+//		         -t 30m \                     # timeout
+//		         -s 2022-01-01 \              # start
+//		         -e 2023-05-01 \              # end (leave out for default: yesterday)
+//		         -c /data/finc/crossref/      # cache dir
 //
 // Space requirements: One day yields about 1M update docs, or a ~2GB
 // compressed file. A year equates to about 800G of compressed data.
@@ -21,6 +21,8 @@
 // snapshot.
 //
 // Data point: https://github.com/miku/filterline#data-point-crossref-snapshot
+//
+// As of 02/2024 we have 768 files (for "feed-1-") using 2.1TB (zstd, est. 12TB uncompressed).
 package main
 
 import (
