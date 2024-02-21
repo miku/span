@@ -40,7 +40,7 @@
 //
 // At most 13GB per day. Total sum of downloaded data is 1.796TB compressed
 // (3); if we recompress with (19) we get around 1.3TB of raw data, or 8.07TiB
-// uncompressed.
+// uncompressed. A typical update day contains 1-2M docs (lines).
 package main
 
 import (
