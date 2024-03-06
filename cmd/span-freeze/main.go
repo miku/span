@@ -1,13 +1,13 @@
 // Freeze file containing urls along with the content of all urls. Frozen file
 // will be a zip file, containing something like:
 //
-//     /blob
-//     /mapping.json
-//     /files/<sha1 of url>
-//     /files/<sha1 of url>
-//     /files/...
+//	/blob
+//	/mapping.json
+//	/files/<sha1 of url>
+//	/files/<sha1 of url>
+//	/files/...
 //
-//     $ curl -s https://queue.acm.org/ | span-freeze -b -o acm.zip
+//	$ curl -s https://queue.acm.org/ | span-freeze -b -o acm.zip
 package main
 
 import (
@@ -45,34 +45,27 @@ var (
 
 func main() {
 	flag.Parse()
-
 	if *showVersion {
 		fmt.Println(span.AppVersion)
 		os.Exit(0)
 	}
-
 	if *output == "" {
 		log.Fatal("output file required")
 	}
-
 	file, err := safefile.Create(*output, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
-
 	w := zip.NewWriter(file)
-
 	comment := fmt.Sprintf(`Freeze-Date: %s`, time.Now().Format(time.RFC3339))
 	if err := w.SetComment(comment); err != nil {
 		log.Fatal(err)
 	}
-
 	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	f, err := w.Create(NameBlob)
 	if err != nil {
 		log.Fatal(err)
@@ -80,12 +73,11 @@ func main() {
 	if _, err := f.Write(b); err != nil {
 		log.Fatal(err)
 	}
-
-	urls := xurls.Strict.FindAllString(string(b), -1)
-
-	seen := make(map[string]bool)
-	var unique []string
-
+	var (
+		urls   = xurls.Strict.FindAllString(string(b), -1)
+		seen   = make(map[string]bool)
+		unique []string
+	)
 	for _, u := range urls {
 		u = strings.TrimSpace(u)
 		if _, ok := seen[u]; !ok {
@@ -93,10 +85,8 @@ func main() {
 			seen[u] = true
 		}
 	}
-
 	// Not necessary, but keep an additional mapping to simplify reading later.
 	mapping := make(map[string]string)
-
 	for i, u := range unique {
 		if !strings.HasPrefix(u, "http") {
 			log.Printf("skip: %s", u)
@@ -105,9 +95,7 @@ func main() {
 		h := sha1.New()
 		h.Write([]byte(u))
 		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
-
 		mapping[u] = name
-
 		resp, err := http.Get(u)
 		if err != nil || resp.StatusCode >= 400 {
 			if *bestEffort {
@@ -118,7 +106,6 @@ func main() {
 			}
 		}
 		defer resp.Body.Close()
-
 		f, err := w.Create(name)
 		if err != nil {
 			log.Fatal(err)
@@ -128,7 +115,6 @@ func main() {
 		}
 		log.Printf("[%04d %s] %s", i, name, u)
 	}
-
 	f, err = w.Create(NameMapping)
 	if err != nil {
 		log.Fatal(err)
