@@ -173,6 +173,23 @@ var SourceNames = map[string]string{
 	"200": "finc TEST",
 	"201": "Perinorm (DIN-Normen)",
 	"202": "Zentralinstitut für Kunstgeschichte",
+	"205": "Music and Dance Online",
+	"207": "BioRxiv",
+	"208": "montandok",
+	"209": "Lecture Notes in Informatics (LNI)",
+	"210": "Universal Database of Social Sciences & Humanities (UDB-EDU)",
+	"211": "Nautos (DIN-Normen)",
+	"212": "Figshare",
+	"213": "Library and Information Science Collection",
+	"214": "DigiZeitschriften",
+	"216": "Alvin",
+	"217": "CEEOL E-Books",
+	"218": "Bibliographie der Buch- und Bibliotheksgeschichte",
+	"219": "IOS-Press Zeitschriften",
+	"220": "Cambridge Publishing and Book Culture",
+	"221": "Arte Campus",
+	"223": "K10plus (FID Medien)",
+	"224": "Newsbank",
 }
 
 // TODO: move to XDG
