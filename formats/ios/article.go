@@ -38,8 +38,6 @@ import (
 const (
 	// SourceID for internal bookkeeping, refs #24731
 	SourceID = "219"
-	// SourceName for finc.mega_collection.
-	SourceName = "IOS Press"
 	// Format for intermediate schema.
 	Format = "ElectronicArticle"
 )
@@ -51,6 +49,8 @@ var (
 		regexp.MustCompile(`(?i)table\s*of\s*content[s]?`),
 	}
 	DOIPattern = regexp.MustCompile(`10\.[0-9]+\/\S+`)
+	// SourceName for finc.mega_collection.
+	SourceNames = []string{"IOS-Press Zeitschriften", "sid-219-col-ios"}
 )
 
 type Article struct {
@@ -114,7 +114,7 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.Authors = article.Authors()
 	output.Format = Format
 	output.Languages = article.Languages()
-	output.MegaCollections = []string{SourceName}
+	output.MegaCollections = SourceNames
 	output.SourceID = SourceID
 	var normalized []string
 	for _, issn := range output.ISSN {
