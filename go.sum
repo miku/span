@@ -71,8 +71,8 @@ github.com/microcosm-cc/bluemonday v1.0.26 h1:xbqSvqzQMeEHCqMi64VAs4d8uy6Mequs3r
 github.com/microcosm-cc/bluemonday v1.0.26/go.mod h1:JyzOCs9gkyQyjs+6h10UEVSe02CGwkhd72Xdqh78TWs=
 github.com/miku/clam v0.1.0 h1:4jKRxzsTuoqgfpUpCOPaqzdDujMX6jgh5LzFNJTRUa4=
 github.com/miku/clam v0.1.0/go.mod h1:1aGgZmbd4zapPliNG8t18wTmtL2DQVK6XnJNnkn2EAU=
-github.com/miku/parallel v0.0.0-20221125231438-6020962e560a h1:WgWqm8yxIjRR/r8qwWD0MV498jlG8O1IIEb4NlqPZ3A=
-github.com/miku/parallel v0.0.0-20221125231438-6020962e560a/go.mod h1:xw37BJ8SoJr6SGn1Y2AJBsc3EsOU+EuXAuRj5VB1+RI=
+github.com/miku/parallel v0.1.3 h1:wocnQJMlkqe2auVg4yIxpe3Jcd/08ken+AmB9f+4dOk=
+github.com/miku/parallel v0.1.3/go.mod h1:wvgfAapQaiJMAra6oGTP9bamYd1EU3lPV+niQnBdYDM=
 github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0 h1:iGY04M/aVE9AYEV3SuQDau65LY8mEVr03enbD7wmOk4=
 github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0/go.mod h1:0StR8czF6aL+My4AiSs6nLJerwnfBuLIXZWjAR2ChGs=
 github.com/mvdan/xurls v1.1.0 h1:OpuDelGQ1R1ueQ6sSryzi6P+1RtBpfQHM8fJwlE45ww=
@@ -85,6 +85,7 @@ github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJ
 github.com/rogpeppe/go-internal v1.6.1 h1:/FiVV8dS/e+YqF2JvO3yXRFbBLTIuSDkuC7aBOAvL+k=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/scylladb/termtables v0.0.0-20191203121021-c4c0b6d42ff4/go.mod h1:C1a7PQSMz9NShzorzCiG2fk9+xuCgLkPeCvMHYR2OWg=
+github.com/segmentio/asm v1.1.3/go.mod h1:Ld3L4ZXGNcSLRg4JBsZ3//1+f/TjYl0Mzen/DQy1EJg=
 github.com/segmentio/asm v1.2.0 h1:9BQrFxC+YOHJlTlHGkTrFWf59nbL3XnCoFLTwDCI7ys=
 github.com/segmentio/asm v1.2.0/go.mod h1:BqMnlJP91P8d+4ibuonYZw9mfnzI9HfxselHZr5aAcs=
 github.com/segmentio/encoding v0.4.0 h1:MEBYvRqiUB2nfR2criEXWqwdY6HJOUrCn5hboVOVmy8=
@@ -101,6 +102,7 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 golang.org/x/net v0.22.0 h1:9sGLhx7iRIHEiX0oAJ3MRZMUCElJgy7Br1nO+AMN3Tc=
 golang.org/x/net v0.22.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
 golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20211110154304-99a53858aa08/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
