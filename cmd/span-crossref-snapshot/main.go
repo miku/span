@@ -237,8 +237,10 @@ func main() {
 			// Encountered with a single document found,
 			// {"DOI":"10.15215\/aupress\/9781897425909.026","score":8.143441}
 			numErrs.Add(1)
-			if numErrs.Load() > *errCountThreshold {
+			if n := numErrs.Load(); n > *errCountThreshold {
 				return nil, err
+			} else {
+				log.Printf("skipping error (errs: %d <= max: %d): %v", n, *errCountThreshold, err)
 			}
 			return nil, nil
 		}
