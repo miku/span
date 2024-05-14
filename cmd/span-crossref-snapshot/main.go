@@ -93,7 +93,7 @@ var (
 	cpuProfile        = flag.String("cpuprofile", "", "write cpuprofile to file")
 	verbose           = flag.Bool("verbose", false, "be verbose")
 	pathFile          = flag.String("f", "", "path to a file naming all inputs files to be considered, one file per line")
-	errCountThreshold = flag.Int("E", 1, "number of json unmarshal errors to tolerate")
+	errCountThreshold = flag.Int64("E", 1, "number of json unmarshal errors to tolerate")
 )
 
 // writeFields writes a variable number of values separated by sep to a given
