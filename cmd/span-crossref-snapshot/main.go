@@ -54,6 +54,7 @@ import (
 	"os/exec"
 	"runtime/pprof"
 	"strings"
+	"sync/atomic"
 
 	"github.com/segmentio/encoding/json"
 
@@ -84,14 +85,15 @@ LIST="$1" LC_ALL=C awk '
 `
 
 var (
-	excludeFile     = flag.String("x", "", "a list of DOI to further ignore")
-	outputFile      = flag.String("o", "", "output file")
-	compressed      = flag.Bool("z", false, "input file is compressed (see: -compress-program)")
-	batchsize       = flag.Int("b", 40000, "batch size")
-	compressProgram = flag.String("compress-program", "zstd", "compress program")
-	cpuProfile      = flag.String("cpuprofile", "", "write cpuprofile to file")
-	verbose         = flag.Bool("verbose", false, "be verbose")
-	pathFile        = flag.String("f", "", "path to a file naming all inputs files to be considered, one file per line")
+	excludeFile       = flag.String("x", "", "a list of DOI to further ignore")
+	outputFile        = flag.String("o", "", "output file")
+	compressed        = flag.Bool("z", false, "input file is compressed (see: -compress-program)")
+	batchsize         = flag.Int("b", 40000, "batch size")
+	compressProgram   = flag.String("compress-program", "zstd", "compress program")
+	cpuProfile        = flag.String("cpuprofile", "", "write cpuprofile to file")
+	verbose           = flag.Bool("verbose", false, "be verbose")
+	pathFile          = flag.String("f", "", "path to a file naming all inputs files to be considered, one file per line")
+	errCountThreshold = flag.Int("E", 1, "number of json unmarshal errors to tolerate")
 )
 
 // writeFields writes a variable number of values separated by sep to a given
@@ -217,8 +219,9 @@ func main() {
 		log.Fatal(err)
 	}
 	var (
-		br = bufio.NewReader(reader)
-		bw = bufio.NewWriter(tf)
+		br      = bufio.NewReader(reader)
+		bw      = bufio.NewWriter(tf)
+		numErrs atomic.Int64
 	)
 	pp := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
 		var (
@@ -231,7 +234,13 @@ func main() {
 			buf bytes.Buffer
 		)
 		if err := json.Unmarshal(b, &doc); err != nil {
-			return nil, err
+			// Encountered with a single document found,
+			// {"DOI":"10.15215\/aupress\/9781897425909.026","score":8.143441}
+			numErrs.Add(1)
+			if numErrs.Load() > *errCountThreshold {
+				return nil, err
+			}
+			return nil, nil
 		}
 		date, err := doc.Indexed.Date()
 		if err != nil {
