@@ -1,6 +1,6 @@
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+//	Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
+//	                  The Finc Authors, http://finc.info
+//	                  Martin Czygan, <martin.czygan@uni-leipzig.de>
 //
 // This file is part of some open source application.
 //
@@ -18,13 +18,13 @@
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 //
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
 package crossref
 
 import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -278,56 +278,53 @@ func (doc *Document) FindLanguages() []string {
 func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	var err error
 	output := finc.NewIntermediateSchema()
-
 	output.Date, err = doc.PublishedPrint.Date()
 	if err != nil {
 		// Fallback to previous behaviour, refs #12321.
 		output.Date, err = doc.Issued.Date()
 	}
-
+	// More fallbacks for dates, some of which may be wrong.
+	if err != nil {
+		log.Printf("warning: crossref: falling back to created date")
+		output.Date, err = doc.Created.Date()
+	}
+	if err != nil {
+		log.Printf("warning: crossref: falling back to deposited date")
+		output.Date, err = doc.Deposited.Date()
+	}
 	if err != nil {
 		return output, err
 	}
-
 	output.RawDate = output.Date.Format("2006-01-02")
-
 	if doc.URL == "" {
 		return output, errNoURL
 	}
-
 	output.ID = doc.ID()
 	if len(output.ID) > span.KeyLengthLimit {
 		return output, span.Skip{Reason: fmt.Sprintf("ID_TOO_LONG %s", output.ID)}
 	}
-
 	if output.Date.After(Future) {
 		return output, span.Skip{Reason: fmt.Sprintf("TOO_FUTURISTIC %s", output.ID)}
 	}
-
 	if doc.Type == "journal-issue" {
 		return output, span.Skip{Reason: fmt.Sprintf("JOURNAL_ISSUE %s", output.ID)}
 	}
-
 	output.ArticleTitle = doc.CombinedTitle()
 	if len(output.ArticleTitle) == 0 {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.ID)}
 	}
-
 	for _, title := range ArticleTitleBlocker {
 		if output.ArticleTitle == title {
 			return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.ID)}
 		}
 	}
-
 	for _, p := range ArticleTitleCleanerPatterns {
 		output.ArticleTitle = p.ReplaceAllString(output.ArticleTitle, "")
 	}
-
 	// refs. #8428, refs. #14286
 	if len(output.ArticleTitle) > 2400 {
 		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.ID)}
 	}
-
 	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
 	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
 	output.Genre = Genres.Lookup(doc.Type, "unknown")
@@ -341,58 +338,47 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Type = doc.Type
 	output.URL = append(output.URL, doc.URL)
 	output.Volume = strings.TrimLeft(doc.Volume, "0")
-
 	if len(doc.ContainerTitle) > 0 {
 		output.JournalTitle = strutil.UnescapeTrim(doc.ContainerTitle[0])
 	} else {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.ID)}
 	}
-
 	// refs #10864
 	if strings.HasPrefix(doc.Type, "book-") {
 		output.ArticleTitle = fmt.Sprintf("%s: %s", output.JournalTitle, output.ArticleTitle)
 	}
-
 	if len(doc.Subtitle) > 0 {
 		output.ArticleSubtitle = strutil.UnescapeTrim(doc.Subtitle[0])
 	}
-
 	output.Authors = doc.Authors()
-
 	// TODO(miku): do we need a config for these things?
 	// Maybe a generic filter (in js?) that will gather exclusion rules?
 	// if len(output.Authors) == 0 {
 	// 	return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.ID)}
 	// }
-
 	pi := doc.PageInfo()
 	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
 	output.EndPage = fmt.Sprintf("%d", pi.EndPage)
 	output.Pages = pi.RawMessage
 	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
-
 	// TODO: use a file for this
 	publisherBlacklist := []string{
 		"Crossref Testing",
 		"test",
 		"crossref-test",
 	}
-
 	for _, s := range publisherBlacklist {
 		if doc.Publisher == s {
 			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_COLLECTION %s", output.ID)}
 		}
 	}
-
 	if doc.Publisher == "" {
 		output.MegaCollections = []string{fmt.Sprintf("X-U (CrossRef)")}
 	} else {
 		publisher := strutil.UnescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
 		output.MegaCollections = []string{fmt.Sprintf("%s (CrossRef)", publisher)}
 	}
-
 	// refs. #13613
 	output.Abstract = doc.Abstract
-
 	return output, nil
 }
