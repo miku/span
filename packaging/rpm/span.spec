@@ -1,6 +1,6 @@
 Summary:    Library data tools.
 Name:       span
-Version:    0.1.361
+Version:    0.1.362
 Release:    0
 License:    GPL
 ExclusiveArch:  x86_64
