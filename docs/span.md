@@ -42,7 +42,7 @@ SYNOPSIS
 
 `span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`-rows` *N*] [`-q`] [`-sleep` *duration*]
 
-`span-crossref-sync` [`-P` *prefix*] [`-i` *interval] [`-p` *compress-program*] [`-s` *date*] [`-e` *date*]
+`span-crossref-sync` [`-P` *prefix*] [`-i` *interval] [`-p` *compress-program*] [`-s` *date*] [`-e` *date*] [`-E` *numerrors*]
 
 
 DESCRIPTION
@@ -164,6 +164,9 @@ This section is correct, but incomplete. Consult `-h` for further flags.
 
 `-h`
   Show usage.
+
+`-E` *numerrors*
+  Number of errors to tolerate during processing. `span-crossref-snapshot` only.
 
 EXAMPLES
 --------

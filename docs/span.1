@@ -37,7 +37,7 @@ schema and integration tools
 .PP
 \fB\fCspan\-crossref\-members\fR [\fB\fC\-base\fR \fIURL\fP] [\fB\fC\-offset\fR \fIN\fP] [\fB\fC\-rows\fR \fIN\fP] [\fB\fC\-q\fR] [\fB\fC\-sleep\fR \fIduration\fP]
 .PP
-\fB\fCspan\-crossref\-sync\fR [\fB\fC\-P\fR \fIprefix\fP] [\fB\fC\-i\fR \fIinterval] [\fB\fC\-p\fR \fIcompress\-program\fP] [\fB\fC\-s\fR \fIdate\fP] [\fB\fC\-e\fR *date\fP]
+\fB\fCspan\-crossref\-sync\fR [\fB\fC\-P\fR \fIprefix\fP] [\fB\fC\-i\fR *interval] [\fB\fC\-p\fR \fIcompress\-program\fP] [\fB\fC\-s\fR \fIdate\fP] [\fB\fC\-e\fR \fIdate\fP] [\fB\fC\-E\fR \fInumerrors\fP]
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -154,6 +154,9 @@ Suppress logging output, \fB\fCspan\-crossref\-members\fR only.
 .TP
 \fB\fC\-h\fR
 Show usage.
+.TP
+\fB\fC\-E\fR \fInumerrors\fP
+Number of errors to tolerate during processing. \fB\fCspan\-crossref\-snapshot\fR only.
 .SH EXAMPLES
 .PP
 List supported formats for conversion to intermediate schema:
