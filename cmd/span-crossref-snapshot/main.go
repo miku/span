@@ -203,7 +203,7 @@ func main() {
 	var (
 		br      = bufio.NewReader(reader)
 		bw      = bufio.NewWriter(tf)
-		numErrs atomic.Int64
+		numErrs atomic.Int64 // error count across threads
 	)
 	pp := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
 		var (
@@ -222,13 +222,21 @@ func main() {
 			if n := numErrs.Load(); n > *errCountThreshold {
 				return nil, err
 			} else {
-				log.Printf("skipping error (errs: %d <= max: %d): %v", n, *errCountThreshold, err)
+				log.Printf("skipping error (#err: %d <= max: %d): %v", n, *errCountThreshold, err)
 			}
 			return nil, nil
 		}
 		date, err := doc.Indexed.Date()
 		if err != nil {
-			return nil, err
+			// Encountered with a single document found,
+			// {"DOI":"10.15215\/aupress\/9781897425909.026","score":8.143441}
+			numErrs.Add(1)
+			if n := numErrs.Load(); n > *errCountThreshold {
+				return nil, err
+			} else {
+				log.Printf("skipping error (#err: %d <= max: %d): %v", n, *errCountThreshold, err)
+			}
+			return nil, nil
 		}
 		if _, ok := excludes[doc.DOI]; ok {
 			return nil, nil
