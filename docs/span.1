@@ -21,7 +21,7 @@ schema and integration tools
 .PP
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x\fR \fIfile\fP] \-o \fIfile\fP \fIfile\fP
+\fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x\fR \fIfile\fP] [\fB\fC\-S\fR \fISIZE\fP] \-o \fIfile\fP \fIfile\fP
 .PP
 \fB\fCspan\-local\-data\fR < \fIfile\fP
 .PP
@@ -157,6 +157,9 @@ Show usage.
 .TP
 \fB\fC\-E\fR \fInumerrors\fP
 Number of errors to tolerate during processing. \fB\fCspan\-crossref\-snapshot\fR only.
+.TP
+\fB\fC\-S\fR \fIsize\fP
+Buffer size, passed to sort. \fB\fCspan\-crossref\-snapshot\fR only.
 .SH EXAMPLES
 .PP
 List supported formats for conversion to intermediate schema:

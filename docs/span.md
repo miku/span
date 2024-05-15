@@ -26,7 +26,7 @@ SYNOPSIS
 
 `span-update-labels` [`-f` *file*, `-s` *separator*] < *file*
 
-`span-crossref-snapshot` [`-x` *file*] -o *file* *file*
+`span-crossref-snapshot` [`-x` *file*] [`-S` *SIZE*] -o *file* *file*
 
 `span-local-data` < *file*
 
@@ -167,6 +167,9 @@ This section is correct, but incomplete. Consult `-h` for further flags.
 
 `-E` *numerrors*
   Number of errors to tolerate during processing. `span-crossref-snapshot` only.
+
+`-S` *size*
+  Buffer size, passed to sort. `span-crossref-snapshot` only.
 
 EXAMPLES
 --------
