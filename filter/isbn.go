@@ -63,6 +63,7 @@ func (f *ISBNFilter) UnmarshalJSON(p []byte) error {
 			return err
 		}
 		for _, line := range lines {
+			// TODO: handle ;;XXX;;;;;;;... lines as well
 			// Valid ISBN can contain x, normalize to uppercase.
 			line = strings.ToUpper(line)
 			// Sniff ISBNs.
