@@ -52,6 +52,7 @@ var (
 	cpuProfile  = flag.String("cpuprofile", "", "write cpu profile to file")
 	memProfile  = flag.String("memprofile", "", "write heap profile to file (go tool pprof -png --alloc_objects program mem.pprof > mem.png)")
 	logfile     = flag.String("logfile", "", "path to logfile to append to, otherwise stderr")
+	verbose     = flag.Bool("verbose", false, "be verbose")
 )
 
 // Factory creates things.
@@ -111,6 +112,9 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 		output, err := converter.ToIntermediateSchema()
 		if err != nil {
 			if _, ok := err.(span.Skip); ok {
+				if *verbose {
+					log.Printf("%v", err)
+				}
 				continue
 			}
 			return err
@@ -138,6 +142,9 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 		}
 		output, err := converter.ToIntermediateSchema()
 		if _, ok := err.(span.Skip); ok {
+			if *verbose {
+				log.Printf("%v", err)
+			}
 			return nil, nil
 		}
 		if err != nil {
@@ -192,12 +199,10 @@ func processText(r io.Reader, w io.Writer, name string) error {
 
 func main() {
 	flag.Parse()
-
 	if *showVersion {
 		fmt.Println(span.AppVersion)
 		os.Exit(0)
 	}
-
 	if *cpuProfile != "" {
 		f, err := os.Create(*cpuProfile)
 		if err != nil {
@@ -208,7 +213,6 @@ func main() {
 		}
 		defer pprof.StopCPUProfile()
 	}
-
 	if *list {
 		var keys []string
 		for k := range FormatMap {
@@ -220,7 +224,6 @@ func main() {
 		}
 		os.Exit(0)
 	}
-
 	if *logfile != "" {
 		f, err := os.OpenFile(*logfile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 		if err != nil {
@@ -232,12 +235,9 @@ func main() {
 		logger.Out = f
 		log.SetOutput(logger.Writer())
 	}
-
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()
-
 	var reader io.Reader = os.Stdin
-
 	if flag.NArg() > 0 {
 		var files []io.Reader
 		for _, filename := range flag.Args() {
@@ -250,7 +250,6 @@ func main() {
 		}
 		reader = io.MultiReader(files...)
 	}
-
 	switch *name {
 	// XXX: Configure this in one place.
 	case
