@@ -73,7 +73,7 @@ This section is correct, but incomplete. Consult `-h` for further flags.
   List supported formats. `span-import`, `span-export` only.
 
 `-verbose`
-  More output. `span-check` only.
+  More output. `span-check`, `span-import` only.
 
 `-b` *N*
   Batch size. `span-tag`, `span-check`, `span-import`, `span-export`, `span-crossref-snapshot` only.
