@@ -2,17 +2,16 @@
 //
 // Taggable document should expose (maybe via interfaces):
 //
-//    SerialNumbers() []string
-//    PublicationTitle() string
-//    Date() string
-//    Volume() string
-//    Issue() string
-//    DatabaseName() string
+//	SerialNumbers() []string
+//	PublicationTitle() string
+//	Date() string
+//	Volume() string
+//	Issue() string
+//	DatabaseName() string
 //
-//    Tagger configuration, e.g. preferred method, failure tolerance.
+//	Tagger configuration, e.g. preferred method, failure tolerance.
 //
-//    tagger.Tag(v interface{}) []string { ... }
-//
+//	tagger.Tag(v interface{}) []string { ... }
 package filter
 
 import (
@@ -92,6 +91,12 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 		return &filter, nil
 	case "issn":
 		var filter ISSNFilter
+		if err := json.Unmarshal(raw, &filter); err != nil {
+			return nil, err
+		}
+		return &filter, nil
+	case "isbn":
+		var filter ISBNFilter
 		if err := json.Unmarshal(raw, &filter); err != nil {
 			return nil, err
 		}

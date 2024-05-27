@@ -11,6 +11,9 @@ import (
 // ISSNPattern is a regular expression matching standard ISSN.
 var ISSNPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9X]`)
 
+// ISBNPattern to match ISBN
+var ISBNPattern = regexp.MustCompile(`(?i)(ISBN)?[\d\s\-]+X?`)
+
 // Truncate truncates a string.
 func Truncate(s string, length int) string {
 	if len(s) < length || length < 0 {

@@ -107,10 +107,15 @@ type Document struct {
 	Created             DateField `json:"created"`
 	DOI                 string
 	Deposited           DateField `json:"deposited"`
+	ISBN                []string
 	ISSN                []string
 	Indexed             DateField `json:"indexed"`
 	IsReferencedByCount int64     `json:"is-referenced-by-count"`
-	IssnType            []struct {
+	IsbnType            []struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"isbn-type"`
+	IssnType []struct {
 		Type  string `json:"type"`
 		Value string `json:"value"`
 	} `json:"issn-type"`
@@ -328,6 +333,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
 	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
 	output.Genre = Genres.Lookup(doc.Type, "unknown")
+	output.ISBN = doc.ISBN
 	output.ISSN = doc.ISSN
 	output.Issue = strings.TrimLeft(doc.Issue, "0")
 	output.Languages = doc.FindLanguages()
