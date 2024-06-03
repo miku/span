@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -25,7 +24,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 		mappings = make(map[string]string)
 		b        []byte
 	)
-	if dir, err = ioutil.TempDir("", "span-tag-unfreeze-"); err != nil {
+	if dir, err = os.MkdirTemp("", "span-tag-unfreeze-"); err != nil {
 		return
 	}
 	if r, err = zip.OpenReader(frozenfile); err != nil {
@@ -66,7 +65,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 		}
 	}
 	blob = filepath.Join(dir, "blob")
-	if b, err = ioutil.ReadFile(blob); err != nil {
+	if b, err = os.ReadFile(blob); err != nil {
 		return
 	}
 	for url, file := range mappings {
@@ -75,7 +74,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 		replacement := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
 		b = bytes.Replace(b, value, replacement, -1)
 	}
-	if err = ioutil.WriteFile(blob, b, 0777); err != nil {
+	if err = os.WriteFile(blob, b, 0777); err != nil {
 		return
 	}
 	return dir, blob, nil

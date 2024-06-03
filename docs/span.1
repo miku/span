@@ -21,7 +21,7 @@ schema and integration tools
 .PP
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x\fR \fIfile\fP] \-o \fIfile\fP \fIfile\fP
+\fB\fCspan\-crossref\-snapshot\fR [\fB\fC\-x\fR \fIfile\fP] [\fB\fC\-S\fR \fISIZE\fP] \-o \fIfile\fP \fIfile\fP
 .PP
 \fB\fCspan\-local\-data\fR < \fIfile\fP
 .PP
@@ -37,7 +37,7 @@ schema and integration tools
 .PP
 \fB\fCspan\-crossref\-members\fR [\fB\fC\-base\fR \fIURL\fP] [\fB\fC\-offset\fR \fIN\fP] [\fB\fC\-rows\fR \fIN\fP] [\fB\fC\-q\fR] [\fB\fC\-sleep\fR \fIduration\fP]
 .PP
-\fB\fCspan\-crossref\-sync\fR [\fB\fC\-P\fR \fIprefix\fP] [\fB\fC\-i\fR \fIinterval] [\fB\fC\-p\fR \fIcompress\-program\fP] [\fB\fC\-s\fR \fIdate\fP] [\fB\fC\-e\fR *date\fP]
+\fB\fCspan\-crossref\-sync\fR [\fB\fC\-P\fR \fIprefix\fP] [\fB\fC\-i\fR *interval] [\fB\fC\-p\fR \fIcompress\-program\fP] [\fB\fC\-s\fR \fIdate\fP] [\fB\fC\-e\fR \fIdate\fP] [\fB\fC\-E\fR \fInumerrors\fP]
 .SH DESCRIPTION
 .PP
 The \fB\fCspan\fR tools convert to and from an intermediate schema and support
@@ -63,7 +63,7 @@ EXAMPLE for a CONFIGURATION FILE. \fB\fCspan\-review\fR details in INDEX REVIEW.
 List supported formats. \fB\fCspan\-import\fR, \fB\fCspan\-export\fR only.
 .TP
 \fB\fC\-verbose\fR
-More output. \fB\fCspan\-check\fR only.
+More output. \fB\fCspan\-check\fR, \fB\fCspan\-import\fR only.
 .TP
 \fB\fC\-b\fR \fIN\fP
 Batch size. \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-import\fR, \fB\fCspan\-export\fR, \fB\fCspan\-crossref\-snapshot\fR only.
@@ -154,6 +154,12 @@ Suppress logging output, \fB\fCspan\-crossref\-members\fR only.
 .TP
 \fB\fC\-h\fR
 Show usage.
+.TP
+\fB\fC\-E\fR \fInumerrors\fP
+Number of errors to tolerate during processing. \fB\fCspan\-crossref\-snapshot\fR only.
+.TP
+\fB\fC\-S\fR \fIsize\fP
+Buffer size, passed to sort. \fB\fCspan\-crossref\-snapshot\fR only.
 .SH EXAMPLES
 .PP
 List supported formats for conversion to intermediate schema:

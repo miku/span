@@ -56,18 +56,18 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/segmentio/encoding/json"
-
 	"github.com/klauspost/compress/zstd"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/parallel"
 	"github.com/miku/span/xio"
+	"github.com/segmentio/encoding/json"
 	log "github.com/sirupsen/logrus"
 )
 
-// fallback awk script is used, if the filterline executable is not found
+// fallback awk script is used, if the filterline executable is not found;
+// compiled filterline is about 3x faster.
 var fallback = `
 #!/bin/bash
 LIST="$1" LC_ALL=C awk '
@@ -94,6 +94,7 @@ var (
 	verbose           = flag.Bool("verbose", false, "be verbose")
 	pathFile          = flag.String("f", "", "path to a file naming all inputs files to be considered, one file per line")
 	errCountThreshold = flag.Int64("E", 1, "number of json unmarshal errors to tolerate")
+	sortBufferSize    = flag.String("S", "25%", "passed to sort")
 )
 
 // writeFields writes a variable number of values separated by sep to a given
@@ -141,27 +142,8 @@ func main() {
 	)
 	switch {
 	case *pathFile != "":
+		// TODO: this feature would allow to skip the file concatenation step.
 		log.Fatal("not yet implemented")
-		// b, err := ioutil.ReadFile(*pathFile)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// s := string(b)
-		// var readers []io.Reader
-		// for _, line := range strings.Split(s, "\n") {
-		// 	line = strings.TrimSpace(line)
-		// 	if len(line) == 0 || strings.HasPrefix(line, "#") {
-		// 		continue
-		// 	}
-		// 	f, err := os.Open(line)
-		// 	if err != nil {
-		// 		log.Fatal(err)
-		// 	}
-		// 	defer f.Close()
-		// 	readers = append(readers, f)
-		// }
-		// log.Printf("path-list: will read from %d files", len(readers))
-		// r = io.MultiReader(readers...)
 	case flag.NArg() == 0:
 		log.Fatal("input file required")
 	case flag.NArg() == 1:
@@ -221,7 +203,7 @@ func main() {
 	var (
 		br      = bufio.NewReader(reader)
 		bw      = bufio.NewWriter(tf)
-		numErrs atomic.Int64
+		numErrs atomic.Int64 // error count across threads
 	)
 	pp := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
 		var (
@@ -240,13 +222,21 @@ func main() {
 			if n := numErrs.Load(); n > *errCountThreshold {
 				return nil, err
 			} else {
-				log.Printf("skipping error (errs: %d <= max: %d): %v", n, *errCountThreshold, err)
+				log.Printf("skipping error (#err: %d <= max: %d): %v", n, *errCountThreshold, err)
 			}
 			return nil, nil
 		}
 		date, err := doc.Indexed.Date()
 		if err != nil {
-			return nil, err
+			// Encountered with a single document found,
+			// {"DOI":"10.15215\/aupress\/9781897425909.026","score":8.143441}
+			numErrs.Add(1)
+			if n := numErrs.Load(); n > *errCountThreshold {
+				return nil, err
+			} else {
+				log.Printf("skipping error (#err: %d <= max: %d): %v", n, *errCountThreshold, err)
+			}
+			return nil, nil
 		}
 		if _, ok := excludes[doc.DOI]; ok {
 			return nil, nil
@@ -273,7 +263,7 @@ func main() {
 	// Stage 2: Identify relevant records. Sort by DOI (3), then date reversed (2);
 	// then unique by DOI (3). Should keep the entry of the last update (filename,
 	// document date, DOI).
-	fastsort := `LC_ALL=C sort -S20%`
+	fastsort := fmt.Sprintf(`LC_ALL=C sort -S%s`, *sortBufferSize)
 	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
 	log.WithFields(log.Fields{
 		"prefix":    "stage 2",
