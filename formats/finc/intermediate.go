@@ -1,6 +1,6 @@
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+//	Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
+//	                  The Finc Authors, http://finc.info
+//	                  Martin Czygan, <martin.czygan@uni-leipzig.de>
 //
 // This file is part of some open source application.
 //
@@ -18,7 +18,6 @@
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 //
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
 package finc
 
 import (
@@ -27,6 +26,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/kennygrant/sanitize"
 )
 
 const (
@@ -279,12 +280,15 @@ func (is *IntermediateSchema) Imprint() (s string) {
 
 // SortableTitle is loosely based on getSortableTitle in SOLRMARC.
 func (is *IntermediateSchema) SortableTitle() string {
+	var v string
 	switch {
 	case is.BookTitle != "":
-		return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.BookTitle, ""))
+		v = is.BookTitle
 	default:
-		return strings.ToLower(NonAlphaNumeric.ReplaceAllString(is.ArticleTitle, ""))
+		v = is.ArticleTitle
 	}
+	// refs #19964
+	return sanitize.HTML(strings.ToLower(NonAlphaNumeric.ReplaceAllString(v, "")))
 }
 
 // SortableAuthor is loosely based on getSortableAuthor in SOLRMARC.
