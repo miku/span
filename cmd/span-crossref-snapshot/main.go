@@ -11,9 +11,11 @@
 //
 // $ span-crossref-snapshot -z crossref.ndj.gz -o out.ndj.gz
 //
-// Anecdata. We started the new "span-crossref-sync" based workflow in
+// Anecdata. We started the new "span-crossref-sync" based workflow on
 // 2022-05-30 and have been requesting daily slices from crossref since
-// 2022-01-01. As of 2023-12-04 we downloaded 701 files (zstd compressed).
+// 2022-01-01. As of 2023-12-04 we downloaded 701 files (zstd compressed). We
+// started with "feed-1" which grew to over 700 files, then we compacted those
+// and started a "feed-2" in Q1/2024.
 //
 //	               sz
 //	count         701
