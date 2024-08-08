@@ -1,14 +1,14 @@
 module github.com/miku/span
 
-go 1.21
+go 1.21.0
 
-toolchain go1.21.4
+toolchain go1.22.5
 
 require (
 	github.com/abadojack/whatlanggo v1.0.1
-	github.com/adrg/xdg v0.4.0
+	github.com/adrg/xdg v0.5.0
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
-	github.com/beevik/etree v1.4.0
+	github.com/beevik/etree v1.4.1
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
 	github.com/fatih/color v1.17.0
 	github.com/fatih/structs v1.1.0
@@ -19,11 +19,11 @@ require (
 	github.com/jinzhu/now v1.1.5
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/kennygrant/sanitize v1.2.4
-	github.com/klauspost/compress v1.17.8
+	github.com/klauspost/compress v1.17.9
 	github.com/klauspost/pgzip v1.2.6
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-sqlite3 v1.14.22
-	github.com/microcosm-cc/bluemonday v1.0.26
+	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/miku/clam v0.1.0
 	github.com/miku/parallel v0.1.3
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
@@ -32,8 +32,8 @@ require (
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/net v0.25.0
-	golang.org/x/text v0.15.0
+	golang.org/x/net v0.28.0
+	golang.org/x/text v0.17.0
 	gopkg.in/yaml.v2 v2.4.0
 	mvdan.cc/xurls v1.1.0
 )
@@ -49,7 +49,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
