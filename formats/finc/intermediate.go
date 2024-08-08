@@ -301,6 +301,11 @@ func (is *IntermediateSchema) SortableAuthor() string {
 	return buf.String()
 }
 
+// AbstractCleaned returns the abstract with HTML tags, refs #19964.
+func (is *IntermediateSchema) AbstractCleaned() string {
+	return sanitize.HTML(is.Abstract)
+}
+
 // StrippedSchema is a snippet of an IntermediateSchema.
 type StrippedSchema struct {
 	DOI      string   `json:"doi"`

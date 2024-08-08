@@ -123,6 +123,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.PublishDateSort = fmt.Sprintf("%d", is.Date.Year())
 	s.PublishDate = []string{is.Date.Format("2006")} // refs #18608
 	s.Publishers = is.Publishers
+	// TODO: may switch back
 	if withFullrecord {
 		s.RecordType = IntermediateSchemaRecordType
 	} else {
@@ -251,7 +252,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.ContainerTitle = is.JournalTitle
 
 	s.Institutions = is.Labels
-	s.Description = is.Abstract
+	s.Description = is.AbstractCleaned()
 
 	if withFullrecord {
 		// refs. #8031
