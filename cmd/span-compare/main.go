@@ -2,23 +2,23 @@
 // side. It can parse the hidden whatislive endpoint to find live, non-live
 // pairs.
 //
-//   $ span-compare -a 10.1.1.7:8085/solr/biblio -b 10.1.1.15:8085/solr/biblio
-//   DE-1156    13   Diss Online                         0         219277    219277
-//   DE-D117    13   Diss Online                         0         219277    219277
-//   DE-L152    13   Diss Online                         0         219277    219277
-//   DE-14      49   Crossref                            35417291  36671073  1253782
-//   DE-14      48   GBI Genios Wiso                     12712115  174470    -12537645
-//   DE-14      85   Elsevier Journals (Sachsen Profil)  1359818   1397962   38144
-//   DE-14      13   Diss Online                         0         219277    219277
-//   DE-D275    49   Crossref                            0         32177218  32177218
-//   DE-D275    48   GBI Genios Wiso                     10501192  2050930   -8450262
-//   DE-Gla1    49   Crossref                            31640516  31467567  -172949
-//   ...
+//	$ span-compare -a 10.1.1.7:8085/solr/biblio -b 10.1.1.15:8085/solr/biblio
+//	DE-1156    13   Diss Online                         0         219277    219277
+//	DE-D117    13   Diss Online                         0         219277    219277
+//	DE-L152    13   Diss Online                         0         219277    219277
+//	DE-14      49   Crossref                            35417291  36671073  1253782
+//	DE-14      48   GBI Genios Wiso                     12712115  174470    -12537645
+//	DE-14      85   Elsevier Journals (Sachsen Profil)  1359818   1397962   38144
+//	DE-14      13   Diss Online                         0         219277    219277
+//	DE-D275    49   Crossref                            0         32177218  32177218
+//	DE-D275    48   GBI Genios Wiso                     10501192  2050930   -8450262
+//	DE-Gla1    49   Crossref                            31640516  31467567  -172949
+//	...
 //
 // Use hidden whatislive endpoint and render textile (for redmine):
 //
-//   $ span-compare -e -t
-//   ...
+//	$ span-compare -e -t
+//	...
 package main
 
 import (
@@ -43,20 +43,21 @@ import (
 
 // SourceNames generated from AMSL API.
 // $ taskcat AMSLService | jq -rc '.[]| [.sourceID, .megaCollection] | @tsv' |
-// sort -un | awk -F '      ' '{printf "\"%s\":\"%s\",\n", $1, $2 }' # CTRL-TAB
+// sort -un | awk -F '      ' '{printf "\"%s\":\"%s\",\n", $1, $2 }' # CTRL-V TAB
 var SourceNames = map[string]string{
 	"0":   "Digital Concert Hall",
+	"1":   "Project Gutenberg",
+	"3":   "PDA Print Nielsen",
 	"4":   "PDA E-Book Central",
 	"5":   "Naxos Music Library",
 	"9":   "Early Music Online",
 	"10":  "Music Treasures Consortium",
-	"12":  "B3Kat BBI",
+	"12":  "Bayerische Staatsbibliothek / Musik",
 	"13":  "DNB / Diss Online",
 	"14":  "RISM Répertoire International des Sources Musicale",
 	"15":  "IMSLP (Petrucci Library)",
-	"16":  "Elsevier E-Books",
 	"17":  "17th and 18th Century Burney Collection Newspapers",
-	"20":  "BNF / Gallica / Buch und Bibliothek",
+	"20":  "BNF / Gallica",
 	"21":  "GBV Musikdigitalisate",
 	"22":  "Qucosa",
 	"24":  "E-Book Central",
@@ -66,52 +67,41 @@ var SourceNames = map[string]string{
 	"29":  "Handwörterbuch der musikalischen Terminologie",
 	"30":  "SSOAR Social Science Open Access Repository",
 	"31":  "Opera in Video",
-	"34":  "ProQuest Open Access Dissertations and Theses (PQDT Open)",
 	"35":  "Hathi Trust",
 	"39":  "Persée",
-	"40":  "Dance in Video",
 	"41":  "Classical Music in Video",
-	"42":  "Classical Scores Library II",
 	"44":  "Deutsches Textarchiv",
 	"48":  "Wiso Journals",
-	"49":  "CrossRef",
-	"50":  "De Gruyter Journals / Social Sciences and Humanities",
+	"49":  "\"LJournal\" (CrossRef)",
 	"51":  "PDA Print VUB",
 	"52":  "OECD iLibrary",
 	"53":  "CEEOL Central and Eastern European Online Library",
-	"55":  "JSTOR",
+	"55":  "JSTOR 19th Century British Pamphlets",
 	"56":  "Folkwang Universität der Künste Essen, Lokalsystem",
 	"57":  "Robert Schumann Hochschule RSH Düsseldorf",
 	"58":  "Hochschule für Musik und Tanz HfMT Köln",
-	"60":  "Thieme Journals",
 	"61":  "IMF International Monetary Fund",
 	"65":  "GVK Verbundkatalog / Nordeuropa",
 	"66":  "Heidelberger Bilddatenbank",
 	"67":  "Künstler/Conart",
-	"68":  "OLC SSG Anglistik",
+	"68":  "OLC SSG Bildungsforschung",
 	"70":  "UBL / Institut Ägyptologie",
 	"71":  "OstDok",
-	"72":  "Morgan & Claypool E-Books",
 	"76":  "E-Books adlr",
 	"77":  "UBL / Portraitstichsammlung",
 	"78":  "IZI-Datenbank",
 	"80":  "Datenbank Internetquellen",
 	"84":  "JSTOR E-Books Open Access",
 	"85":  "Elsevier Journals",
-	"86":  "Cambridge E-Books",
 	"87":  "International Journal of Communication",
 	"88":  "Zeitschrift \"Rundfunk und Geschichte\"",
 	"89":  "IEEE Xplore Library",
-	"94":  "ACS Legacy Archives 1879-1995",
-	"96":  "Thieme E-Books / Tiermedizin (VetCenter)",
 	"99":  "Media Perspektiven",
 	"101": "Kieler Beiträge zur Filmmusikforschung",
 	"103": "Margaret Herrick Library",
-	"106": "Primary Sources for Slavic Studies",
 	"107": "Heidelberger historische Bestände",
 	"109": "Kunsthochschule für Medien Köln (VK Film)",
 	"111": "Volltexte aus Illustrierten Magazinen",
-	"113": "Loeb Classical Library",
 	"114": "Academic E-Books 'The Arts'",
 	"115": "Bibliographie Caricature & Comic",
 	"117": "Universität der Künste Berlin (VK Film)",
@@ -122,14 +112,12 @@ var SourceNames = map[string]string{
 	"130": "VDEH",
 	"131": "GDMB",
 	"134": "MONAliesA",
-	"135": "Elsevier E-Books",
 	"136": "Leipziger Städtische Bibliotheken",
 	"137": "Bundeskunsthalle Bonn",
 	"140": "Nachlässe SLUB Dresden",
 	"142": "Gesamtkatalog der Düsseldorfer Kulturinstitute (VK Film)",
 	"143": "JOVE Journal of Visualized Experiments (Biology)",
 	"145": "TIB AV-Portal",
-	"147": "Palgrave E-Books / Economics & Finance",
 	"148": "Bundesarchiv (Filmarchiv)",
 	"150": "MOnAMi Hochschulschriftenserver Mittweida",
 	"151": "Filmakademie Baden-Württemberg (VK Film)",
@@ -141,7 +129,7 @@ var SourceNames = map[string]string{
 	"160": "UBL / Diplomarbeiten Sportwissenschaft",
 	"162": "Gender Open",
 	"163": "Digitale Sammlungen UBL / Nachlass Karl Bücher",
-	"165": "Tectum E-Books",
+	"164": "UBL / Japanische Videospiele",
 	"166": "Kunsthistorisches Institut Florenz",
 	"167": "Bildarchiv Foto Marburg",
 	"168": "Bibliotheca Hertziana - Max-Planck-Institut für Kunstgeschichte",
@@ -150,7 +138,7 @@ var SourceNames = map[string]string{
 	"171": "PressReader",
 	"172": "OPAL",
 	"173": "Wolfenbütteler Bibliographie zur Geschichte des Buchwesens",
-	"179": "LIS Scholarship Archive",
+	"179": "EarthArXiv",
 	"180": "British National Bibliography",
 	"181": "British Library Catalogue",
 	"182": "Bibliographie zum Archivwesen der Archivschule Marburg",
@@ -160,7 +148,6 @@ var SourceNames = map[string]string{
 	"186": "Buch und Papier",
 	"187": "UBL / Digitalisierte Zeitschriften (UrMEL)",
 	"188": "GoeScholar - Publikationenserver der Georg-August-Universität Göttingen",
-	"190": "Early English Books Online EEBO",
 	"191": "MediArxiv",
 	"192": "Babelscores",
 	"193": "HeBIS Verbundkatalog",
@@ -190,6 +177,9 @@ var SourceNames = map[string]string{
 	"221": "Arte Campus",
 	"223": "K10plus (FID Medien)",
 	"224": "Newsbank",
+	"225": "BabelScores",
+	"226": "Filmgalerie Westend",
+	"227": "OERSI",
 }
 
 // TODO: move to XDG
