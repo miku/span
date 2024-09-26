@@ -59,8 +59,8 @@ type Solr5Vufind3 struct {
 	URL                  []string `json:"url,omitempty"`
 	PublishDate          []string `json:"publishDate,omitempty"`
 	Physical             []string `json:"physical,omitempty"`
-	Description          string   `json:"description"`
-	Collections          []string `json:"collection"` // index/wiki/Kollektionsfacette
+	Description          string   `json:"description,omitempty"`
+	Collections          []string `json:"collection,omitempty"` // index/wiki/Kollektionsfacette
 
 	ContainerIssue     string `json:"container_issue,omitempty"`
 	ContainerStartPage string `json:"container_start_page,omitempty"`
