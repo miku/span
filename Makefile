@@ -45,6 +45,7 @@ clean:
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
+	rm -f coverage.out
 
 # Code quality and performance.
 lint:
