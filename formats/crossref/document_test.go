@@ -35,6 +35,13 @@ func TestDocumentCombinedTitle(t *testing.T) {
 			},
 			result: "Hello Sub",
 		},
+		{
+			doc: &Document{
+				Title:    []string{"Deutsche Nationalkataloge – Herausforderungen an das deutsche Bibliothekssystem"},
+				Subtitle: []string{"Was aus der Perspektive der Digital Humanities zu tun wäre"},
+			},
+			result: "Deutsche Nationalkataloge – Herausforderungen an das deutsche Bibliothekssystem : Was aus der Perspektive der Digital Humanities zu tun wäre",
+		},
 	}
 	for _, c := range cases {
 		result := c.doc.CombinedTitle()

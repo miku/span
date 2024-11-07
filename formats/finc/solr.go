@@ -140,7 +140,11 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	}
 
 	s.SourceID = is.SourceID
-	s.Subtitle = is.ArticleSubtitle
+	if len(is.ArticleSubtitle) > 20 && !strings.Contains(s.Title, is.ArticleSubtitle) {
+		// refs #21429, avoid duplications, e.g. crossref assembles a title
+		// from both title and subtitle already
+		s.Subtitle = is.ArticleSubtitle
+	}
 	s.TitleSort = is.SortableTitle()
 	s.Topics = is.Subjects
 
