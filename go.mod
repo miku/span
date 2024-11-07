@@ -6,11 +6,11 @@ toolchain go1.22.5
 
 require (
 	github.com/abadojack/whatlanggo v1.0.1
-	github.com/adrg/xdg v0.5.0
+	github.com/adrg/xdg v0.5.3
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/beevik/etree v1.4.1
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
-	github.com/fatih/color v1.17.0
+	github.com/fatih/color v1.18.0
 	github.com/fatih/structs v1.1.0
 	github.com/goodsign/monday v1.0.2
 	github.com/google/go-cmp v0.5.9
@@ -19,7 +19,7 @@ require (
 	github.com/jinzhu/now v1.1.5
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/kennygrant/sanitize v1.2.4
-	github.com/klauspost/compress v1.17.10
+	github.com/klauspost/compress v1.17.11
 	github.com/klauspost/pgzip v1.2.6
 	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-sqlite3 v1.14.24
