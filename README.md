@@ -54,10 +54,12 @@ the help of a small library called
 screening of sources serialized as XML - making the process of mapping new data
 sources easier.
 
-Since about 2018 (0.1.211), the span tools have seen mostly small fixes and additions.
-Notable, since 2021, the previous scripts used to fetch daily metadata updates
-from [crossref](https://api.crossref.org) has been put into a standalone tool, `span-crossref-sync`, which
-merely adds some retry logic and consistent file naming to the API harvest.
+Since about 2018 (0.1.211), the span tools have seen mostly small fixes and
+additions.  Notable, since 2021, the previous scripts used to fetch daily
+metadata updates from [crossref](https://api.crossref.org) has been put into a
+standalone tool, `span-crossref-sync`, which merely adds some retry logic and
+consistent file naming to the API harvest. In 2024, `span-webhookd`,
+`span-check`, `span-review`, `span-tagger` are gone.
 
 ## Documentation
 
@@ -96,12 +98,3 @@ input from stdin as well, allowing for one-off things like:
 $ metha-cat http://oai.web | span-import -i name | span-tag -c amsl | span-export | solrbulk
 ```
 
-## TODO
-
-There is a [open issue](https://github.com/miku/span/issues/2) regarding more
-flexible license labelling. While this would be useful, it would be probably
-even more useful to separate content conversions from licensing issues
-altogether. There is lots of work done in prototypes, which explore how fast
-and how reliable we can rewrite documents in a production server.
-
-Ideally, a cron job or trigger regularly checks and ensures compliance.
