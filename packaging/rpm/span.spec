@@ -38,11 +38,8 @@ install -m 755 span-local-data $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-report $RPM_BUILD_ROOT/usr/local/bin
-install -m 755 span-review $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/bin
-install -m 755 span-tagger $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/bin
-install -m 755 span-webhookd $RPM_BUILD_ROOT/usr/local/bin
 
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
@@ -82,11 +79,8 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/bin/span-oa-filter
 /usr/local/bin/span-redact
 /usr/local/bin/span-report
-/usr/local/bin/span-review
 /usr/local/bin/span-tag
-/usr/local/bin/span-tagger
 /usr/local/bin/span-update-labels
-/usr/local/bin/span-webhookd
 
 %attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
