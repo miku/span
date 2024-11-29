@@ -17,11 +17,8 @@ TARGETS = \
 		  span-oa-filter \
 		  span-redact \
 		  span-report \
-		  span-review \
 		  span-tag \
-          span-tagger \
-		  span-update-labels \
-		  span-webhookd
+		  span-update-labels
 
 PKGNAME = span
 MAKEFLAGS := --jobs=$(shell nproc)
