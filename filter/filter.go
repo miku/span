@@ -17,9 +17,8 @@ package filter
 import (
 	"fmt"
 
-	"github.com/segmentio/encoding/json"
-
 	"github.com/miku/span/formats/finc"
+	"github.com/segmentio/encoding/json"
 )
 
 // Filter returns go or no for a given record.
@@ -51,8 +50,8 @@ func (t *Tree) Apply(is finc.IntermediateSchema) bool {
 	return t.Root.Apply(is)
 }
 
-// Tagger takes a list of tags (ISILs) and annotates an intermediate schema
-// according to a number of filters, defined per label. The tagger is loaded
+// Tagger takes a list of labels (ISILs) and annotates an intermediate schema
+// according to a number of filters, defined per labels The tagger is loaded
 // directly from JSON.
 type Tagger struct {
 	FilterMap map[string]Tree
