@@ -23,7 +23,6 @@ Library data tools.
 
 mkdir -p $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/local/bin
-install -m 755 span-check $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/local/bin
@@ -64,7 +63,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/lib/systemd/system/span-webhookd.service
 /usr/local/share/man/man1/span.1
 /usr/local/bin/span-amsl-discovery
-/usr/local/bin/span-check
 /usr/local/bin/span-compare
 /usr/local/bin/span-crossref-members
 /usr/local/bin/span-crossref-snapshot

@@ -1,7 +1,6 @@
 SHELL = /bin/bash
 TARGETS = \
           span-amsl-discovery \
-		  span-check \
 		  span-compare \
           span-crossref-members \
 		  span-crossref-snapshot \
