@@ -28,8 +28,8 @@ require (
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/net v0.31.0
-	golang.org/x/text v0.20.0
+	golang.org/x/net v0.34.0
+	golang.org/x/text v0.21.0
 	mvdan.cc/xurls v1.1.0
 )
 
@@ -43,7 +43,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
