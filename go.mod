@@ -39,7 +39,7 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/hoisie/mustache v0.0.0-20160804235033-6375acf62c69 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
