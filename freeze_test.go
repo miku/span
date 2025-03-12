@@ -1,16 +1,16 @@
 package span
 
 import (
-	"github.com/segmentio/encoding/json"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/segmentio/encoding/json"
 )
 
-func filenames(fis []os.FileInfo) (result []string) {
-	for _, fi := range fis {
-		result = append(result, fi.Name())
+func filenames(des []os.DirEntry) (result []string) {
+	for _, de := range des {
+		result = append(result, de.Name())
 	}
 	return
 }
@@ -32,7 +32,7 @@ func TestUnfreezeFilterConfig(t *testing.T) {
 	if err := dec.Decode(&payload); err != nil {
 		t.Errorf("could not decode JSON: %v", err)
 	}
-	fis, err := ioutil.ReadDir(dir)
+	fis, err := os.ReadDir(dir)
 	if err != nil {
 		t.Errorf("could not read dir: %v", err)
 	}
