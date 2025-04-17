@@ -72,7 +72,7 @@ var SourceNames = map[string]string{
 	"41":  "Classical Music in Video",
 	"44":  "Deutsches Textarchiv",
 	"48":  "Wiso Journals",
-	"49":  "\"LJournal\" (CrossRef)",
+	"49":  "CrossRef",
 	"51":  "PDA Print VUB",
 	"52":  "OECD iLibrary",
 	"53":  "CEEOL Central and Eastern European Online Library",
