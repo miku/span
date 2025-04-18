@@ -149,7 +149,9 @@ func BenchmarkDecodeKbart(b *testing.B) {
 		r.Comma = '\t'
 		dec := NewDecoder(r)
 		var example TestEntry
-		dec.Decode(&example)
+		if err := dec.Decode(&example); err != nil {
+			b.Errorf("Decode: %v", err)
+		}
 	}
 }
 

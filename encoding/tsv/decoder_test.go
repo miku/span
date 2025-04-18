@@ -159,7 +159,9 @@ func BenchmarkDecodeKbart(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		dec := NewDecoder(strings.NewReader(testTwo))
 		var example TestEntry
-		dec.Decode(&example)
+		if err := dec.Decode(&example); err != nil {
+			b.Errorf("Decode: %v", err)
+		}
 	}
 }
 
