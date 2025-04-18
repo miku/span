@@ -80,17 +80,13 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.Abstract = strings.Join(r.Metadata.DC.Description, "\n")
 
-	for _, v := range r.Metadata.DC.Publisher {
-		output.Publishers = append(output.Publishers, v)
-	}
+	output.Publishers = append(output.Publishers, r.Metadata.DC.Publisher...)
 	for _, v := range r.Metadata.DC.Language {
 		if isocode := span.LanguageIdentifier(v); isocode != "" {
 			output.Languages = append(output.Languages, isocode)
 		}
 	}
-	for _, v := range r.Metadata.DC.Subject {
-		output.Subjects = append(output.Subjects, v)
-	}
+	output.Subjects = append(output.Subjects, r.Metadata.DC.Subject...)
 	if len(r.Metadata.DC.Date) > 0 && len(r.Metadata.DC.Date[0]) >= 10 {
 		// 1993-01-01 00:00:00.0
 		t, err := time.Parse("2006-01-02", r.Metadata.DC.Date[0][:10])

@@ -2,7 +2,6 @@ package atomic
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -10,7 +9,7 @@ import (
 func test(t *testing.T, dir, prefix string) {
 	t.Parallel()
 
-	tmpfile, err := ioutil.TempFile(dir, prefix)
+	tmpfile, err := os.CreateTemp(dir, prefix)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +24,9 @@ func test(t *testing.T, dir, prefix string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Write([]byte("foo"))
+	if _, err := f.Write([]byte("foo")); err != nil {
+		t.Fatalf("%v", err)
+	}
 	if _, err := os.Stat(name); !os.IsNotExist(err) {
 		t.Fatal("did not expect file to exist")
 	}
@@ -53,7 +54,7 @@ func TestDefaultTmpDir(t *testing.T) {
 func TestAbort(t *testing.T) {
 	contents := []byte("the answer is 42")
 	t.Parallel()
-	tmpfile, err := ioutil.TempFile("", "atomicfile-abort-")
+	tmpfile, err := os.CreateTemp("", "atomicfile-abort-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,14 +68,16 @@ func TestAbort(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Write([]byte("foo"))
+	if _, err := f.Write([]byte("foo")); err != nil {
+		t.Fatalf("%v", err)
+	}
 	if err := f.Abort(); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := os.Stat(name); err != nil {
 		t.Fatalf("expected file to exist: %s", err)
 	}
-	actual, err := ioutil.ReadFile(name)
+	actual, err := os.ReadFile(name)
 	if err != nil {
 		t.Fatal(err)
 	}

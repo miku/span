@@ -20,7 +20,6 @@ var (
 
 	noSkipUnmatched = flag.Bool("S", false, "do not skip unmatched documents")
 	updateKey       = flag.String("k", "doi_str_mv", "update key")
-	forceOverwrite  = flag.Bool("f", false, "force update, even if updateKey field exists")
 	identifierKey   = flag.String("i", "id", "identifier key")
 	ignoreKeys      = flag.String("K", "barcode,dewey", "ignore keys (regexp), comma separated") // TODO: repeated flag
 	numWorkers      = flag.Int("w", runtime.NumCPU(), "number of workers")

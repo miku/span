@@ -132,7 +132,7 @@ func BenchmarkContainsDate(b *testing.B) {
 	}
 	v := "1992"
 	for i := 0; i < b.N; i++ {
-		entry.containsDate(v)
+		_ = entry.containsDate(v)
 	}
 }
 
@@ -318,7 +318,7 @@ func BenchmarkCovers(b *testing.B) {
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				bm.entry.Covers(bm.date, bm.volume, bm.issue)
+				_ = bm.entry.Covers(bm.date, bm.volume, bm.issue)
 			}
 		})
 	}

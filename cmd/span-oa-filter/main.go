@@ -3,11 +3,12 @@ package main
 
 import (
 	"bufio"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 
 	log "github.com/sirupsen/logrus"
 
@@ -77,7 +78,6 @@ var (
 	freeContentFile  = flag.String("fc", "", "path to a .../list?do=freeContent AMSL response JSON file")
 	batchsize        = flag.Int("b", 5000, "batch size")
 	verbose          = flag.Bool("verbose", false, "extended output")
-	debug            = flag.Bool("debug", false, "debug output")
 	batchMemoryLimit = flag.Int64("m", 209715200, "memory limit per batch")
 )
 

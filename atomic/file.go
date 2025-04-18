@@ -3,7 +3,6 @@ package atomic
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -21,7 +20,7 @@ type File struct {
 // New creates a new temporary file that will replace the file at the given
 // path when Closed.
 func New(path string, mode os.FileMode) (*File, error) {
-	f, err := ioutil.TempFile(filepath.Dir(path), fmt.Sprintf("%s-tmp-", filepath.Base(path)))
+	f, err := os.CreateTemp(filepath.Dir(path), fmt.Sprintf("%s-tmp-", filepath.Base(path)))
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +59,7 @@ func (f *File) Abort() error {
 }
 
 func CompressType(filename string, ty string) (string, error) {
-	tf, err := ioutil.TempFile("", "span-atomic-")
+	tf, err := os.CreateTemp("", "span-atomic-")
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +96,7 @@ func Compress(filename string) (string, error) {
 // WriteFile writes the data to a temp file and atomically move if everything else succeeds.
 func WriteFile(filename string, data []byte, perm os.FileMode) error {
 	dir, name := path.Split(filename)
-	f, err := ioutil.TempFile(dir, name)
+	f, err := os.CreateTemp(dir, name)
 	if err != nil {
 		return err
 	}

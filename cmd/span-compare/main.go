@@ -26,7 +26,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"os"
 	"path"
@@ -212,7 +211,7 @@ func fetchSourceNames(amsl string) (map[string]string, error) {
 	if err != nil {
 		return nil, nil
 	}
-	b, err := ioutil.ReadFile(filename)
+	b, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +298,7 @@ func (w *TextileWriter) WriteFields(fields ...interface{}) {
 		}
 		s = append(s, v)
 	}
-	_, w.err = fmt.Fprintf(w.w, fmt.Sprintf("| %s |\n", strings.Join(s, " | ")))
+	_, w.err = fmt.Fprintf(w.w, "| %s |\n", strings.Join(s, " | "))
 }
 
 // prependHTTP prepends http, if necessary.

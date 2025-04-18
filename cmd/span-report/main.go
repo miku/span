@@ -3,14 +3,13 @@
 // Example report: For a given collection, find all ISSN it contains and the
 // number of publications in a given interval, e.g. per month.
 //
-// Collection X
+// # Collection X
 //
 // |      | 01/18 | 02/18 | 03/18 | 04/18 | ...
 // |------|-------|-------|-------|-------|----
 // | ISSN | 10    | 12    | 0     | 12    | ...
 // | ISSN | 8     | 9     | 19    | 1     | ...
 // | ISSN | 1     | 2     | 0     | 1     | ...
-//
 //
 // These results are exported as CSV, TSV or similar, so they can be passed
 // forward into Excel, Pandas or other tools with visualization capabilities.
@@ -24,32 +23,31 @@
 //
 // Given a SOLR under load.
 //
-// * Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
-// * Facet (sid, c, issn, date) with facet.limit 10000 takes about 2 hours.
-//   1.3G response.
-// * The "fast" report type runs about 240k queries in 2h40mins and could be
-//   optimized a bit; it has no limit like facet.limit.
-// * The "faster" report type run 240k queries in 103m35.106s. There is a bit
-//   more headroom by batching issns, to reduce local overhead.
-// * A 32 core SOLR can get to a load of 30; span-report will use up to 24 CPUs
-//   while SOLR will use mostly six. Around 300 qps, which still seems slow.
-//   There are actually two queries per issn (numFound and date faceting, the
-//   numFound is fluff). A first run (-w 32 -bs 100) took about 50min.
-//
+//   - Facet (sid, c, issn) with facet.limit 10000, 42M response, takes 5 min.
+//   - Facet (sid, c, issn, date) with facet.limit 10000 takes about 2 hours.
+//     1.3G response.
+//   - The "fast" report type runs about 240k queries in 2h40mins and could be
+//     optimized a bit; it has no limit like facet.limit.
+//   - The "faster" report type run 240k queries in 103m35.106s. There is a bit
+//     more headroom by batching issns, to reduce local overhead.
+//   - A 32 core SOLR can get to a load of 30; span-report will use up to 24 CPUs
+//     while SOLR will use mostly six. Around 300 qps, which still seems slow.
+//     There are actually two queries per issn (numFound and date faceting, the
+//     numFound is fluff). A first run (-w 32 -bs 100) took about 50min.
 package main
 
 import (
 	"bufio"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/solrutil"
 	log "github.com/sirupsen/logrus"
@@ -173,7 +171,6 @@ func writer(w io.Writer, result chan string, done chan bool) {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
 	flag.Parse()
 
 	if *listReports {

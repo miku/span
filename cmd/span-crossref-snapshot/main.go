@@ -51,7 +51,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"runtime/pprof"
@@ -198,7 +197,7 @@ func main() {
 		"excludesFile": *excludeFile,
 		"excludes":     len(excludes),
 	}).Info("preparing extraction")
-	tf, err := ioutil.TempFile("", "span-crossref-snapshot-")
+	tf, err := os.CreateTemp("", "span-crossref-snapshot-")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -283,7 +282,7 @@ func main() {
 		if _, err := exec.LookPath("awk"); err != nil {
 			log.Fatal("filterline (git.io/v7qak) or awk is required")
 		}
-		tf, err := ioutil.TempFile("", "span-crossref-snapshot-filterline-")
+		tf, err := os.CreateTemp("", "span-crossref-snapshot-filterline-")
 		if err != nil {
 			log.Fatal(err)
 		}

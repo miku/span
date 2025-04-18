@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
@@ -82,7 +81,7 @@ type SavedLink struct {
 // Save link to a temporary file, return the filename.
 func (s *SavedLink) Save() (filename string, err error) {
 	r := &LinkReader{Link: s.Link}
-	s.f, err = ioutil.TempFile("", "span-")
+	s.f, err = os.CreateTemp("", "span-")
 	if err != nil {
 		return
 	}
@@ -222,7 +221,7 @@ type SavedReaders struct {
 
 // Save saves all readers to a temporary file and returns the filename.
 func (r *SavedReaders) Save() (filename string, err error) {
-	r.f, err = ioutil.TempFile("", "span-")
+	r.f, err = os.CreateTemp("", "span-")
 	if err != nil {
 		return
 	}
@@ -323,7 +322,7 @@ func AtomicDownload(link, filename string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}

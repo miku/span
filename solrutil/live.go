@@ -1,12 +1,13 @@
 package solrutil
 
 import (
-	"github.com/segmentio/encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/segmentio/encoding/json"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -35,7 +36,7 @@ func findSolrServer(spanConfigFile, kind string) (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

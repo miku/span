@@ -156,7 +156,9 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		pprof.StartCPUProfile(file)
+		if err := pprof.StartCPUProfile(file); err != nil {
+			log.Fatal(err)
+		}
 		defer pprof.StopCPUProfile()
 	}
 	if *server != "" {

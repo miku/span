@@ -86,7 +86,7 @@ func (r Record) FindYear() string {
 	if len(date) == 4 {
 		// XXX: o.J.
 		if date == "o.J." {
-			return fmt.Sprintf("2010-01-01")
+			return "2010-01-01"
 		}
 		return fmt.Sprintf("%s-01-01", date)
 	}

@@ -74,12 +74,8 @@ func (r DublicCoreRecord) ToIntermediateSchema() (*finc.IntermediateSchema, erro
 	}
 	output.Abstract = strings.Join(r.Metadata.DC.Source, "\n")
 
-	for _, v := range r.Metadata.DC.Publisher {
-		output.Publishers = append(output.Publishers, v)
-	}
-	for _, v := range r.Metadata.DC.Subject {
-		output.Subjects = append(output.Subjects, v)
-	}
+	output.Publishers = append(output.Publishers, r.Metadata.DC.Publisher...)
+	output.Subjects = append(output.Subjects, r.Metadata.DC.Subject...)
 
 	// Reach out to METS for dates.
 	return output, nil

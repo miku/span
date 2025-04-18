@@ -393,8 +393,9 @@ func (article *Article) parsePubDate(pd PubDate) (t time.Time) {
 	if pd.Day.Value == "" {
 		if pd.Month.Value == "" {
 			s = pd.Year.Value
+		} else {
+			s = fmt.Sprintf("%s-%s", pd.Year.Value, pd.Month.Value)
 		}
-		s = fmt.Sprintf("%s-%s", pd.Year.Value, pd.Month.Value)
 	} else {
 		s = fmt.Sprintf("%s-%s-%s", pd.Year.Value, pd.Month.Value, pd.Day.Value)
 	}

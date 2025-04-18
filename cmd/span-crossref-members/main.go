@@ -6,16 +6,16 @@ package main
 
 import (
 	"bytes"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span"
 )
@@ -99,7 +99,7 @@ func main() {
 	flag.Parse()
 
 	if *silent {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 	if *version {
 		fmt.Println(span.AppVersion)

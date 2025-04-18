@@ -3,6 +3,7 @@ package ceeol
 import (
 	"encoding/xml"
 	"fmt"
+	"log"
 	"regexp"
 	"strings"
 	"time"
@@ -121,7 +122,8 @@ func (r Record) ID() (string, error) {
 	for _, v := range values {
 		matches := identifierRegexp.FindStringSubmatch(v)
 		if len(matches) < 2 {
-			return "", fmt.Errorf("value without id: %v", v)
+			log.Printf("value without id: %v", v)
+			continue
 		}
 		id := matches[1]
 		return id, nil
@@ -308,6 +310,9 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	output.RawDate = fmt.Sprintf("%s-01-01", r.PublicationYear())
 	output.Date, err = time.Parse("2006-01-02", fmt.Sprintf("%s-01-01", r.PublicationYear()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse CEEOL date: %w", err)
+	}
 	output.Languages = r.Languages()
 	output.Volume = r.Volume()
 	output.Issue = r.Issue()

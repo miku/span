@@ -3,7 +3,6 @@ package main
 
 import (
 	"bufio"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/container"
 	"github.com/miku/span/licensing/kbart"

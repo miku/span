@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -80,7 +80,7 @@ func (api *API) Authenticate(username, password string) (err error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 201 {
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			log.Printf("[ee] failed to read body: %v", err)
 		} else {

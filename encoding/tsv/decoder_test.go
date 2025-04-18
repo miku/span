@@ -77,7 +77,7 @@ func TestDecode(t *testing.T) {
 
 	var example TestSimple
 	if err := dec.Decode(&example); err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 	}
 
 	expected := TestSimple{Title: "Hello", ID: "123"}
@@ -91,7 +91,7 @@ func TestDecodeRepetitions(t *testing.T) {
 
 	var example TestRepetition
 	if err := dec.Decode(&example); err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 	}
 
 	expected := TestRepetition{Title: "Hello", Publication: "Hello", ID: "123"}
@@ -105,7 +105,7 @@ func TestDecodeKbart(t *testing.T) {
 
 	var example TestEntry
 	if err := dec.Decode(&example); err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 	}
 
 	expected := TestEntry{
@@ -144,7 +144,7 @@ func TestDecodeSingleColumnKbart(t *testing.T) {
 
 	var example TestEntry
 	if err := dec.Decode(&example); err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 	}
 
 	expected := TestEntry{

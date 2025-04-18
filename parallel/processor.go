@@ -1,22 +1,22 @@
 // Package parallel implements helpers for fast processing of line oriented
 // inputs. Basic usage example:
 //
-//     r := strings.NewReader("1\n2\n3\n")
-//     f := func(ln int, b []byte) ([]byte, error) {
-//         result := fmt.Sprintf("#%d %s", ln, string(b))
-//         return []byte(result), nil
-//     }
+//	r := strings.NewReader("1\n2\n3\n")
+//	f := func(ln int, b []byte) ([]byte, error) {
+//	    result := fmt.Sprintf("#%d %s", ln, string(b))
+//	    return []byte(result), nil
+//	}
 //
-//     p := parallel.NewProcessor(r, os.Stdout, f)
-//     if err := p.Run(); err != nil {
-//         log.Fatal(err)
-//     }
+//	p := parallel.NewProcessor(r, os.Stdout, f)
+//	if err := p.Run(); err != nil {
+//	    log.Fatal(err)
+//	}
 //
 // This would print out:
 //
-//     #0 1
-//     #1 2
-//     #2 3
+//	#0 1
+//	#1 2
+//	#2 3
 //
 // Note that the order of the input is not guaranteed to be preserved. If you
 // care about the exact position, utilize the originating line number passed
@@ -71,9 +71,7 @@ func (bb *BytesBatch) Size() int {
 // Slice returns a slice of byte slices.
 func (bb *BytesBatch) Slice() []Record {
 	b := make([]Record, len(bb.b))
-	for i := 0; i < len(bb.b); i++ {
-		b[i] = bb.b[i]
-	}
+	copy(b, bb.b)
 	return b
 }
 

@@ -85,7 +85,7 @@ func parsePages(s string) (start, end, total string) {
 // insensitive.
 func stringsContainsAny(v string, vals []string) bool {
 	for _, vv := range vals {
-		if strings.ToLower(v) == strings.ToLower(vv) {
+		if strings.EqualFold(v, vv) {
 			return true
 		}
 	}
@@ -128,9 +128,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	} else {
 		output.BookTitle = record.BookTitle()
 	}
-	for _, p := range record.Metadata.Dc.Publisher {
-		output.Publishers = append(output.Publishers, p)
-	}
+	output.Publishers = append(output.Publishers, record.Metadata.Dc.Publisher...)
 
 	if record.Metadata.Dc.Date == "" {
 		return output, span.Skip{Reason: "empty date"}
@@ -148,9 +146,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.RawDate = output.Date.Format("2006-01-02")
 	}
 
-	for _, s := range record.Metadata.Dc.Subject {
-		output.Subjects = append(output.Subjects, s)
-	}
+	output.Subjects = append(output.Subjects, record.Metadata.Dc.Subject...)
 	start, end, total := parsePages(record.Metadata.Dc.Source)
 	output.StartPage = start
 	output.EndPage = end

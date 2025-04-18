@@ -58,7 +58,6 @@ var (
 	apiEmail        = flag.String("m", "martin.czygan@uni-leipzig.de", "email address")
 	numRows         = flag.Int("r", 1000, "number of docs per request")
 	userAgent       = flag.String("ua", "span-crossref-sync/dev (https://github.com/miku/span)", "user agent string")
-	modeCount       = flag.Bool("C", false, "just sum up all total results values")
 	debug           = flag.Bool("debug", false, "print out intervals")
 	verbose         = flag.Bool("verbose", false, "be verbose")
 	outputFile      = flag.String("o", "", "output filename (stdout, otherwise)")

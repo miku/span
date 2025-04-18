@@ -77,7 +77,7 @@ func TestNested(t *testing.T) {
 
 	b, err := Marshal(p)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 	}
 	if string(b) != want {
 		t.Errorf("Marshal got %v, want %v", string(b), want)
@@ -102,7 +102,7 @@ func TestDanglingCR(t *testing.T) {
 			ArticleTitle string `json:"rft.atitle"`
 		}
 		if err := json.Unmarshal([]byte(c.in), &v); err != nil {
-			t.Errorf(err.Error())
+			t.Error(err.Error())
 		}
 		b, err := Marshal(v)
 		if err != c.err {

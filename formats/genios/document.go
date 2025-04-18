@@ -1,6 +1,6 @@
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+//	Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
+//	                  The Finc Authors, http://finc.info
+//	                  Martin Czygan, <martin.czygan@uni-leipzig.de>
 //
 // This file is part of some open source application.
 //
@@ -18,7 +18,6 @@
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 //
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
 package genios
 
 import (
@@ -282,7 +281,7 @@ func (doc Document) ToIntermediateSchema() (output *finc.IntermediateSchema, err
 		// konsortium_sachsen_literaturnachweise_sozialwissenschaften_DZI_reload_1_10000.xml
 		// | grep Modules && echo $? # 1
 		log.Printf("genios: DB is not associated with any package: %s, falling back to generic default for mega_collection", doc.DB)
-		output.MegaCollections = []string{fmt.Sprintf("Genios")}
+		output.MegaCollections = []string{"Genios"}
 	}
 	// Genios DB (for debugging)
 	output.Packages = append(output.Packages, doc.DB)

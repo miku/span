@@ -204,14 +204,14 @@ func (p Publication) Date() (time.Time, error) {
 		}
 	}
 
-	y, m, d := "1970", "Jan", "1"
+	_, m, d := "1970", "Jan", "1"
 	if date.Year == "" {
 		return time.Time{}, ErrNoDate
 	}
 	if _, err := strconv.Atoi(date.Year); err != nil {
 		return time.Time{}, err
 	}
-	y = date.Year
+	y := date.Year
 	if date.Month != "" {
 		if len(date.Month) > 3 {
 			date.Month = date.Month[:3]
@@ -248,7 +248,7 @@ func (p Publication) Date() (time.Time, error) {
 			return t, nil
 		}
 	}
-	return time.Time{}, fmt.Errorf(fmt.Sprintf("%s", p.Volume.Article.Articleinfo.Date))
+	return time.Time{}, fmt.Errorf("%s", p.Volume.Article.Articleinfo.Date)
 }
 
 // Authors returns authors.

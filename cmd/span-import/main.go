@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
@@ -174,7 +173,7 @@ func processText(r io.Reader, w io.Writer, name string) error {
 	if !ok {
 		return fmt.Errorf("cannot unmarshal text: %T", data)
 	}
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return err
 	}
@@ -299,7 +298,7 @@ func main() {
 		}
 		encoder := json.NewEncoder(w)
 		for _, doc := range docs {
-			if encoder.Encode(doc); err != nil {
+			if err := encoder.Encode(doc); err != nil {
 				log.Fatal(err)
 			}
 		}

@@ -455,7 +455,9 @@ The generated TSV (via -f) fields are:
 				log.Fatal(err)
 			}
 		}
-		tx.Commit()
+		if err := tx.Commit(); err != nil {
+			log.Fatal(err)
+		}
 		log.Printf("@%d in %s", len(updates), time.Since(started))
 	default:
 		if err := json.NewEncoder(bw).Encode(updates); err != nil {

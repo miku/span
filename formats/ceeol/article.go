@@ -110,6 +110,9 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	}
 	output.RawDate = fmt.Sprintf("%s-01-01", article.PublicationYear)
 	output.Date, err = time.Parse("2006-01-02", fmt.Sprintf("%s-01-01", article.PublicationYear))
+	if err != nil {
+		return nil, fmt.Errorf("ceeol: invalid date: %w", err)
+	}
 	output.Subjects = article.SubjectTerms
 	output.URL = append(output.URL, article.ArticleURL)
 	output.RecordID = article.UniqueID
