@@ -68,7 +68,7 @@ deb: all
 	cp docs/$(PKGNAME).1 packaging/deb/$(PKGNAME)/usr/local/share/man/man1
 	mkdir -p packaging/deb/$(PKGNAME)/usr/lib/systemd/system
 	cp packaging/span-webhookd.service packaging/deb/$(PKGNAME)/usr/lib/systemd/system/
-	cd packaging/deb && fakeroot dpkg-deb --build $(PKGNAME) .
+	cd packaging/deb && fakeroot dpkg-deb -Zzstd --build $(PKGNAME) .
 	mv packaging/deb/$(PKGNAME)_*.deb .
 
 rpm: all
