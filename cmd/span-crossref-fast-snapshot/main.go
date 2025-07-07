@@ -1,3 +1,10 @@
+// Create a snapshot from a list of API slices.
+//
+// Background: After harvesting daily slices from crossref, we accumulate duplicates
+// and we want to dedupliate and keep the latest version for a DOI.
+//
+// Ex. 797,724,618 messages; with 64 cores, we are parsing about 215053 json
+// docs/s, or about 3K docs/s/core. Data is about 70GB, so only about 19MB/s.
 package main
 
 import (
