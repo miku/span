@@ -106,7 +106,7 @@ func DefaultSnapshotOptions() SnapshotOptions {
 }
 
 // FilterFunc can filter a record
-type FilterFunc func(r Record) bool
+type FilterFunc func(_ Record) bool
 
 // NoFilter is a noop filter
 var NoFilter = func(_ Record) bool { return true }
@@ -392,11 +392,11 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 	switch {
 	case isZstdCompressed(indexFile):
 		pipeline = fmt.Sprintf(
-			"zstd -cd -T0 %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -t $'\\t' -k4,4 -k3,3nr | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -t $'\\t' -k4,4 -u | cut -f1,2 > %s",
+			"zstd -cd -T0 %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
 			indexFile, runtime.NumCPU(), sortBufferSize, runtime.NumCPU(), sortBufferSize, lineNumsFile)
 	default:
 		pipeline = fmt.Sprintf(
-			"LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -t $'\\t' -k4,4 -k3,3nr %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -t $'\\t' -k4,4 -u | cut -f1,2 > %s",
+			"LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
 			runtime.NumCPU(), sortBufferSize, indexFile, runtime.NumCPU(), sortBufferSize, lineNumsFile)
 	}
 	if verbose {
