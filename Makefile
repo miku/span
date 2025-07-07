@@ -3,6 +3,7 @@ TARGETS = \
           span-amsl-discovery \
 		  span-compare \
           span-crossref-members \
+		  span-crossref-fast-snapshot \
 		  span-crossref-snapshot \
           span-crossref-sync \
 		  span-crossref-table \
