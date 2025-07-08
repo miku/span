@@ -19,13 +19,14 @@ import (
 )
 
 var (
-	outputFile     = flag.String("o", crossref.DefaultOutputFile, "output file path, use .gz or .zst to enable compression")
-	batchSize      = flag.Int("n", 100000, "number of records to process in memory before writing to index")
-	workers        = flag.Int("w", runtime.NumCPU(), "number of worker goroutines for parallel processing")
-	keepTempFiles  = flag.Bool("k", false, "keep temporary files (for debugging)")
-	verbose        = flag.Bool("v", false, "verbose output")
-	sortBufferSize = flag.String("S", "25%", "sort buffer size")
-	excludesFile   = flag.String("X", "", "file with DOI to exclude, one per line")
+	outputFile        = flag.String("o", crossref.DefaultOutputFile, "output file path, use .gz or .zst to enable compression")
+	batchSize         = flag.Int("n", 100000, "number of records to process in memory before writing to index")
+	workers           = flag.Int("w", runtime.NumCPU(), "number of worker goroutines for parallel processing")
+	keepTempFiles     = flag.Bool("k", false, "keep temporary files (for debugging)")
+	verbose           = flag.Bool("v", false, "verbose output")
+	sortBufferSize    = flag.String("S", "25%", "sort buffer size")
+	excludesFile      = flag.String("X", "", "file with DOI to exclude, one per line")
+	shuffleInputFiles = flag.Bool("R", false, "shuffle input files")
 )
 
 func main() {
@@ -54,14 +55,15 @@ func main() {
 		s = ""
 	}
 	opts := crossref.SnapshotOptions{
-		InputFiles:     inputFiles,
-		OutputFile:     *outputFile,
-		BatchSize:      *batchSize,
-		NumWorkers:     *workers,
-		Verbose:        *verbose,
-		KeepTempFiles:  *keepTempFiles,
-		SortBufferSize: *sortBufferSize,
-		Excludes:       excludes,
+		InputFiles:        inputFiles,
+		OutputFile:        *outputFile,
+		BatchSize:         *batchSize,
+		NumWorkers:        *workers,
+		Verbose:           *verbose,
+		KeepTempFiles:     *keepTempFiles,
+		SortBufferSize:    *sortBufferSize,
+		Excludes:          excludes,
+		ShuffleInputFiles: *shuffleInputFiles,
 	}
 	if err := crossref.CreateSnapshot(opts); err != nil {
 		log.Fatalf("error creating snapshot: %v", err)

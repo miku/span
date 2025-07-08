@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand/v2"
 	"os"
 	"os/exec"
 	"path"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -72,15 +74,16 @@ type Record struct {
 
 // SnapshotOptions contains configuration for the snapshot process.
 type SnapshotOptions struct {
-	InputFiles     []string // InputFiles, following a Record structure
-	OutputFile     string   // OutputFile is the file the snapshot is written to
-	TempDir        string   // TempDir
-	BatchSize      int      // BatchSize is the number records we process at once, affects memory usage
-	NumWorkers     int      // Threads
-	SortBufferSize string   // For sort -S parameter (e.g. "25%"), higher values make sort faste
-	KeepTempFiles  bool     // For debugging
-	Verbose        bool     // Verbose output
-	Excludes       []string // List of DOI to exclude
+	InputFiles        []string // InputFiles, following a Record structure
+	OutputFile        string   // OutputFile is the file the snapshot is written to
+	TempDir           string   // TempDir
+	BatchSize         int      // BatchSize is the number records we process at once, affects memory usage
+	NumWorkers        int      // Threads
+	SortBufferSize    string   // For sort -S parameter (e.g. "25%"), higher values make sort faste
+	KeepTempFiles     bool     // For debugging
+	Verbose           bool     // Verbose output
+	Excludes          []string // List of DOI to exclude
+	ShuffleInputFiles bool     // Randomize processing order
 }
 
 type LineNumberEntry struct {
@@ -139,6 +142,18 @@ func ExcludeFilter(excludes []string) func(record Record) bool {
 func CreateSnapshot(opts SnapshotOptions) error {
 	if len(opts.InputFiles) == 0 {
 		return fmt.Errorf("no input files provided")
+	}
+	switch {
+	case opts.ShuffleInputFiles:
+		rand.Shuffle(len(opts.InputFiles), func(i, j int) {
+			opts.InputFiles[i], opts.InputFiles[j] = opts.InputFiles[j], opts.InputFiles[i]
+		})
+	default:
+		var err error
+		opts.InputFiles, err = SortFilesBySize(opts.InputFiles)
+		if err != nil {
+			return err
+		}
 	}
 	indexFile, err := os.CreateTemp("", fmt.Sprintf("%s-index-*.txt.zst", TempfilePrefix))
 	if err != nil {
@@ -623,4 +638,42 @@ func createFallbackScript() (string, error) {
 		return "", fmt.Errorf("error making fallback script executable: %v", err)
 	}
 	return scriptFile.Name(), nil
+}
+
+// FileInfo holds filename and size for sorting
+type FileInfo struct {
+	Name string
+	Size int64
+}
+
+// SortFilesBySize takes a slice of filenames and returns them sorted by file size (largest first)
+func SortFilesBySize(filenames []string) ([]string, error) {
+	// Create slice to hold file info
+	fileInfos := make([]FileInfo, 0, len(filenames))
+
+	// Get file sizes
+	for _, filename := range filenames {
+		info, err := os.Stat(filename)
+		if err != nil {
+			// Skip files that don't exist or can't be accessed
+			continue
+		}
+		fileInfos = append(fileInfos, FileInfo{
+			Name: filename,
+			Size: info.Size(),
+		})
+	}
+
+	// Sort by size (largest first)
+	sort.Slice(fileInfos, func(i, j int) bool {
+		return fileInfos[i].Size > fileInfos[j].Size
+	})
+
+	// Extract sorted filenames
+	result := make([]string, len(fileInfos))
+	for i, info := range fileInfos {
+		result[i] = info.Name
+	}
+
+	return result, nil
 }
