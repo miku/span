@@ -5,6 +5,14 @@
 //
 // Ex. 797,724,618 messages; with 64 cores, we are parsing about 215053 json
 // docs/s, or about 3K docs/s/core. Data is about 70GB, so only about 19MB/s.
+// Overall, we save 1-2TB of SSD writes per month, which should extend the
+// lifetime of the storage hardware (est. TBW of ssd: 14,016 TB)
+//
+// # for d in /dev/nvme{0..3}; do smartctl -A $d | grep "Data Units Written"; done # 2025-07-08
+// Data Units Written:                 114,134,244 [58.4 TB]
+// Data Units Written:                 114,188,635 [58.4 TB]
+// Data Units Written:                 114,185,851 [58.4 TB]
+// Data Units Written:                 114,109,391 [58.4 TB]
 package main
 
 import (
