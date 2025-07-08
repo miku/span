@@ -26,6 +26,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -186,8 +187,9 @@ OUTER:
 			break OUTER
 		case "s", "sync":
 			for _, item := range wr.Message.Items {
-				item = append(item, bNewline...)
-				if _, err := w.Write(item); err != nil {
+				cleanItem := cleanEscapedSlashes(item)
+				cleanItem = append(cleanItem, bNewline...)
+				if _, err := w.Write(cleanItem); err != nil {
 					return err
 				}
 			}
@@ -371,4 +373,17 @@ func main() {
 			}
 		}
 	}
+}
+
+// cleanEscapedSlashes is a convenience; API returns escaped forward slashes,
+// which is valid JSON but makes grepping harder.
+func cleanEscapedSlashes(raw json.RawMessage) json.RawMessage {
+	if !json.Valid(raw) {
+		return raw
+	}
+	fixed := bytes.ReplaceAll(raw, []byte(`\/`), []byte(`/`))
+	if !json.Valid(fixed) {
+		return raw
+	}
+	return fixed
 }
