@@ -480,8 +480,11 @@ func groupLineNumbersByFile(lineNumsFile string, sortBufferSize string, verbose 
 			line  = scanner.Text()
 			parts = strings.Fields(line)
 		)
+		if len(parts) < 2 || len(line) < 2 || strings.HasPrefix(line, "#") {
+			continue
+		}
 		if len(parts) != 2 {
-			return nil, fmt.Errorf("invalid line format: %s", line)
+			return nil, fmt.Errorf("invalid line format (parts=%d): %s", len(parts), line)
 		}
 		var (
 			filename = parts[0]
