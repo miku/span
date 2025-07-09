@@ -598,11 +598,11 @@ func extractLinesFromFile(filename string, lineNumbersFile string, outputFile st
 	var cmd *exec.Cmd
 	switch {
 	case strings.HasSuffix(filename, ".zst"):
-		cmd = exec.Command("bash", "-c", fmt.Sprintf("%s %s <(zstd -cd -T0 %s) | zstd -c9 -T0 >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
+		cmd = exec.Command("bash", "-c", fmt.Sprintf("set -o pipefail; %s %s <(zstd -cd -T0 %s) | zstd -c9 -T0 >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
 	case strings.HasSuffix(filename, ".gz"):
-		cmd = exec.Command("bash", "-c", fmt.Sprintf("%s %s <(gzip -cd %s) | gzip -c9 >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
+		cmd = exec.Command("bash", "-c", fmt.Sprintf("set -o pipefail; %s %s <(gzip -cd %s) | gzip -c9 >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
 	default:
-		cmd = exec.Command("bash", "-c", fmt.Sprintf("%s %s %s >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
+		cmd = exec.Command("bash", "-c", fmt.Sprintf("set -o pipefail; %s %s %s >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
 	}
 	if verbose {
 		log.Println(cmd)
