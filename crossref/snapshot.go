@@ -102,7 +102,7 @@ func DefaultSnapshotOptions() SnapshotOptions {
 		TempDir:        os.TempDir(),
 		BatchSize:      100_000,
 		NumWorkers:     runtime.NumCPU(),
-		SortBufferSize: "25%",
+		SortBufferSize: "25%", // Note: this should not be >50% as we are using this in parallel for two sort invocations.
 		KeepTempFiles:  false,
 		Verbose:        false,
 	}
@@ -407,11 +407,11 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 	switch {
 	case isZstdCompressed(indexFile):
 		pipeline = fmt.Sprintf(
-			"zstd -cd -T0 %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
+			"set -o pipefail; zstd -cd -T0 %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
 			indexFile, runtime.NumCPU(), sortBufferSize, runtime.NumCPU(), sortBufferSize, lineNumsFile)
 	default:
 		pipeline = fmt.Sprintf(
-			"LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
+			"set -o pipefail; LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
 			runtime.NumCPU(), sortBufferSize, indexFile, runtime.NumCPU(), sortBufferSize, lineNumsFile)
 	}
 	if verbose {
