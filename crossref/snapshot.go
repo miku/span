@@ -37,6 +37,23 @@ import (
 // regarding the number of open files.
 //
 // Represent line numbers as a bitset; could keep 1B lines in 16MB.
+//
+// Example log output:
+//
+// ...
+// 2025/07/09 11:39:32 done [548/551][99.46%]: /data/finc/crossref/feed-2-index-2024-12-25-2024-12-25.json.zst
+// 2025/07/09 11:46:04 done [549/551][99.64%]: /data/finc/crossref/feed-2-index-2025-02-21-2025-02-21.json.zst
+// 2025/07/09 12:25:43 done [550/551][99.82%]: /data/finc/crossref/feed-2-index-2024-03-31-2024-03-31.json.zst
+// 2025/07/09 12:25:44 done [551/551][100.00%]: /data/finc/crossref/feed-2-index-2022-01-01-2024-04-01.json.zst
+// 2025/07/09 12:25:44 stage 1 completed in 1h21m26.990901593s
+// 2025/07/09 12:25:44 stage 2: identifying latest versions of each DOI
+// 2025/07/09 12:25:44 sorting and identifying latest versions
+// 2025/07/09 12:25:44 executing sort pipeline: zstd -cd -T0 /data/tmp/span-crossref-snapshot-index-2188365357.txt.zst | LC_ALL=C sort --compress-program=zstd --parallel 64 -S35% -k4,4 -k3,3nr | LC_ALL=C sort --compress-program=zstd --parallel 64 -S35% -k4,4 -u | cut -f1,2 > /data/tmp/span-crossref-snapshot-lines-3977036807.txt
+// 2025/07/09 12:47:46 sorting and filtering complete, output file size: 12404732532 bytes
+// 2025/07/09 12:47:46 stage 2 completed in 22m1.831171277s
+// 2025/07/09 12:47:46 stage 3: extracting relevant records to output file
+// extracting relevant records
+// ...
 
 var (
 	MaxScanTokenSize  = 104_857_600 // 100MB, note: each thread will allocate a buffer of this size
@@ -200,7 +217,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		return fmt.Errorf("error closing index file: %v", err)
 	}
 	if opts.Verbose {
-		log.Printf("stage 1 completed in %s", time.Since(t)) // 1h9m26.202802464s
+		log.Printf("stage 1 completed in %s", time.Since(t)) // 1h21m26.990901593s
 	}
 	// Stage 2: Sort and find latest version of each DOI
 	// =================================================
@@ -212,7 +229,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		return fmt.Errorf("error in stage 2: %v", err)
 	}
 	if opts.Verbose {
-		log.Printf("stage 2 completed in %s", time.Since(t)) // 14m53.753035045s
+		log.Printf("stage 2 completed in %s", time.Since(t)) // 22m1.831171277s
 	}
 	// Stage 3: Extract identified lines to create final output
 	// ========================================================
