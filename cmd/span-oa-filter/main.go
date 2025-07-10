@@ -79,6 +79,7 @@ var (
 	batchsize        = flag.Int("b", 5000, "batch size")
 	verbose          = flag.Bool("verbose", false, "extended output")
 	batchMemoryLimit = flag.Int64("m", 209715200, "memory limit per batch")
+	bestEffort       = flag.Bool("B", false, "ignore unmarshaling errors")
 )
 
 func main() {
@@ -140,7 +141,12 @@ func main() {
 	p := parallel.NewProcessor(bufio.NewReader(os.Stdin), w, func(_ int64, b []byte) ([]byte, error) {
 		var is finc.IntermediateSchema
 		if err := json.Unmarshal(b, &is); err != nil {
-			return nil, err
+			if *bestEffort {
+				log.Printf("warning (%v): %v", err, string(b))
+				return nil, nil
+			} else {
+				return nil, err
+			}
 		}
 
 		if _, ok := openAccessSids[is.SourceID]; ok {
