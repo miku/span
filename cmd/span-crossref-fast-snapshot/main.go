@@ -59,8 +59,6 @@ func main() {
 		}
 		var s = string(b)
 		excludes = strings.Split(s, "\n")
-		b = nil
-		s = ""
 	}
 	opts := crossref.SnapshotOptions{
 		InputFiles:        inputFiles,
