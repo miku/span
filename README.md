@@ -59,7 +59,8 @@ additions.  Notable, since 2021, the previous scripts used to fetch daily
 metadata updates from [crossref](https://api.crossref.org) has been put into a
 standalone tool, `span-crossref-sync`, which merely adds some retry logic and
 consistent file naming to the API harvest. In 2024, `span-webhookd`,
-`span-check`, `span-review`, `span-tagger` are gone.
+`span-check`, `span-review`, `span-tagger` are gone. A [faster crossref snapshot
+tool](https://github.com/miku/span/blob/29d0af845102464475e1d3b9aba779895847c32e/cmd/span-crossref-fast-snapshot/main.go) was implemented in 2025.
 
 ## Documentation
 
