@@ -75,7 +75,7 @@ var SourceNames = map[string]string{
 	"51":  "PDA Print VUB",
 	"52":  "OECD iLibrary",
 	"53":  "CEEOL Central and Eastern European Online Library",
-	"55":  "JSTOR 19th Century British Pamphlets",
+	"55":  "JSTOR",
 	"56":  "Folkwang Universität der Künste Essen, Lokalsystem",
 	"57":  "Robert Schumann Hochschule RSH Düsseldorf",
 	"58":  "Hochschule für Musik und Tanz HfMT Köln",
