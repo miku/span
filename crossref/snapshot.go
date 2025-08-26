@@ -198,6 +198,10 @@ func CreateSnapshot(opts SnapshotOptions) error {
 			_ = os.Remove(lineNumsFile.Name())
 		}
 	}()
+	outputDir := path.Dir(opts.OutputFile)
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
 	if opts.Verbose {
 		log.Printf("processing %d files with %d workers\n", len(opts.InputFiles), opts.NumWorkers)
 		log.Printf("output file: %s\n", opts.OutputFile)
