@@ -1,26 +1,28 @@
 Summary:    Library data tools.
 Name:       span
-Version:    0.2.9
+Version:    0.2.10
 Release:    0
 License:    GPL
-ExclusiveArch:  x86_64
+BuildArch:  x86_64
 BuildRoot:  %{_tmppath}/%{name}-build
 Group:      System/Base
 Vendor:     Leipzig University Library, https://www.ub.uni-leipzig.de
 URL:        https://github.com/miku/span
+Source:     %{name}.tar.gz
+%define _binary_payload w1.zstdio
 
 %description
-
 Library data tools.
 
 %prep
+%setup -q -n span
 
 %build
+# Nothing to build - precompiled binaries
 
 %pre
 
 %install
-
 mkdir -p $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/bin
@@ -41,7 +43,6 @@ install -m 755 span-report $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-tag $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/bin
 
-
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
 
@@ -60,9 +61,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 
 %files
 %defattr(-,root,root)
-
-/usr/lib/systemd/system/span-webhookd.service
-/usr/local/share/man/man1/span.1
 /usr/local/bin/span-amsl-discovery
 /usr/local/bin/span-compare
 /usr/local/bin/span-crossref-members
@@ -81,11 +79,11 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/bin/span-report
 /usr/local/bin/span-tag
 /usr/local/bin/span-update-labels
-
+/usr/local/share/man/man1/span.1
+/usr/lib/systemd/system/span-webhookd.service
 %attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
 %changelog
-
 * Mon Feb 18 2019 Martin Czygan
 - 0.1.281 release
 - replace span-amsl with span-amsl-discovery
@@ -158,3 +156,5 @@ rm -rf %{_topdir}/BUILD/%{name}
 * Wed Feb 11 2015 Martin Czygan
 - 0.1.2 release
 - initial release
+
+
