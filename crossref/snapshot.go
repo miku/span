@@ -411,8 +411,9 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 				return err
 			}
 			if verbose {
-				donePct := float64(numProcessed.Load()) / float64(len(inputFiles)) * 100
-				log.Printf("done [%d/%d][%0.2f%%]: %s", numProcessed.Load(), len(inputFiles), donePct, inputPath)
+				k := numProcessed.Load()
+				donePct := float64(k) / float64(len(inputFiles)) * 100
+				log.Printf("done [%d/%d][%0.2f%%]: %s", k, len(inputFiles), donePct, inputPath)
 			}
 		}
 		return nil
