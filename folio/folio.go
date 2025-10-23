@@ -144,14 +144,14 @@ type MetadataCollectionsResponse struct {
 
 // FincConfigMetadataCollection is a single configuration entry.
 type FincConfigMetadataCollection struct {
-	CollectionId      string        `json:"collectionId"`
-	ContentFilesValue []interface{} `json:"contentFiles"`
-	Description       string        `json:"description"`
-	FacetLabel        string        `json:"facetLabel"`
-	FreeContent       string        `json:"freeContent"`
-	Id                string        `json:"id"`
-	Label             string        `json:"label"`
-	Lod               struct {
+	CollectionId string   `json:"collectionId"`
+	ContentFiles []string `json:"contentFiles"`
+	Description  string   `json:"description"`
+	FacetLabel   string   `json:"facetLabel"`
+	FreeContent  string   `json:"freeContent"`
+	Id           string   `json:"id"`
+	Label        string   `json:"label"`
+	Lod          struct {
 		Note        string `json:"note"`
 		Publication string `json:"publication"`
 	} `json:"lod"`
@@ -163,82 +163,12 @@ type FincConfigMetadataCollection struct {
 		CreatedDate string `json:"createdDate"`
 		UpdatedDate string `json:"updatedDate"`
 	} `json:"metadata"`
-	MetadataAvailable   string        `json:"metadataAvailable"`
-	PermittedFor        []string      `json:"permittedFor"`
-	SelectedBy          []string      `json:"selectedBy"`
-	SolrMegaCollections []string      `json:"solrMegaCollections"`
-	Tickets             []interface{} `json:"tickets"`
-	UsageRestricted     string        `json:"usageRestricted"`
-}
-
-func (c *FincConfigMetadataCollection) ContentFiles() (result []string) {
-	for _, v := range c.ContentFilesValue {
-		switch w := v.(type) {
-		case string:
-			result = append(result, w)
-		}
-	}
-	return
-}
-
-// LoginResponse for bl-users/login, used to obtain auth tokens.
-type LoginResponse struct {
-	PatronGroup struct {
-		Desc     string `json:"desc"`
-		Group    string `json:"group"`
-		Id       string `json:"id"`
-		Metadata struct {
-			CreatedDate string `json:"createdDate"`
-			UpdatedDate string `json:"updatedDate"`
-		} `json:"metadata"`
-	} `json:"patronGroup"`
-	Permissions struct {
-		Id       string `json:"id"`
-		Metadata struct {
-			CreatedByUserId string `json:"createdByUserId"`
-			CreatedDate     string `json:"createdDate"`
-			UpdatedByUserId string `json:"updatedByUserId"`
-			UpdatedDate     string `json:"updatedDate"`
-		} `json:"metadata"`
-		Permissions []string `json:"permissions"`
-		UserId      string   `json:"userId"`
-	} `json:"permissions"`
-	ProxiesFor        []interface{} `json:"proxiesFor"`
-	ServicePointsUser struct {
-		Id       string `json:"id"`
-		Metadata struct {
-			CreatedByUserId string `json:"createdByUserId"`
-			CreatedDate     string `json:"createdDate"`
-			UpdatedByUserId string `json:"updatedByUserId"`
-			UpdatedDate     string `json:"updatedDate"`
-		} `json:"metadata"`
-		ServicePoints    []interface{} `json:"servicePoints"`
-		ServicePointsIds []interface{} `json:"servicePointsIds"`
-		UserId           string        `json:"userId"`
-	} `json:"servicePointsUser"`
-	User struct {
-		Active      bool          `json:"active"`
-		CreatedDate string        `json:"createdDate"`
-		Departments []interface{} `json:"departments"`
-		Id          string        `json:"id"`
-		Metadata    struct {
-			CreatedByUserId string `json:"createdByUserId"`
-			CreatedDate     string `json:"createdDate"`
-			UpdatedByUserId string `json:"updatedByUserId"`
-			UpdatedDate     string `json:"updatedDate"`
-		} `json:"metadata"`
-		PatronGroup string `json:"patronGroup"`
-		Personal    struct {
-			Addresses              []interface{} `json:"addresses"`
-			Email                  string        `json:"email"`
-			FirstName              string        `json:"firstName"`
-			LastName               string        `json:"lastName"`
-			PreferredContactTypeId string        `json:"preferredContactTypeId"`
-		} `json:"personal"`
-		ProxyFor    []interface{} `json:"proxyFor"`
-		UpdatedDate string        `json:"updatedDate"`
-		Username    string        `json:"username"`
-	} `json:"user"`
+	MetadataAvailable   string   `json:"metadataAvailable"`
+	PermittedFor        []string `json:"permittedFor"`
+	SelectedBy          []string `json:"selectedBy"`
+	SolrMegaCollections []string `json:"solrMegaCollections"`
+	Tickets             []string `json:"tickets"`
+	UsageRestricted     string   `json:"usageRestricted"`
 }
 
 // Example response
