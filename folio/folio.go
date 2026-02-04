@@ -96,11 +96,18 @@ func (api *API) Authenticate(username, password string) (err error) {
 	return nil
 }
 
+// SetToken sets the API token directly, bypassing the login flow. Use this
+// when the token is provided via environment variable.
+func (api *API) SetToken(token string) {
+	api.Token = token
+}
+
 // MetadataCollectionsOpts collections options for the metadata collections
 // API. Not complete.
 type MetadataCollectionsOpts struct {
-	CQL   string
-	Limit int
+	CQL               string
+	Limit             int
+	IncludeFilteredBy bool
 }
 
 // MetadataCollections queries for collection and attachment information.
@@ -111,6 +118,9 @@ func (api *API) MetadataCollections(opts MetadataCollectionsOpts) (*MetadataColl
 	)
 	v.Add("query", opts.CQL)                      // (selectedBy=("DIKU-01" or "DE-15")
 	v.Add("limit", fmt.Sprintf("%d", opts.Limit)) // https://s3.amazonaws.com/foliodocs/api/mod-finc-config/p/fincConfigMetadataCollections.html#finc_config_metadata_collections_get
+	if opts.IncludeFilteredBy {
+		v.Add("includeFilteredBy", "true")
+	}
 	link := fmt.Sprintf("%s/finc-config/metadata-collections?%s", api.Base, v.Encode())
 	req, err := http.NewRequest("GET", link, nil)
 	if err != nil {
@@ -166,9 +176,48 @@ type FincConfigMetadataCollection struct {
 	MetadataAvailable   string   `json:"metadataAvailable"`
 	PermittedFor        []string `json:"permittedFor"`
 	SelectedBy          []string `json:"selectedBy"`
-	SolrMegaCollections []string `json:"solrMegaCollections"`
-	Tickets             []string `json:"tickets"`
-	UsageRestricted     string   `json:"usageRestricted"`
+	SolrMegaCollections []string       `json:"solrMegaCollections"`
+	Tickets             []string       `json:"tickets"`
+	UsageRestricted     string         `json:"usageRestricted"`
+	FilteredBy          []FilterEntry  `json:"filteredBy"`
+}
+
+// FilterEntry describes a filter applied to a collection for a specific ISIL.
+type FilterEntry struct {
+	Id          string       `json:"id"`
+	Label       string       `json:"label"`
+	Type        string       `json:"type"` // e.g. "Whitelist", "Blacklist"
+	FilterFiles []FilterFile `json:"filterFiles"`
+	Isil        string       `json:"isil"`
+}
+
+// FilterFile references a file stored in FOLIO's finc-config module.
+type FilterFile struct {
+	Label  string `json:"label"`
+	FileId string `json:"fileId"`
+}
+
+// FetchFile downloads a file by its ID from the finc-config files endpoint.
+// The caller is responsible for closing the returned ReadCloser.
+func (api *API) FetchFile(fileId string) (io.ReadCloser, error) {
+	api.ensureClient()
+	link := fmt.Sprintf("%s/finc-config/files/%s", api.Base, fileId)
+	req, err := http.NewRequest("GET", link, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Accept", "application/octet-stream")
+	req.Header.Set("X-Okapi-Tenant", api.Tenant)
+	req.Header.Set("X-Okapi-Token", api.Token)
+	resp, err := api.Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		resp.Body.Close()
+		return nil, fmt.Errorf("failed to fetch file %s: %v", fileId, resp.Status)
+	}
+	return resp.Body, nil
 }
 
 // Example response
