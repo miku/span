@@ -139,7 +139,6 @@ func runLegacy() {
 		h := sha1.New()
 		h.Write([]byte(u))
 		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
-		mapping[u] = name
 		resp, err := httpClient.Get(u)
 		if err != nil || resp.StatusCode >= 400 {
 			if *bestEffort {
@@ -157,6 +156,7 @@ func runLegacy() {
 		if _, err := io.Copy(f, resp.Body); err != nil {
 			log.Fatal(err)
 		}
+		mapping[u] = name
 		log.Printf("[%04d %s] %s", i, name, u)
 	}
 	f, err = w.Create(NameMapping)
@@ -339,7 +339,6 @@ func runFolio() {
 		h := sha1.New()
 		h.Write([]byte(u))
 		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
-		mapping[u] = name
 		var (
 			body  io.ReadCloser
 			dlErr error
@@ -381,6 +380,7 @@ func runFolio() {
 			log.Fatal(err)
 		}
 		body.Close()
+		mapping[u] = name
 		log.Printf("[%04d %s] %s", i, name, u)
 	}
 	// Write mapping.
