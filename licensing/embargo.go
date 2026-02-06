@@ -20,7 +20,7 @@ var (
 	Year = 8760 * time.Hour
 
 	// embargoPattern fixes allowed embargo strings (type, length, units).
-	embargoPattern = regexp.MustCompile(`([P|R])([0-9]+)([Y|M|D])`)
+	embargoPattern = regexp.MustCompile(`([PR])([0-9]+)([YMD])`)
 
 	ErrBeforeMovingWall = errors.New("before moving wall")
 	ErrAfterMovingWall  = errors.New("after moving wall")

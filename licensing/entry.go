@@ -215,12 +215,20 @@ func (entry *Entry) beginGranularity(g DateGranularity) time.Time {
 }
 
 // end parses right boundary of license interval, returns a date far in the future
-// if it is not defined.
+// if it is not defined. For coarse-grained dates the result is adjusted to the
+// end of the period so that year "2008" covers through Dec 31 and month
+// "2008-06" covers through June 30.
 func (entry *Entry) end() time.Time {
 	if entry.parsed.LastIssueDate.IsZero() {
 		entry.parsed.LastIssueDate = farInTheFuture
 		for _, dfmt := range datePatterns {
 			if t, err := time.Parse(dfmt.layout, entry.LastIssueDate); err == nil {
+				switch dfmt.granularity {
+				case GranularityYear:
+					t = time.Date(t.Year(), 12, 31, 0, 0, 0, 0, time.UTC)
+				case GranularityMonth:
+					t = time.Date(t.Year(), t.Month()+1, 0, 0, 0, 0, 0, time.UTC)
+				}
 				entry.parsed.LastIssueDate = t
 				break
 			}

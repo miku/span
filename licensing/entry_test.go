@@ -243,6 +243,22 @@ func TestCovers(t *testing.T) {
 			Entry{OnlineIdentifier: "2477-5975"}, "1967-12-01T00:00:00Z", "", "", nil,
 		},
 		{
+			"year granularity end date covers whole year, refs span-d6s",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008"}, "2008-06", "", "", nil,
+		},
+		{
+			"month granularity end date covers whole month, refs span-d6s",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008-06"}, "2008-06-15", "", "", nil,
+		},
+		{
+			"query after year-granularity end is still rejected, refs span-d6s",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008"}, "2009-01", "", "", ErrAfterLastIssueDate,
+		},
+		{
+			"query after month-granularity end is still rejected, refs span-d6s",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008-06"}, "2008-07-01", "", "", ErrAfterLastIssueDate,
+		},
+		{
 			"refs #12775",
 			Entry{
 				PublicationTitle:      "Journal of the Acoustical Society of America / JASA Express Letters",
