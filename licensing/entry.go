@@ -151,22 +151,33 @@ func (entry *Entry) ISSNList() []string {
 	return issns.SortedValues()
 }
 
-// Covers is a generic method to determine, whether a given date, volume or
-// issue is covered by this entry. It takes into account moving walls. If
-// values are not defined, we assume they are not constrained. It is an error,
-// if the given date string cannot be parsed by one of the deposited layouts.
-func (entry *Entry) Covers(date, volume, issue string) error {
+// CoversDate checks whether the given date falls within the entry's date
+// range and satisfies any embargo restrictions.
+func (entry *Entry) CoversDate(date string) error {
 	t, g, err := parseWithGranularity(date)
 	if err != nil {
 		return err
 	}
-	// TODO: Containment and embargo should be one thing, maybe.
 	if err := entry.containsDateTime(t, g); err != nil {
 		return err
 	}
-	if err := Embargo(entry.Embargo).Compatible(t); err != nil {
+	return Embargo(entry.Embargo).Compatible(t)
+}
+
+// CoversVolumeIssue checks whether the given volume and issue fall within
+// the entry's boundaries for the year of the given date.
+func (entry *Entry) CoversVolumeIssue(date, volume, issue string) error {
+	t, _, err := parseWithGranularity(date)
+	if err != nil {
 		return err
 	}
+	return entry.coversVolumeIssue(t, volume, issue)
+}
+
+// coversVolumeIssue checks volume/issue boundaries against a parsed date.
+func (entry *Entry) coversVolumeIssue(t time.Time, volume, issue string) error {
+	entry.begin()
+	entry.end()
 	if entry.parsed.FirstIssueDate.Year() == t.Year() {
 		if entry.FirstVolume != "" && volume != "" && findInt(volume) < findInt(entry.FirstVolume) {
 			return ErrBeforeFirstVolume
@@ -184,6 +195,24 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 		}
 	}
 	return nil
+}
+
+// Covers is a generic method to determine, whether a given date, volume or
+// issue is covered by this entry. It takes into account moving walls. If
+// values are not defined, we assume they are not constrained. It is an error,
+// if the given date string cannot be parsed by one of the deposited layouts.
+func (entry *Entry) Covers(date, volume, issue string) error {
+	t, g, err := parseWithGranularity(date)
+	if err != nil {
+		return err
+	}
+	if err := entry.containsDateTime(t, g); err != nil {
+		return err
+	}
+	if err := Embargo(entry.Embargo).Compatible(t); err != nil {
+		return err
+	}
+	return entry.coversVolumeIssue(t, volume, issue)
 }
 
 // begin parses left boundary of license interval, returns a date far in the
@@ -258,7 +287,6 @@ func (entry *Entry) containsDateTime(t time.Time, g DateGranularity) error {
 		return nil
 	}
 	if t.Before(entry.beginGranularity(g)) {
-		// XXX: This has nothing to do with issue.
 		return ErrBeforeFirstIssueDate
 	}
 	if t.After(entry.endGranularity(g)) {

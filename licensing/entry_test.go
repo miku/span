@@ -340,6 +340,76 @@ func BenchmarkCovers(b *testing.B) {
 	}
 }
 
+func TestCoversDate(t *testing.T) {
+	var cases = []struct {
+		about string
+		entry Entry
+		date  string
+		err   error
+	}{
+		{"empty date is invalid",
+			Entry{}, "", ErrInvalidDate},
+		{"date within range",
+			Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "2000", nil},
+		{"date before range",
+			Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "1989", ErrBeforeFirstIssueDate},
+		{"date after range",
+			Entry{FirstIssueDate: "1990-01-01", LastIssueDate: "2008-01-01"}, "2008-02", ErrAfterLastIssueDate},
+		{"embargo rejects recent date",
+			Entry{FirstIssueDate: "2000-01-01", Embargo: "P1Y"},
+			time.Now().Add(-168 * time.Hour).Format("2006-01-02"), ErrAfterMovingWall},
+		{"embargo allows old date",
+			Entry{FirstIssueDate: "2000-01-01", Embargo: "P1Y"},
+			time.Now().Add(-10000 * time.Hour).Format("2006-01-02"), nil},
+		{"no constraints",
+			Entry{}, "2000", nil},
+	}
+	for _, c := range cases {
+		err := c.entry.CoversDate(c.date)
+		if err != c.err {
+			t.Errorf("CoversDate(%v): got %v, want %v (%s)", c.date, err, c.err, c.about)
+		}
+	}
+}
+
+func TestCoversVolumeIssue(t *testing.T) {
+	var cases = []struct {
+		about  string
+		entry  Entry
+		date   string
+		volume string
+		issue  string
+		err    error
+	}{
+		{"no constraints",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008"}, "2004", "5", "10", nil},
+		{"volume too early in first year",
+			Entry{FirstIssueDate: "2000", FirstVolume: "3", LastIssueDate: "2008"},
+			"2000", "1", "", ErrBeforeFirstVolume},
+		{"issue too early in first year",
+			Entry{FirstIssueDate: "2000", FirstVolume: "3", FirstIssue: "21", LastIssueDate: "2008"},
+			"2000", "3", "20", ErrBeforeFirstIssue},
+		{"volume too late in last year",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2"},
+			"2008", "3", "", ErrAfterLastVolume},
+		{"issue too late in last year",
+			Entry{FirstIssueDate: "2000", LastIssueDate: "2008", LastVolume: "2", LastIssue: "12"},
+			"2008", "2", "13", ErrAfterLastIssue},
+		{"volume ok in non-boundary year",
+			Entry{FirstIssueDate: "2000", FirstVolume: "6", LastIssueDate: "2008"},
+			"2001-05-05", "4", "", nil},
+		{"empty volume and issue are unconstrained",
+			Entry{FirstIssueDate: "2000", FirstVolume: "6", LastIssueDate: "2008"},
+			"2000", "", "", nil},
+	}
+	for _, c := range cases {
+		err := c.entry.CoversVolumeIssue(c.date, c.volume, c.issue)
+		if err != c.err {
+			t.Errorf("CoversVolumeIssue(%v, %v, %v): got %v, want %v (%s)", c.date, c.volume, c.issue, err, c.err, c.about)
+		}
+	}
+}
+
 // === RUN   TestCovers
 // --- PASS: TestCovers (0.00s)
 // BenchmarkContainsDate-4   	10000000	       221 ns/op
