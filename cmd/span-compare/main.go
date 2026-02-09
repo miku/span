@@ -40,6 +40,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// TODO: use other source;
 // SourceNames generated from AMSL API.
 // $ taskcat AMSLService | jq -rc '.[]| [.sourceID, .megaCollection] | @tsv' |
 // sort -un | awk -F '      ' '{printf "\"%s\":\"%s\",\n", $1, $2 }' # CTRL-V TAB
@@ -267,9 +268,10 @@ func (w *TextileWriter) WriteHeader(header ...string) {
 	w.columns = len(header)
 	var decorated []string
 	for _, h := range header {
-		decorated = append(decorated, fmt.Sprintf("*%s*", h))
+		// https://www.redmine.org/projects/redmine/wiki/RedmineTextFormattingTextile#Tables
+		decorated = append(decorated, fmt.Sprintf("._%s", h))
 	}
-	_, w.err = fmt.Fprintf(w.w, "| %s |\n", strings.Join(decorated, " | "))
+	_, w.err = fmt.Fprintf(w.w, "|%s |\n", strings.Join(decorated, " | "))
 }
 
 // WriteFields writes fields.
