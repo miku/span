@@ -269,9 +269,9 @@ func (w *TextileWriter) WriteHeader(header ...string) {
 	var decorated []string
 	for _, h := range header {
 		// https://www.redmine.org/projects/redmine/wiki/RedmineTextFormattingTextile#Tables
-		decorated = append(decorated, fmt.Sprintf("._%s", h))
+		decorated = append(decorated, fmt.Sprintf("%s", h))
 	}
-	_, w.err = fmt.Fprintf(w.w, "|%s |\n", strings.Join(decorated, " | "))
+	_, w.err = fmt.Fprintf(w.w, "|_. %s |\n", strings.Join(decorated, " |_. "))
 }
 
 // WriteFields writes fields.
