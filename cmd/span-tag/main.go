@@ -193,13 +193,15 @@ func main() {
 		}
 	}
 	if *expand != "" {
-		b, err := os.ReadFile(*expand)
-		if err != nil {
-			log.Fatal(err)
-		}
 		var rules map[string][]string
-		if err := json.Unmarshal(b, &rules); err != nil {
-			log.Fatal(err)
+		if err := json.Unmarshal([]byte(*expand), &rules); err != nil {
+			b, err := os.ReadFile(*expand)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if err := json.Unmarshal(b, &rules); err != nil {
+				log.Fatal(err)
+			}
 		}
 		tagger.Expand(rules)
 		log.Printf("[span-tag] expanded %d meta-ISIL(s)", len(rules))
