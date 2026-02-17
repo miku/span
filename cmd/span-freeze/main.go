@@ -58,6 +58,7 @@ var (
 	okapiURL    = flag.String("okapi-url", os.Getenv("OKAPI_URL"), "OKAPI base URL (env: OKAPI_URL)")
 	tenant      = flag.String("tenant", "de_15", "FOLIO tenant")
 	limit       = flag.Int("limit", 100000, "API pagination limit")
+	expand      = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs to expand into")
 )
 
 // httpClient is the shared HTTP client, configured after flag parsing.
@@ -94,6 +95,36 @@ func main() {
 	}
 }
 
+// parseExpandRules parses the -expand flag value as inline JSON or a file path.
+func parseExpandRules(s string) (map[string][]string, error) {
+	var rules map[string][]string
+	if err := json.Unmarshal([]byte(s), &rules); err != nil {
+		b, err := os.ReadFile(s)
+		if err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal(b, &rules); err != nil {
+			return nil, err
+		}
+	}
+	return rules, nil
+}
+
+// expandFilterConfig copies meta-ISIL entries to each target ISIL and removes
+// the original key.
+func expandFilterConfig(fc map[string]interface{}, rules map[string][]string) {
+	for metaISIL, targets := range rules {
+		v, ok := fc[metaISIL]
+		if !ok {
+			continue
+		}
+		for _, target := range targets {
+			fc[target] = v
+		}
+		delete(fc, metaISIL)
+	}
+}
+
 // runLegacy reads a blob from stdin, extracts and downloads all URLs found in
 // it, and writes them into a zip file alongside the original blob.
 func runLegacy() {
@@ -110,6 +141,22 @@ func runLegacy() {
 	b, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
+	}
+	if *expand != "" {
+		rules, err := parseExpandRules(*expand)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var fc map[string]interface{}
+		if err := json.Unmarshal(b, &fc); err != nil {
+			log.Fatalf("cannot parse blob for expansion: %v", err)
+		}
+		expandFilterConfig(fc, rules)
+		b, err = json.MarshalIndent(fc, "", "  ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("expanded %d meta-ISIL(s)", len(rules))
 	}
 	f, err := w.Create(NameBlob)
 	if err != nil {
@@ -304,6 +351,14 @@ func runFolio() {
 				"or": orFilters,
 			}
 		}
+	}
+	if *expand != "" {
+		rules, err := parseExpandRules(*expand)
+		if err != nil {
+			log.Fatal(err)
+		}
+		expandFilterConfig(filterConfig, rules)
+		log.Printf("expanded %d meta-ISIL(s)", len(rules))
 	}
 	blob, err := json.MarshalIndent(filterConfig, "", "  ")
 	if err != nil {
