@@ -48,6 +48,7 @@ var (
 	prefs                = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred source id first, for deduplication")
 	ignoreSameIdentifier = flag.Bool("isi", false, "when doing deduplication, ignore matches in index with the same id")
 	dropDangling         = flag.Bool("D", false, "drop dangling documents that do not have any isil attached")
+	expand               = flag.String("expand", "", "JSON file mapping meta-ISILs to lists of ISILs to expand into")
 )
 
 // SelectResponse with reduced fields.
@@ -190,6 +191,18 @@ func main() {
 		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
 			log.Fatal(err)
 		}
+	}
+	if *expand != "" {
+		b, err := os.ReadFile(*expand)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var rules map[string][]string
+		if err := json.Unmarshal(b, &rules); err != nil {
+			log.Fatal(err)
+		}
+		tagger.Expand(rules)
+		log.Printf("[span-tag] expanded %d meta-ISIL(s)", len(rules))
 	}
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()

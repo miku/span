@@ -139,6 +139,55 @@ func TestAndFilter1(t *testing.T) {
 	}
 }
 
+// TestTaggerExpand verifies that Expand replaces meta-ISIL keys with expanded ISILs.
+func TestTaggerExpand(t *testing.T) {
+	s := `{
+		"finc-DHSN": {"any": {}},
+		"DE-15": {"source": ["49"]}
+	}`
+	var tagger Tagger
+	if err := json.Unmarshal([]byte(s), &tagger); err != nil {
+		t.Fatal(err)
+	}
+	tagger.Expand(map[string][]string{
+		"finc-DHSN": {"DE-Bn3", "DE-Brt1", "DE-D161"},
+	})
+	if _, ok := tagger.FilterMap["finc-DHSN"]; ok {
+		t.Error("meta-ISIL finc-DHSN should have been removed")
+	}
+	for _, isil := range []string{"DE-Bn3", "DE-Brt1", "DE-D161"} {
+		tree, ok := tagger.FilterMap[isil]
+		if !ok {
+			t.Errorf("expected ISIL %s in FilterMap", isil)
+			continue
+		}
+		// The expanded ISIL should match any record (inherited from "any" filter).
+		record := finc.IntermediateSchema{SourceID: "99"}
+		if !tree.Apply(record) {
+			t.Errorf("expected %s filter to match any record", isil)
+		}
+	}
+	// DE-15 should remain unchanged.
+	if _, ok := tagger.FilterMap["DE-15"]; !ok {
+		t.Error("DE-15 should still be in FilterMap")
+	}
+}
+
+// TestTaggerExpandMissing verifies that Expand silently skips rules for absent keys.
+func TestTaggerExpandMissing(t *testing.T) {
+	s := `{"DE-15": {"any": {}}}`
+	var tagger Tagger
+	if err := json.Unmarshal([]byte(s), &tagger); err != nil {
+		t.Fatal(err)
+	}
+	tagger.Expand(map[string][]string{
+		"finc-MISSING": {"DE-X1", "DE-X2"},
+	})
+	if len(tagger.FilterMap) != 1 {
+		t.Errorf("expected 1 entry, got %d", len(tagger.FilterMap))
+	}
+}
+
 // TestNotFilter1 simple NOT.
 func TestNotFilter1(t *testing.T) {
 	s := `

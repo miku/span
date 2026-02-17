@@ -74,6 +74,22 @@ func (t *Tagger) UnmarshalJSON(p []byte) error {
 	return json.Unmarshal(p, &t.FilterMap)
 }
 
+// Expand replaces meta-ISIL keys in the FilterMap with individual ISILs. For
+// each key in the rules map, if that key exists in FilterMap, its filter tree
+// is copied to each target ISIL and the original key is removed.
+func (t *Tagger) Expand(rules map[string][]string) {
+	for metaISIL, targets := range rules {
+		tree, ok := t.FilterMap[metaISIL]
+		if !ok {
+			continue
+		}
+		for _, target := range targets {
+			t.FilterMap[target] = tree
+		}
+		delete(t.FilterMap, metaISIL)
+	}
+}
+
 // unmarshalFilter takes the name of a filter and a raw JSON message and
 // unmarshals the appropriate filter. All filters must be registered here.
 // Unknown filters cause an error.

@@ -60,3 +60,4 @@ logs/*
 *.pkl
 df.h5
 /tags
+/docs/issues
