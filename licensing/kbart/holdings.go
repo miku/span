@@ -13,7 +13,9 @@ package kbart
 
 import (
 	"io"
+	"maps"
 	"regexp"
+	"slices"
 
 	"github.com/miku/span/encoding/tsv"
 	"github.com/miku/span/licensing"
@@ -60,9 +62,7 @@ func (h *Holdings) SerialNumberMap() map[string][]licensing.Entry {
 	// Make unique.
 	result := make(map[string][]licensing.Entry)
 	for issn, entrymap := range cache {
-		for k := range entrymap {
-			result[issn] = append(result[issn], k)
-		}
+		result[issn] = slices.Collect(maps.Keys(entrymap))
 	}
 	return result
 }
@@ -79,9 +79,7 @@ func (h *Holdings) TitleMap() map[string][]licensing.Entry {
 	// Make unique.
 	result := make(map[string][]licensing.Entry)
 	for title, entrymap := range cache {
-		for k := range entrymap {
-			result[title] = append(result[title], k)
-		}
+		result[title] = slices.Collect(maps.Keys(entrymap))
 	}
 	return result
 }
@@ -111,24 +109,19 @@ func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
 	// Make unique. XXX: Move this out.
 	result := make(map[string][]licensing.Entry)
 	for issn, entrymap := range cache {
-		for k := range entrymap {
-			result[issn] = append(result[issn], k)
-		}
+		result[issn] = slices.Collect(maps.Keys(entrymap))
 	}
 	return result
 }
 
 // Filter finds entries with certain characteristics. This will be very slow
 // for KBART files with thousands of entries.
-func (h *Holdings) Filter(f func(licensing.Entry) bool) (result []licensing.Entry) {
+func (h *Holdings) Filter(f func(licensing.Entry) bool) []licensing.Entry {
 	cache := make(map[licensing.Entry]bool)
 	for _, e := range *h {
 		if f(e) {
 			cache[e] = true
 		}
 	}
-	for k := range cache {
-		result = append(result, k)
-	}
-	return
+	return slices.Collect(maps.Keys(cache))
 }

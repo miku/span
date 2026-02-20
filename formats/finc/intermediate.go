@@ -23,7 +23,9 @@ package finc
 import (
 	"bytes"
 	"fmt"
+	"maps"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -179,11 +181,7 @@ func (is *IntermediateSchema) ISSNList() []string {
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		set[issn] = struct{}{}
 	}
-	var issns []string
-	for k := range set {
-		issns = append(issns, k)
-	}
-	return issns
+	return slices.Collect(maps.Keys(set))
 }
 
 // ISBNList returns a deduplicated list of all ISBN and EISBN.
@@ -192,11 +190,7 @@ func (is *IntermediateSchema) ISBNList() []string {
 	for _, isbn := range append(is.ISBN, is.EISBN...) {
 		set[isbn] = struct{}{}
 	}
-	var isbns []string
-	for k := range set {
-		isbns = append(isbns, k)
-	}
-	return isbns
+	return slices.Collect(maps.Keys(set))
 }
 
 // Allfields returns a combination of various fields.

@@ -11,7 +11,8 @@ import (
 	"os/exec"
 	"path"
 	"runtime"
-	"sort"
+	"cmp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -693,8 +694,8 @@ func SortFilesBySize(filenames []string) ([]string, error) {
 	}
 
 	// Sort by size (largest first)
-	sort.Slice(fileInfos, func(i, j int) bool {
-		return fileInfos[i].Size > fileInfos[j].Size
+	slices.SortFunc(fileInfos, func(a, b FileInfo) int {
+		return cmp.Compare(b.Size, a.Size)
 	})
 
 	// Extract sorted filenames

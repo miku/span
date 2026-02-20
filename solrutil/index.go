@@ -2,12 +2,15 @@
 package solrutil
 
 import (
-	"github.com/segmentio/encoding/json"
 	"fmt"
+	"maps"
 	"math/rand"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
+
+	"github.com/segmentio/encoding/json"
 )
 
 // DefaultFacetLimit for fetching collections (there might be tens of thousands).
@@ -213,10 +216,7 @@ func (index Index) FacetKeys(query, field string) (result []string, err error) {
 	if err != nil {
 		return result, err
 	}
-	for k := range fmap {
-		result = append(result, k)
-	}
-	return result, nil
+	return slices.Collect(maps.Keys(fmap)), nil
 }
 
 // NumFound returns the size of the result set for a query.

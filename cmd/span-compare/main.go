@@ -29,7 +29,7 @@ import (
 	"math"
 	"os"
 	"path"
-	"sort"
+	"slices"
 	"strings"
 	"text/template"
 
@@ -366,13 +366,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sort.Strings(sids)
+	slices.Sort(sids)
 
 	institutions, err := nonlive.Institutions()
 	if err != nil {
 		log.Fatal(err)
 	}
-	sort.Strings(institutions)
+	slices.Sort(institutions)
 
 	var rw ResultWriter
 	switch {

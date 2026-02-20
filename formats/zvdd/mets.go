@@ -5,7 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"regexp"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -226,7 +226,7 @@ func (r *MetsRecord) ToIntermediateSchema() (output *finc.IntermediateSchema, er
 		}
 	}
 
-	sort.Strings(dates)
+	slices.Sort(dates)
 	if len(dates) > 0 {
 		output.RawDate = dates[0]
 		output.Date, err = parseDate(output.RawDate)

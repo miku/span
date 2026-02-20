@@ -5,17 +5,13 @@ import "fmt"
 // AllowedKeys returns an error if facets values contain non-zero values that
 // are not explicitly allowed. Used for reviews.
 func (f FacetMap) AllowedKeys(allowed ...string) error {
-	var keys []string
-	for k := range f {
-		keys = append(keys, k)
-	}
 	s := make(map[string]bool)
 	for _, v := range allowed {
 		s[v] = true
 	}
-	for _, k := range keys {
-		if _, ok := s[k]; !ok && f[k] > 0 {
-			return fmt.Errorf("facet value not allowed: %s (%d)", k, f[k])
+	for k, count := range f {
+		if !s[k] && count > 0 {
+			return fmt.Errorf("facet value not allowed: %s (%d)", k, count)
 		}
 	}
 	return nil

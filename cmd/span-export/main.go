@@ -8,10 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"runtime"
 	"runtime/pprof"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/miku/span"
@@ -49,11 +50,7 @@ func main() {
 	}
 
 	if *listFormats {
-		var keys []string
-		for key := range Exporters {
-			keys = append(keys, key)
-		}
-		sort.Strings(keys)
+		keys := slices.Sorted(maps.Keys(Exporters))
 		fmt.Println(strings.Join(keys, "\n"))
 		os.Exit(0)
 	}

@@ -4,7 +4,9 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"maps"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -21,15 +23,12 @@ var (
 	RefTypes    = assetutil.MustLoadStringMap("assets/hhbd/reftypes.json")
 )
 
-func uniqueStrings(s []string) (result []string) {
+func uniqueStrings(s []string) []string {
 	m := make(map[string]bool)
 	for _, v := range s {
 		m[v] = true
 	}
-	for k := range m {
-		result = append(result, k)
-	}
-	return
+	return slices.Collect(maps.Keys(m))
 }
 
 // Record was generated 2017-12-22 16:25:34 by tir on apollo.

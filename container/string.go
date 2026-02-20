@@ -24,7 +24,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 )
 
@@ -106,20 +107,13 @@ func (set *StringSet) Size() int {
 }
 
 // Values returns the set values as a string slice.
-func (set *StringSet) Values() (values []string) {
-	for k := range set.Set {
-		values = append(values, k)
-	}
-	return values
+func (set *StringSet) Values() []string {
+	return slices.Collect(maps.Keys(set.Set))
 }
 
-// Values returns the set values as a string slice.
-func (set *StringSet) SortedValues() (values []string) {
-	for k := range set.Set {
-		values = append(values, k)
-	}
-	sort.Strings(values)
-	return values
+// SortedValues returns the set values as a sorted string slice.
+func (set *StringSet) SortedValues() []string {
+	return slices.Sorted(maps.Keys(set.Set))
 }
 
 // Intersection returns the intersection of two string sets.

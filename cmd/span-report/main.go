@@ -42,7 +42,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -221,7 +221,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			sort.Strings(keys)
+			slices.Sort(keys)
 			log.Printf("%s (%d), %d distinct dates", issn, count, len(keys))
 		}
 	case "json":

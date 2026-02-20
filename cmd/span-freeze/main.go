@@ -24,11 +24,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -281,11 +282,7 @@ func runFolio() {
 	// Build the filterconfig blob.
 	filterConfig := make(map[string]interface{})
 	// Sort ISILs for deterministic output.
-	isils := make([]string, 0, len(isilCollections))
-	for isil := range isilCollections {
-		isils = append(isils, isil)
-	}
-	sort.Strings(isils)
+	isils := slices.Sorted(maps.Keys(isilCollections))
 	for _, isil := range isils {
 		cols := isilCollections[isil]
 		var orFilters []interface{}
@@ -385,11 +382,7 @@ func runFolio() {
 	}
 	// Download files and build mapping.
 	mapping := make(map[string]string)
-	urls := make([]string, 0, len(urlSet))
-	for u := range urlSet {
-		urls = append(urls, u)
-	}
-	sort.Strings(urls)
+	urls := slices.Sorted(maps.Keys(urlSet))
 	for i, u := range urls {
 		h := sha1.New()
 		h.Write([]byte(u))
