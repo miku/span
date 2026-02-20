@@ -16,7 +16,7 @@ import (
 
 	"github.com/miku/span/xio"
 	"github.com/sethgrid/pester"
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )

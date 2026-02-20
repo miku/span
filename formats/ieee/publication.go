@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"

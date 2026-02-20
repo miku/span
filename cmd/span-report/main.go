@@ -50,7 +50,7 @@ import (
 	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/solrutil"
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 var (

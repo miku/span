@@ -8,7 +8,7 @@ import (
 
 	"github.com/segmentio/encoding/json"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"

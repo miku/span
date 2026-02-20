@@ -51,6 +51,8 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
+	"log/slog"
 	"os"
 	"os/exec"
 	"runtime/pprof"
@@ -64,7 +66,6 @@ import (
 	"github.com/miku/span/parallel"
 	"github.com/miku/span/xio"
 	"github.com/segmentio/encoding/json"
-	log "github.com/sirupsen/logrus"
 )
 
 // fallback awk script is used, if the filterline executable is not found;
@@ -123,7 +124,7 @@ func writeFields(w io.Writer, sep string, values ...interface{}) (int, error) {
 func main() {
 	flag.Parse()
 	if *verbose {
-		log.SetLevel(log.DebugLevel)
+		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 	if *cpuProfile != "" {
 		f, err := os.Create(*cpuProfile)
@@ -189,14 +190,14 @@ func main() {
 		if err := xio.LoadSet(file, excludes); err != nil {
 			log.Fatal(err)
 		}
-		log.Debugf("excludes: %d", len(excludes))
+		slog.Debug("excludes", "count", len(excludes))
 	}
 	// Stage 1: Extract minimum amount of information from the raw data, write to tempfile.
-	log.WithFields(log.Fields{
-		"prefix":       "stage 1",
-		"excludesFile": *excludeFile,
-		"excludes":     len(excludes),
-	}).Info("preparing extraction")
+	slog.Info("preparing extraction",
+		"prefix", "stage 1",
+		"excludesFile", *excludeFile,
+		"excludes", len(excludes),
+	)
 	tf, err := os.CreateTemp("", "span-crossref-snapshot-")
 	if err != nil {
 		log.Fatal(err)
@@ -248,10 +249,10 @@ func main() {
 		return buf.Bytes(), nil
 	})
 	pp.BatchSize = *batchsize
-	log.WithFields(log.Fields{
-		"prefix":    "stage 1",
-		"batchsize": *batchsize,
-	}).Info("starting extraction")
+	slog.Info("starting extraction",
+		"prefix", "stage 1",
+		"batchsize", *batchsize,
+	)
 	if err := pp.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -266,10 +267,10 @@ func main() {
 	// document date, DOI).
 	fastsort := fmt.Sprintf(`LC_ALL=C sort -S%s`, *sortBufferSize)
 	cmd := `{{ f }} -k3,3 -rk2,2 {{ input }} | {{ f }} -k3,3 -u | cut -f1 | {{ f }} -n > {{ output }}`
-	log.WithFields(log.Fields{
-		"prefix":    "stage 2",
-		"batchsize": *batchsize,
-	}).Info("identifying relevant records")
+	slog.Info("identifying relevant records",
+		"prefix", "stage 2",
+		"batchsize", *batchsize,
+	)
 	output, err := clam.RunOutput(cmd, clam.Map{"f": fastsort, "input": tf.Name()})
 	if err != nil {
 		log.Fatal(err)
@@ -299,12 +300,12 @@ func main() {
 		filterline = tf.Name()
 	}
 	// Stage 3: Extract relevant records. Compressed input will be recompressed again.
-	log.WithFields(log.Fields{
-		"prefix":     "stage 3",
-		"comp":       comp,
-		"decomp":     decomp,
-		"filterline": filterline,
-	}).Info("extract relevant records")
+	slog.Info("extract relevant records",
+		"prefix", "stage 3",
+		"comp", comp,
+		"decomp", decomp,
+		"filterline", filterline,
+	)
 	cmd = `{{ filterline }} {{ L }} {{ F }} > {{ output }}`
 	if *compressed {
 		switch *compressProgram {

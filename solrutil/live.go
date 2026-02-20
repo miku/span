@@ -9,7 +9,7 @@ import (
 
 	"github.com/segmentio/encoding/json"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 // findSolrServer looks in the config for the whatislive.url key, takes the URL

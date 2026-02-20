@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	"bufio"
 

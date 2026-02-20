@@ -17,7 +17,6 @@ require (
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/klauspost/compress v1.18.4
 	github.com/klauspost/pgzip v1.2.6
-	github.com/lytics/logrus v0.0.0-20170528191427-4389a17ed024
 	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/miku/clam v0.1.0
@@ -26,7 +25,6 @@ require (
 	github.com/segmentio/encoding v0.5.3
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
-	github.com/sirupsen/logrus v1.9.4
 	golang.org/x/net v0.50.0
 	golang.org/x/text v0.34.0
 	mvdan.cc/xurls v1.1.0
@@ -41,5 +39,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	golang.org/x/sys v0.41.0 // indirect
 )

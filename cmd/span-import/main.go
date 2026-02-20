@@ -13,7 +13,8 @@ import (
 	"runtime/pprof"
 	"sort"
 
-	"github.com/lytics/logrus"
+	"log/slog"
+
 	"github.com/miku/span"
 	"github.com/miku/span/formats/ceeol"
 	"github.com/miku/span/formats/crossref"
@@ -229,10 +230,8 @@ func main() {
 			log.Fatal(err)
 		}
 		defer f.Close()
-		logger := logrus.New()
-		logger.Formatter = &logrus.JSONFormatter{}
-		logger.Out = f
-		log.SetOutput(logger.Writer())
+		handler := slog.NewJSONHandler(f, nil)
+		slog.SetDefault(slog.New(handler))
 	}
 	w := bufio.NewWriter(os.Stdout)
 	defer w.Flush()

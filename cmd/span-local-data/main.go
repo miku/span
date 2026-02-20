@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	"github.com/miku/span/parallel"
 )

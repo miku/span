@@ -19,7 +19,7 @@ import (
 	"github.com/miku/span/parallel"
 
 	json "github.com/segmentio/encoding/json"
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 var (

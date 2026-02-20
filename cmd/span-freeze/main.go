@@ -35,7 +35,7 @@ import (
 	"github.com/segmentio/encoding/json"
 
 	"github.com/dchest/safefile"
-	log "github.com/sirupsen/logrus"
+	"log"
 	"github.com/sethgrid/pester"
 
 	"github.com/miku/span"

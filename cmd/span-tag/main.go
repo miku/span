@@ -21,7 +21,7 @@ import (
 	"strings"
 
 	json "github.com/segmentio/encoding/json"
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	"github.com/miku/span"
 	"github.com/miku/span/filter"

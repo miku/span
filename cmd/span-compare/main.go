@@ -37,7 +37,7 @@ import (
 	"github.com/miku/span/solrutil"
 	"github.com/miku/span/xio"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 // TODO: use other source;

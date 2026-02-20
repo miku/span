@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span/formats/finc"
