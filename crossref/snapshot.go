@@ -180,7 +180,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 	}
 	indexFile, err := os.CreateTemp("", fmt.Sprintf("%s-index-*.txt.zst", TempfilePrefix))
 	if err != nil {
-		return fmt.Errorf("error creating temporary index file: %v", err)
+		return fmt.Errorf("error creating temporary index file: %w", err)
 	}
 	defer func() {
 		_ = indexFile.Close()
@@ -190,7 +190,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 	}()
 	lineNumsFile, err := os.CreateTemp(opts.TempDir, fmt.Sprintf("%s-lines-*.txt", TempfilePrefix))
 	if err != nil {
-		return fmt.Errorf("error creating temporary line numbers file: %v", err)
+		return fmt.Errorf("error creating temporary line numbers file: %w", err)
 	}
 	defer func() {
 		_ = lineNumsFile.Close()
@@ -221,10 +221,10 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		filterFunc = ExcludeFilter(opts.Excludes)
 	}
 	if err := extractMinimalInfo(opts.InputFiles, indexFile, filterFunc, opts.NumWorkers, opts.BatchSize, opts.Verbose); err != nil {
-		return fmt.Errorf("error in stage 1: %v", err)
+		return fmt.Errorf("error in stage 1: %w", err)
 	}
 	if err := indexFile.Close(); err != nil {
-		return fmt.Errorf("error closing index file: %v", err)
+		return fmt.Errorf("error closing index file: %w", err)
 	}
 	if opts.Verbose {
 		log.Printf("stage 1 completed in %s", time.Since(t)) // 1h21m26.990901593s
@@ -236,7 +236,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 	}
 	t = time.Now()
 	if err := identifyLatestVersions(indexFile.Name(), lineNumsFile.Name(), opts.SortBufferSize, opts.Verbose); err != nil {
-		return fmt.Errorf("error in stage 2: %v", err)
+		return fmt.Errorf("error in stage 2: %w", err)
 	}
 	if opts.Verbose {
 		log.Printf("stage 2 completed in %s", time.Since(t)) // 22m1.831171277s
@@ -248,7 +248,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 	}
 	t = time.Now()
 	if err := extractRelevantRecords(lineNumsFile.Name(), opts.InputFiles, opts.OutputFile, opts.SortBufferSize, opts.Verbose); err != nil {
-		return fmt.Errorf("error in stage 3: %v", err)
+		return fmt.Errorf("error in stage 3: %w", err)
 	}
 	if opts.Verbose {
 		// [i7-13900T] stage 3 completed in 1h40m0.654023657s (previously, with pure Go zstd and filtering it took 5h29m)
@@ -288,7 +288,7 @@ func openFile(filename string) (io.ReadCloser, error) {
 func processFile(filename string, filterFunc FilterFunc, fn func(line string, record Record, lineNum int64) error) error {
 	r, err := openFile(filename)
 	if err != nil {
-		return fmt.Errorf("error opening file %s: %v", filename, err)
+		return fmt.Errorf("error opening file %s: %w", filename, err)
 	}
 	defer r.Close()
 	scanner := bufio.NewScanner(r)
@@ -317,7 +317,7 @@ func processFile(filename string, filterFunc FilterFunc, fn func(line string, re
 		lineNum++
 	}
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading file %s: %v", filename, err)
+		return fmt.Errorf("error reading file %s: %w", filename, err)
 	}
 	return nil
 }
@@ -399,7 +399,7 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 			return nil
 		})
 		if err != nil {
-			return fmt.Errorf("error processing file %s: %v", inputPath, err)
+			return fmt.Errorf("error processing file %s: %w", inputPath, err)
 		}
 		numProcessed.Add(1)
 		// Write any remaining entries, report progress.
@@ -448,11 +448,11 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 	cmd := exec.Command("bash", "-c", pipeline)
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("error executing sort pipeline: %v\nOutput: %s", err, string(b))
+		return fmt.Errorf("error executing sort pipeline: %w\nOutput: %s", err, string(b))
 	}
 	fileInfo, err := os.Stat(lineNumsFile)
 	if err != nil {
-		return fmt.Errorf("error checking line numbers file: %v", err)
+		return fmt.Errorf("error checking line numbers file: %w", err)
 	}
 	if fileInfo.Size() == 0 {
 		return fmt.Errorf("error: line numbers file is empty after sorting")
@@ -508,7 +508,7 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 func groupLineNumbersByFile(lineNumsFile string, sortBufferSize string, verbose bool) (LineNumbersMap, error) {
 	file, err := os.Open(lineNumsFile)
 	if err != nil {
-		return nil, fmt.Errorf("error opening line numbers file: %v", err)
+		return nil, fmt.Errorf("error opening line numbers file: %w", err)
 	}
 	defer file.Close()
 	var (
@@ -563,7 +563,7 @@ func groupLineNumbersByFile(lineNumsFile string, sortBufferSize string, verbose 
 		fileLineMap[filename].NumLines++
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error reading line numbers file: %v", err)
+		return nil, fmt.Errorf("error reading line numbers file: %w", err)
 	}
 	for _, tf := range tempFileMap {
 		if err := tf.Flush(); err != nil {
@@ -653,17 +653,17 @@ func isCommandAvailable(command string) bool {
 func createFallbackScript() (string, error) {
 	scriptFile, err := os.CreateTemp("", fmt.Sprintf("%s-fallback-*.sh", TempfilePrefix))
 	if err != nil {
-		return "", fmt.Errorf("error creating fallback script: %v", err)
+		return "", fmt.Errorf("error creating fallback script: %w", err)
 	}
 	if _, err := scriptFile.WriteString(fallbackFilterlineScript); err != nil {
 		_ = scriptFile.Close()
 		_ = os.Remove(scriptFile.Name())
-		return "", fmt.Errorf("error writing fallback script: %v", err)
+		return "", fmt.Errorf("error writing fallback script: %w", err)
 	}
 	_ = scriptFile.Close()
 	if err := os.Chmod(scriptFile.Name(), 0755); err != nil {
 		_ = os.Remove(scriptFile.Name())
-		return "", fmt.Errorf("error making fallback script executable: %v", err)
+		return "", fmt.Errorf("error making fallback script executable: %w", err)
 	}
 	return scriptFile.Name(), nil
 }
