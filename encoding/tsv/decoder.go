@@ -51,7 +51,7 @@ func (dec *Decoder) readHeader() (err error) {
 }
 
 // Decode a single entry, reuse csv struct tags.
-func (dec *Decoder) Decode(v interface{}) error {
+func (dec *Decoder) Decode(v any) error {
 	if err := dec.readHeader(); err != nil {
 		return err
 	}

@@ -63,7 +63,7 @@ func NewSniffer(r io.Reader, w io.Writer) *Sniffer {
 func (s *Sniffer) Run() error {
 	pp := parallel.NewProcessor(s.Reader, s.Writer, func(p []byte) ([]byte, error) {
 		var (
-			data   map[string]interface{}
+			data   map[string]any
 			result []string
 		)
 		if err := json.Unmarshal(p, &data); err != nil {
@@ -87,7 +87,7 @@ func (s *Sniffer) Run() error {
 					// expect).
 					case []string:
 						shouldOverwrite = len(w) == 0
-					case []interface{}:
+					case []any:
 						shouldOverwrite = len(w) == 0
 					default:
 						shouldOverwrite = true
@@ -123,7 +123,7 @@ type MapSniffer struct {
 	IgnoreKeys []*regexp.Regexp
 }
 
-func (s *MapSniffer) SearchMap(doc map[string]interface{}) []string {
+func (s *MapSniffer) SearchMap(doc map[string]any) []string {
 	ss := container.NewStringSet()
 	for k, v := range doc {
 		if anyMatchString(s.IgnoreKeys, k) {

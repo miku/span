@@ -63,9 +63,9 @@ func createFreeContentLookup(filename string) (FreeContentLookup, error) {
 }
 
 // kbartToFilterConfig creates map that can be serialized into a valid filterconfig JSON.
-func kbartToFilterConfig(filename string, verbose bool) (interface{}, error) {
-	return map[string]map[string]interface{}{
-		"holdings": map[string]interface{}{
+func kbartToFilterConfig(filename string, verbose bool) (any, error) {
+	return map[string]map[string]any{
+		"holdings": map[string]any{
 			"file":    filename,
 			"verbose": verbose,
 		},

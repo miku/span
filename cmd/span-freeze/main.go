@@ -113,7 +113,7 @@ func parseExpandRules(s string) (map[string][]string, error) {
 
 // expandFilterConfig copies meta-ISIL entries to each target ISIL and removes
 // the original key.
-func expandFilterConfig(fc map[string]interface{}, rules map[string][]string) {
+func expandFilterConfig(fc map[string]any, rules map[string][]string) {
 	for metaISIL, targets := range rules {
 		v, ok := fc[metaISIL]
 		if !ok {
@@ -148,7 +148,7 @@ func runLegacy() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		var fc map[string]interface{}
+		var fc map[string]any
 		if err := json.Unmarshal(b, &fc); err != nil {
 			log.Fatalf("cannot parse blob for expansion: %v", err)
 		}
@@ -280,14 +280,14 @@ func runFolio() {
 	// Track all URLs that need downloading.
 	urlSet := make(map[string]bool)
 	// Build the filterconfig blob.
-	filterConfig := make(map[string]interface{})
+	filterConfig := make(map[string]any)
 	// Sort ISILs for deterministic output.
 	isils := slices.Sorted(maps.Keys(isilCollections))
 	for _, isil := range isils {
 		cols := isilCollections[isil]
-		var orFilters []interface{}
+		var orFilters []any
 		for _, col := range cols {
-			var andFilters []interface{}
+			var andFilters []any
 			// Source filter.
 			andFilters = append(andFilters, map[string][]string{
 				"source": {col.sourceId},
@@ -297,8 +297,8 @@ func runFolio() {
 				for _, u := range col.contentFiles {
 					urlSet[u] = true
 				}
-				andFilters = append(andFilters, map[string]interface{}{
-					"holdings": map[string]interface{}{
+				andFilters = append(andFilters, map[string]any{
+					"holdings": map[string]any{
 						"urls": col.contentFiles,
 					},
 				})
@@ -313,20 +313,20 @@ func runFolio() {
 					urlSet[fileURL] = true
 					label := strings.ToLower(fb.Label)
 					if strings.Contains(label, "holdings") || strings.Contains(label, "ezb") {
-						andFilters = append(andFilters, map[string]interface{}{
-							"holdings": map[string]interface{}{
+						andFilters = append(andFilters, map[string]any{
+							"holdings": map[string]any{
 								"urls": []string{fileURL},
 							},
 						})
 					} else if strings.Contains(label, "issn") {
-						andFilters = append(andFilters, map[string]interface{}{
-							"issn": map[string]interface{}{
+						andFilters = append(andFilters, map[string]any{
+							"issn": map[string]any{
 								"link": fileURL,
 							},
 						})
 					} else {
-						andFilters = append(andFilters, map[string]interface{}{
-							"holdings": map[string]interface{}{
+						andFilters = append(andFilters, map[string]any{
+							"holdings": map[string]any{
 								"urls": []string{fileURL},
 							},
 						})
@@ -336,7 +336,7 @@ func runFolio() {
 			if len(andFilters) == 1 {
 				orFilters = append(orFilters, andFilters[0])
 			} else {
-				orFilters = append(orFilters, map[string]interface{}{
+				orFilters = append(orFilters, map[string]any{
 					"and": andFilters,
 				})
 			}
@@ -344,7 +344,7 @@ func runFolio() {
 		if len(orFilters) == 1 {
 			filterConfig[isil] = orFilters[0]
 		} else {
-			filterConfig[isil] = map[string]interface{}{
+			filterConfig[isil] = map[string]any{
 				"or": orFilters,
 			}
 		}

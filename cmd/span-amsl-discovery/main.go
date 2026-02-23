@@ -94,7 +94,7 @@ func SeparatedFields(s, sep string) (result []string) {
 }
 
 // readFrom decodes data from reader into value, returning bytes read.
-func readFrom(r io.Reader, v interface{}) (int64, error) {
+func readFrom(r io.Reader, v any) (int64, error) {
 	cr := xio.NewCountReader(r)
 	if err := json.NewDecoder(cr).Decode(v); err != nil {
 		return 0, err
@@ -432,7 +432,7 @@ The generated TSV (via -f) fields are:
 			if i%100000 == 0 {
 				log.Printf("@%d in %s", i, time.Since(started))
 			}
-			fields := []interface{}{
+			fields := []any{
 				update.ShardLabel,
 				update.ISIL,
 				update.SourceID,

@@ -20,7 +20,7 @@ var (
 
 // skipper is shared by tests and benchmarks.
 type skipper interface {
-	Skipf(format string, args ...interface{})
+	Skipf(format string, args ...any)
 }
 
 func loadHoldings(s skipper) *Holdings {

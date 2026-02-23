@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-type M map[string]interface{}
+type M map[string]any
 
 func TestSniffer(t *testing.T) {
 	var cases = []struct {

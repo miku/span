@@ -22,7 +22,7 @@ var (
 
 // marshal encodes a value as formeta and writes it to the given writer.
 // Toplevel object must be a struct. JSON tags are reused as keys, if defined.
-func marshal(w io.Writer, k string, v interface{}) error {
+func marshal(w io.Writer, k string, v any) error {
 	switch reflect.TypeOf(v).Kind() {
 	case reflect.Struct:
 		// If v is a time.Time, it will be recognized as struct as well, but we
@@ -124,7 +124,7 @@ func marshal(w io.Writer, k string, v interface{}) error {
 //	    publisher: Vandenhoeck und Ruprecht\: Göttingen,
 //	    isbn: 978-3-525-20764-2
 //	}
-func Marshal(v interface{}) ([]byte, error) {
+func Marshal(v any) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	if err := marshal(buf, "", v); err != nil {
 		return []byte{}, err

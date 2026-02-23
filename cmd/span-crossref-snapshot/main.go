@@ -101,7 +101,7 @@ var (
 
 // writeFields writes a variable number of values separated by sep to a given
 // writer. Returns bytes written and error.
-func writeFields(w io.Writer, sep string, values ...interface{}) (int, error) {
+func writeFields(w io.Writer, sep string, values ...any) (int, error) {
 	var ss = make([]string, len(values))
 	for i, v := range values {
 		switch v.(type) {

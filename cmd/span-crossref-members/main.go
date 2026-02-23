@@ -24,15 +24,15 @@ import (
 type MembersResponse struct {
 	Message struct {
 		Items []struct {
-			Breakdowns interface{} `json:"breakdowns"`
+			Breakdowns any `json:"breakdowns"`
 			Counts     struct {
 				BackfileDois int64 `json:"backfile-dois"`
 				CurrentDois  int64 `json:"current-dois"`
 				TotalDois    int64 `json:"total-dois"`
 			} `json:"counts"`
-			CountsType   interface{} `json:"counts-type"`
-			Coverage     interface{} `json:"coverage"`
-			CoverageType interface{} `json:"coverage-type"`
+			CountsType   any `json:"counts-type"`
+			Coverage     any `json:"coverage"`
+			CoverageType any `json:"coverage-type"`
 			Flags        struct {
 				Deposits                           bool `json:"deposits"`
 				DepositsAbstractsBackfile          bool `json:"deposits-abstracts-backfile"`
@@ -75,7 +75,7 @@ type MembersResponse struct {
 		} `json:"items"`
 		ItemsPerPage int64 `json:"items-per-page"`
 		Query        struct {
-			SearchTerms interface{} `json:"search-terms"`
+			SearchTerms any `json:"search-terms"`
 			StartIndex  int64       `json:"start-index"`
 		} `json:"query"`
 		TotalResults int64 `json:"total-results"`

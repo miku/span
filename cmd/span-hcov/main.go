@@ -80,7 +80,7 @@ func main() {
 
 	coveragePct := float64(hset.Intersection(iset).Size()) / float64(hset.Size())
 
-	b, err := json.Marshal(map[string]interface{}{
+	b, err := json.Marshal(map[string]any{
 		"coverage_pct":        fmt.Sprintf("%0.2f%%", coveragePct*100),
 		"date":                time.Now(),
 		"holdings":            hset.Size(),

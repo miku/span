@@ -55,7 +55,7 @@ type SelectResponse struct {
 
 // Facets unwraps the facet_fields list into a FacetMap.
 func (sr SelectResponse) Facets() (FacetMap, error) {
-	unwrap := make(map[string]interface{})
+	unwrap := make(map[string]any)
 	if err := json.Unmarshal(sr.FacetCounts.FacetFields, &unwrap); err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (sr SelectResponse) Facets() (FacetMap, error) {
 	}
 	result := make(FacetMap)
 	for _, v := range unwrap {
-		flist, ok := v.([]interface{})
+		flist, ok := v.([]any)
 		if !ok {
 			return nil, fmt.Errorf("facet frequency is not a list")
 		}
@@ -152,7 +152,7 @@ func (index Index) FacetLink(query, facetField string) string {
 }
 
 // decodeLink fetches a link and unmarshals the response into a given value.
-func decodeLink(link string, value interface{}) error {
+func decodeLink(link string, value any) error {
 	resp, err := http.Get(link)
 	if err != nil {
 		return err

@@ -11,7 +11,7 @@
 //
 //	Tagger configuration, e.g. preferred method, failure tolerance.
 //
-//	tagger.Tag(v interface{}) []string { ... }
+//	tagger.Tag(v any) []string { ... }
 package filter
 
 import (
@@ -173,7 +173,7 @@ func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
 // It peeks into the fragment. An empty document will cause an error, as will
 // multiple top level keys.
 func firstKey(raw json.RawMessage) (string, error) {
-	var peeker = make(map[string]interface{})
+	var peeker = make(map[string]any)
 	if err := json.Unmarshal(raw, &peeker); err != nil {
 		return "", err
 	}

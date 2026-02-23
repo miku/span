@@ -104,7 +104,7 @@ type WorksResponse struct {
 		ItemsPerPage int64             `json:"items-per-page"`
 		NextCursor   string            `json:"next-cursor"` // iterate
 		Query        struct {
-			SearchTerms interface{} `json:"search-terms"`
+			SearchTerms any `json:"search-terms"`
 			StartIndex  int64       `json:"start-index"`
 		} `json:"query"`
 		TotalResults int64 `json:"total-results"` // want to estimate total results (and verify download)

@@ -200,7 +200,7 @@ var (
 // ResultWriter for report generator.
 type ResultWriter interface {
 	WriteHeader(...string)
-	WriteFields(...interface{})
+	WriteFields(...any)
 	Err() error
 }
 
@@ -237,7 +237,7 @@ type TabWriter struct {
 }
 
 func (w *TabWriter) WriteHeader(header ...string) {}
-func (w *TabWriter) WriteFields(fields ...interface{}) {
+func (w *TabWriter) WriteFields(fields ...any) {
 	var s []string
 	for _, f := range fields {
 		s = append(s, fmt.Sprintf("%v", f))
@@ -275,7 +275,7 @@ func (w *TextileWriter) WriteHeader(header ...string) {
 }
 
 // WriteFields writes fields.
-func (w *TextileWriter) WriteFields(fields ...interface{}) {
+func (w *TextileWriter) WriteFields(fields ...any) {
 	if w.err != nil {
 		return
 	}
@@ -312,7 +312,7 @@ func prependHTTP(s string) string {
 }
 
 // renderSourceLink renders a textile link to a source, with the given link text.
-func renderSourceLink(tmpl string, data interface{}, text string) (string, error) {
+func renderSourceLink(tmpl string, data any, text string) (string, error) {
 	t, err := template.New("t").Parse(tmpl)
 	if err != nil {
 		return "", err

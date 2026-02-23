@@ -8,7 +8,7 @@ import (
 
 func TestEncoding(t *testing.T) {
 	var cases = []struct {
-		in  interface{}
+		in  any
 		out string
 		err error
 	}{

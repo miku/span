@@ -140,7 +140,7 @@ func worker(name string, index solrutil.Index, queue chan []work, result chan st
 				if err != nil {
 					log.Fatal(err)
 				}
-				var entry = map[string]interface{}{
+				var entry = map[string]any{
 					"sid":   w.sid,
 					"c":     w.c,
 					"issn":  normalizeISSN(issn),
@@ -263,7 +263,7 @@ func main() {
 					if err != nil {
 						log.Fatal(err)
 					}
-					var entry = map[string]interface{}{
+					var entry = map[string]any{
 						"sid":   sid,
 						"c":     c,
 						"issn":  normalizeISSN(issn),

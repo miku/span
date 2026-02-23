@@ -57,35 +57,35 @@ var (
 )
 
 // Factory creates things.
-type Factory func() interface{}
+type Factory func() any
 
 // FormatMap maps format name to pointer to format struct. TODO(miku): That
 // looks just wrong.
 var FormatMap = map[string]Factory{
-	"ceeol":         func() interface{} { return new(ceeol.Article) },
-	"ceeol-marcxml": func() interface{} { return new(ceeol.Record) },
-	"crossref":      func() interface{} { return new(crossref.Document) },
-	"dblp":          func() interface{} { return new(dblp.Article) },
-	"degruyter":     func() interface{} { return new(degruyter.Article) },
-	"doaj":          func() interface{} { return new(doaj.ArticleV1) },
-	"doaj-legacy":   func() interface{} { return new(doaj.Response) },
-	"doaj-oai":      func() interface{} { return new(doaj.Record) },
-	"dummy":         func() interface{} { return new(dummy.Example) },
-	"genderopen":    func() interface{} { return new(genderopen.Record) },
-	"genios":        func() interface{} { return new(genios.Document) },
-	"hhbd":          func() interface{} { return new(hhbd.Record) },
-	"highwire":      func() interface{} { return new(highwire.Record) },
-	"ieee":          func() interface{} { return new(ieee.Publication) },
-	"imslp":         func() interface{} { return new(imslp.Data) },
-	"ios":           func() interface{} { return new(ios.Article) },
-	"jstor":         func() interface{} { return new(jstor.Article) },
-	"mediarep-dim":  func() interface{} { return new(mediarep.Dim) },
-	"olms":          func() interface{} { return new(olms.Record) },
-	"olms-mets":     func() interface{} { return new(olms.MetsRecord) },
-	"ssoar":         func() interface{} { return new(ssoar.Record) },
-	"thieme-nlm":    func() interface{} { return new(thieme.Record) },
-	"zvdd":          func() interface{} { return new(zvdd.DublicCoreRecord) },
-	"zvdd-mets":     func() interface{} { return new(zvdd.MetsRecord) },
+	"ceeol":         func() any { return new(ceeol.Article) },
+	"ceeol-marcxml": func() any { return new(ceeol.Record) },
+	"crossref":      func() any { return new(crossref.Document) },
+	"dblp":          func() any { return new(dblp.Article) },
+	"degruyter":     func() any { return new(degruyter.Article) },
+	"doaj":          func() any { return new(doaj.ArticleV1) },
+	"doaj-legacy":   func() any { return new(doaj.Response) },
+	"doaj-oai":      func() any { return new(doaj.Record) },
+	"dummy":         func() any { return new(dummy.Example) },
+	"genderopen":    func() any { return new(genderopen.Record) },
+	"genios":        func() any { return new(genios.Document) },
+	"hhbd":          func() any { return new(hhbd.Record) },
+	"highwire":      func() any { return new(highwire.Record) },
+	"ieee":          func() any { return new(ieee.Publication) },
+	"imslp":         func() any { return new(imslp.Data) },
+	"ios":           func() any { return new(ios.Article) },
+	"jstor":         func() any { return new(jstor.Article) },
+	"mediarep-dim":  func() any { return new(mediarep.Dim) },
+	"olms":          func() any { return new(olms.Record) },
+	"olms-mets":     func() any { return new(olms.MetsRecord) },
+	"ssoar":         func() any { return new(ssoar.Record) },
+	"thieme-nlm":    func() any { return new(thieme.Record) },
+	"zvdd":          func() any { return new(zvdd.DublicCoreRecord) },
+	"zvdd-mets":     func() any { return new(zvdd.MetsRecord) },
 }
 
 // IntermediateSchemaer wrap a basic conversion method.

@@ -186,16 +186,16 @@ func TestMarshalHoldingsFilter(t *testing.T) {
 		t.Fatalf("marshal: %v", err)
 	}
 	// Unmarshal to verify structure.
-	var m map[string]interface{}
+	var m map[string]any
 	if err := json.Unmarshal(b, &m); err != nil {
 		t.Fatalf("unmarshal check: %v", err)
 	}
-	h, ok := m["holdings"].(map[string]interface{})
+	h, ok := m["holdings"].(map[string]any)
 	if !ok {
 		t.Fatalf("expected holdings key, got %v", m)
 	}
-	files, _ := h["files"].([]interface{})
-	urls, _ := h["urls"].([]interface{})
+	files, _ := h["files"].([]any)
+	urls, _ := h["urls"].([]any)
 	if len(files) != 1 || files[0] != "/path/to/file.tsv" {
 		t.Errorf("expected files=[/path/to/file.tsv], got %v", files)
 	}

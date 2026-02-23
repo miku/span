@@ -28,7 +28,7 @@ func TestUnfreezeFilterConfig(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	dec := json.NewDecoder(f)
-	var payload = make(map[string]interface{})
+	var payload = make(map[string]any)
 	if err := dec.Decode(&payload); err != nil {
 		t.Errorf("could not decode JSON: %v", err)
 	}

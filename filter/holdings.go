@@ -166,7 +166,7 @@ func (f *HoldingsFilter) covers(entry licensing.Entry, is finc.IntermediateSchem
 		return true
 	}
 	if f.Verbose {
-		msg := map[string]interface{}{"document": is, "entry": entry, "err": err.Error()}
+		msg := map[string]any{"document": is, "entry": entry, "err": err.Error()}
 		if b, err := json.Marshal(msg); err == nil {
 			log.Println(string(b))
 		}

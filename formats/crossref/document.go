@@ -102,7 +102,7 @@ type Document struct {
 	ContainerTitle []string `json:"container-title"`
 	ContentDomain  struct {
 		CrossmarkRestriction bool          `json:"crossmark-restriction"`
-		Domain               []interface{} `json:"domain"`
+		Domain               []any `json:"domain"`
 	} `json:"content-domain"`
 	Created             DateField `json:"created"`
 	DOI                 string
@@ -139,7 +139,7 @@ type Document struct {
 		URL                 string
 	} `json:"link"`
 	Member          string        `json:"member"`
-	OriginalTitle   []interface{} `json:"original-title"`
+	OriginalTitle   []any `json:"original-title"`
 	Page            string        `json:"page"`
 	Prefix          string        `json:"prefix"`
 	PublishedPrint  DateField     `json:"published-print"`
@@ -150,7 +150,7 @@ type Document struct {
 	} `json:"relation"`
 	Score               float64     `json:"score"`
 	ShortContainerTitle []string    `json:"short-container-title"`
-	ShortTitle          interface{} `json:"short-title"`
+	ShortTitle          any `json:"short-title"`
 	Source              string      `json:"source"`
 	Subject             []string    `json:"subject"`
 	Subtitle            []string    `json:"subtitle"`
