@@ -13,18 +13,21 @@ func TestBuilderOrFilter(t *testing.T) {
 		Collection("A", "B"),
 	))
 	var tests = []struct {
+		about  string
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, false},
+		{"source match", finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
+		{"both match", finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
+		{"collection match", finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
+		{"no match", finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, false},
 	}
 	for _, test := range tests {
-		if result := tree.Apply(test.record); result != test.result {
-			t.Errorf("Apply(%+v) got %v, want %v", test.record, result, test.result)
-		}
+		t.Run(test.about, func(t *testing.T) {
+			if result := tree.Apply(test.record); result != test.result {
+				t.Errorf("Apply(%+v) got %v, want %v", test.record, result, test.result)
+			}
+		})
 	}
 }
 
@@ -34,18 +37,21 @@ func TestBuilderAndFilter(t *testing.T) {
 		Collection("A", "B"),
 	))
 	var tests = []struct {
+		about  string
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, false},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, false},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, false},
+		{"source only", finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, false},
+		{"both match", finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, true},
+		{"collection only", finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, false},
+		{"neither", finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, false},
 	}
 	for _, test := range tests {
-		if result := tree.Apply(test.record); result != test.result {
-			t.Errorf("Apply(%+v) got %v, want %v", test.record, result, test.result)
-		}
+		t.Run(test.about, func(t *testing.T) {
+			if result := tree.Apply(test.record); result != test.result {
+				t.Errorf("Apply(%+v) got %v, want %v", test.record, result, test.result)
+			}
+		})
 	}
 }
 
@@ -55,18 +61,21 @@ func TestBuilderNotFilter(t *testing.T) {
 		Collection("A", "B"),
 	)))
 	var tests = []struct {
+		about  string
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
-		{finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, false},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
-		{finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, true},
+		{"source only negated", finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"C"}}, true},
+		{"both match negated", finc.IntermediateSchema{SourceID: "1", MegaCollections: []string{"A"}}, false},
+		{"collection only negated", finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"A"}}, true},
+		{"neither negated", finc.IntermediateSchema{SourceID: "2", MegaCollections: []string{"C"}}, true},
 	}
 	for _, test := range tests {
-		if result := tree.Apply(test.record); result != test.result {
-			t.Errorf("Apply(%+v) got %v, want %v", test.record, result, test.result)
-		}
+		t.Run(test.about, func(t *testing.T) {
+			if result := tree.Apply(test.record); result != test.result {
+				t.Errorf("Apply(%+v) got %v, want %v", test.record, result, test.result)
+			}
+		})
 	}
 }
 
@@ -97,24 +106,27 @@ func TestBuilderRoundTrip(t *testing.T) {
 	}
 	// Verify both trees produce the same results.
 	var tests = []struct {
+		about  string
 		record finc.IntermediateSchema
 		result bool
 	}{
-		{finc.IntermediateSchema{SourceID: "55", MegaCollections: []string{"JSTOR Arts & Sciences II"}}, true},
-		{finc.IntermediateSchema{SourceID: "55", MegaCollections: []string{"Other"}}, false},
-		{finc.IntermediateSchema{SourceID: "49", MegaCollections: []string{"Turkish Family Physicians Association (CrossRef)"}}, true},
-		{finc.IntermediateSchema{SourceID: "49", MegaCollections: []string{"Unrelated"}}, false},
-		{finc.IntermediateSchema{SourceID: "99", MegaCollections: []string{"JSTOR Arts & Sciences II"}}, false},
+		{"source 55 matching collection", finc.IntermediateSchema{SourceID: "55", MegaCollections: []string{"JSTOR Arts & Sciences II"}}, true},
+		{"source 55 non-matching collection", finc.IntermediateSchema{SourceID: "55", MegaCollections: []string{"Other"}}, false},
+		{"source 49 matching collection", finc.IntermediateSchema{SourceID: "49", MegaCollections: []string{"Turkish Family Physicians Association (CrossRef)"}}, true},
+		{"source 49 non-matching collection", finc.IntermediateSchema{SourceID: "49", MegaCollections: []string{"Unrelated"}}, false},
+		{"unknown source", finc.IntermediateSchema{SourceID: "99", MegaCollections: []string{"JSTOR Arts & Sciences II"}}, false},
 	}
 	for _, test := range tests {
-		orig := tree.Apply(test.record)
-		roundtripped := got.Apply(test.record)
-		if orig != test.result {
-			t.Errorf("original Apply(%+v) got %v, want %v", test.record, orig, test.result)
-		}
-		if roundtripped != test.result {
-			t.Errorf("roundtripped Apply(%+v) got %v, want %v", test.record, roundtripped, test.result)
-		}
+		t.Run(test.about, func(t *testing.T) {
+			orig := tree.Apply(test.record)
+			roundtripped := got.Apply(test.record)
+			if orig != test.result {
+				t.Errorf("original Apply got %v, want %v", orig, test.result)
+			}
+			if roundtripped != test.result {
+				t.Errorf("roundtripped Apply got %v, want %v", roundtripped, test.result)
+			}
+		})
 	}
 }
 

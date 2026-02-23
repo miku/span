@@ -1,6 +1,7 @@
 package licensing
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -37,11 +38,13 @@ func TestISSNList(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
-		result := c.entry.ISSNList()
-		if !reflect.DeepEqual(result, c.result) {
-			t.Errorf("ISSNList: got %v, want %v", result, c.result)
-		}
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
+			result := c.entry.ISSNList()
+			if !reflect.DeepEqual(result, c.result) {
+				t.Errorf("ISSNList: got %v, want %v", result, c.result)
+			}
+		})
 	}
 }
 
@@ -117,11 +120,13 @@ func TestContainsDate(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
-		err := c.entry.containsDate(c.value)
-		if err != c.err {
-			t.Errorf("containsDate(%v, %v): got %v, want %v", c.entry, c.value, err, c.err)
-		}
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
+			err := c.entry.containsDate(c.value)
+			if err != c.err {
+				t.Errorf("containsDate(%v, %v): got %v, want %v", c.entry, c.value, err, c.err)
+			}
+		})
 	}
 }
 
@@ -278,10 +283,12 @@ func TestCovers(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		err := c.entry.Covers(c.date, c.volume, c.issue)
-		if err != c.err {
-			t.Errorf("Covers(%#v, %v, %v, %v): got %v, want %v (%s)", c.entry, c.date, c.volume, c.issue, err, c.err, c.about)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			err := c.entry.Covers(c.date, c.volume, c.issue)
+			if err != c.err {
+				t.Errorf("Covers: got %v, want %v", err, c.err)
+			}
+		})
 	}
 }
 
@@ -365,10 +372,12 @@ func TestCoversDate(t *testing.T) {
 			Entry{}, "2000", nil},
 	}
 	for _, c := range cases {
-		err := c.entry.CoversDate(c.date)
-		if err != c.err {
-			t.Errorf("CoversDate(%v): got %v, want %v (%s)", c.date, err, c.err, c.about)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			err := c.entry.CoversDate(c.date)
+			if err != c.err {
+				t.Errorf("CoversDate(%v): got %v, want %v", c.date, err, c.err)
+			}
+		})
 	}
 }
 
@@ -403,10 +412,12 @@ func TestCoversVolumeIssue(t *testing.T) {
 			"2000", "", "", nil},
 	}
 	for _, c := range cases {
-		err := c.entry.CoversVolumeIssue(c.date, c.volume, c.issue)
-		if err != c.err {
-			t.Errorf("CoversVolumeIssue(%v, %v, %v): got %v, want %v (%s)", c.date, c.volume, c.issue, err, c.err, c.about)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			err := c.entry.CoversVolumeIssue(c.date, c.volume, c.issue)
+			if err != c.err {
+				t.Errorf("CoversVolumeIssue(%v, %v, %v): got %v, want %v", c.date, c.volume, c.issue, err, c.err)
+			}
+		})
 	}
 }
 

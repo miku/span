@@ -49,21 +49,21 @@ func TestSimple(t *testing.T) {
 		err      error
 	}{
 		{
-			about:    `No input produces no output.`,
+			about:    "no input produces no output",
 			r:        strings.NewReader(""),
 			expected: "",
 			f:        func(_ int64, b []byte) ([]byte, error) { return []byte{}, nil },
 			err:      nil,
 		},
 		{
-			about:    `Order is not guaranteed.`,
+			about:    "order is not guaranteed",
 			r:        strings.NewReader("a\nb\n"),
 			expected: "B\nA\n",
 			f:        func(_ int64, b []byte) ([]byte, error) { return bytes.ToUpper(b), nil },
 			err:      nil,
 		},
 		{
-			about:    `Like grep, we can filter out items by returning nothing.`,
+			about:    "filter out items by returning nothing",
 			r:        strings.NewReader("a\nb\n"),
 			expected: "B\n",
 			f: func(_ int64, b []byte) ([]byte, error) {
@@ -75,7 +75,7 @@ func TestSimple(t *testing.T) {
 			err: nil,
 		},
 		{
-			about:    `Empty lines skipped.`,
+			about:    "empty lines skipped",
 			r:        strings.NewReader("a\na\na\na\n\n\nb\n"),
 			expected: "B\n",
 			f: func(_ int64, b []byte) ([]byte, error) {
@@ -87,7 +87,7 @@ func TestSimple(t *testing.T) {
 			err: nil,
 		},
 		{
-			about:    `On empty input, the transformer func is never called.`,
+			about:    "on empty input transformer never called",
 			r:        strings.NewReader(""),
 			expected: "",
 			f: func(_ int64, b []byte) ([]byte, error) {
@@ -96,7 +96,7 @@ func TestSimple(t *testing.T) {
 			err: nil,
 		},
 		{
-			about:    `Error does not come through, if all lines are skipped.`,
+			about:    "error does not come through if all lines skipped",
 			r:        strings.NewReader("\n"),
 			expected: "",
 			f: func(_ int64, b []byte) ([]byte, error) {
@@ -107,14 +107,16 @@ func TestSimple(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		var buf bytes.Buffer
-		p := NewProcessor(c.r, &buf, c.f)
-		err := p.Run()
-		if err != c.err {
-			t.Errorf("p.Run: got %v, want %v", err, c.err)
-		}
-		if !LinesEqual(buf.String(), c.expected) {
-			t.Errorf("p.Run: got %v, want %v", buf.String(), c.expected)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			var buf bytes.Buffer
+			p := NewProcessor(c.r, &buf, c.f)
+			err := p.Run()
+			if err != c.err {
+				t.Errorf("p.Run: got %v, want %v", err, c.err)
+			}
+			if !LinesEqual(buf.String(), c.expected) {
+				t.Errorf("p.Run: got %v, want %v", buf.String(), c.expected)
+			}
+		})
 	}
 }

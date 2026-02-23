@@ -18,61 +18,37 @@ func TestSniffer(t *testing.T) {
 	}{
 		{
 			"nothing to find",
-			M{
-				"a": "b",
-			},
+			M{"a": "b"},
 			nil,
 			nil,
 		},
 		{
 			"a single field",
-			M{
-				"a": "10.5617/osla.8504",
-			},
+			M{"a": "10.5617/osla.8504"},
 			nil,
 			[]string{"10.5617/osla.8504"},
 		},
 		{
 			"extra chars",
-			M{
-				"a": "some value: 10.5617/osla.8504",
-			},
+			M{"a": "some value: 10.5617/osla.8504"},
 			nil,
 			[]string{"10.5617/osla.8504"},
 		},
 		{
 			"only the first is discovered",
-			M{
-				"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503",
-			},
-			nil,
-			[]string{"10.5617/osla.8504"},
-		},
-		{
-			"only the first is discovered",
-			M{
-				"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503",
-			},
+			M{"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503"},
 			nil,
 			[]string{"10.5617/osla.8504"},
 		},
 		{
 			"ignore key",
-			M{
-				"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503",
-			},
-			[]*regexp.Regexp{
-				regexp.MustCompile(`a`),
-			},
+			M{"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503"},
+			[]*regexp.Regexp{regexp.MustCompile(`a`)},
 			nil,
 		},
 		{
 			"find in list",
-			M{
-				"a": []string{
-					"some value: 10.5617/osla.8504",
-				},
-			},
+			M{"a": []string{"some value: 10.5617/osla.8504"}},
 			nil,
 			[]string{"10.5617/osla.8504"},
 		},
@@ -81,10 +57,12 @@ func TestSniffer(t *testing.T) {
 		Pattern: regexp.MustCompile(PatDOI),
 	}
 	for _, c := range cases {
-		sniffer.IgnoreKeys = c.ignoreKeys
-		result := sniffer.SearchMap(c.doc)
-		if !cmp.Equal(result, c.doi) {
-			t.Fatalf("got %v, want %v [%s]", result, c.doi, c.about)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			sniffer.IgnoreKeys = c.ignoreKeys
+			result := sniffer.SearchMap(c.doc)
+			if !cmp.Equal(result, c.doi) {
+				t.Errorf("got %v, want %v", result, c.doi)
+			}
+		})
 	}
 }

@@ -1,6 +1,9 @@
 package span
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestGenFincID(t *testing.T) {
 	var cases = []struct {
@@ -14,9 +17,11 @@ func TestGenFincID(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		result := GenFincID(c.sid, c.rid)
-		if result != c.expected {
-			t.Errorf("want %v, got %v", c.expected, result)
-		}
+		t.Run(fmt.Sprintf("%s/%s", c.sid, c.rid), func(t *testing.T) {
+			result := GenFincID(c.sid, c.rid)
+			if result != c.expected {
+				t.Errorf("want %v, got %v", c.expected, result)
+			}
+		})
 	}
 }

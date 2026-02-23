@@ -1,45 +1,42 @@
 package formeta
 
 import (
-	"github.com/segmentio/encoding/json"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/segmentio/encoding/json"
 )
 
 func TestEncoding(t *testing.T) {
 	var cases = []struct {
-		in  any
-		out string
-		err error
+		about string
+		in    any
+		out   string
+		err   error
 	}{
-		{in: "", out: "", err: nil},
-		{in: "x", out: "", err: ErrValueNotAllowed},
-		{in: struct{ A string }{A: "B"}, out: `{ A: 'B',  }`, err: nil},
-		{in: struct{ A string }{A: "B 'A"}, out: `{ A: 'B \'A',  }`, err: nil},
-		{in: struct{ A []string }{A: []string{"B", "C"}}, out: `{ A: 'B', A: 'C',  }`, err: nil},
-		{in: struct{ A int }{A: 1}, out: `{ A: 1,  }`, err: nil},
-		{in: struct{ A int64 }{A: 1}, out: `{ A: 1,  }`, err: nil},
-		{
-			in: struct{ A string }{A: `B
-A`}, out: `{ A: 'B\nA',  }`, err: nil,
-		},
-		{
-			in: struct{ A string }{A: `B\ A`}, out: `{ A: 'B\\ A',  }`, err: nil,
-		},
-		{
-			in: struct{ A string }{A: `B\
-'A \`}, out: `{ A: 'B\\\n\'A \\',  }`, err: nil,
-		},
+		{"empty string", "", "", nil},
+		{"single char rejected", "x", "", ErrValueNotAllowed},
+		{"simple struct", struct{ A string }{A: "B"}, `{ A: 'B',  }`, nil},
+		{"single quote in value", struct{ A string }{A: "B 'A"}, `{ A: 'B \'A',  }`, nil},
+		{"string slice", struct{ A []string }{A: []string{"B", "C"}}, `{ A: 'B', A: 'C',  }`, nil},
+		{"int field", struct{ A int }{A: 1}, `{ A: 1,  }`, nil},
+		{"int64 field", struct{ A int64 }{A: 1}, `{ A: 1,  }`, nil},
+		{"newline in value", struct{ A string }{A: "B\nA"}, `{ A: 'B\nA',  }`, nil},
+		{"backslash in value", struct{ A string }{A: `B\ A`}, `{ A: 'B\\ A',  }`, nil},
+		{"mixed escapes", struct{ A string }{A: "B\\\n'A \\"}, `{ A: 'B\\\n\'A \\',  }`, nil},
 	}
 
 	for _, c := range cases {
-		b, err := Marshal(c.in)
-		if err != c.err {
-			t.Errorf("Marshal got %v, want %v", err, c.err)
-		}
-		if string(b) != c.out {
-			t.Errorf("Marshal got %v, want %v", string(b), c.out)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			b, err := Marshal(c.in)
+			if err != c.err {
+				t.Errorf("Marshal got error %v, want %v", err, c.err)
+			}
+			if string(b) != c.out {
+				t.Errorf("Marshal got %v, want %v", string(b), c.out)
+			}
+		})
 	}
 }
 
@@ -86,30 +83,73 @@ func TestNested(t *testing.T) {
 
 func TestDanglingCR(t *testing.T) {
 	var cases = []struct {
-		in  string
-		out string
-		err error
+		about string
+		in    string
+		out   string
+		err   error
 	}{
 		{
-			in:  `{"rft.atitle":"多様な生息地から採取したギョウジャニンニク系統の萌芽期の早晩性およびRAPD分析による分類\r Variations on Sprouting Time and Classification by RAPD Analysis of Allium victorialis L. Clones Collected from Diverse Habitats"}`,
-			out: `{ rft.atitle: '多様な生息地から採取したギョウジャニンニク系統の萌芽期の早晩性およびRAPD分析による分類  Variations on Sprouting Time and Classification by RAPD Analysis of Allium victorialis L. Clones Collected from Diverse Habitats',  }`,
-			err: nil,
+			"japanese title with CR",
+			`{"rft.atitle":"多様な生息地から採取したギョウジャニンニク系統の萌芽期の早晩性およびRAPD分析による分類\r Variations on Sprouting Time and Classification by RAPD Analysis of Allium victorialis L. Clones Collected from Diverse Habitats"}`,
+			`{ rft.atitle: '多様な生息地から採取したギョウジャニンニク系統の萌芽期の早晩性およびRAPD分析による分類  Variations on Sprouting Time and Classification by RAPD Analysis of Allium victorialis L. Clones Collected from Diverse Habitats',  }`,
+			nil,
 		},
 	}
 
 	for _, c := range cases {
-		var v struct {
-			ArticleTitle string `json:"rft.atitle"`
-		}
-		if err := json.Unmarshal([]byte(c.in), &v); err != nil {
-			t.Error(err.Error())
-		}
-		b, err := Marshal(v)
-		if err != c.err {
-			t.Errorf("got error %v, want %v", err, c.err)
-		}
-		if string(b) != c.out {
-			t.Errorf("got %v, want %v", string(b), c.out)
-		}
+		t.Run(c.about, func(t *testing.T) {
+			var v struct {
+				ArticleTitle string `json:"rft.atitle"`
+			}
+			if err := json.Unmarshal([]byte(c.in), &v); err != nil {
+				t.Fatal(err)
+			}
+			b, err := Marshal(v)
+			if err != c.err {
+				t.Errorf("got error %v, want %v", err, c.err)
+			}
+			if string(b) != c.out {
+				t.Errorf("got %v, want %v", string(b), c.out)
+			}
+		})
+	}
+}
+
+func BenchmarkMarshal(b *testing.B) {
+	benchmarks := []struct {
+		name string
+		in   any
+	}{
+		{"simple", struct{ A string }{A: "B"}},
+		{"slice", struct{ A []string }{A: []string{"B", "C", "D"}}},
+		{"nested", TestPeak{
+			Name:     "test",
+			Location: TestPosition{38.916667, 72.016667},
+			Variants: []string{"a", "b"},
+			Camps:    []TestPosition{{1, 2}, {3, 4}},
+		}},
+	}
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				_, _ = Marshal(bm.in)
+			}
+		})
+	}
+}
+
+func BenchmarkMarshalString(b *testing.B) {
+	inputs := []string{
+		"simple",
+		"with 'quotes' and \\backslashes",
+		"with\nnewlines\nand\ttabs",
+	}
+	for _, in := range inputs {
+		b.Run(fmt.Sprintf("len=%d", len(in)), func(b *testing.B) {
+			v := struct{ A string }{A: in}
+			for i := 0; i < b.N; i++ {
+				_, _ = Marshal(v)
+			}
+		})
 	}
 }
