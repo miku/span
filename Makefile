@@ -37,7 +37,7 @@ test:
 	# go mod tidy
 
 $(TARGETS): %: cmd/%/main.go
-	go build -o $@ $<
+	go build -ldflags "-X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
 
 .PHONY: clean
 clean:
@@ -121,7 +121,6 @@ assets/crossref/names.ndj: span-crossref-members
 
 .PHONY: update-version
 update-version:
-	sed -i -e 's@AppVersion =.*@AppVersion = "$(VERSION)"@' common.go
 	sed -i -e 's@^Version:.*@Version: $(VERSION)@' packaging/deb/span/DEBIAN/control
 	sed -i -e 's@^Version:.*@Version:    $(VERSION)@' packaging/rpm/span.spec
 

@@ -27,9 +27,11 @@ import (
 	"fmt"
 )
 
+// AppVersion of span package. Commandline tools will show this on -v.
+// Set at build time via: -ldflags "-X github.com/miku/span.AppVersion=..."
+var AppVersion = "0.2.20"
+
 const (
-	// AppVersion of span package. Commandline tools will show this on -v.
-	AppVersion = "0.2.20"
 	// KeyLengthLimit was a limit imposed by the memcached protocol, which
 	// was used for blob storage until Q1 2017. We switched the key-value
 	// store, so this limit is somewhat obsolete.
