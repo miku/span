@@ -94,21 +94,13 @@
 //     }
 //
 // That is all. We need to register the filter, so we can use it in the configuration file.
-// The "unmarshalFilter" (filter.go) method acts as a dispatcher:
+// Add an entry to filterRegistry in filter.go:
 //
-//     func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
-//         switch name {
-//         // Add more filters here.
-//         case "any":
-//             return &AnyFilter{}, nil
-//         case "doi":
-//             ...
-//
-//         // Register awesome filter. No configuration options, so no need to unmarshal.
-//         case "awesome":
-//             return &AwesomeFilter{}, nil
-//
+//     var filterRegistry = map[string]func() Filter{
 //         ...
+//         "awesome": func() Filter { return &AwesomeFilter{} },
+//         ...
+//     }
 //
 // We can then use the filter in the JSON configuration:
 //

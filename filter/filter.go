@@ -90,83 +90,37 @@ func (t *Tagger) Expand(rules map[string][]string) {
 	}
 }
 
+// filterRegistry maps filter names to factory functions that return a new
+// zero-value instance of the filter. To register a new filter, add an entry
+// here.
+var filterRegistry = map[string]func() Filter{
+	"any":        func() Filter { return &AnyFilter{} },
+	"and":        func() Filter { return &AndFilter{} },
+	"collection": func() Filter { return &CollectionFilter{} },
+	"doi":        func() Filter { return &DOIFilter{} },
+	"holdings":   func() Filter { return &HoldingsFilter{} },
+	"isbn":       func() Filter { return &ISBNFilter{} },
+	"issn":       func() Filter { return &ISSNFilter{} },
+	"not":        func() Filter { return &NotFilter{} },
+	"or":         func() Filter { return &OrFilter{} },
+	"package":    func() Filter { return &PackageFilter{} },
+	"source":     func() Filter { return &SourceFilter{} },
+	"subject":    func() Filter { return &SubjectFilter{} },
+}
+
 // unmarshalFilter takes the name of a filter and a raw JSON message and
-// unmarshals the appropriate filter. All filters must be registered here.
-// Unknown filters cause an error.
+// unmarshals the appropriate filter. All filters must be registered in
+// filterRegistry. Unknown filters cause an error.
 func unmarshalFilter(name string, raw json.RawMessage) (Filter, error) {
-	switch name {
-	// Add more filters here.
-	case "any":
-		return &AnyFilter{}, nil
-	case "doi":
-		var filter DOIFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "issn":
-		var filter ISSNFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "isbn":
-		var filter ISBNFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "package":
-		var filter PackageFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "holdings":
-		var filter HoldingsFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "collection":
-		var filter CollectionFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "source":
-		var filter SourceFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "subject":
-		var filter SubjectFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "or":
-		var filter OrFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "and":
-		var filter AndFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	case "not":
-		var filter NotFilter
-		if err := json.Unmarshal(raw, &filter); err != nil {
-			return nil, err
-		}
-		return &filter, nil
-	default:
+	newFilter, ok := filterRegistry[name]
+	if !ok {
 		return nil, fmt.Errorf("unknown filter: %s", name)
 	}
+	f := newFilter()
+	if err := json.Unmarshal(raw, f); err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 // firstKey returns the top level key of an object, given as a raw JSON message.
