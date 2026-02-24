@@ -321,7 +321,7 @@ func runFolio() {
 					} else if strings.Contains(label, "issn") {
 						andFilters = append(andFilters, map[string]any{
 							"issn": map[string]any{
-								"link": fileURL,
+								"url": fileURL,
 							},
 						})
 					} else {

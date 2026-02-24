@@ -3,7 +3,6 @@ package span
 import (
 	"archive/zip"
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -68,14 +67,46 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 	if b, err = os.ReadFile(blob); err != nil {
 		return
 	}
-	for url, file := range mappings {
-		value := []byte(fmt.Sprintf(`%q`, url))
-		// Debian is fine w/ file://, but fedora not?
-		replacement := []byte(fmt.Sprintf(`"file://%s"`, filepath.Join(dir, file)))
-		b = bytes.Replace(b, value, replacement, -1)
+	// Parse the blob as JSON, replace URLs in the tree, and re-serialize.
+	// This is more robust than byte-level replacement, which can fail when
+	// the JSON encoder uses different escaping (e.g. \u0026 for &) than
+	// Go's %q format.
+	var parsed any
+	if err = json.Unmarshal(b, &parsed); err != nil {
+		return
+	}
+	parsed = replaceURLs(parsed, mappings, dir)
+	if b, err = json.MarshalIndent(parsed, "", "  "); err != nil {
+		return
 	}
 	if err = os.WriteFile(blob, b, 0777); err != nil {
 		return
 	}
 	return dir, blob, nil
+}
+
+// replaceURLs recursively walks a parsed JSON value and replaces any string
+// that matches a URL in the mappings with its corresponding file:// path.
+func replaceURLs(v any, mappings map[string]string, dir string) any {
+	switch val := v.(type) {
+	case string:
+		if file, ok := mappings[val]; ok {
+			return "file://" + filepath.Join(dir, file)
+		}
+		return val
+	case map[string]any:
+		result := make(map[string]any, len(val))
+		for k, child := range val {
+			result[k] = replaceURLs(child, mappings, dir)
+		}
+		return result
+	case []any:
+		result := make([]any, len(val))
+		for i, child := range val {
+			result[i] = replaceURLs(child, mappings, dir)
+		}
+		return result
+	default:
+		return val
+	}
 }
