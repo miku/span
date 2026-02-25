@@ -84,7 +84,7 @@ var SourceNames = map[string]string{
 	"65":  "GVK Verbundkatalog / Nordeuropa",
 	"66":  "Heidelberger Bilddatenbank",
 	"67":  "Künstler/Conart",
-	"68":  "OLC SSG Bildungsforschung",
+	"68":  "OLC SSG ...",
 	"70":  "UBL / Institut Ägyptologie",
 	"71":  "OstDok",
 	"76":  "E-Books adlr",
