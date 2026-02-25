@@ -272,9 +272,10 @@ func runFolio() {
 	}
 	// Build filterconfig: group collections by ISIL.
 	type collectionInfo struct {
-		sourceId     string
-		contentFiles []string
-		filteredBy   []folio.FilterEntry
+		sourceId            string
+		contentFiles        []string
+		filteredBy          []folio.FilterEntry
+		solrMegaCollections []string
 	}
 	isilCollections := make(map[string][]collectionInfo)
 	skipped := 0
@@ -287,9 +288,10 @@ func runFolio() {
 		sourceId := m[1]
 		for _, isil := range col.SelectedBy {
 			isilCollections[isil] = append(isilCollections[isil], collectionInfo{
-				sourceId:     sourceId,
-				contentFiles: col.ContentFiles,
-				filteredBy:   col.FilteredBy,
+				sourceId:            sourceId,
+				contentFiles:        col.ContentFiles,
+				filteredBy:          col.FilteredBy,
+				solrMegaCollections: col.SolrMegaCollections,
 			})
 		}
 	}
@@ -349,6 +351,15 @@ func runFolio() {
 						})
 					}
 				}
+			}
+			// When no content files or filteredBy entries narrow this
+			// collection (only source filter so far), use
+			// solrMegaCollections as a collection filter so the source
+			// is not matched too broadly.
+			if len(andFilters) == 1 && len(col.solrMegaCollections) > 0 {
+				andFilters = append(andFilters, map[string][]string{
+					"collection": col.solrMegaCollections,
+				})
 			}
 			if len(andFilters) == 1 {
 				orFilters = append(orFilters, andFilters[0])
