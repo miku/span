@@ -60,6 +60,7 @@ var (
 	tenant      = flag.String("tenant", "de_15", "FOLIO tenant")
 	limit       = flag.Int("limit", 100000, "API pagination limit")
 	expand      = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs to expand into")
+	keepResp    = flag.Bool("k", false, "keep FOLIO API response in a temporary file")
 )
 
 // httpClient is the shared HTTP client, configured after flag parsing.
@@ -253,6 +254,22 @@ func runFolio() {
 		log.Fatalf("failed to fetch metadata collections: %v", err)
 	}
 	log.Printf("fetched %d collections", len(resp.FincConfigMetadataCollections))
+	if *keepResp {
+		respData, err := json.MarshalIndent(resp, "", "  ")
+		if err != nil {
+			log.Fatalf("failed to marshal FOLIO response: %v", err)
+		}
+		tmpFile, err := os.CreateTemp("", "span-freeze-folio-*.json")
+		if err != nil {
+			log.Fatalf("failed to create temp file: %v", err)
+		}
+		if _, err := tmpFile.Write(respData); err != nil {
+			tmpFile.Close()
+			log.Fatalf("failed to write FOLIO response: %v", err)
+		}
+		tmpFile.Close()
+		log.Printf("kept FOLIO response in %s", tmpFile.Name())
+	}
 	// Build filterconfig: group collections by ISIL.
 	type collectionInfo struct {
 		sourceId     string
