@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"maps"
 	"net"
 	"net/http"
@@ -33,14 +34,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/segmentio/encoding/json"
-
 	"github.com/dchest/safefile"
-	"log"
-	"github.com/sethgrid/pester"
-
 	"github.com/miku/span"
 	"github.com/miku/span/folio"
+	"github.com/segmentio/encoding/json"
+	"github.com/sethgrid/pester"
 	"mvdan.cc/xurls"
 )
 
@@ -331,24 +329,26 @@ func runFolio() {
 					fileURL := fmt.Sprintf("%s/finc-config/files/%s", *okapiURL, ff.FileId)
 					urlSet[fileURL] = true
 					label := strings.ToLower(fb.Label)
-					if strings.Contains(label, "holdings") || strings.Contains(label, "ezb") {
+					switch {
+					case strings.Contains(label, "holdings") || strings.Contains(label, "ezb"):
 						andFilters = append(andFilters, map[string]any{
 							"holdings": map[string]any{
 								"urls": []string{fileURL},
 							},
 						})
-					} else if strings.Contains(label, "issn") {
+					case strings.Contains(label, "issn"):
 						andFilters = append(andFilters, map[string]any{
 							"issn": map[string]any{
 								"url": fileURL,
 							},
 						})
-					} else {
+					default:
 						andFilters = append(andFilters, map[string]any{
 							"holdings": map[string]any{
 								"urls": []string{fileURL},
 							},
 						})
+
 					}
 				}
 			}
