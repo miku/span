@@ -125,9 +125,9 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 	s.Publishers = is.Publishers
 	// TODO: may switch back
 	if withFullrecord {
-		s.RecordType = IntermediateSchemaRecordType
-	} else {
 		s.RecordType = AIRecordType
+	} else {
+		s.RecordType = IntermediateSchemaRecordType
 	}
 	// refs #22746, #21605
 	s.RecordFormat = s.RecordType
