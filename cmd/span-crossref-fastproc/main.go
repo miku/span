@@ -36,15 +36,12 @@ var (
 	expand      = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs")
 )
 
-// outputFilename derives the output filename from the input filename.
-// feed-2-index-2026-03-02-2026-03-02.json.zst → feed-2-index-2026-03-02-2026-03-02-solr-export-with-fullrecord.json.zst
+// outputFilename derives the output filename from the input filename. Only
+// .json.zst input is supported.
+// feed-2-index-2026-03-02-2026-03-02.json.zst -> feed-2-index-2026-03-02-2026-03-02-solr-export-with-fullrecord.json.zst
 func outputFilename(inputPath string) string {
 	base := filepath.Base(inputPath)
-	// Strip compression and json extensions.
-	name := base
-	for _, ext := range []string{".zst", ".zstd", ".gz", ".json"} {
-		name = strings.TrimSuffix(name, ext)
-	}
+	name := strings.TrimSuffix(strings.TrimSuffix(base, ".zst"), ".json")
 	return name + "-solr-export-with-fullrecord.json.zst"
 }
 
@@ -129,9 +126,9 @@ func main() {
 	}
 	w := bufio.NewWriter(zw)
 
-	// Combined processing function: import → tag → export.
+	// Combined processing function: import -> tag -> export.
 	procfunc := func(_ int64, b []byte) ([]byte, error) {
-		// Stage 1: import (crossref → intermediate schema).
+		// Stage 1: import (crossref -> intermediate schema).
 		var doc crossref.Document
 		if err := json.Unmarshal(b, &doc); err != nil {
 			return nil, fmt.Errorf("crossref unmarshal: %w", err)
@@ -145,7 +142,7 @@ func main() {
 		}
 		// Stage 2: tag (apply filter rules).
 		tagged := tagger.Tag(*is)
-		// Stage 3: export (intermediate schema → solr).
+		// Stage 3: export (intermediate schema -> solr).
 		var exporter finc.Solr5Vufind3
 		bb, err := exporter.Export(tagged, true)
 		if err != nil {
