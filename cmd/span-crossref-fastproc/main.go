@@ -1,11 +1,16 @@
 // span-crossref-fastproc takes a raw crossref daily data slice (zstd
-// compressed) and a frozen filterconfig (from span-freeze) and produces a
-// solr-importable file by running the equivalent of: span-import -i crossref |
-// span-tag -unfreeze filterconfig.zip | span-export -with-fullrecord.
+// compressed) and produces a solr-importable file by running the equivalent
+// of: span-import -i crossref | span-tag -unfreeze filterconfig.zip |
+// span-export -with-fullrecord.
+//
+// The filterconfig can be supplied as a frozen zip file (-f) or fetched
+// directly from FOLIO API (via OKAPI_URL and OKAPI_TOKEN env vars), with
+// automatic caching.
 //
 // Usage:
 //
-//	span-crossref-fastproc -f filterconfig.zip -o /output/dir feed-2-index-2026-03-02-2026-03-02.json.zst
+//	span-crossref-fastproc -o /output/dir feed-2-index-2026-03-02-2026-03-02.json.zst
+//	span-crossref-fastproc -f filterconfig.zip feed-2-index-2026-03-02-2026-03-02.json.zst
 package main
 
 import (
@@ -17,23 +22,30 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/klauspost/compress/zstd"
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/crossref"
 	"github.com/miku/span/formats/finc"
+	"github.com/miku/span/freeze"
 	"github.com/miku/span/parallel"
 	"github.com/segmentio/encoding/json"
 )
 
 var (
-	frozenFile  = flag.String("f", "", "frozen filterconfig zip file (from span-freeze)")
+	frozenFile  = flag.String("f", "", "frozen filterconfig zip file; if omitted, fetch from FOLIO API")
 	outputDir   = flag.String("o", ".", "output directory")
 	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
 	batchSize   = flag.Int("b", 10000, "batch size")
 	showVersion = flag.Bool("v", false, "show version")
-	expand      = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs")
+	expandFlag  = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs")
+	okapiURL    = flag.String("okapi-url", os.Getenv("OKAPI_URL"), "OKAPI base URL (env: OKAPI_URL)")
+	tenant      = flag.String("tenant", "de_15", "FOLIO tenant")
+	noProxy     = flag.Bool("no-proxy", false, "ignore system proxy settings")
+	cacheTTL    = flag.Duration("cache-ttl", 24*time.Hour, "filterconfig cache TTL")
+	forceFreeze = flag.Bool("force", false, "force re-download of filterconfig, ignoring cache")
 )
 
 // outputFilename derives the output filename from the input filename. Only
@@ -45,10 +57,47 @@ func outputFilename(inputPath string) string {
 	return name + "-solr-export-with-fullrecord.json.zst"
 }
 
+// resolveFilterconfig returns the path to a frozen filterconfig zip. If -f is
+// set, it returns that path. Otherwise it fetches from FOLIO with caching.
+func resolveFilterconfig() (string, error) {
+	if *frozenFile != "" {
+		return *frozenFile, nil
+	}
+	token := os.Getenv("OKAPI_TOKEN")
+	if token == "" {
+		return "", fmt.Errorf("either -f filterconfig.zip or OKAPI_TOKEN env var is required")
+	}
+	if *okapiURL == "" {
+		return "", fmt.Errorf("OKAPI_URL env var or -okapi-url flag is required")
+	}
+	var expandRules map[string][]string
+	if *expandFlag != "" {
+		var err error
+		expandRules, err = freeze.ParseExpandRules(*expandFlag)
+		if err != nil {
+			return "", fmt.Errorf("parse expand rules: %w", err)
+		}
+	}
+	return freeze.FetchOrCached(
+		freeze.FolioOpts{
+			OkapiURL: *okapiURL,
+			Tenant:   *tenant,
+			Token:    token,
+			Expand:   expandRules,
+			NoProxy:  *noProxy,
+		},
+		freeze.CacheOpts{
+			TTL:   *cacheTTL,
+			Force: *forceFreeze,
+		},
+	)
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "usage: span-crossref-fastproc [options] INPUT.json.zst\n\n")
-		fmt.Fprintf(os.Stderr, "Converts a raw crossref daily slice into a solr-importable file.\n\n")
+		fmt.Fprintf(os.Stderr, "Converts a raw crossref daily slice into a solr-importable file.\n")
+		fmt.Fprintf(os.Stderr, "Filterconfig is fetched from FOLIO (OKAPI_URL, OKAPI_TOKEN) or supplied via -f.\n\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -60,13 +109,16 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	if *frozenFile == "" {
-		log.Fatal("filterconfig required: use -f filterconfig.zip")
-	}
 	inputFile := flag.Arg(0)
 
+	// Resolve filterconfig (from file or FOLIO API).
+	zipPath, err := resolveFilterconfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Unfreeze filterconfig.
-	dir, filterconfig, err := span.UnfreezeFilterConfig(*frozenFile)
+	dir, filterconfig, err := freeze.UnfreezeFilterConfig(zipPath)
 	if err != nil {
 		log.Fatalf("unfreeze: %v", err)
 	}
@@ -85,11 +137,11 @@ func main() {
 	}
 	f.Close()
 
-	// Handle expand rules.
-	if *expand != "" {
+	// Handle expand rules (for pre-supplied zip files; FOLIO mode expands during freeze).
+	if *frozenFile != "" && *expandFlag != "" {
 		var rules map[string][]string
-		if err := json.Unmarshal([]byte(*expand), &rules); err != nil {
-			b, err := os.ReadFile(*expand)
+		if err := json.Unmarshal([]byte(*expandFlag), &rules); err != nil {
+			b, err := os.ReadFile(*expandFlag)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -155,7 +207,7 @@ func main() {
 	p := parallel.NewProcessor(bufio.NewReader(zr), w, procfunc)
 	p.NumWorkers = *numWorkers
 	p.BatchSize = *batchSize
-	log.Printf("processing %s → %s (%d workers)", inputFile, outName, *numWorkers)
+	log.Printf("processing %s -> %s (%d workers)", inputFile, outName, *numWorkers)
 	if err := p.Run(); err != nil {
 		log.Fatalf("processing: %v", err)
 	}

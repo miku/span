@@ -25,6 +25,7 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
+	"github.com/miku/span/freeze"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/parallel"
 	"github.com/miku/span/solrutil"
@@ -171,7 +172,7 @@ func main() {
 		reader io.Reader = os.Stdin
 	)
 	if *unfreeze != "" {
-		dir, filterconfig, err := span.UnfreezeFilterConfig(*unfreeze)
+		dir, filterconfig, err := freeze.UnfreezeFilterConfig(*unfreeze)
 		if err != nil {
 			log.Fatal(err)
 		}
