@@ -26,8 +26,9 @@ Library data tools.
 mkdir -p $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-amsl-discovery $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-compare $RPM_BUILD_ROOT/usr/local/bin
-install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-fast-snapshot $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-crossref-fastproc $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-crossref-members $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-snapshot $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-sync $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-crossref-table $RPM_BUILD_ROOT/usr/local/bin
@@ -63,8 +64,9 @@ rm -rf %{_topdir}/BUILD/%{name}
 %defattr(-,root,root)
 /usr/local/bin/span-amsl-discovery
 /usr/local/bin/span-compare
-/usr/local/bin/span-crossref-members
 /usr/local/bin/span-crossref-fast-snapshot
+/usr/local/bin/span-crossref-fastproc
+/usr/local/bin/span-crossref-members
 /usr/local/bin/span-crossref-snapshot
 /usr/local/bin/span-crossref-sync
 /usr/local/bin/span-crossref-table
