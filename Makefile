@@ -5,6 +5,7 @@ TARGETS = \
 		  span-compare \
           span-crossref-members \
 		  span-crossref-fast-snapshot \
+		  span-crossref-fastproc \
 		  span-crossref-snapshot \
           span-crossref-sync \
 		  span-crossref-table \
