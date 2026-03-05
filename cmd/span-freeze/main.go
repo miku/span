@@ -51,7 +51,7 @@ var (
 	useFolio    = flag.Bool("f", false, "use FOLIO API instead of stdin")
 	noProxy     = flag.Bool("no-proxy", false, "ignore system proxy settings")
 	okapiURL    = flag.String("okapi-url", os.Getenv("OKAPI_URL"), "OKAPI base URL (env: OKAPI_URL)")
-	tenant      = flag.String("tenant", "de_15", "FOLIO tenant")
+	tenant      = flag.String("tenant", "de15", "FOLIO tenant")
 	limit       = flag.Int("limit", 100000, "API pagination limit")
 	expand      = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs to expand into")
 	keepResp    = flag.Bool("k", false, "keep FOLIO API response in a temporary file")
