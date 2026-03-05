@@ -95,59 +95,22 @@ func FetchOrCached(fopts FolioOpts, copts CacheOpts) (string, error) {
 	return cached, nil
 }
 
-// Fetch fetches a filterconfig from FOLIO and writes a frozen zip to outputPath.
-func Fetch(opts FolioOpts, outputPath string) error {
-	if opts.Token == "" {
-		return fmt.Errorf("OKAPI token is required")
-	}
-	if opts.OkapiURL == "" {
-		return fmt.Errorf("OKAPI URL is required")
-	}
-	if opts.Limit <= 0 {
-		opts.Limit = 100000
-	}
-	var httpClient *http.Client
-	if opts.NoProxy {
-		httpClient = &http.Client{
-			Transport: &http.Transport{
-				Proxy:                 nil,
-				DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
-				TLSHandshakeTimeout:   10 * time.Second,
-				ResponseHeaderTimeout: 30 * time.Second,
-			},
-		}
-	} else {
-		httpClient = http.DefaultClient
-	}
-	pesterClient := pester.New()
-	if opts.NoProxy {
-		pesterClient.Transport = httpClient.Transport
-	}
-	api := folio.API{
-		Base:   opts.OkapiURL,
-		Tenant: opts.Tenant,
-		Client: pesterClient,
-	}
-	api.SetToken(opts.Token)
-	resp, err := api.MetadataCollections(folio.MetadataCollectionsOpts{
-		CQL:               `(selectedBy=("*"))`,
-		Limit:             opts.Limit,
-		IncludeFilteredBy: true,
-	})
-	if err != nil {
-		return fmt.Errorf("fetch metadata collections: %w", err)
-	}
-	log.Printf("fetched %d collections", len(resp.FincConfigMetadataCollections))
-	// Build filterconfig: group collections by ISIL.
-	type collectionInfo struct {
-		sourceId            string
-		contentFiles        []string
-		filteredBy          []folio.FilterEntry
-		solrMegaCollections []string
-	}
+// collectionInfo holds the fields needed to build a single filterconfig entry.
+type collectionInfo struct {
+	sourceId            string
+	contentFiles        []string
+	filteredBy          []folio.FilterEntry
+	solrMegaCollections []string
+}
+
+// buildFilterConfig groups FOLIO metadata collections by ISIL and assembles
+// the filterconfig map. It returns the config and the set of URLs referenced
+// by it (content files and filter files). Collections whose CollectionId
+// doesn't match sourceIdPattern are silently skipped.
+func buildFilterConfig(collections []folio.FincConfigMetadataCollection, okapiURL string) (map[string]any, map[string]bool) {
 	isilCollections := make(map[string][]collectionInfo)
 	skipped := 0
-	for _, col := range resp.FincConfigMetadataCollections {
+	for _, col := range collections {
 		m := sourceIdPattern.FindStringSubmatch(col.CollectionId)
 		if m == nil {
 			skipped++
@@ -164,9 +127,7 @@ func Fetch(opts FolioOpts, outputPath string) error {
 		}
 	}
 	log.Printf("found %d ISILs, skipped %d collections without source ID", len(isilCollections), skipped)
-	// Track all URLs that need downloading.
 	urlSet := make(map[string]bool)
-	// Build the filterconfig blob.
 	filterConfig := make(map[string]any)
 	isils := slices.Sorted(maps.Keys(isilCollections))
 	for _, isil := range isils {
@@ -192,7 +153,7 @@ func Fetch(opts FolioOpts, outputPath string) error {
 					continue
 				}
 				for _, ff := range fb.FilterFiles {
-					fileURL := fmt.Sprintf("%s/finc-config/files/%s", opts.OkapiURL, ff.FileId)
+					fileURL := fmt.Sprintf("%s/finc-config/files/%s", okapiURL, ff.FileId)
 					urlSet[fileURL] = true
 					label := strings.ToLower(fb.Label)
 					switch {
@@ -238,6 +199,53 @@ func Fetch(opts FolioOpts, outputPath string) error {
 			}
 		}
 	}
+	return filterConfig, urlSet
+}
+
+// Fetch fetches a filterconfig from FOLIO and writes a frozen zip to outputPath.
+func Fetch(opts FolioOpts, outputPath string) error {
+	if opts.Token == "" {
+		return fmt.Errorf("OKAPI token is required")
+	}
+	if opts.OkapiURL == "" {
+		return fmt.Errorf("OKAPI URL is required")
+	}
+	if opts.Limit <= 0 {
+		opts.Limit = 100000
+	}
+	var httpClient *http.Client
+	if opts.NoProxy {
+		httpClient = &http.Client{
+			Transport: &http.Transport{
+				Proxy:                 nil,
+				DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
+				TLSHandshakeTimeout:   10 * time.Second,
+				ResponseHeaderTimeout: 30 * time.Second,
+			},
+		}
+	} else {
+		httpClient = http.DefaultClient
+	}
+	pesterClient := pester.New()
+	if opts.NoProxy {
+		pesterClient.Transport = httpClient.Transport
+	}
+	api := folio.API{
+		Base:   opts.OkapiURL,
+		Tenant: opts.Tenant,
+		Client: pesterClient,
+	}
+	api.SetToken(opts.Token)
+	resp, err := api.MetadataCollections(folio.MetadataCollectionsOpts{
+		CQL:               `(selectedBy=("*"))`,
+		Limit:             opts.Limit,
+		IncludeFilteredBy: true,
+	})
+	if err != nil {
+		return fmt.Errorf("fetch metadata collections: %w", err)
+	}
+	log.Printf("fetched %d collections", len(resp.FincConfigMetadataCollections))
+	filterConfig, urlSet := buildFilterConfig(resp.FincConfigMetadataCollections, opts.OkapiURL)
 	if opts.Expand != nil {
 		ExpandFilterConfig(filterConfig, opts.Expand)
 		log.Printf("expanded %d meta-ISIL(s)", len(opts.Expand))
