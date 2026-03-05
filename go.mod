@@ -1,8 +1,6 @@
 module github.com/miku/span
 
-go 1.24.0
-
-toolchain go1.24.1
+go 1.25.0
 
 require (
 	github.com/abadojack/whatlanggo v1.0.1
@@ -25,7 +23,7 @@ require (
 	github.com/segmentio/encoding v0.5.3
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
-	golang.org/x/net v0.50.0
+	golang.org/x/net v0.51.0
 	golang.org/x/text v0.34.0
 	mvdan.cc/xurls v1.1.0
 )
