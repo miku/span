@@ -29,7 +29,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 		return
 	}
 	defer r.Close()
-	if err = os.MkdirAll(filepath.Join(dir, "files"), 0777); err != nil {
+	if err = os.MkdirAll(filepath.Join(dir, nameDir), 0777); err != nil {
 		return
 	}
 	for _, f := range r.File {
@@ -39,7 +39,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 		if ff, err = os.Create(filepath.Join(dir, f.Name)); err != nil {
 			return
 		}
-		if f.Name == "mapping.json" {
+		if f.Name == nameMapping {
 			var (
 				buf bytes.Buffer
 				tr  = io.TeeReader(rc, &buf)
@@ -62,7 +62,7 @@ func UnfreezeFilterConfig(frozenfile string) (dir, blob string, err error) {
 			return
 		}
 	}
-	blob = filepath.Join(dir, "blob")
+	blob = filepath.Join(dir, nameBlob)
 	if b, err = os.ReadFile(blob); err != nil {
 		return
 	}
