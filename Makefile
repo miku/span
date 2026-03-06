@@ -14,6 +14,7 @@ TARGETS = \
           span-folio \
 		  span-freeze \
 		  span-hcov \
+		  span-index \
 		  span-import \
 		  span-local-data \
 		  span-oa-filter \
