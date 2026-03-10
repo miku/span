@@ -227,11 +227,11 @@ func (p Publication) Date() (time.Time, error) {
 		}
 	}
 	if date.Day != "" {
-		if v, err := strconv.Atoi(date.Day); err != nil {
+		if v, err := strconv.Atoi(date.Day); err == nil {
 			if v > 0 && v < 32 {
-				m = date.Day
+				d = date.Day
 			} else {
-				m = "1"
+				d = "1"
 			}
 		}
 	}
@@ -304,6 +304,7 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	is.SourceID = SourceID
 	is.MegaCollections = []string{Collection, TechnicalCollectionID}
 	is.Format = Format
+	is.Genre = Genre
 
 	if p.Volume.Article.Articleinfo.Amsid != "" {
 		is.URL = append(is.URL, fmt.Sprintf("http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=%s", p.Volume.Article.Articleinfo.Amsid))
@@ -323,7 +324,9 @@ func (p Publication) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	is.StartPage = p.Volume.Article.Articleinfo.Artpagenums.Startpage
 	is.EndPage = p.Volume.Article.Articleinfo.Artpagenums.Endpage
-	is.Pages = fmt.Sprintf("%s-%s", is.StartPage, is.EndPage)
+	if is.StartPage != "" || is.EndPage != "" {
+		is.Pages = fmt.Sprintf("%s-%s", is.StartPage, is.EndPage)
+	}
 	is.PageCount = p.PageCount()
 
 	is.Publishers = []string{"IEEE"}

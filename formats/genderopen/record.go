@@ -103,7 +103,11 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.Genre = "article"
 	output.RefType = "EJOUR"
 	output.Format = "ElectronicArticle"
-	output.Languages = []string{record.Metadata.Dc.Language}
+	if record.Metadata.Dc.Language != "" {
+		output.Languages = []string{record.Metadata.Dc.Language}
+	} else {
+		output.Languages = []string{"und"}
+	}
 
 	output.ArticleTitle = record.Metadata.Dc.Title
 

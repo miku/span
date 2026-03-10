@@ -1,6 +1,7 @@
 package mediarep
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"strconv"
@@ -85,7 +86,11 @@ func (r *Dim) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output := finc.NewIntermediateSchema()
 
 	output.SourceID = "170"
+	output.RecordID = r.Header.Identifier
+	output.ID = fmt.Sprintf("ai-170-%s", base64.RawURLEncoding.EncodeToString([]byte(r.Header.Identifier)))
 	output.MegaCollections = []string{"sid-170-col-mediarep"}
+	output.Genre = "article"
+	output.RefType = "EJOUR"
 
 	output.ArticleTitle = r.FieldValue("dc", "title", "")
 	output.Subjects = r.FieldValues("dc", "subject", "")

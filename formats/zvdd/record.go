@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -76,6 +77,15 @@ func (r DublicCoreRecord) ToIntermediateSchema() (*finc.IntermediateSchema, erro
 
 	output.Publishers = append(output.Publishers, r.Metadata.DC.Publisher...)
 	output.Subjects = append(output.Subjects, r.Metadata.DC.Subject...)
+
+	for _, l := range r.Metadata.DC.Language {
+		if lang := span.LanguageIdentifier(l); lang != "" {
+			output.Languages = append(output.Languages, lang)
+		}
+	}
+	if len(output.Languages) == 0 {
+		output.Languages = []string{"und"}
+	}
 
 	// Reach out to METS for dates.
 	return output, nil

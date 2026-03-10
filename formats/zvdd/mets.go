@@ -220,7 +220,7 @@ func (r *MetsRecord) ToIntermediateSchema() (output *finc.IntermediateSchema, er
 	// Use earliest date.
 	var dates []string
 	for _, origin := range mods.Origin {
-		output.Publishers = origin.Publisher
+		output.Publishers = append(output.Publishers, origin.Publisher...)
 		for _, di := range origin.DateIssued {
 			dates = append(dates, di.Date)
 		}

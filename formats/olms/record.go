@@ -117,5 +117,6 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Subjects = append(output.Subjects, record.Metadata.Dc.Subject.Text)
 	}
 
+	output.Languages = []string{"und"}
 	return output, nil
 }

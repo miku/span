@@ -501,7 +501,9 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.StartPage = article.Front.Article.FirstPage.Value
 	output.EndPage = article.Front.Article.LastPage.Value
 	output.PageCount = article.PageCount()
-	output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+	if output.StartPage != "" || output.EndPage != "" {
+		output.Pages = fmt.Sprintf("%s-%s", output.StartPage, output.EndPage)
+	}
 
 	return output, nil
 }

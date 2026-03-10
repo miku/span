@@ -77,7 +77,11 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 	output.MegaCollections = []string{"DBLP", "sid-210-coll-dblp"}
 	output.SourceID = "210"
 	output.ID = article.ID()
+	output.RecordID = article.Key
 	output.RawDate = output.Date.Format("2006-01-02")
+	output.Genre = "article"
+	output.RefType = "EJOUR"
+	output.Languages = []string{"eng"}
 	output.Volume = article.Volume
 	switch {
 	case strings.HasPrefix(article.URL, "http"):

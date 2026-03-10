@@ -285,6 +285,12 @@ func (record MetsRecord) ToIntermediateSchema() (*finc.IntermediateSchema, error
 			log.Printf("%d-%d, %s (%s)", i, j, id.Text, id.Type)
 		}
 		log.Printf("----")
+		if lang := sec.MdWrap.XmlData.Mods.Language.LanguageTerm.Text; lang != "" {
+			output.Languages = append(output.Languages, lang)
+		}
+	}
+	if len(output.Languages) == 0 {
+		output.Languages = []string{"und"}
 	}
 	return output, nil
 }

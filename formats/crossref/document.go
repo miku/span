@@ -330,6 +330,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(output.ArticleTitle) > 2400 {
 		return output, span.Skip{Reason: fmt.Sprintf("TOO_LONG_TITLE %s", output.ID)}
 	}
+	output.RecordID = doc.DOI
 	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
 	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
 	output.Genre = Genres.Lookup(doc.Type, "unknown")
@@ -363,10 +364,16 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	// 	return output, span.Skip{Reason: fmt.Sprintf("NO_AUTHORS %s", output.ID)}
 	// }
 	pi := doc.PageInfo()
-	output.StartPage = fmt.Sprintf("%d", pi.StartPage)
-	output.EndPage = fmt.Sprintf("%d", pi.EndPage)
+	if pi.StartPage != 0 {
+		output.StartPage = fmt.Sprintf("%d", pi.StartPage)
+	}
+	if pi.EndPage != 0 {
+		output.EndPage = fmt.Sprintf("%d", pi.EndPage)
+	}
 	output.Pages = pi.RawMessage
-	output.PageCount = fmt.Sprintf("%d", pi.PageCount())
+	if pc := pi.PageCount(); pc != 0 {
+		output.PageCount = fmt.Sprintf("%d", pc)
+	}
 	// TODO: use a file for this
 	publisherBlacklist := []string{
 		"Crossref Testing",

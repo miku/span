@@ -28,6 +28,10 @@ func (data *Data) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output := finc.NewIntermediateSchema()
 	output.SourceID = SourceIdentifier
+	output.MegaCollections = []string{"IMSLP"}
+	output.Genre = "document"
+	output.RefType = "MUSIC"
+	output.Languages = []string{"und"}
 	for _, t := range doc.FindElements("//var/recordId") {
 		encoded := base64.RawURLEncoding.EncodeToString([]byte(t.Text()))
 		output.ID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, encoded)

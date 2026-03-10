@@ -201,6 +201,9 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	output.RecordID = doc.DOI()
+	if output.RecordID == "" {
+		output.RecordID = doc.ID
+	}
 	output.ID = id
 	output.SourceID = SourceIdentifier
 	output.Volume = doc.BibJSON.Journal.Volume

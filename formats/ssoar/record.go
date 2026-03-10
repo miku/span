@@ -175,7 +175,7 @@ func (r Record) FindPages() (string, string, string) {
 			}
 			if len(sms[0]) >= 3 {
 				pagecount := stringDifference(sms[0][2], sms[0][1])
-				return sms[0][0], sms[0][1], pagecount
+				return sms[0][1], sms[0][2], pagecount
 			}
 		}
 	}
@@ -206,9 +206,11 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	case "eBook":
 		output.BookTitle = r.Title()
 		output.Genre = "book"
+		output.RefType = "EBOOK"
 	default:
 		output.ArticleTitle = r.Title()
 		output.Genre = "article"
+		output.RefType = "EJOUR"
 	}
 	output.JournalTitle = r.JournalTitle()
 	output.URL = r.MustGetDataFields("856.u")
@@ -224,7 +226,7 @@ func (r Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.RawDate = r.FindYear()
 	date, err := time.Parse("2006-01-02", output.RawDate)
 	if err != nil {
-		log.Fatal(err)
+		return output, err
 	}
 	output.Date = date
 	output.Languages = r.MustGetDataFields("041.a")
