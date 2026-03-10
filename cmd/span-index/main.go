@@ -223,6 +223,164 @@ var tasks = []task{
 			return nil
 		},
 	},
+	{
+		Name: "authors",
+		Help: "top authors with counts; -p limit:20",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			return printFacet(index, queryFromParams(p), "author_facet", p)
+		},
+	},
+	{
+		Name: "topics",
+		Help: "top subjects/topics with counts; -p limit:20",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			return printFacet(index, queryFromParams(p), "topic_facet", p)
+		},
+	},
+	{
+		Name: "journals",
+		Help: "top journal/container titles with counts; -p limit:20",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			return printFacet(index, queryFromParams(p), "container_title", p)
+		},
+	},
+	{
+		Name: "series",
+		Help: "list series with counts; -p limit:20",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			return printFacet(index, queryFromParams(p), "series", p)
+		},
+	},
+	{
+		Name: "availability",
+		Help: "facet_avail breakdown (Online, Free, etc.)",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			return printFacet(index, queryFromParams(p), "facet_avail", p)
+		},
+	},
+	{
+		Name: "missing",
+		Help: "count docs where a field is empty; -p field:FIELDNAME",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			field, ok := p["field"]
+			if !ok {
+				return fmt.Errorf("parameter field required")
+			}
+			q := fmt.Sprintf("-%s:[* TO *]", field)
+			n, err := index.NumFound(q)
+			if err != nil {
+				return err
+			}
+			fmt.Println(n)
+			return nil
+		},
+	},
+	{
+		Name: "has",
+		Help: "count docs where a field is non-empty; -p field:FIELDNAME",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			field, ok := p["field"]
+			if !ok {
+				return fmt.Errorf("parameter field required")
+			}
+			q := fmt.Sprintf("%s:[* TO *]", field)
+			n, err := index.NumFound(q)
+			if err != nil {
+				return err
+			}
+			fmt.Println(n)
+			return nil
+		},
+	},
+	{
+		Name: "source-collections",
+		Help: "collections for a given source; -p source_id:49",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			sid, ok := p["source_id"]
+			if !ok {
+				return fmt.Errorf("parameter source_id required")
+			}
+			return printFacet(index, fmt.Sprintf("source_id:%q", sid), "mega_collection", p)
+		},
+	},
+	{
+		Name: "source-formats",
+		Help: "format breakdown for a given source; -p source_id:49",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			sid, ok := p["source_id"]
+			if !ok {
+				return fmt.Errorf("parameter source_id required")
+			}
+			return printFacet(index, fmt.Sprintf("source_id:%q", sid), "format", p)
+		},
+	},
+	{
+		Name: "source-languages",
+		Help: "language breakdown for a given source; -p source_id:49",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			sid, ok := p["source_id"]
+			if !ok {
+				return fmt.Errorf("parameter source_id required")
+			}
+			return printFacet(index, fmt.Sprintf("source_id:%q", sid), "language", p)
+		},
+	},
+	{
+		Name: "recent",
+		Help: "most recently indexed docs; -p rows:10",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			rows := "10"
+			if v, ok := p["rows"]; ok {
+				rows = v
+			}
+			vs := url.Values{}
+			vs.Set("q", queryFromParams(p))
+			vs.Set("rows", rows)
+			vs.Set("sort", "last_indexed desc")
+			vs.Set("fl", "id,source_id,title,last_indexed")
+			vs.Set("wt", "json")
+			resp, err := index.Select(vs)
+			if err != nil {
+				return err
+			}
+			for _, doc := range resp.Response.Docs {
+				fmt.Println(string(doc))
+			}
+			return nil
+		},
+	},
+	{
+		Name: "between",
+		Help: "docs published between two years; -p from:2020 -p to:2024",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			from, ok := p["from"]
+			if !ok {
+				return fmt.Errorf("parameter from required (e.g. 2020)")
+			}
+			to, ok := p["to"]
+			if !ok {
+				return fmt.Errorf("parameter to required (e.g. 2024)")
+			}
+			q := fmt.Sprintf("publishDate:[%s TO %s]", from, to)
+			n, err := index.NumFound(q)
+			if err != nil {
+				return err
+			}
+			fmt.Println(n)
+			return nil
+		},
+	},
+	{
+		Name: "institution-sources",
+		Help: "source breakdown for a given institution (ISIL); -p institution:DE-14",
+		Run: func(index solrutil.Index, p map[string]string) error {
+			isil, ok := p["institution"]
+			if !ok {
+				return fmt.Errorf("parameter institution required (e.g. DE-14)")
+			}
+			return printFacet(index, fmt.Sprintf("institution:%q", isil), "source_id", p)
+		},
+	},
 }
 
 // queryFromParams builds a SOLR query from common parameter conventions. If a
