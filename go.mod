@@ -38,5 +38,5 @@ require (
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 )
