@@ -52,7 +52,7 @@ clean:
 # Code quality and performance.
 .PHONY: lint
 lint:
-	golint -set_exit_status ./...
+	staticcheck ./...
 
 .PHONY: bench
 bench:
