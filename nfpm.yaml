@@ -1,0 +1,158 @@
+name: span
+arch: ${GOARCH}
+platform: linux
+version: ${SEMVER}
+version_schema: semver
+epoch: 0
+release: 0
+section: utils
+priority: optional
+maintainer: Martin Czygan <martin.czygan@uni-leipzig.de>
+description: Assorted command line utilities to parse and convert metadata formats, apply licensing, and more.
+vendor: Leipzig University Library
+homepage: https://github.com/ubleipzig/span
+license: MIT
+disable_globbing: false
+
+depends:
+  - libc6 (>= 2.12)
+
+contents:
+  # Binaries
+  - src: span-amsl-discovery
+    dst: /usr/local/bin/span-amsl-discovery
+    file_info:
+      mode: 0755
+
+  - src: span-compare
+    dst: /usr/local/bin/span-compare
+    file_info:
+      mode: 0755
+
+  - src: span-crossref-fast-snapshot
+    dst: /usr/local/bin/span-crossref-fast-snapshot
+    file_info:
+      mode: 0755
+
+  - src: span-crossref-fastproc
+    dst: /usr/local/bin/span-crossref-fastproc
+    file_info:
+      mode: 0755
+
+  - src: span-crossref-members
+    dst: /usr/local/bin/span-crossref-members
+    file_info:
+      mode: 0755
+
+  - src: span-crossref-snapshot
+    dst: /usr/local/bin/span-crossref-snapshot
+    file_info:
+      mode: 0755
+
+  - src: span-crossref-sync
+    dst: /usr/local/bin/span-crossref-sync
+    file_info:
+      mode: 0755
+
+  - src: span-crossref-table
+    dst: /usr/local/bin/span-crossref-table
+    file_info:
+      mode: 0755
+
+  - src: span-doisniffer
+    dst: /usr/local/bin/span-doisniffer
+    file_info:
+      mode: 0755
+
+  - src: span-export
+    dst: /usr/local/bin/span-export
+    file_info:
+      mode: 0755
+
+  - src: span-folio
+    dst: /usr/local/bin/span-folio
+    file_info:
+      mode: 0755
+
+  - src: span-freeze
+    dst: /usr/local/bin/span-freeze
+    file_info:
+      mode: 0755
+
+  - src: span-hcov
+    dst: /usr/local/bin/span-hcov
+    file_info:
+      mode: 0755
+
+  - src: span-import
+    dst: /usr/local/bin/span-import
+    file_info:
+      mode: 0755
+
+  - src: span-index
+    dst: /usr/local/bin/span-index
+    file_info:
+      mode: 0755
+
+  - src: span-local-data
+    dst: /usr/local/bin/span-local-data
+    file_info:
+      mode: 0755
+
+  - src: span-mail
+    dst: /usr/local/bin/span-mail
+    file_info:
+      mode: 0755
+
+  - src: span-oa-filter
+    dst: /usr/local/bin/span-oa-filter
+    file_info:
+      mode: 0755
+
+  - src: span-redact
+    dst: /usr/local/bin/span-redact
+    file_info:
+      mode: 0755
+
+  - src: span-report
+    dst: /usr/local/bin/span-report
+    file_info:
+      mode: 0755
+
+  - src: span-tag
+    dst: /usr/local/bin/span-tag
+    file_info:
+      mode: 0755
+
+  - src: span-update-labels
+    dst: /usr/local/bin/span-update-labels
+    file_info:
+      mode: 0755
+
+  # Man page
+  - src: docs/span.1
+    dst: /usr/local/share/man/man1/span.1
+    file_info:
+      mode: 0644
+
+  # Systemd service
+  - src: packaging/span-webhookd.service
+    dst: /usr/lib/systemd/system/span-webhookd.service
+    file_info:
+      mode: 0644
+
+  # Log file
+  - dst: /var/log/span-webhookd.log
+    type: ghost
+    file_info:
+      mode: 0644
+      owner: daemon
+      group: daemon
+
+umask: 0o002
+
+deb:
+  compression: zstd
+
+rpm:
+  compression: zstd

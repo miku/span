@@ -40,7 +40,8 @@ test:
 	# go mod tidy
 
 $(TARGETS): %: cmd/%/main.go
-	go build -ldflags "-X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
+	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
+	$(if $(shell which upx 2>/dev/null),upx --best --lzma $@,)
 
 .PHONY: clean
 clean:
@@ -72,31 +73,16 @@ vet:
 cover:
 	go test -cover ./...
 
-# Packaging related.
+# nfpm-based packaging (preferred).
+SEMVER := $(shell echo $(VERSION) | sed 's/^v//')
+
 .PHONY: deb
 deb: all
-	mkdir -p packaging/deb/$(PKGNAME)/usr/local/bin
-	cp $(TARGETS) packaging/deb/$(PKGNAME)/usr/local/bin
-	mkdir -p packaging/deb/$(PKGNAME)/usr/local/share/man/man1
-	cp docs/$(PKGNAME).1 packaging/deb/$(PKGNAME)/usr/local/share/man/man1
-	mkdir -p packaging/deb/$(PKGNAME)/usr/lib/systemd/system
-	cp packaging/span-webhookd.service packaging/deb/$(PKGNAME)/usr/lib/systemd/system/
-	cd packaging/deb && fakeroot dpkg-deb -Zzstd --build $(PKGNAME) .
-	mv packaging/deb/$(PKGNAME)_*.deb .
-
+	SEMVER=$(SEMVER) GOARCH=amd64 nfpm package -p deb -f nfpm.yaml
 
 .PHONY: rpm
 rpm: all
-	# on deb based distros, you may need:
-	# sudo rpm --initdb && sudo chmod -R a+r /var/lib/rpm/
-	mkdir -p $(HOME)/rpmbuild/{BUILD,SOURCES,SPECS,RPMS}
-	mkdir -p $(HOME)/rpmbuild/SOURCES/span
-	cp ./packaging/rpm/$(PKGNAME).spec $(HOME)/rpmbuild/SPECS
-	cp $(TARGETS) $(HOME)/rpmbuild/SOURCES/span
-	cp docs/$(PKGNAME).1 $(HOME)/rpmbuild/SOURCES/span
-	cp packaging/span-webhookd.service $(HOME)/rpmbuild/SOURCES/span
-	./packaging/rpm/buildrpm.sh $(PKGNAME)
-	cp $(HOME)/rpmbuild/RPMS/x86_64/$(PKGNAME)-$(VERSION)*.rpm .
+	SEMVER=$(SEMVER) GOARCH=amd64 nfpm package -p rpm -f nfpm.yaml
 
 # Docs related, https://github.com/sunaku/md2man
 docs/$(PKGNAME).1: docs/$(PKGNAME).md
