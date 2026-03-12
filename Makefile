@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-VERSION := 0.2.28
+VERSION := 0.2.29
 TARGETS = \
           span-amsl-discovery \
 		  span-compare \
@@ -41,7 +41,7 @@ test:
 
 $(TARGETS): %: cmd/%/main.go
 	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
-	$(if $(shell which upx 2>/dev/null),upx --best --lzma $@,)
+	$(if $(shell which upx 2>/dev/null),upx -q --best --lzma $@,)
 
 .PHONY: clean
 clean:

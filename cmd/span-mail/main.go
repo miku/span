@@ -18,6 +18,13 @@ import (
 	"github.com/miku/span/mail"
 )
 
+var (
+	sender   = flag.String("f", "", "The value of the From: header (required)")
+	subject  = flag.String("s", "", "The value of the Subject: header (required)")
+	textfile = flag.String("b", "", "The textfile for the Body (required)")
+	output   = flag.String("o", "", "Print the composed message to FILE instead of sending")
+)
+
 // stringSlice implements flag.Value to allow repeated -t flags.
 type stringSlice []string
 
@@ -28,15 +35,9 @@ func (s *stringSlice) Set(value string) error {
 }
 
 func main() {
-	sender := flag.String("f", "", "The value of the From: header (required)")
-	subject := flag.String("s", "", "The value of the Subject: header (required)")
-	textfile := flag.String("b", "", "The textfile for the Body (required)")
-	output := flag.String("o", "", "Print the composed message to FILE instead of sending")
 	var recipients stringSlice
 	flag.Var(&recipients, "t", "A To: header value (at least one required)")
-
 	flag.Parse()
-
 	if *sender == "" {
 		fmt.Fprintln(os.Stderr, "error: -f/--sender is required")
 		flag.Usage()
@@ -57,13 +58,11 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-
 	bodyBytes, err := os.ReadFile(*textfile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error reading body file %s: %v\n", *textfile, err)
 		os.Exit(1)
 	}
-
 	msg := &mail.Message{
 		From:       *sender,
 		To:         recipients,
@@ -71,7 +70,6 @@ func main() {
 		Body:       string(bodyBytes),
 		Precedence: "bulk",
 	}
-
 	if *output != "" {
 		if err := os.WriteFile(*output, msg.Bytes(), 0644); err != nil {
 			fmt.Fprintf(os.Stderr, "error writing output file %s: %v\n", *output, err)
@@ -79,7 +77,6 @@ func main() {
 		}
 		return
 	}
-
 	server := os.Getenv("SPAN_SMTP_SERVER")
 	if err := mail.Send(server+":25", nil, msg); err != nil {
 		fmt.Fprintf(os.Stderr, "error sending mail: %v\n", err)
