@@ -47,6 +47,7 @@ $(TARGETS): %: cmd/%/main.go
 .PHONY: clean
 clean:
 	rm -f $(TARGETS)
+	rm -f span-*.upx
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
