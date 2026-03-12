@@ -16,6 +16,7 @@ TARGETS = \
 		  span-hcov \
 		  span-index \
 		  span-import \
+		  span-mail \
 		  span-local-data \
 		  span-oa-filter \
 		  span-redact \

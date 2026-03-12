@@ -36,9 +36,10 @@ install -m 755 span-doisniffer $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-export $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-freeze $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-hcov $RPM_BUILD_ROOT/usr/local/bin
-install -m 755 span-index $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-import $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-index $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-local-data $RPM_BUILD_ROOT/usr/local/bin
+install -m 755 span-mail $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-oa-filter $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-redact $RPM_BUILD_ROOT/usr/local/bin
 install -m 755 span-report $RPM_BUILD_ROOT/usr/local/bin
@@ -75,9 +76,10 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/bin/span-export
 /usr/local/bin/span-freeze
 /usr/local/bin/span-hcov
-/usr/local/bin/span-index
 /usr/local/bin/span-import
+/usr/local/bin/span-index
 /usr/local/bin/span-local-data
+/usr/local/bin/span-mail
 /usr/local/bin/span-oa-filter
 /usr/local/bin/span-redact
 /usr/local/bin/span-report
