@@ -61,3 +61,7 @@ logs/*
 df.h5
 /tags
 /docs/issues
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
