@@ -14,9 +14,6 @@ homepage: https://github.com/ubleipzig/span
 license: MIT
 disable_globbing: false
 
-depends:
-  - libc6 (>= 2.12)
-
 contents:
   # Binaries
   - src: span-amsl-discovery

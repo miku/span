@@ -40,6 +40,7 @@ test:
 	# go mod tidy
 
 $(TARGETS): %: cmd/%/main.go
+	# CGO_ENABELED required?
 	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
 	$(if $(shell which upx 2>/dev/null),upx -q --best --lzma $@,)
 
