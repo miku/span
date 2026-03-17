@@ -42,6 +42,9 @@ var (
 	sortBufferSize    = flag.String("S", "25%", "sort buffer size")
 	excludesFile      = flag.String("X", "", "file with DOI to exclude, one per line")
 	shuffleInputFiles = flag.Bool("R", false, "shuffle input files")
+	cacheEnabled      = flag.Bool("cache", true, "enable per-file caching of Stage 1 index")
+	cacheDir          = flag.String("cache-dir", "", "override cache directory (default: $XDG_CACHE_HOME/span/crossref-snapshot/)")
+	cacheClear        = flag.Bool("cache-clear", false, "clear cache before running")
 )
 
 func main() {
@@ -77,6 +80,9 @@ func main() {
 		SortBufferSize:    *sortBufferSize,
 		Excludes:          excludes,
 		ShuffleInputFiles: *shuffleInputFiles,
+		CacheEnabled:      *cacheEnabled,
+		CacheDir:          *cacheDir,
+		CacheClear:        *cacheClear,
 	}
 	if err := crossref.CreateSnapshot(opts); err != nil {
 		log.Fatalf("error creating snapshot: %v", err)

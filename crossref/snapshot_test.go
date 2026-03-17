@@ -156,6 +156,139 @@ func verifyOutput(t *testing.T, outputFile string, expectedDOIs map[string]bool)
 	}
 }
 
+func TestCacheKey(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "crossref-cache-key-test-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	// Create a test file
+	testFile := filepath.Join(tempDir, "test-file.json.zst")
+	if err := os.WriteFile(testFile, []byte("test content here"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	key, err := cacheKey(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := "test-file.json.zst_17"
+	if key != expected {
+		t.Errorf("expected cache key %q, got %q", expected, key)
+	}
+
+	// Different file size should produce different key
+	if err := os.WriteFile(testFile, []byte("different"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	key2, err := cacheKey(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if key == key2 {
+		t.Errorf("different file sizes should produce different keys, got %q and %q", key, key2)
+	}
+
+	// Non-existent file should return error
+	_, err = cacheKey(filepath.Join(tempDir, "nonexistent"))
+	if err == nil {
+		t.Error("expected error for non-existent file")
+	}
+}
+
+func TestCachedCreateSnapshot(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "crossref-cache-test-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	cacheDir := filepath.Join(tempDir, "cache")
+	inputFiles, expectedDOIs := createTestInputFiles(t, tempDir)
+
+	// First run — should populate cache
+	outputFile1 := filepath.Join(tempDir, "output1.json")
+	opts := SnapshotOptions{
+		InputFiles:     inputFiles,
+		OutputFile:     outputFile1,
+		TempDir:        tempDir,
+		BatchSize:      10,
+		NumWorkers:     2,
+		SortBufferSize: "10%",
+		KeepTempFiles:  false,
+		Verbose:        true,
+		CacheEnabled:   true,
+		CacheDir:       cacheDir,
+	}
+	if err := CreateSnapshot(opts); err != nil {
+		t.Fatalf("First CreateSnapshot failed: %v", err)
+	}
+	verifyOutput(t, outputFile1, expectedDOIs)
+
+	// Verify cache files were created
+	cacheEntries, err := os.ReadDir(cacheDir)
+	if err != nil {
+		t.Fatalf("Failed to read cache dir: %v", err)
+	}
+	if len(cacheEntries) != len(inputFiles) {
+		t.Errorf("Expected %d cache files, got %d", len(inputFiles), len(cacheEntries))
+	}
+
+	// Second run — should use cache and produce identical results
+	outputFile2 := filepath.Join(tempDir, "output2.json")
+	opts.OutputFile = outputFile2
+	if err := CreateSnapshot(opts); err != nil {
+		t.Fatalf("Second CreateSnapshot (cached) failed: %v", err)
+	}
+	verifyOutput(t, outputFile2, expectedDOIs)
+}
+
+func TestCreateSnapshotCacheClear(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "crossref-cacheclear-test-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	cacheDir := filepath.Join(tempDir, "cache")
+	inputFiles, expectedDOIs := createTestInputFiles(t, tempDir)
+
+	// First run — populate cache
+	outputFile1 := filepath.Join(tempDir, "output1.json")
+	opts := SnapshotOptions{
+		InputFiles:     inputFiles,
+		OutputFile:     outputFile1,
+		TempDir:        tempDir,
+		BatchSize:      10,
+		NumWorkers:     2,
+		SortBufferSize: "10%",
+		CacheEnabled:   true,
+		CacheDir:       cacheDir,
+	}
+	if err := CreateSnapshot(opts); err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify cache was populated
+	entries, err := os.ReadDir(cacheDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) == 0 {
+		t.Fatal("Expected cache files after first run")
+	}
+
+	// Second run with cache-clear — should still produce correct output
+	outputFile2 := filepath.Join(tempDir, "output2.json")
+	opts.OutputFile = outputFile2
+	opts.CacheClear = true
+	if err := CreateSnapshot(opts); err != nil {
+		t.Fatal(err)
+	}
+	verifyOutput(t, outputFile2, expectedDOIs)
+}
+
 // TestSortAndFilter specifically tests the sort and filter stage
 func TestSortAndFilter(t *testing.T) {
 	// Create a temporary directory

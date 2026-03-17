@@ -3,6 +3,7 @@ package crossref
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 	"cmp"
 	"slices"
@@ -105,6 +107,9 @@ type SnapshotOptions struct {
 	Verbose           bool     // Verbose output
 	Excludes          []string // List of DOI to exclude
 	ShuffleInputFiles bool     // Randomize processing order
+	CacheEnabled      bool     // Enable per-file caching of Stage 1 index
+	CacheDir          string   // Cache directory override (empty = default XDG location)
+	CacheClear        bool     // Clear cache before running
 }
 
 type LineNumberEntry struct {
@@ -126,6 +131,7 @@ func DefaultSnapshotOptions() SnapshotOptions {
 		SortBufferSize: "25%", // Note: this should not be >50% as we are using this in parallel for two sort invocations.
 		KeepTempFiles:  false,
 		Verbose:        false,
+		CacheEnabled:   true,
 	}
 }
 
@@ -145,6 +151,81 @@ func ExcludeFilter(excludes []string) func(record Record) bool {
 		_, ok := m[record.DOI]
 		return !ok
 	}
+}
+
+// defaultCacheDir returns the default cache directory following the XDG Base
+// Directory spec.
+func defaultCacheDir() string {
+	if dir := os.Getenv("XDG_CACHE_HOME"); dir != "" {
+		return filepath.Join(dir, "span", "crossref-snapshot")
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return filepath.Join(os.TempDir(), "span-crossref-snapshot-cache")
+	}
+	return filepath.Join(home, ".cache", "span", "crossref-snapshot")
+}
+
+// cacheKey returns a cache key for the given file based on its basename and
+// size. This works because input files are write-once and never modified after
+// harvest.
+func cacheKey(filename string) (string, error) {
+	info, err := os.Stat(filename)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s_%d", filepath.Base(filename), info.Size()), nil
+}
+
+// readCacheToIndex reads a cached Stage 1 index file and writes its contents
+// to the shared index writer, prepending the current input path. Cache format
+// stores lines without the filename column (linenum\ttimestamp\tDOI); the full
+// index format includes it (filename\tlinenum\ttimestamp\tDOI).
+func readCacheToIndex(cachePath, inputPath string, zw *zstd.Encoder, mu *sync.Mutex, batchSize int) error {
+	f, err := os.Open(cachePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	zr, err := zstd.NewReader(f)
+	if err != nil {
+		return err
+	}
+	defer zr.Close()
+	scanner := bufio.NewScanner(zr)
+	var buffer bytes.Buffer
+	entriesProcessed := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			continue
+		}
+		// Prepend current input path to restore full index format
+		_, _ = fmt.Fprintf(&buffer, "%s\t%s\n", inputPath, line)
+		entriesProcessed++
+		if entriesProcessed >= batchSize {
+			mu.Lock()
+			_, err := zw.Write(buffer.Bytes())
+			mu.Unlock()
+			if err != nil {
+				return err
+			}
+			buffer.Reset()
+			entriesProcessed = 0
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	if buffer.Len() > 0 {
+		mu.Lock()
+		_, err := zw.Write(buffer.Bytes())
+		mu.Unlock()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // CreateSnapshot implements a three-stage metadata snapshot approach, given
@@ -211,17 +292,37 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		log.Printf("batch size: %d records\n", opts.BatchSize)
 		log.Printf("sort buffer size: %s\n", opts.SortBufferSize)
 	}
+	// Set up cache directory
+	cacheDir := ""
+	if opts.CacheEnabled {
+		cacheDir = opts.CacheDir
+		if cacheDir == "" {
+			cacheDir = defaultCacheDir()
+		}
+		if opts.CacheClear {
+			if err := os.RemoveAll(cacheDir); err != nil {
+				log.Printf("warning: failed to clear cache: %v", err)
+			}
+		}
+		if err := os.MkdirAll(cacheDir, 0755); err != nil {
+			log.Printf("warning: failed to create cache directory, caching disabled: %v", err)
+			cacheDir = ""
+		}
+	}
 	// Stage 1: Extract DOI, timestamp, filename, and line number to temp file
 	// =======================================================================
 	if opts.Verbose {
 		fmt.Println("stage 1: extracting minimal information from input files")
+		if cacheDir != "" {
+			log.Printf("cache directory: %s", cacheDir)
+		}
 	}
 	t := time.Now()
 	filterFunc := NoFilter
 	if len(opts.Excludes) > 0 {
 		filterFunc = ExcludeFilter(opts.Excludes)
 	}
-	if err := extractMinimalInfo(opts.InputFiles, indexFile, filterFunc, opts.NumWorkers, opts.BatchSize, opts.Verbose); err != nil {
+	if err := extractMinimalInfo(opts.InputFiles, indexFile, filterFunc, opts.NumWorkers, opts.BatchSize, cacheDir, opts.Verbose); err != nil {
 		return fmt.Errorf("error in stage 1: %w", err)
 	}
 	if err := indexFile.Close(); err != nil {
@@ -295,27 +396,24 @@ func processFile(filename string, filterFunc FilterFunc, fn func(line string, re
 	scanner := bufio.NewScanner(r)
 	buf := make([]byte, MaxScanTokenSize)
 	scanner.Buffer(buf, MaxScanTokenSize)
-	var lineNum int64 = 1 // downstream filterline and tools like sed use 1-based line numbers
+	var lineNum int64 // downstream filterline and tools like sed use 1-based line numbers
 	for scanner.Scan() {
+		lineNum++
 		line := scanner.Text()
 		var record Record
 		if err := json.Unmarshal([]byte(line), &record); err != nil {
 			log.Printf("skipping invalid JSON at %s:%d: %v\n", filename, lineNum, err)
-			lineNum++
 			continue
 		}
 		if record.DOI == "" {
-			lineNum++
 			continue
 		}
 		if !filterFunc(record) {
-			lineNum++
 			continue
 		}
 		if err := fn(line, record, lineNum); err != nil {
 			return err
 		}
-		lineNum++
 	}
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("error reading file %s: %w", filename, err)
@@ -354,11 +452,37 @@ func processFilesParallel(inputFiles []string, numWorkers int, processor func(st
 	return nil
 }
 
+// newCacheWriter sets up a temporary file and zstd encoder for writing a
+// cache entry. Returns nils if cacheDir is empty or any setup step fails.
+// On success the caller must close both the encoder and file, then rename
+// the temp file to cachePath. Returns nil values and no error when cacheDir
+// is empty (caching disabled).
+func newCacheWriter(cacheDir, inputPath string) (*os.File, *zstd.Encoder, string, error) {
+	if cacheDir == "" {
+		return nil, nil, "", nil
+	}
+	key, err := cacheKey(inputPath)
+	if err != nil {
+		return nil, nil, "", err
+	}
+	cachePath := filepath.Join(cacheDir, key+".idx.zst")
+	tmpFile, err := os.CreateTemp(cacheDir, ".tmp-*.idx.zst")
+	if err != nil {
+		return nil, nil, "", err
+	}
+	cw, err := zstd.NewWriter(tmpFile)
+	if err != nil {
+		return nil, nil, "", errors.Join(err, tmpFile.Close(), os.Remove(tmpFile.Name()))
+	}
+	return tmpFile, cw, cachePath, nil
+}
+
 // extractMinimalInfo processes all input files and extracts DOI, timestamp,
 // filename, and line number; this data will go into an indexFile;
 // uncompressed, this file is about 70GB in size, but could probably compressed
-// as well
-func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc FilterFunc, numWorkers, batchSize int, verbose bool) error {
+// as well. If cacheDir is non-empty, per-file results are cached to avoid
+// reprocessing unchanged files on subsequent runs.
+func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc FilterFunc, numWorkers, batchSize int, cacheDir string, verbose bool) (retErr error) {
 	var (
 		indexMutex   sync.Mutex
 		numProcessed atomic.Uint64
@@ -371,21 +495,50 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 		return err
 	}
 	defer func() {
-		_ = zw.Flush()
-		_ = zw.Close()
+		if err := zw.Close(); err != nil && retErr == nil {
+			retErr = fmt.Errorf("error closing index writer: %w", err)
+		}
 	}()
 	return processFilesParallel(inputFiles, numWorkers, func(inputPath string) error {
+		// Try cache hit
+		if cacheDir != "" {
+			if key, err := cacheKey(inputPath); err == nil {
+				cachePath := filepath.Join(cacheDir, key+".idx.zst")
+				if readCacheToIndex(cachePath, inputPath, zw, &indexMutex, batchSize) == nil {
+					numProcessed.Add(1)
+					if verbose {
+						k := numProcessed.Load()
+						donePct := float64(k) / float64(len(inputFiles)) * 100
+						log.Printf("cached [%d/%d][%0.2f%%]: %s", k, len(inputFiles), donePct, inputPath)
+					}
+					return nil
+				}
+			}
+		}
 		if verbose {
 			log.Printf("processing file: %s", inputPath)
+		}
+		// Set up cache writer for atomic write
+		cacheFile, cacheWriter, cachePath, err := newCacheWriter(cacheDir, inputPath)
+		if err != nil {
+			log.Printf("warning: failed to set up cache for %s: %v", inputPath, err)
 		}
 		var (
 			buffer           bytes.Buffer
 			entriesProcessed = 0
+			cacheWriteOK     = true
 		)
-		err := processFile(inputPath, filterFunc, func(line string, record Record, lineNum int64) error {
+		processErr := processFile(inputPath, filterFunc, func(line string, record Record, lineNum int64) error {
 			// Format: filename \t lineNumber \t timestamp \t DOI
 			_, _ = fmt.Fprintf(&buffer, "%s\t%d\t%d\t%s\n",
 				inputPath, lineNum, record.Indexed.Timestamp, record.DOI)
+			// Cache format: lineNumber \t timestamp \t DOI (no filename)
+			if cacheWriter != nil && cacheWriteOK {
+				if _, err := fmt.Fprintf(cacheWriter, "%d\t%d\t%s\n",
+					lineNum, record.Indexed.Timestamp, record.DOI); err != nil {
+					cacheWriteOK = false
+				}
+			}
 			entriesProcessed++
 			if entriesProcessed >= batchSize {
 				indexMutex.Lock()
@@ -399,8 +552,23 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 			}
 			return nil
 		})
-		if err != nil {
-			return fmt.Errorf("error processing file %s: %w", inputPath, err)
+		// Finalize cache file
+		if cacheWriter != nil {
+			closeErr := errors.Join(cacheWriter.Close(), cacheFile.Close())
+			if processErr == nil && closeErr == nil && cacheWriteOK {
+				if err := os.Rename(cacheFile.Name(), cachePath); err != nil {
+					log.Printf("warning: failed to write cache for %s: %v", inputPath, err)
+					_ = os.Remove(cacheFile.Name())
+				}
+			} else {
+				if closeErr != nil {
+					log.Printf("warning: failed to finalize cache for %s: %v", inputPath, closeErr)
+				}
+				_ = os.Remove(cacheFile.Name())
+			}
+		}
+		if processErr != nil {
+			return fmt.Errorf("error processing file %s: %w", inputPath, processErr)
 		}
 		numProcessed.Add(1)
 		// Write any remaining entries, report progress.
@@ -661,7 +829,10 @@ func createFallbackScript() (string, error) {
 		_ = os.Remove(scriptFile.Name())
 		return "", fmt.Errorf("error writing fallback script: %w", err)
 	}
-	_ = scriptFile.Close()
+	if err := scriptFile.Close(); err != nil {
+		_ = os.Remove(scriptFile.Name())
+		return "", fmt.Errorf("error closing fallback script: %w", err)
+	}
 	if err := os.Chmod(scriptFile.Name(), 0755); err != nil {
 		_ = os.Remove(scriptFile.Name())
 		return "", fmt.Errorf("error making fallback script executable: %w", err)
