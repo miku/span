@@ -3,6 +3,7 @@ VERSION := 0.2.29
 TARGETS = \
           span-amsl-discovery \
 		  span-compare \
+		  span-compare-file \
           span-crossref-members \
 		  span-crossref-fast-snapshot \
 		  span-crossref-fastproc \

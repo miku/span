@@ -26,6 +26,11 @@ contents:
     file_info:
       mode: 0755
 
+  - src: span-compare-file
+    dst: /usr/local/bin/span-compare-file
+    file_info:
+      mode: 0755
+
   - src: span-crossref-fast-snapshot
     dst: /usr/local/bin/span-crossref-fast-snapshot
     file_info:

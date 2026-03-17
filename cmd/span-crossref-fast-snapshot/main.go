@@ -13,6 +13,13 @@
 // Data Units Written:                 114,188,635 [58.4 TB]
 // Data Units Written:                 114,185,851 [58.4 TB]
 // Data Units Written:                 114,109,391 [58.4 TB]
+//
+// # for d in /dev/nvme{0..3}; do smartctl -A $d | grep "Data Units Written"; done # 2026-03-17
+// Data Units Written:                 129,076,907 [66.0 TB]
+// Data Units Written:                 129,141,986 [66.1 TB]
+// Data Units Written:                 129,051,496 [66.0 TB]
+// Data Units Written:                 129,145,327 [66.1 TB]
+
 package main
 
 import (
