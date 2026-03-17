@@ -10,6 +10,7 @@ import (
 	"hash/fnv"
 	"io"
 	"log"
+	"log/slog"
 	"math/rand/v2"
 	"os"
 	"os/exec"
@@ -99,19 +100,20 @@ type Record struct {
 
 // SnapshotOptions contains configuration for the snapshot process.
 type SnapshotOptions struct {
-	InputFiles        []string // InputFiles, following a Record structure
-	OutputFile        string   // OutputFile is the file the snapshot is written to
-	TempDir           string   // TempDir
-	BatchSize         int      // BatchSize is the number records we process at once, affects memory usage
-	NumWorkers        int      // Threads
-	SortBufferSize    string   // For sort -S parameter (e.g. "25%"), higher values make sort faste
-	KeepTempFiles     bool     // For debugging
-	Verbose           bool     // Verbose output
-	Excludes          []string // List of DOI to exclude
-	ShuffleInputFiles bool     // Randomize processing order
-	CacheEnabled      bool     // Enable per-file caching of Stage 1 index
-	CacheDir          string   // Cache directory override (empty = default XDG location)
-	CacheClear        bool     // Clear cache before running
+	InputFiles        []string     // InputFiles, following a Record structure
+	OutputFile        string       // OutputFile is the file the snapshot is written to
+	TempDir           string       // TempDir
+	BatchSize         int          // BatchSize is the number records we process at once, affects memory usage
+	NumWorkers        int          // Threads
+	SortBufferSize    string       // For sort -S parameter (e.g. "25%"), higher values make sort faste
+	KeepTempFiles     bool         // For debugging
+	Verbose           bool         // Verbose output (controls default Logger level)
+	Excludes          []string     // List of DOI to exclude
+	ShuffleInputFiles bool         // Randomize processing order
+	CacheEnabled      bool         // Enable per-file caching of Stage 1 index
+	CacheDir          string       // Cache directory override (empty = default XDG location)
+	CacheClear        bool         // Clear cache before running
+	Logger            *slog.Logger // Logger for structured logging (nil = default based on Verbose)
 }
 
 type LineNumberEntry struct {
@@ -184,14 +186,12 @@ func cacheKey(filename string) (string, error) {
 
 // cleanupStaleTemp removes files matching a glob pattern in a directory. Used
 // to clean up temp files left behind by aborted previous runs.
-func cleanupStaleTemp(dir, pattern string, verbose bool) {
+func cleanupStaleTemp(dir, pattern string, logger *slog.Logger) {
 	matches, err := filepath.Glob(filepath.Join(dir, pattern))
 	if err != nil || len(matches) == 0 {
 		return
 	}
-	if verbose {
-		log.Printf("cleaning up %d stale temp file(s) in %s", len(matches), dir)
-	}
+	logger.Debug("cleaning up stale temp files", "count", len(matches), "dir", dir)
 	for _, match := range matches {
 		_ = os.Remove(match)
 	}
@@ -268,6 +268,13 @@ func CreateSnapshot(opts SnapshotOptions) error {
 	if len(opts.InputFiles) == 0 {
 		return fmt.Errorf("no input files provided")
 	}
+	if opts.Logger == nil {
+		level := slog.LevelWarn
+		if opts.Verbose {
+			level = slog.LevelDebug
+		}
+		opts.Logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: level}))
+	}
 	switch {
 	case opts.ShuffleInputFiles:
 		rand.Shuffle(len(opts.InputFiles), func(i, j int) {
@@ -304,83 +311,69 @@ func CreateSnapshot(opts SnapshotOptions) error {
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return err
 	}
-	if opts.Verbose {
-		log.Printf("processing %d files with %d workers\n", len(opts.InputFiles), opts.NumWorkers)
-		log.Printf("output file: %s\n", opts.OutputFile)
-		log.Printf("temporary index file: %s\n", indexFile.Name())
-		log.Printf("temporary line numbers file: %s\n", lineNumsFile.Name())
-		log.Printf("batch size: %d records\n", opts.BatchSize)
-		log.Printf("sort buffer size: %s\n", opts.SortBufferSize)
-	}
+	opts.Logger.Info("configuration",
+		"files", len(opts.InputFiles),
+		"workers", opts.NumWorkers,
+		"output", opts.OutputFile,
+		"index", indexFile.Name(),
+		"linenums", lineNumsFile.Name(),
+		"batch_size", opts.BatchSize,
+		"sort_buffer", opts.SortBufferSize,
+	)
 	// Clean up stale temp files from aborted previous runs.
-	cleanupStaleTemp(outputDir, "span-extract-*.tmp", opts.Verbose)
+	cleanupStaleTemp(outputDir, "span-extract-*.tmp", opts.Logger)
 	// Set up cache directory
-	cacheDir := ""
 	if opts.CacheEnabled {
-		cacheDir = opts.CacheDir
-		if cacheDir == "" {
-			cacheDir = defaultCacheDir()
+		if opts.CacheDir == "" {
+			opts.CacheDir = defaultCacheDir()
 		}
 		if opts.CacheClear {
-			if err := os.RemoveAll(cacheDir); err != nil {
-				log.Printf("warning: failed to clear cache: %v", err)
+			if err := os.RemoveAll(opts.CacheDir); err != nil {
+				opts.Logger.Warn("failed to clear cache", "err", err)
 			}
 		}
-		if err := os.MkdirAll(cacheDir, 0755); err != nil {
-			log.Printf("warning: failed to create cache directory, caching disabled: %v", err)
-			cacheDir = ""
+		if err := os.MkdirAll(opts.CacheDir, 0755); err != nil {
+			opts.Logger.Warn("failed to create cache directory, caching disabled", "err", err)
+			opts.CacheDir = ""
 		} else {
-			cleanupStaleTemp(cacheDir, ".tmp-*.idx.zst", opts.Verbose)
+			cleanupStaleTemp(opts.CacheDir, ".tmp-*.idx.zst", opts.Logger)
 		}
 	}
 	// Stage 1: Extract DOI, timestamp, filename, and line number to temp file
 	// =======================================================================
-	if opts.Verbose {
-		fmt.Println("stage 1: extracting minimal information from input files")
-		if cacheDir != "" {
-			log.Printf("cache directory: %s", cacheDir)
-		}
-	}
+	opts.Logger.Info("stage 1: extracting minimal information from input files",
+		"cache_dir", opts.CacheDir,
+	)
 	t := time.Now()
 	filterFunc := NoFilter
 	if len(opts.Excludes) > 0 {
 		filterFunc = ExcludeFilter(opts.Excludes)
 	}
-	if err := extractMinimalInfo(opts.InputFiles, indexFile, filterFunc, opts.NumWorkers, opts.BatchSize, cacheDir, opts.Verbose); err != nil {
+	if err := extractMinimalInfo(indexFile, filterFunc, &opts); err != nil {
 		return fmt.Errorf("error in stage 1: %w", err)
 	}
 	if err := indexFile.Close(); err != nil {
 		return fmt.Errorf("error closing index file: %w", err)
 	}
-	if opts.Verbose {
-		log.Printf("stage 1 completed in %s", time.Since(t)) // 1h21m26.990901593s
-	}
+	opts.Logger.Info("stage 1 completed", "elapsed", time.Since(t))
 	// Stage 2: Sort and find latest version of each DOI
 	// =================================================
-	if opts.Verbose {
-		log.Println("stage 2: identifying latest versions of each DOI")
-	}
+	opts.Logger.Info("stage 2: identifying latest versions of each DOI")
 	t = time.Now()
-	if err := identifyLatestVersions(indexFile.Name(), lineNumsFile.Name(), opts.SortBufferSize, opts.Verbose); err != nil {
+	if err := identifyLatestVersions(indexFile.Name(), lineNumsFile.Name(), &opts); err != nil {
 		return fmt.Errorf("error in stage 2: %w", err)
 	}
-	if opts.Verbose {
-		log.Printf("stage 2 completed in %s", time.Since(t)) // 22m1.831171277s
-	}
+	opts.Logger.Info("stage 2 completed", "elapsed", time.Since(t))
 	// Stage 3: Extract identified lines to create final output
 	// ========================================================
-	if opts.Verbose {
-		log.Println("stage 3: extracting relevant records to output file")
-	}
+	opts.Logger.Info("stage 3: extracting relevant records to output file")
 	t = time.Now()
-	if err := extractRelevantRecords(lineNumsFile.Name(), opts.InputFiles, opts.OutputFile, opts.SortBufferSize, opts.NumWorkers, opts.Verbose); err != nil {
+	if err := extractRelevantRecords(lineNumsFile.Name(), &opts); err != nil {
 		return fmt.Errorf("error in stage 3: %w", err)
 	}
-	if opts.Verbose {
-		// [i7-13900T] stage 3 completed in 1h40m0.654023657s (previously, with pure Go zstd and filtering it took 5h29m)
-		// [E5645] 2025/04/28 15:43:46 stage 3 completed in 4h15m39.224463716s
-		log.Printf("stage 3 completed in %s", time.Since(t)) // 2h4m54.969516444s
-	}
+	// [i7-13900T] stage 3 completed in 1h40m0.654023657s (previously, with pure Go zstd and filtering it took 5h29m)
+	// [E5645] 2025/04/28 15:43:46 stage 3 completed in 4h15m39.224463716s
+	opts.Logger.Info("stage 3 completed", "elapsed", time.Since(t))
 	return nil
 }
 
@@ -506,14 +499,12 @@ func newCacheWriter(cacheDir, inputPath string) (*os.File, *zstd.Encoder, string
 // uncompressed, this file is about 70GB in size, but could probably compressed
 // as well. If cacheDir is non-empty, per-file results are cached to avoid
 // reprocessing unchanged files on subsequent runs.
-func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc FilterFunc, numWorkers, batchSize int, cacheDir string, verbose bool) (retErr error) {
+func extractMinimalInfo(indexFile *os.File, filterFunc FilterFunc, opts *SnapshotOptions) (retErr error) {
 	var (
 		indexMutex   sync.Mutex
 		numProcessed atomic.Uint64
 	)
-	if verbose {
-		log.Printf("extracting minimal information with %d workers", numWorkers)
-	}
+	opts.Logger.Debug("extracting minimal information", "workers", opts.NumWorkers)
 	zw, err := zstd.NewWriter(indexFile)
 	if err != nil {
 		return err
@@ -523,29 +514,25 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 			retErr = fmt.Errorf("error closing index writer: %w", err)
 		}
 	}()
-	return processFilesParallel(inputFiles, numWorkers, func(inputPath string) error {
+	return processFilesParallel(opts.InputFiles, opts.NumWorkers, func(inputPath string) error {
 		// Try cache hit
-		if cacheDir != "" {
+		if opts.CacheDir != "" {
 			if key, err := cacheKey(inputPath); err == nil {
-				cachePath := filepath.Join(cacheDir, key+".idx.zst")
-				if readCacheToIndex(cachePath, inputPath, zw, &indexMutex, batchSize) == nil {
+				cachePath := filepath.Join(opts.CacheDir, key+".idx.zst")
+				if readCacheToIndex(cachePath, inputPath, zw, &indexMutex, opts.BatchSize) == nil {
 					numProcessed.Add(1)
-					if verbose {
-						k := numProcessed.Load()
-						donePct := float64(k) / float64(len(inputFiles)) * 100
-						log.Printf("cached [%d/%d][%0.2f%%]: %s [%s]", k, len(inputFiles), donePct, inputPath, key)
-					}
+					k := numProcessed.Load()
+					donePct := float64(k) / float64(len(opts.InputFiles)) * 100
+					opts.Logger.Debug("cached", "progress", fmt.Sprintf("[%d/%d][%0.2f%%]", k, len(opts.InputFiles), donePct), "file", inputPath, "key", key)
 					return nil
 				}
 			}
 		}
-		if verbose {
-			log.Printf("processing file: %s", inputPath)
-		}
+		opts.Logger.Debug("processing file", "path", inputPath)
 		// Set up cache writer for atomic write
-		cacheFile, cacheWriter, cachePath, err := newCacheWriter(cacheDir, inputPath)
+		cacheFile, cacheWriter, cachePath, err := newCacheWriter(opts.CacheDir, inputPath)
 		if err != nil {
-			log.Printf("warning: failed to set up cache for %s: %v", inputPath, err)
+			opts.Logger.Warn("failed to set up cache", "file", inputPath, "err", err)
 		}
 		var (
 			buffer           bytes.Buffer
@@ -564,7 +551,7 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 				}
 			}
 			entriesProcessed++
-			if entriesProcessed >= batchSize {
+			if entriesProcessed >= opts.BatchSize {
 				indexMutex.Lock()
 				_, err := zw.Write(buffer.Bytes())
 				indexMutex.Unlock()
@@ -581,12 +568,12 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 			closeErr := errors.Join(cacheWriter.Close(), cacheFile.Close())
 			if processErr == nil && closeErr == nil && cacheWriteOK {
 				if err := os.Rename(cacheFile.Name(), cachePath); err != nil {
-					log.Printf("warning: failed to write cache for %s: %v", inputPath, err)
+					opts.Logger.Warn("failed to write cache", "file", inputPath, "err", err)
 					_ = os.Remove(cacheFile.Name())
 				}
 			} else {
 				if closeErr != nil {
-					log.Printf("warning: failed to finalize cache for %s: %v", inputPath, closeErr)
+					opts.Logger.Warn("failed to finalize cache", "file", inputPath, "err", closeErr)
 				}
 				_ = os.Remove(cacheFile.Name())
 			}
@@ -603,23 +590,19 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 			if err != nil {
 				return err
 			}
-			if verbose {
-				k := numProcessed.Load()
-				donePct := float64(k) / float64(len(inputFiles)) * 100
-				log.Printf("done [%d/%d][%0.2f%%]: %s", k, len(inputFiles), donePct, inputPath)
-			}
+			k := numProcessed.Load()
+			donePct := float64(k) / float64(len(opts.InputFiles)) * 100
+			opts.Logger.Debug("done", "progress", fmt.Sprintf("[%d/%d][%0.2f%%]", k, len(opts.InputFiles), donePct), "file", inputPath)
 		}
 		return nil
 	})
 }
 
 // identifyLatestVersions sorts the index and identifies the latest version of each DOI
-func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verbose bool) error {
-	if verbose {
-		log.Println("sorting and identifying latest versions")
-	}
+func identifyLatestVersions(indexFile, lineNumsFile string, opts *SnapshotOptions) error {
+	opts.Logger.Debug("sorting and identifying latest versions")
+	sortBufferSize := opts.SortBufferSize
 	if sortBufferSize == "" {
-		// Initial buffer size, as percentage of RAM.
 		sortBufferSize = "25%"
 	}
 	var pipeline string
@@ -635,9 +618,7 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 			"set -o pipefail; LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -k3,3nr %s | LC_ALL=C sort --compress-program=zstd --parallel %d -S%s -k4,4 -u | cut -f1,2 > %s",
 			runtime.NumCPU(), sortBufferSize, indexFile, runtime.NumCPU(), sortBufferSize, lineNumsFile)
 	}
-	if verbose {
-		log.Printf("executing sort pipeline: %s", pipeline)
-	}
+	opts.Logger.Debug("executing sort pipeline", "cmd", pipeline)
 	cmd := exec.Command("bash", "-c", pipeline)
 	b, err := cmd.CombinedOutput()
 	if err != nil {
@@ -650,9 +631,7 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 	if fileInfo.Size() == 0 {
 		return fmt.Errorf("error: line numbers file is empty after sorting")
 	}
-	if verbose {
-		log.Printf("sorting and filtering complete, output file size: %d bytes", fileInfo.Size())
-	}
+	opts.Logger.Debug("sorting and filtering complete", "size_bytes", fileInfo.Size())
 	return nil
 }
 
@@ -660,11 +639,9 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 // in parallel, then concatenates the results in input order. Each file is
 // extracted to its own temp file so workers don't contend on a shared output.
 // zstd frames can be concatenated, so the final cat produces a valid file.
-func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile string, sortBufferSize string, numWorkers int, verbose bool) error {
-	if verbose {
-		fmt.Println("extracting relevant records")
-	}
-	fileLineMap, err := groupLineNumbersByFile(lineNumsFile, sortBufferSize, verbose)
+func extractRelevantRecords(lineNumsFile string, opts *SnapshotOptions) error {
+	opts.Logger.Debug("extracting relevant records")
+	fileLineMap, err := groupLineNumbersByFile(lineNumsFile, opts)
 	if err != nil {
 		return err
 	}
@@ -673,18 +650,16 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 		entry    *LineNumberEntry
 		tempFile string
 	}
-	outputDir := filepath.Dir(outputFile)
+	outputDir := filepath.Dir(opts.OutputFile)
 	workMap := make(map[string]*extractWork)
 	var (
 		filesToExtract []string
 		totalExtracted int64
 	)
-	for _, inputFile := range inputFiles {
+	for _, inputFile := range opts.InputFiles {
 		entry, ok := fileLineMap[inputFile]
 		if !ok {
-			if verbose {
-				log.Printf("no records to extract from %s", inputFile)
-			}
+			opts.Logger.Debug("no records to extract", "file", inputFile)
 			continue
 		}
 		tmpFile, err := os.CreateTemp(outputDir, "span-extract-*.tmp")
@@ -714,20 +689,18 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 		defer func() { _ = os.Remove(filterlineExe) }()
 	}
 	// Extract in parallel — each file writes to its own temp file.
-	if err := processFilesParallel(filesToExtract, numWorkers, func(inputFile string) error {
+	if err := processFilesParallel(filesToExtract, opts.NumWorkers, func(inputFile string) error {
 		w := workMap[inputFile]
-		if err := extractLinesFromFile(inputFile, w.entry.LineNumbersFilename, w.tempFile, filterlineExe, verbose); err != nil {
+		if err := extractLinesFromFile(inputFile, w.entry.LineNumbersFilename, w.tempFile, filterlineExe, opts.Logger); err != nil {
 			return err
 		}
-		if verbose {
-			log.Printf("extracted %d records from %s", w.entry.NumLines, inputFile)
-		}
+		opts.Logger.Debug("extracted records", "count", w.entry.NumLines, "file", inputFile)
 		return nil
 	}); err != nil {
 		return err
 	}
 	// Concatenate temp files in input order to produce the final output.
-	outFile, err := os.Create(outputFile)
+	outFile, err := os.Create(opts.OutputFile)
 	if err != nil {
 		return fmt.Errorf("error creating output file: %w", err)
 	}
@@ -749,9 +722,7 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 	if err := outFile.Close(); err != nil {
 		return fmt.Errorf("error closing output file: %w", err)
 	}
-	if verbose {
-		log.Printf("total records extracted: %d", totalExtracted)
-	}
+	opts.Logger.Info("total records extracted", "count", totalExtracted)
 	return nil
 }
 
@@ -759,7 +730,7 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 // and will write out one TSV file with just the line number for each file.
 // XXX: This may fail, if the number of input files gets closer to
 // /proc/sys/fs/file-max.
-func groupLineNumbersByFile(lineNumsFile string, sortBufferSize string, verbose bool) (LineNumbersMap, error) {
+func groupLineNumbersByFile(lineNumsFile string, opts *SnapshotOptions) (LineNumbersMap, error) {
 	file, err := os.Open(lineNumsFile)
 	if err != nil {
 		return nil, fmt.Errorf("error opening line numbers file: %w", err)
@@ -832,14 +803,14 @@ func groupLineNumbersByFile(lineNumsFile string, sortBufferSize string, verbose 
 	// We need to sort the file with the line numbers for the "filterline"
 	// approach to work.
 	for _, entry := range fileLineMap {
-		cmd := exec.Command("sort", "-n", "-S", sortBufferSize,
+		cmd := exec.Command("sort", "-n", "-S", opts.SortBufferSize,
 			"--parallel", strconv.Itoa(runtime.NumCPU()),
 			"-o", entry.LineNumbersFilename, entry.LineNumbersFilename)
 		cmd.Env = os.Environ()
 		cmd.Env = append(cmd.Env, "LC_ALL=C")
 		b, err := cmd.CombinedOutput()
 		if err != nil {
-			log.Printf("sorting line numbers file failed: %v", string(b))
+			opts.Logger.Error("sorting line numbers file failed", "output", string(b))
 			return nil, err
 		}
 	}
@@ -858,7 +829,7 @@ func resolveFilterlineExe() (string, error) {
 
 // extractLinesFromFile uses the provided filterline executable to extract
 // specific lines from a file.
-func extractLinesFromFile(filename string, lineNumbersFile string, outputFile string, filterlineExe string, verbose bool) error {
+func extractLinesFromFile(filename, lineNumbersFile, outputFile, filterlineExe string, logger *slog.Logger) error {
 	var cmd *exec.Cmd
 	switch {
 	case strings.HasSuffix(filename, ".zst"):
@@ -868,12 +839,10 @@ func extractLinesFromFile(filename string, lineNumbersFile string, outputFile st
 	default:
 		cmd = exec.Command("bash", "-c", fmt.Sprintf("set -o pipefail; %s %s %s >> %s", filterlineExe, lineNumbersFile, filename, outputFile))
 	}
-	if verbose {
-		log.Println(cmd)
-	}
+	logger.Debug("running filterline", "cmd", cmd.String())
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Printf("command failed: %v", string(b))
+		logger.Error("command failed", "output", string(b))
 	}
 	return err
 }

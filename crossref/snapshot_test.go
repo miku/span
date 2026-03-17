@@ -3,6 +3,7 @@ package crossref
 import (
 	"bufio"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -326,7 +327,12 @@ func TestSortAndFilter(t *testing.T) {
 	lineNumsFile := filepath.Join(tempDir, "linenums.txt")
 
 	// Run the sort and filter
-	if err := identifyLatestVersions(indexFile, lineNumsFile, "10%", true); err != nil {
+	opts := &SnapshotOptions{
+		SortBufferSize: "10%",
+		Verbose:        true,
+		Logger:         slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})),
+	}
+	if err := identifyLatestVersions(indexFile, lineNumsFile, opts); err != nil {
 		time.Sleep(30 * time.Second)
 		t.Fatalf("identifyLatestVersions failed: %v", err)
 	}

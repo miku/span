@@ -19,6 +19,9 @@
 // Data Units Written:                 129,141,986 [66.1 TB]
 // Data Units Written:                 129,051,496 [66.0 TB]
 // Data Units Written:                 129,145,327 [66.1 TB]
+//
+// w/  cache: 2026/03/17 17:51:30 stage 1 completed in 2h4m9.345486823s
+// w/o cache: 2026/03/17 18:14:51 stage 1 completed in 16m7.102753007s (12%)
 
 package main
 
