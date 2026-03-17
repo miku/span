@@ -173,9 +173,9 @@ func TestCacheKey(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := "test-file.json.zst_17"
-	if key != expected {
-		t.Errorf("expected cache key %q, got %q", expected, key)
+	// FNV-128a hash → 32 hex chars
+	if len(key) != 32 {
+		t.Errorf("expected 32-char hex key, got %q (len %d)", key, len(key))
 	}
 
 	// Different file size should produce different key

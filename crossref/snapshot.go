@@ -3,8 +3,11 @@ package crossref
 import (
 	"bufio"
 	"bytes"
+	"cmp"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"io"
 	"log"
 	"math/rand/v2"
@@ -13,7 +16,6 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
-	"cmp"
 	"slices"
 	"strconv"
 	"strings"
@@ -166,15 +168,33 @@ func defaultCacheDir() string {
 	return filepath.Join(home, ".cache", "span", "crossref-snapshot")
 }
 
-// cacheKey returns a cache key for the given file based on its basename and
+// cacheKey returns a hex-encoded FNV-128a hash of the file's basename and
 // size. This works because input files are write-once and never modified after
-// harvest.
+// harvest. The hash produces opaque, fixed-length filenames suitable for a
+// cache directory; the verbose log shows the mapping for debugging.
 func cacheKey(filename string) (string, error) {
 	info, err := os.Stat(filename)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s_%d", filepath.Base(filename), info.Size()), nil
+	h := fnv.New128a()
+	fmt.Fprintf(h, "%s\x00%d", filepath.Base(filename), info.Size())
+	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// cleanupStaleTemp removes files matching a glob pattern in a directory. Used
+// to clean up temp files left behind by aborted previous runs.
+func cleanupStaleTemp(dir, pattern string, verbose bool) {
+	matches, err := filepath.Glob(filepath.Join(dir, pattern))
+	if err != nil || len(matches) == 0 {
+		return
+	}
+	if verbose {
+		log.Printf("cleaning up %d stale temp file(s) in %s", len(matches), dir)
+	}
+	for _, match := range matches {
+		_ = os.Remove(match)
+	}
 }
 
 // readCacheToIndex reads a cached Stage 1 index file and writes its contents
@@ -193,7 +213,7 @@ func readCacheToIndex(cachePath, inputPath string, zw *zstd.Encoder, mu *sync.Mu
 	}
 	defer zr.Close()
 	scanner := bufio.NewScanner(zr)
-	var buffer bytes.Buffer
+	var buf bytes.Buffer
 	entriesProcessed := 0
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -201,25 +221,25 @@ func readCacheToIndex(cachePath, inputPath string, zw *zstd.Encoder, mu *sync.Mu
 			continue
 		}
 		// Prepend current input path to restore full index format
-		_, _ = fmt.Fprintf(&buffer, "%s\t%s\n", inputPath, line)
+		_, _ = fmt.Fprintf(&buf, "%s\t%s\n", inputPath, line)
 		entriesProcessed++
 		if entriesProcessed >= batchSize {
 			mu.Lock()
-			_, err := zw.Write(buffer.Bytes())
+			_, err := zw.Write(buf.Bytes())
 			mu.Unlock()
 			if err != nil {
 				return err
 			}
-			buffer.Reset()
+			buf.Reset()
 			entriesProcessed = 0
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		return err
 	}
-	if buffer.Len() > 0 {
+	if buf.Len() > 0 {
 		mu.Lock()
-		_, err := zw.Write(buffer.Bytes())
+		_, err := zw.Write(buf.Bytes())
 		mu.Unlock()
 		if err != nil {
 			return err
@@ -292,6 +312,8 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		log.Printf("batch size: %d records\n", opts.BatchSize)
 		log.Printf("sort buffer size: %s\n", opts.SortBufferSize)
 	}
+	// Clean up stale temp files from aborted previous runs.
+	cleanupStaleTemp(outputDir, "span-extract-*.tmp", opts.Verbose)
 	// Set up cache directory
 	cacheDir := ""
 	if opts.CacheEnabled {
@@ -307,6 +329,8 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		if err := os.MkdirAll(cacheDir, 0755); err != nil {
 			log.Printf("warning: failed to create cache directory, caching disabled: %v", err)
 			cacheDir = ""
+		} else {
+			cleanupStaleTemp(cacheDir, ".tmp-*.idx.zst", opts.Verbose)
 		}
 	}
 	// Stage 1: Extract DOI, timestamp, filename, and line number to temp file
@@ -349,7 +373,7 @@ func CreateSnapshot(opts SnapshotOptions) error {
 		log.Println("stage 3: extracting relevant records to output file")
 	}
 	t = time.Now()
-	if err := extractRelevantRecords(lineNumsFile.Name(), opts.InputFiles, opts.OutputFile, opts.SortBufferSize, opts.Verbose); err != nil {
+	if err := extractRelevantRecords(lineNumsFile.Name(), opts.InputFiles, opts.OutputFile, opts.SortBufferSize, opts.NumWorkers, opts.Verbose); err != nil {
 		return fmt.Errorf("error in stage 3: %w", err)
 	}
 	if opts.Verbose {
@@ -509,7 +533,7 @@ func extractMinimalInfo(inputFiles []string, indexFile *os.File, filterFunc Filt
 					if verbose {
 						k := numProcessed.Load()
 						donePct := float64(k) / float64(len(inputFiles)) * 100
-						log.Printf("cached [%d/%d][%0.2f%%]: %s", k, len(inputFiles), donePct, inputPath)
+						log.Printf("cached [%d/%d][%0.2f%%]: %s [%s]", k, len(inputFiles), donePct, inputPath, key)
 					}
 					return nil
 				}
@@ -632,9 +656,11 @@ func identifyLatestVersions(indexFile, lineNumsFile, sortBufferSize string, verb
 	return nil
 }
 
-// extractRelevantRecords extracts the identified lines from the original
-// files. After successful completion, all temporary files will be cleaned up.
-func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile string, sortBufferSize string, verbose bool) error {
+// extractRelevantRecords extracts the identified lines from the original files
+// in parallel, then concatenates the results in input order. Each file is
+// extracted to its own temp file so workers don't contend on a shared output.
+// zstd frames can be concatenated, so the final cat produces a valid file.
+func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile string, sortBufferSize string, numWorkers int, verbose bool) error {
 	if verbose {
 		fmt.Println("extracting relevant records")
 	}
@@ -642,7 +668,17 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 	if err != nil {
 		return err
 	}
-	var totalExtracted int64 = 0
+	// Determine files with records to extract and create per-file temp files.
+	type extractWork struct {
+		entry    *LineNumberEntry
+		tempFile string
+	}
+	outputDir := filepath.Dir(outputFile)
+	workMap := make(map[string]*extractWork)
+	var (
+		filesToExtract []string
+		totalExtracted int64
+	)
 	for _, inputFile := range inputFiles {
 		entry, ok := fileLineMap[inputFile]
 		if !ok {
@@ -651,21 +687,70 @@ func extractRelevantRecords(lineNumsFile string, inputFiles []string, outputFile
 			}
 			continue
 		}
-		err := extractLinesFromFile(inputFile, entry.LineNumbersFilename, outputFile, verbose)
+		tmpFile, err := os.CreateTemp(outputDir, "span-extract-*.tmp")
 		if err != nil {
+			return fmt.Errorf("error creating temp extraction file: %w", err)
+		}
+		_ = tmpFile.Close()
+		workMap[inputFile] = &extractWork{entry: entry, tempFile: tmpFile.Name()}
+		filesToExtract = append(filesToExtract, inputFile)
+		totalExtracted += entry.NumLines
+	}
+	// Ensure cleanup of all temp files.
+	defer func() {
+		for _, w := range workMap {
+			_ = os.Remove(w.tempFile)
+		}
+		for _, entry := range fileLineMap {
+			_ = os.Remove(entry.LineNumbersFilename)
+		}
+	}()
+	// Resolve filterline executable once for all workers.
+	filterlineExe, err := resolveFilterlineExe()
+	if err != nil {
+		return err
+	}
+	if strings.HasPrefix(filterlineExe, os.TempDir()) {
+		defer func() { _ = os.Remove(filterlineExe) }()
+	}
+	// Extract in parallel — each file writes to its own temp file.
+	if err := processFilesParallel(filesToExtract, numWorkers, func(inputFile string) error {
+		w := workMap[inputFile]
+		if err := extractLinesFromFile(inputFile, w.entry.LineNumbersFilename, w.tempFile, filterlineExe, verbose); err != nil {
 			return err
 		}
-		totalExtracted += entry.NumLines
 		if verbose {
-			log.Printf("extracted %d records from %s", entry.NumLines, inputFile)
+			log.Printf("extracted %d records from %s", w.entry.NumLines, inputFile)
 		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	// Concatenate temp files in input order to produce the final output.
+	outFile, err := os.Create(outputFile)
+	if err != nil {
+		return fmt.Errorf("error creating output file: %w", err)
+	}
+	for _, inputFile := range filesToExtract {
+		w := workMap[inputFile]
+		f, err := os.Open(w.tempFile)
+		if err != nil {
+			_ = outFile.Close()
+			return fmt.Errorf("error opening temp extraction file: %w", err)
+		}
+		if _, err := io.Copy(outFile, f); err != nil {
+			_ = f.Close()
+			_ = outFile.Close()
+			return fmt.Errorf("error concatenating extraction output: %w", err)
+		}
+		_ = f.Close()
+		_ = os.Remove(w.tempFile) // free disk space early
+	}
+	if err := outFile.Close(); err != nil {
+		return fmt.Errorf("error closing output file: %w", err)
 	}
 	if verbose {
 		log.Printf("total records extracted: %d", totalExtracted)
-	}
-	// Cleanup temporary line number files.
-	for _, entry := range fileLineMap {
-		_ = os.Remove(entry.LineNumbersFilename)
 	}
 	return nil
 }
@@ -761,20 +846,19 @@ func groupLineNumbersByFile(lineNumsFile string, sortBufferSize string, verbose 
 	return fileLineMap, nil
 }
 
-// extractLinesFromFile uses external tools to perform the slicing. If the
-// filterline program can be found, it will use that. Otherwise fall back to a
-// small awk snippet (that is a bit slower).
-func extractLinesFromFile(filename string, lineNumbersFile string, outputFile string, verbose bool) error {
-	var (
-		filterlineExe = "filterline"
-		err           error
-	)
-	if !isCommandAvailable(filterlineExe) {
-		filterlineExe, err = createFallbackScript()
-		if err != nil {
-			return err
-		}
+// resolveFilterlineExe returns the path to the filterline executable. If
+// filterline is not in PATH, a temporary fallback awk script is created.
+// The caller is responsible for removing the fallback script when done.
+func resolveFilterlineExe() (string, error) {
+	if isCommandAvailable("filterline") {
+		return "filterline", nil
 	}
+	return createFallbackScript()
+}
+
+// extractLinesFromFile uses the provided filterline executable to extract
+// specific lines from a file.
+func extractLinesFromFile(filename string, lineNumbersFile string, outputFile string, filterlineExe string, verbose bool) error {
 	var cmd *exec.Cmd
 	switch {
 	case strings.HasSuffix(filename, ".zst"):
