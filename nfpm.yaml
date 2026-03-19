@@ -111,6 +111,11 @@ contents:
     file_info:
       mode: 0755
 
+  - src: span-query
+    dst: /usr/local/bin/span-query
+    file_info:
+      mode: 0755
+
   - src: span-redact
     dst: /usr/local/bin/span-redact
     file_info:
