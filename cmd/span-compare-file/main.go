@@ -38,6 +38,7 @@ var (
 	textile   = flag.Bool("t", false, "emit textile (redmine wiki) output")
 	showAll   = flag.Bool("a", false, "show all ISILs (including those only in the index)")
 	showEmpty = flag.Bool("z", false, "show ISILs with zero counts on both sides")
+	batchSize = flag.Int("b", 0, "number of lines to buffer for parallel parsing (default: NumCPU*64)")
 	version   = flag.Bool("v", false, "show version")
 )
 
@@ -89,12 +90,15 @@ type workerResult struct {
 // countFile reads a JSONL file (one solr doc per line) and returns per-ISIL
 // counts and a set of source IDs found. JSON parsing is parallelised across
 // multiple workers while reading remains serial.
-func countFile(r io.Reader, filterSID string) (counts map[string]int64, sources map[string]struct{}, total int64, err error) {
+func countFile(r io.Reader, filterSID string, batchSize int) (counts map[string]int64, sources map[string]struct{}, total int64, err error) {
 	numWorkers := runtime.NumCPU()
 	if numWorkers < 1 {
 		numWorkers = 1
 	}
-	lines := make(chan []byte, numWorkers*64)
+	if batchSize <= 0 {
+		batchSize = numWorkers * 64
+	}
+	lines := make(chan []byte, batchSize)
 	results := make(chan workerResult, numWorkers)
 	var wg sync.WaitGroup
 	wg.Add(numWorkers)
@@ -179,7 +183,7 @@ func main() {
 	}
 
 	// Count ISILs in file.
-	fileCounts, sources, totalFile, err := countFile(reader, *sourceID)
+	fileCounts, sources, totalFile, err := countFile(reader, *sourceID, *batchSize)
 	if err != nil {
 		log.Fatal(err)
 	}
