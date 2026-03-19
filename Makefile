@@ -17,6 +17,7 @@ TARGETS = \
 		  span-hcov \
 		  span-index \
 		  span-import \
+		  span-query \
 		  span-mail \
 		  span-local-data \
 		  span-oa-filter \
@@ -41,9 +42,9 @@ test:
 	# go mod tidy
 
 $(TARGETS): %: cmd/%/main.go
-	# CGO_ENABELED required?
+	@# CGO_ENABELED required?
 	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
-	# $(if $(shell which upx 2>/dev/null),upx -qq --best --lzma $@,)
+	@$(if $(shell which upx 2>/dev/null),upx -qqq --best --lzma $@,)
 
 .PHONY: clean
 clean:
