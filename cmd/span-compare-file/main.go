@@ -38,7 +38,7 @@ var (
 	textile   = flag.Bool("t", false, "emit textile (redmine wiki) output")
 	showAll   = flag.Bool("a", false, "show all ISILs (including those only in the index)")
 	showEmpty = flag.Bool("z", false, "show ISILs with zero counts on both sides")
-	batchSize = flag.Int("b", 0, "number of lines to buffer for parallel parsing (default: NumCPU*64)")
+	batchSize = flag.Int("b", runtime.NumCPU()*64, "number of lines to buffer for parallel parsing")
 	version   = flag.Bool("v", false, "show version")
 )
 
