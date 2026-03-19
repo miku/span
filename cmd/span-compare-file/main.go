@@ -20,8 +20,10 @@ import (
 	"log"
 	"math"
 	"os"
+	"runtime"
 	"slices"
 	"strings"
+	"sync"
 	"text/tabwriter"
 
 	"github.com/klauspost/compress/zstd"
@@ -77,32 +79,80 @@ func (z *zstdReadCloser) Close() error {
 	return z.f.Close()
 }
 
+// workerResult holds per-worker local counts to avoid shared-map contention.
+type workerResult struct {
+	counts  map[string]int64
+	sources map[string]struct{}
+	total   int64
+}
+
 // countFile reads a JSONL file (one solr doc per line) and returns per-ISIL
-// counts and a set of source IDs found.
+// counts and a set of source IDs found. JSON parsing is parallelised across
+// multiple workers while reading remains serial.
 func countFile(r io.Reader, filterSID string) (counts map[string]int64, sources map[string]struct{}, total int64, err error) {
-	counts = make(map[string]int64)
-	sources = make(map[string]struct{})
+	numWorkers := runtime.NumCPU()
+	if numWorkers < 1 {
+		numWorkers = 1
+	}
+	lines := make(chan []byte, numWorkers*64)
+	results := make(chan workerResult, numWorkers)
+	var wg sync.WaitGroup
+	wg.Add(numWorkers)
+	for range numWorkers {
+		go func() {
+			defer wg.Done()
+			local := workerResult{
+				counts:  make(map[string]int64),
+				sources: make(map[string]struct{}),
+			}
+			for line := range lines {
+				var rec record
+				if err := json.Unmarshal(line, &rec); err != nil {
+					continue
+				}
+				if filterSID != "" && rec.SourceID != filterSID {
+					continue
+				}
+				local.sources[rec.SourceID] = struct{}{}
+				local.total++
+				for _, inst := range rec.Institutions {
+					local.counts[inst]++
+				}
+			}
+			results <- local
+		}()
+	}
+	// Read lines and distribute to workers.
 	scanner := bufio.NewScanner(r)
 	scanner.Buffer(make([]byte, 0, 1<<20), 1<<24) // up to 16MB lines
 	for scanner.Scan() {
-		line := scanner.Bytes()
-		if len(line) == 0 {
+		b := scanner.Bytes()
+		if len(b) == 0 {
 			continue
 		}
-		var rec record
-		if err := json.Unmarshal(line, &rec); err != nil {
-			continue
+		// Copy because scanner reuses the buffer.
+		cp := make([]byte, len(b))
+		copy(cp, b)
+		lines <- cp
+	}
+	close(lines)
+	wg.Wait()
+	close(results)
+	if err = scanner.Err(); err != nil {
+		return nil, nil, 0, err
+	}
+	// Merge worker results.
+	counts = make(map[string]int64)
+	sources = make(map[string]struct{})
+	for res := range results {
+		total += res.total
+		for k, v := range res.counts {
+			counts[k] += v
 		}
-		if filterSID != "" && rec.SourceID != filterSID {
-			continue
-		}
-		sources[rec.SourceID] = struct{}{}
-		total++
-		for _, inst := range rec.Institutions {
-			counts[inst]++
+		for k := range res.sources {
+			sources[k] = struct{}{}
 		}
 	}
-	err = scanner.Err()
 	return
 }
 
