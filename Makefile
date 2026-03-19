@@ -54,6 +54,8 @@ clean:
 	rm -f $(PKGNAME)-*rpm
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
 	rm -f coverage.out
+	rm -f *.000
+	rm -f *.001
 
 # Code quality and performance.
 .PHONY: lint
