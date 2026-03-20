@@ -718,7 +718,7 @@ func countFileISIL(r io.Reader) (counts map[string]int64, sources map[string]str
 	if numWorkers < 1 {
 		numWorkers = 1
 	}
-	const batchSize = 1024
+	const batchSize = 262144 //  1024
 	var (
 		batches = make(chan [][]byte, numWorkers)
 		results = make(chan workerResult, numWorkers)
