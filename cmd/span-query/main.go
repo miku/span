@@ -73,9 +73,7 @@ type task struct {
 	Run  func(index solrutil.Index, p map[string]string, args []string) error
 }
 
-// --- Index query tasks (from span-index) ---
-
-var indexTasks = []task{
+var tasks = []task{
 	{
 		Name: "numdocs",
 		Help: "total number of documents in the index",
@@ -92,7 +90,7 @@ var indexTasks = []task{
 		Name: "sources",
 		Help: "list source ids with document counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, "*:*", "source_id", p)
+			return printFacet(index, facetOpts{Query: "*:*", Field: "source_id"})
 		},
 	},
 	{
@@ -132,63 +130,63 @@ var indexTasks = []task{
 		Name: "publishers",
 		Help: "list publishers with counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "publisher", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "publisher", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "formats",
 		Help: "list all formats with counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "format", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "format", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "record-formats",
 		Help: "list all record formats with counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "record_format", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "record_format", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "collections",
 		Help: "list mega_collection names with counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "mega_collection", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "mega_collection", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "dewey",
 		Help: "list dewey-raw values with counts; -p limit:20",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "dewey-raw", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "dewey-raw", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "publish-years",
 		Help: "histogram of publishDate values; -p limit:20",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "publishDate", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "publishDate", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "languages",
 		Help: "list languages with counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "language", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "language", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "institutions",
 		Help: "list institutions (ISIL) with counts",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "institution", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "institution", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "urls",
 		Help: "list URLs; -p limit:100",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "url", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "url", Limit: limitFromParams(p)})
 		},
 	},
 	{
@@ -199,7 +197,7 @@ var indexTasks = []task{
 			if !ok {
 				return fmt.Errorf("parameter field required")
 			}
-			return printFacet(index, queryFromParams(p), field, p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: field, Limit: limitFromParams(p)})
 		},
 	},
 	{
@@ -242,35 +240,35 @@ var indexTasks = []task{
 		Name: "authors",
 		Help: "top authors with counts; -p limit:20",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "author_facet", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "author_facet", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "topics",
 		Help: "top subjects/topics with counts; -p limit:20",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "topic_facet", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "topic_facet", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "journals",
 		Help: "top journal/container titles with counts; -p limit:20",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "container_title", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "container_title", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "series",
 		Help: "list series with counts; -p limit:20",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "series", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "series", Limit: limitFromParams(p)})
 		},
 	},
 	{
 		Name: "availability",
 		Help: "facet_avail breakdown (Online, Free, etc.)",
 		Run: func(index solrutil.Index, p map[string]string, args []string) error {
-			return printFacet(index, queryFromParams(p), "facet_avail", p)
+			return printFacet(index, facetOpts{Query: queryFromParams(p), Field: "facet_avail", Limit: limitFromParams(p)})
 		},
 	},
 	{
@@ -315,7 +313,7 @@ var indexTasks = []task{
 			if !ok {
 				return fmt.Errorf("parameter source_id required")
 			}
-			return printFacet(index, fmt.Sprintf("source_id:%q", sid), "mega_collection", p)
+			return printFacet(index, facetOpts{Query: fmt.Sprintf("source_id:%q", sid), Field: "mega_collection", Limit: limitFromParams(p)})
 		},
 	},
 	{
@@ -326,7 +324,7 @@ var indexTasks = []task{
 			if !ok {
 				return fmt.Errorf("parameter source_id required")
 			}
-			return printFacet(index, fmt.Sprintf("source_id:%q", sid), "format", p)
+			return printFacet(index, facetOpts{Query: fmt.Sprintf("source_id:%q", sid), Field: "format", Limit: limitFromParams(p)})
 		},
 	},
 	{
@@ -337,7 +335,7 @@ var indexTasks = []task{
 			if !ok {
 				return fmt.Errorf("parameter source_id required")
 			}
-			return printFacet(index, fmt.Sprintf("source_id:%q", sid), "language", p)
+			return printFacet(index, facetOpts{Query: fmt.Sprintf("source_id:%q", sid), Field: "language", Limit: limitFromParams(p)})
 		},
 	},
 	{
@@ -393,14 +391,9 @@ var indexTasks = []task{
 			if !ok {
 				return fmt.Errorf("parameter institution required (e.g. DE-14)")
 			}
-			return printFacet(index, fmt.Sprintf("institution:%q", isil), "source_id", p)
+			return printFacet(index, facetOpts{Query: fmt.Sprintf("institution:%q", isil), Field: "source_id", Limit: limitFromParams(p)})
 		},
 	},
-}
-
-// --- File-based tasks (from span-compare-file) ---
-
-var fileTasks = []task{
 	{
 		Name: "isil-file",
 		Help: "count ISILs in a JSONL file (zstd ok); [-p sid:49] FILE",
@@ -410,8 +403,7 @@ var fileTasks = []task{
 				return err
 			}
 			defer r.Close()
-			sid := p["sid"]
-			counts, sources, total, err := countFileISIL(r, sid)
+			counts, sources, total, err := countFileISIL(r)
 			if err != nil {
 				return err
 			}
@@ -441,7 +433,7 @@ var fileTasks = []task{
 			}
 			defer r.Close()
 			sid := p["sid"]
-			fileCounts, sources, totalFile, err := countFileISIL(r, sid)
+			fileCounts, sources, totalFile, err := countFileISIL(r)
 			if err != nil {
 				return err
 			}
@@ -504,11 +496,6 @@ var fileTasks = []task{
 			return nil
 		},
 	},
-}
-
-// --- Report tasks (from span-report) ---
-
-var reportTasks = []task{
 	{
 		Name: "issn-report",
 		Help: "ISSN/date report for source+collection; -p sid:49 -p c:\"Coll\" [-p workers:32] [-p bs:1]",
@@ -591,16 +578,7 @@ var reportTasks = []task{
 	},
 }
 
-// tasks is the combined registry.
-var tasks []task
-
-func init() {
-	tasks = append(tasks, indexTasks...)
-	tasks = append(tasks, fileTasks...)
-	tasks = append(tasks, reportTasks...)
-}
-
-// --- Helpers: query building and facet printing (from span-index) ---
+// --- Helpers: query building and facet printing ---
 
 // queryFromParams builds a SOLR query from common parameter conventions.
 func queryFromParams(p map[string]string) string {
@@ -619,20 +597,31 @@ func queryFromParams(p map[string]string) string {
 	return strings.Join(clauses, " AND ")
 }
 
-func printFacet(index solrutil.Index, query, field string, p map[string]string) error {
-	limit := 0
+// facetOpts groups the options for a facet query, so callers of printFacet can
+// use named fields instead of positional strings.
+type facetOpts struct {
+	Query string // SOLR query (e.g. "*:*", "source_id:\"49\"")
+	Field string // field to facet on (e.g. "source_id", "institution")
+	Limit int    // max entries to return; 0 means unlimited
+}
+
+// limitFromParams extracts an integer "limit" from the parameter map, returning
+// 0 if absent or invalid.
+func limitFromParams(p map[string]string) int {
 	if v, ok := p["limit"]; ok {
-		n, err := strconv.Atoi(v)
-		if err != nil {
-			return fmt.Errorf("invalid limit: %v", err)
+		if n, err := strconv.Atoi(v); err == nil {
+			return n
 		}
-		limit = n
 	}
+	return 0
+}
+
+func printFacet(index solrutil.Index, opts facetOpts) error {
 	idx := index
-	if limit > 0 {
-		idx.FacetLimit = limit
+	if opts.Limit > 0 {
+		idx.FacetLimit = opts.Limit
 	}
-	resp, err := idx.FacetQuery(query, field)
+	resp, err := idx.FacetQuery(opts.Query, opts.Field)
 	if err != nil {
 		return err
 	}
@@ -656,8 +645,8 @@ func printFacet(index solrutil.Index, query, field string, p map[string]string) 
 		}
 		return strings.Compare(a.key, b.key)
 	})
-	if limit > 0 && len(entries) > limit {
-		entries = entries[:limit]
+	if opts.Limit > 0 && len(entries) > opts.Limit {
+		entries = entries[:opts.Limit]
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, e := range entries {
@@ -683,7 +672,11 @@ func openReader(filename string) (io.ReadCloser, error) {
 		return nil, err
 	}
 	if strings.HasSuffix(filename, ".zst") || strings.HasSuffix(filename, ".zstd") {
-		r, err := zstd.NewReader(f)
+		r, err := zstd.NewReader(f,
+			zstd.WithDecoderConcurrency(0),
+			zstd.WithDecoderLowmem(false),
+			zstd.IgnoreChecksum(true),
+		)
 		if err != nil {
 			f.Close()
 			return nil, err
@@ -714,19 +707,23 @@ type workerResult struct {
 	counts  map[string]int64
 	sources map[string]struct{}
 	total   int64
+	errors  int64
 }
 
 // countFileISIL reads a JSONL file and returns per-ISIL counts, source IDs, and
-// total record count. JSON parsing is parallelised across multiple workers.
-func countFileISIL(r io.Reader, filterSID string) (counts map[string]int64, sources map[string]struct{}, total int64, err error) {
+// total record count. JSON parsing is parallelised across multiple workers;
+// lines are sent in batches to reduce channel overhead.
+func countFileISIL(r io.Reader) (counts map[string]int64, sources map[string]struct{}, total int64, err error) {
 	numWorkers := runtime.NumCPU()
 	if numWorkers < 1 {
 		numWorkers = 1
 	}
-	batchSize := numWorkers * 64
-	lines := make(chan []byte, batchSize)
-	results := make(chan workerResult, numWorkers)
-	var wg sync.WaitGroup
+	const batchSize = 1024
+	var (
+		batches = make(chan [][]byte, numWorkers)
+		results = make(chan workerResult, numWorkers)
+		wg      sync.WaitGroup
+	)
 	wg.Add(numWorkers)
 	for range numWorkers {
 		go func() {
@@ -735,18 +732,18 @@ func countFileISIL(r io.Reader, filterSID string) (counts map[string]int64, sour
 				counts:  make(map[string]int64),
 				sources: make(map[string]struct{}),
 			}
-			for line := range lines {
-				var rec record
-				if err := json.Unmarshal(line, &rec); err != nil {
-					continue
-				}
-				if filterSID != "" && rec.SourceID != filterSID {
-					continue
-				}
-				local.sources[rec.SourceID] = struct{}{}
-				local.total++
-				for _, inst := range rec.Institutions {
-					local.counts[inst]++
+			for batch := range batches {
+				for _, line := range batch {
+					var rec record
+					if err := json.Unmarshal(line, &rec); err != nil {
+						local.errors++
+						continue
+					}
+					local.sources[rec.SourceID] = struct{}{}
+					local.total++
+					for _, inst := range rec.Institutions {
+						local.counts[inst]++
+					}
 				}
 			}
 			results <- local
@@ -754,6 +751,7 @@ func countFileISIL(r io.Reader, filterSID string) (counts map[string]int64, sour
 	}
 	scanner := bufio.NewScanner(r)
 	scanner.Buffer(make([]byte, 0, 1<<20), 1<<24)
+	batch := make([][]byte, 0, batchSize)
 	for scanner.Scan() {
 		b := scanner.Bytes()
 		if len(b) == 0 {
@@ -761,9 +759,16 @@ func countFileISIL(r io.Reader, filterSID string) (counts map[string]int64, sour
 		}
 		cp := make([]byte, len(b))
 		copy(cp, b)
-		lines <- cp
+		batch = append(batch, cp)
+		if len(batch) >= batchSize {
+			batches <- batch
+			batch = make([][]byte, 0, batchSize)
+		}
 	}
-	close(lines)
+	if len(batch) > 0 {
+		batches <- batch
+	}
+	close(batches)
 	wg.Wait()
 	close(results)
 	if err = scanner.Err(); err != nil {
@@ -771,14 +776,19 @@ func countFileISIL(r io.Reader, filterSID string) (counts map[string]int64, sour
 	}
 	counts = make(map[string]int64)
 	sources = make(map[string]struct{})
+	var parseErrors int64
 	for res := range results {
 		total += res.total
+		parseErrors += res.errors
 		for k, v := range res.counts {
 			counts[k] += v
 		}
 		for k := range res.sources {
 			sources[k] = struct{}{}
 		}
+	}
+	if parseErrors > 0 {
+		log.Printf("countFileISIL: %d lines failed to parse", parseErrors)
 	}
 	return
 }
