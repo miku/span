@@ -189,12 +189,11 @@ func (doc *Document) Authors() (authors []finc.Author) {
 	return authors
 }
 
-// ID is of the form <kind>-<source-id>-<id-base64-unpadded>
-// We simple map any primary key of the source (preferably a URL)
-// to a safer alphabet. Since the base64 part is not meant to be decoded
-// we drop the padding. It is simple enough to recover the original value.
+// ID is of the form <kind>-<source-id>-<id-base64-unpadded>.
+// Crossref identities should be DOI-based so URL representation changes do
+// not create a second record for the same work.
 func (doc *Document) ID() string {
-	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.URL)))
+	return fmt.Sprintf("ai-%s-%s", SourceID, base64.RawURLEncoding.EncodeToString([]byte(doc.DOI)))
 }
 
 // PageInfo parses a page specfication in a best effort manner into a PageInfo struct.

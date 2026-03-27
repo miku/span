@@ -2,6 +2,33 @@ package crossref
 
 import "testing"
 
+func TestDocumentIDUsesDOI(t *testing.T) {
+	doc := &Document{
+		DOI: "10.1038/jid.2009.354",
+		URL: "http://dx.doi.org/10.1038/jid.2009.354",
+	}
+
+	want := "ai-49-MTAuMTAzOC9qaWQuMjAwOS4zNTQ"
+	if got := doc.ID(); got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}
+
+func TestDocumentIDIgnoresURLRepresentation(t *testing.T) {
+	a := &Document{
+		DOI: "10.1038/jid.2009.354",
+		URL: "http://dx.doi.org/10.1038/jid.2009.354",
+	}
+	b := &Document{
+		DOI: "10.1038/jid.2009.354",
+		URL: "https://doi.org/10.1038/jid.2009.354",
+	}
+
+	if a.ID() != b.ID() {
+		t.Fatalf("expected same ID for same DOI, got %q and %q", a.ID(), b.ID())
+	}
+}
+
 func TestDocumentCombinedTitle(t *testing.T) {
 	var cases = []struct {
 		about  string
