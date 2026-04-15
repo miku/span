@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-VERSION := 0.2.31
+VERSION := 0.2.32
 TARGETS = \
           span-amsl-discovery \
 		  span-compare \
