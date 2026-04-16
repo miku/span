@@ -2,6 +2,7 @@ SHELL = /bin/bash
 VERSION := 0.2.32
 TARGETS = \
           span-amsl-discovery \
+		  span-compact \
 		  span-compare \
 		  span-compare-file \
           span-crossref-members \
