@@ -54,7 +54,6 @@ var (
 	tenant      = flag.String("tenant", "de15", "FOLIO tenant")
 	limit       = flag.Int("limit", 100000, "API pagination limit")
 	expand      = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs to expand into")
-	keepResp    = flag.Bool("k", false, "keep FOLIO API response in a temporary file")
 )
 
 // httpClient is the shared HTTP client, configured after flag parsing.
