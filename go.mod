@@ -34,7 +34,7 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/hoisie/mustache v0.0.0-20160804235033-6375acf62c69 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
-	github.com/mattn/go-isatty v0.0.21 // indirect
+	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
