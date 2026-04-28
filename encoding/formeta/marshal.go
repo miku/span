@@ -9,8 +9,6 @@ import (
 	"reflect"
 	"strings"
 	"time"
-
-	"github.com/fatih/structs"
 )
 
 var (
@@ -35,20 +33,23 @@ func marshal(w io.Writer, k string, v any) error {
 		if _, err := io.WriteString(w, k+" { "); err != nil {
 			return err
 		}
-		for _, f := range structs.New(v).Fields() {
-			if !f.IsExported() {
+		rv := reflect.ValueOf(v)
+		rt := rv.Type()
+		for i := 0; i < rt.NumField(); i++ {
+			field := rt.Field(i)
+			if !field.IsExported() {
 				continue
 			}
 			var (
 				key  string
-				tagv = strings.Split(f.Tag("json"), ",")
+				tagv = strings.Split(field.Tag.Get("json"), ",")
 			)
 			if len(tagv) > 0 && tagv[0] != "" {
 				key = tagv[0]
 			} else {
-				key = f.Name()
+				key = field.Name
 			}
-			if err := marshal(w, key, f.Value()); err != nil {
+			if err := marshal(w, key, rv.Field(i).Interface()); err != nil {
 				return err
 			}
 		}

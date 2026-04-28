@@ -8,11 +8,9 @@ import (
 	"bufio"
 	"io"
 	"reflect"
+	"strings"
 	"sync"
 
-	"strings"
-
-	"github.com/fatih/structs"
 	"github.com/miku/span/xio"
 )
 
@@ -55,7 +53,8 @@ func (dec *Decoder) Decode(v any) error {
 	if err := dec.readHeader(); err != nil {
 		return err
 	}
-	if reflect.TypeOf(v).Elem().Kind() != reflect.Struct {
+	rv := reflect.ValueOf(v)
+	if rv.Kind() != reflect.Pointer || rv.Elem().Kind() != reflect.Struct {
 		return nil
 	}
 	line, err := dec.r.ReadString('\n')
@@ -64,21 +63,27 @@ func (dec *Decoder) Decode(v any) error {
 	}
 	record := strings.Split(line, dec.Separator)
 
-	s := structs.New(v)
-	for _, f := range s.Fields() {
-		tag := f.Tag("csv")
+	rv = rv.Elem()
+	rt := rv.Type()
+	for i := 0; i < rt.NumField(); i++ {
+		field := rt.Field(i)
+		if !field.IsExported() {
+			continue
+		}
+		tag := field.Tag.Get("csv")
 		if tag == "" || tag == "-" {
 			continue
 		}
-		for i, header := range dec.Header {
+		for j, header := range dec.Header {
 			if tag != header {
 				continue
 			}
-			if i >= len(record) {
+			if j >= len(record) {
 				break // Record has too few columns.
 			}
-			if err := f.Set(record[i]); err != nil {
-				return err
+			fv := rv.Field(i)
+			if fv.Kind() == reflect.String {
+				fv.SetString(record[j])
 			}
 		}
 	}

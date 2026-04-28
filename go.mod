@@ -8,7 +8,6 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/beevik/etree v1.6.0
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
-	github.com/fatih/structs v1.1.0
 	github.com/goodsign/monday v1.0.2
 	github.com/google/go-cmp v0.5.9
 	github.com/jinzhu/now v1.1.5
