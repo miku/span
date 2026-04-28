@@ -3,6 +3,7 @@ package strutil
 import (
 	"html"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/miku/span/container"
@@ -27,20 +28,10 @@ func UnescapeTrim(s string) string {
 	return strings.TrimSpace(html.UnescapeString(s))
 }
 
-// StringSliceContains returns true, if a given string is contained in a slice.
-func StringSliceContains(ss []string, s string) bool {
-	for _, v := range ss {
-		if v == s {
-			return true
-		}
-	}
-	return false
-}
-
 // RemoveEach returns a new slice with elements not contained in a drop list.
 func RemoveEach(ss []string, drop []string) (result []string) {
 	for _, s := range ss {
-		if !StringSliceContains(drop, s) {
+		if !slices.Contains(drop, s) {
 			result = append(result, s)
 		}
 	}

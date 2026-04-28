@@ -18,6 +18,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/pprof"
+	"slices"
 	"strings"
 
 	json "github.com/segmentio/encoding/json"
@@ -125,7 +126,7 @@ func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
 				ignored++
 				continue
 			}
-			if !strutil.StringSliceContains(doc.Institution, label) {
+			if !slices.Contains(doc.Institution, label) {
 				continue
 			}
 			// The document (is) might be already in the index (same or other source).

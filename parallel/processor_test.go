@@ -4,20 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"slices"
 	"strings"
 	"testing"
 )
 
 var errFake1 = errors.New("fake error #1")
-
-func StringSliceContains(sl []string, s string) bool {
-	for _, v := range sl {
-		if s == v {
-			return true
-		}
-	}
-	return false
-}
 
 // LinesEqualSeparator returns true, if every line in a, when separated by
 // separator, can be found in b.
@@ -28,7 +20,7 @@ func LinesEqualSeparator(a, b, sep string) bool {
 		return false
 	}
 	for _, line := range al {
-		if !StringSliceContains(bl, line) {
+		if !slices.Contains(bl, line) {
 			return false
 		}
 	}
