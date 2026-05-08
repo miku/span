@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-VERSION := 0.2.32
+VERSION := 0.2.33
 TARGETS = \
           span-amsl-discovery \
 		  span-compact \
@@ -18,7 +18,6 @@ TARGETS = \
 		  span-hcov \
 		  span-index \
 		  span-import \
-		  span-query \
 		  span-mail \
 		  span-local-data \
 		  span-oa-filter \
@@ -42,9 +41,9 @@ test:
 	go test -v -cover ./...
 	# go mod tidy
 
-$(TARGETS): %: cmd/%/main.go
+$(TARGETS): %: $(wildcard cmd/%/*.go)
 	@# CGO_ENABELED required?
-	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ $<
+	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ ./cmd/$@
 	@$(if $(shell which upx 2>/dev/null),upx -qqq --best --lzma $@,)
 
 .PHONY: clean
