@@ -44,12 +44,10 @@ test:
 $(TARGETS): %: $(wildcard cmd/%/*.go)
 	@# CGO_ENABELED required?
 	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ ./cmd/$@
-	@$(if $(shell which upx 2>/dev/null),upx -qqq --best --lzma $@,)
 
 .PHONY: clean
 clean:
 	rm -f $(TARGETS)
-	rm -f span-*.upx
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
