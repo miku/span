@@ -60,7 +60,7 @@ clean:
 # Code quality and performance.
 .PHONY: lint
 lint:
-	staticcheck ./...
+	go tool staticcheck ./...
 
 .PHONY: bench
 bench:
@@ -68,8 +68,7 @@ bench:
 
 .PHONY: imports
 imports:
-	go get golang.org/x/tools/cmd/goimports
-	goimports -w .
+	go tool goimports -w .
 
 .PHONY: vet
 vet:

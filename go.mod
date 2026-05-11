@@ -9,7 +9,7 @@ require (
 	github.com/beevik/etree v1.6.0
 	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
 	github.com/goodsign/monday v1.0.2
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/jinzhu/now v1.1.5
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/klauspost/compress v1.18.6
@@ -28,6 +28,7 @@ require (
 )
 
 require (
+	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
@@ -37,5 +38,16 @@ require (
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
+	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
+	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6 // indirect
+	golang.org/x/tools v0.45.0 // indirect
+	honnef.co/go/tools v0.7.0 // indirect
+)
+
+tool (
+	golang.org/x/tools/cmd/goimports
+	honnef.co/go/tools/cmd/staticcheck
 )
