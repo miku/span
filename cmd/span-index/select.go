@@ -16,6 +16,12 @@ func runSelect(args []string) error {
 	sort := fs.String("sort", "", "Solr sort spec, e.g. \"last_indexed desc\"")
 	fl := fs.String("fl", "", "comma-separated field list")
 	start := fs.Int("start", 0, "offset into the result set")
+	setExamples(fs,
+		`span-index select -q "source_id:49 AND format:Article"`,
+		`span-index select -q "*:*" -rows 1 -fl id,title`,
+		`span-index select -q "*:*" -sort "last_indexed desc" -rows 5`,
+		`span-index select -q "issn:1234-5678" -rows 100 -start 100`,
+	)
 	if err := fs.Parse(args); err != nil {
 		return err
 	}

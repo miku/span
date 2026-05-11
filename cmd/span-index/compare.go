@@ -51,6 +51,13 @@ func runCompare(args []string) error {
 	textile := fs.Bool("textile", false, "render the comparison as a Textile table")
 	dump := fs.Bool("dump", false, "write parsed file counts to stdout (no index query)")
 	noCache := fs.Bool("no-cache", false, "skip the local prepared-data cache")
+	setExamples(fs,
+		"span-index compare --file 49.ldj",
+		"span-index compare --file 49.ldj.zst --sid 49",
+		"span-index compare --file 49.ldj --all --textile",
+		"span-index compare --file 49.ldj --dump > 49.dump   # prepare once",
+		"span-index compare --file 49.dump                   # reuse prepared dump",
+	)
 	if err := fs.Parse(args); err != nil {
 		return err
 	}

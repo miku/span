@@ -43,6 +43,13 @@ func runReport(args []string) error {
 	fs, server := newFlagSet("report")
 	name := fs.String("name", "", "report name (use --list to enumerate)")
 	list := fs.Bool("list", false, "list available reports")
+	setExamples(fs,
+		"span-index report --list",
+		"span-index report --name collections",
+		"span-index report --name recent -rows 20",
+		"span-index report --name issn --sid 49",
+		"span-index report --name issn --sid 49 --collection \"DOAJ Directory of Open Access Journals\" --verbose",
+	)
 	if err := fs.Parse(args); err != nil {
 		return err
 	}

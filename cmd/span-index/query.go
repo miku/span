@@ -108,6 +108,18 @@ func runQuery(args []string) error {
 		byBools[b.flag] = fs.Bool(b.flag, false, "facet by "+b.field)
 	}
 
+	setExamples(fs,
+		"span-index query --size",
+		"span-index query --size --sid 49",
+		"span-index query --by-sid",
+		"span-index query --formats --sid 49",
+		"span-index query --since 1.day.ago",
+		"span-index query --after 2026-01-01 --before 2026-02-01 --sid 49",
+		"span-index query --missing doi",
+		"span-index query --has issn --sid 49",
+		`span-index query --q "source_id:49 AND format:Article" --size`,
+	)
+
 	if err := fs.Parse(args); err != nil {
 		return err
 	}

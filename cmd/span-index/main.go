@@ -100,6 +100,23 @@ func newFlagSet(name string) (*flag.FlagSet, *string) {
 	return fs, server
 }
 
+// setExamples appends an "Examples:" block to the FlagSet's -h output.
+// Subcommands call this after registering all their flags.
+func setExamples(fs *flag.FlagSet, examples ...string) {
+	fs.Usage = func() {
+		fmt.Fprintf(fs.Output(), "Usage of %s:\n", fs.Name())
+		fs.PrintDefaults()
+		if len(examples) == 0 {
+			return
+		}
+		fmt.Fprintln(fs.Output())
+		fmt.Fprintln(fs.Output(), "Examples:")
+		for _, ex := range examples {
+			fmt.Fprintln(fs.Output(), "  "+ex)
+		}
+	}
+}
+
 // indexFor builds a solrutil.Index from a server string.
 func indexFor(server string) solrutil.Index {
 	return solrutil.Index{Server: solrutil.PrependHTTP(server)}
