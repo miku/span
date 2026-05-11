@@ -11,9 +11,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
+
+	"github.com/spf13/pflag"
 
 	"github.com/miku/span"
 	"github.com/miku/span/solrutil"
@@ -76,9 +77,9 @@ func usage(w *os.File) {
 	}
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Flags common to all subcommands:")
-	fmt.Fprintln(w, "  -s URL     SOLR server (default "+defaultServer+")")
-	fmt.Fprintln(w, "  -h         show this help (or per-subcommand flags)")
-	fmt.Fprintln(w, "  -v         print version")
+	fmt.Fprintln(w, "  -s, --server URL   SOLR server (default "+defaultServer+")")
+	fmt.Fprintln(w, "  -h, --help         show this help (or per-subcommand flags)")
+	fmt.Fprintln(w, "  -v, --version      print version")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Examples:")
 	fmt.Fprintln(w, "  span-index query --size")
@@ -92,27 +93,28 @@ func usage(w *os.File) {
 }
 
 // newFlagSet returns a FlagSet that prints usage to stderr and exits on error.
-// The -s flag for the SOLR server is registered automatically; subcommands
-// read its value via the returned *string.
-func newFlagSet(name string) (*flag.FlagSet, *string) {
-	fs := flag.NewFlagSet(name, flag.ExitOnError)
-	server := fs.String("s", defaultServer, "SOLR server URL")
+// The --server / -s flag for the SOLR server is registered automatically;
+// subcommands read its value via the returned *string.
+func newFlagSet(name string) (*pflag.FlagSet, *string) {
+	fs := pflag.NewFlagSet(name, pflag.ExitOnError)
+	server := fs.StringP("server", "s", defaultServer, "SOLR server URL")
 	return fs, server
 }
 
 // setExamples appends an "Examples:" block to the FlagSet's -h output.
 // Subcommands call this after registering all their flags.
-func setExamples(fs *flag.FlagSet, examples ...string) {
+func setExamples(fs *pflag.FlagSet, examples ...string) {
 	fs.Usage = func() {
-		fmt.Fprintf(fs.Output(), "Usage of %s:\n", fs.Name())
+		out := fs.Output()
+		fmt.Fprintf(out, "Usage of %s:\n", fs.Name())
 		fs.PrintDefaults()
 		if len(examples) == 0 {
 			return
 		}
-		fmt.Fprintln(fs.Output())
-		fmt.Fprintln(fs.Output(), "Examples:")
+		fmt.Fprintln(out)
+		fmt.Fprintln(out, "Examples:")
 		for _, ex := range examples {
-			fmt.Fprintln(fs.Output(), "  "+ex)
+			fmt.Fprintln(out, "  "+ex)
 		}
 	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/spf13/pflag"
 
 	"github.com/miku/span/solrutil"
 	"github.com/segmentio/encoding/json"
@@ -46,7 +47,7 @@ func runReport(args []string) error {
 	setExamples(fs,
 		"span-index report --list",
 		"span-index report --name collections",
-		"span-index report --name recent -rows 20",
+		"span-index report --name recent --rows 20",
 		"span-index report --name issn --sid 49",
 		"span-index report --name issn --sid 49 --collection \"DOAJ Directory of Open Access Journals\" --verbose",
 	)
@@ -87,7 +88,7 @@ type issnWork struct {
 }
 
 func reportISSN(idx solrutil.Index, args []string) error {
-	fs := flag.NewFlagSet("report issn", flag.ExitOnError)
+	fs := pflag.NewFlagSet("report issn", pflag.ExitOnError)
 	sid := fs.String("sid", "", "limit to source_id (default: all sources)")
 	collection := fs.String("collection", "", "limit to mega_collection")
 	workers := fs.Int("workers", 32, "concurrent index queries")
@@ -236,7 +237,7 @@ func partition(ss []string, size int) [][]string {
 // --- simpler reports ---------------------------------------------------------
 
 func reportCollections(idx solrutil.Index, args []string) error {
-	fs := flag.NewFlagSet("report collections", flag.ExitOnError)
+	fs := pflag.NewFlagSet("report collections", pflag.ExitOnError)
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -259,7 +260,7 @@ func reportCollections(idx solrutil.Index, args []string) error {
 }
 
 func reportRecent(idx solrutil.Index, args []string) error {
-	fs := flag.NewFlagSet("report recent", flag.ExitOnError)
+	fs := pflag.NewFlagSet("report recent", pflag.ExitOnError)
 	rows := fs.Int("rows", 10, "rows to return")
 	if err := fs.Parse(args); err != nil {
 		return err
