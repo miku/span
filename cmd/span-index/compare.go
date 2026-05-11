@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"text/tabwriter"
+	"time"
 
 	"github.com/adrg/xdg"
 	"github.com/klauspost/compress/zstd"
@@ -51,6 +52,7 @@ func runCompare(args []string) error {
 	textile := fs.Bool("textile", false, "render the comparison as a Textile table")
 	dump := fs.Bool("dump", false, "write parsed file counts to stdout (no index query)")
 	noCache := fs.Bool("no-cache", false, "skip the local prepared-data cache")
+	verbose := fs.Bool("verbose", false, "log stage progress and timings to stderr")
 	setExamples(fs,
 		"span-index compare --file 49.ldj",
 		"span-index compare --file 49.ldj.zst --sid 49",
@@ -64,12 +66,19 @@ func runCompare(args []string) error {
 	if *file == "" {
 		return fmt.Errorf("--file is required")
 	}
+	vlog := func(format string, args ...any) {
+		if *verbose {
+			log.Printf(format, args...)
+		}
+	}
 
 	// Load: detect prepared dump vs raw JSONL by magic prefix.
-	fc, err := loadFileCounts(*file, !*noCache)
+	t0 := time.Now()
+	fc, err := loadFileCounts(*file, !*noCache, vlog)
 	if err != nil {
 		return err
 	}
+	vlog("load done in %s", time.Since(t0).Round(time.Millisecond))
 	log.Printf("file: %d records, %d distinct ISILs, %d source(s)", fc.Total, len(fc.Counts), len(fc.Sources))
 
 	if *dump {
@@ -95,12 +104,16 @@ func runCompare(args []string) error {
 		log.Printf("warning: multiple source_ids in file: %v; pass --sid to scope", ss)
 	}
 
+	vlog("query index source_id=%q", resolvedSID)
+	t1 := time.Now()
 	indexFacets, err := fetchIndexFacets(indexFor(*server), resolvedSID)
 	if err != nil {
 		return err
 	}
+	vlog("index returned %d ISILs in %s", len(indexFacets), time.Since(t1).Round(time.Millisecond))
 
 	isils := mergeISILs(fc.Counts, indexFacets, *all)
+	vlog("render %d rows", len(isils))
 	if *textile {
 		printTextile(isils, fc.Counts, indexFacets, *empty)
 	} else {
@@ -111,7 +124,11 @@ func runCompare(args []string) error {
 
 // loadFileCounts reads either a prepared dump or a raw JSONL stream and
 // returns aggregated ISIL counts. Caching is keyed by a fast file fingerprint.
-func loadFileCounts(path string, useCache bool) (*fileCounts, error) {
+// vlog receives verbose-only progress; it may be nil.
+func loadFileCounts(path string, useCache bool, vlog func(string, ...any)) (*fileCounts, error) {
+	if vlog == nil {
+		vlog = func(string, ...any) {}
+	}
 	// Sniff: open, peek the first bytes for our dump magic.
 	f, err := os.Open(path)
 	if err != nil {
@@ -120,6 +137,7 @@ func loadFileCounts(path string, useCache bool) (*fileCounts, error) {
 	br := bufio.NewReader(f)
 	head, _ := br.Peek(len(dumpMagic))
 	if string(head) == dumpMagic {
+		vlog("reading prepared dump %s", path)
 		fc, err := readDump(br)
 		f.Close()
 		return fc, err
@@ -134,9 +152,12 @@ func loadFileCounts(path string, useCache bool) (*fileCounts, error) {
 	cachePath := compareCachePath(fp)
 	if useCache {
 		if fc, ok := readCache(cachePath); ok {
-			log.Printf("compare: loaded cached counts from %s", cachePath)
+			vlog("cache hit %s", cachePath)
 			return fc, nil
 		}
+		vlog("cache miss, parsing %s", path)
+	} else {
+		vlog("parsing %s (cache disabled)", path)
 	}
 
 	// Parse the JSONL file.
@@ -152,6 +173,8 @@ func loadFileCounts(path string, useCache bool) (*fileCounts, error) {
 	if useCache {
 		if err := writeCache(cachePath, fc); err != nil {
 			log.Printf("compare: failed to write cache %s: %v", cachePath, err)
+		} else {
+			vlog("wrote cache %s", cachePath)
 		}
 	}
 	return fc, nil
