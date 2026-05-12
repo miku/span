@@ -29,7 +29,7 @@ import (
 
 // AppVersion of span package. Commandline tools will show this on -v.
 // Set at build time via: -ldflags "-X github.com/miku/span.AppVersion=..."
-var AppVersion = "0.2.20"
+var AppVersion = "dev"
 
 const (
 	// KeyLengthLimit was a limit imposed by the memcached protocol, which
