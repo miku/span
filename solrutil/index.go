@@ -3,6 +3,7 @@ package solrutil
 
 import (
 	"fmt"
+	"io"
 	"maps"
 	"math/rand"
 	"net/http"
@@ -157,10 +158,11 @@ func decodeLink(link string, value any) error {
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode >= 400 {
-		return fmt.Errorf("select failed with HTTP %d at %s", resp.StatusCode, link)
-	}
 	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 2048))
+		return fmt.Errorf("select failed with HTTP %d at %s: %s", resp.StatusCode, link, strings.TrimSpace(string(body)))
+	}
 	return json.NewDecoder(resp.Body).Decode(value)
 }
 
@@ -217,6 +219,24 @@ func (index Index) FacetKeys(query, field string) (result []string, err error) {
 		return result, err
 	}
 	return slices.Collect(maps.Keys(fmap)), nil
+}
+
+// SchemaFields returns the list of field names defined in the Solr schema.
+func (index Index) SchemaFields() ([]string, error) {
+	link := fmt.Sprintf("%s/schema/fields?wt=json", index.Server)
+	var resp struct {
+		Fields []struct {
+			Name string `json:"name"`
+		} `json:"fields"`
+	}
+	if err := decodeLink(link, &resp); err != nil {
+		return nil, err
+	}
+	out := make([]string, 0, len(resp.Fields))
+	for _, f := range resp.Fields {
+		out = append(out, f.Name)
+	}
+	return out, nil
 }
 
 // NumFound returns the size of the result set for a query.

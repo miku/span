@@ -77,7 +77,11 @@ func usage(w *os.File) {
 	}
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Flags common to all subcommands:")
-	fmt.Fprintln(w, "  -s, --server URL   SOLR server (default "+defaultServer+", or $SPAN_INDEX_SERVER)")
+	def := defaultServer
+	if v := os.Getenv("SPAN_INDEX_SERVER"); v != "" {
+		def = v
+	}
+	fmt.Fprintln(w, "  -s, --server URL   SOLR server (default "+def+") [$SPAN_INDEX_SERVER]")
 	fmt.Fprintln(w, "  -h, --help         show this help (or per-subcommand flags)")
 	fmt.Fprintln(w, "  -v, --version      print version")
 	fmt.Fprintln(w)

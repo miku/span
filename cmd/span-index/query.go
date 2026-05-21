@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"slices"
 	"strings"
@@ -184,9 +185,15 @@ func runQuery(args []string) error {
 	idx := indexFor(*server)
 	switch {
 	case qf.missing != "":
-		return printNumFound(idx, fmt.Sprintf("-%s:[* TO *]", qf.missing))
+		if err := checkField(idx, qf.missing); err != nil {
+			return err
+		}
+		return printNumFoundFq(idx, q, fmt.Sprintf("-%s:[* TO *]", qf.missing))
 	case qf.has != "":
-		return printNumFound(idx, fmt.Sprintf("%s:[* TO *]", qf.has))
+		if err := checkField(idx, qf.has); err != nil {
+			return err
+		}
+		return printNumFoundFq(idx, q, fmt.Sprintf("%s:[* TO *]", qf.has))
 	case qf.field != "":
 		return printFacet(idx, q, qf.field, qf.limit)
 	case qf.shortField != "":
@@ -251,6 +258,49 @@ func printNumFound(idx solrutil.Index, q string) error {
 		return err
 	}
 	fmt.Println(n)
+	return nil
+}
+
+// checkField verifies that name is defined in the Solr schema. On miss it
+// returns an error listing close matches (substring containment, case-insensitive),
+// or the full field list if none are close.
+func checkField(idx solrutil.Index, name string) error {
+	fields, err := idx.SchemaFields()
+	if err != nil {
+		return fmt.Errorf("schema lookup failed: %w", err)
+	}
+	if slices.Contains(fields, name) {
+		return nil
+	}
+	var near []string
+	lname := strings.ToLower(name)
+	for _, f := range fields {
+		if strings.Contains(strings.ToLower(f), lname) {
+			near = append(near, f)
+		}
+	}
+	slices.Sort(fields)
+	if len(near) > 0 {
+		slices.Sort(near)
+		return fmt.Errorf("field %q is not in the schema; did you mean: %s", name, strings.Join(near, ", "))
+	}
+	return fmt.Errorf("field %q is not in the schema (have %d fields: %s)", name, len(fields), strings.Join(fields, ", "))
+}
+
+// printNumFoundFq runs q with an extra filter query (fq). Using fq for the
+// negation avoids the pure-negative-query trap of Solr's standard parser when
+// expressing "field is missing".
+func printNumFoundFq(idx solrutil.Index, q, fq string) error {
+	vals := url.Values{}
+	vals.Add("q", q)
+	vals.Add("fq", fq)
+	vals.Add("rows", "0")
+	vals.Add("wt", "json")
+	resp, err := idx.Select(vals)
+	if err != nil {
+		return err
+	}
+	fmt.Println(resp.Response.NumFound)
 	return nil
 }
 
