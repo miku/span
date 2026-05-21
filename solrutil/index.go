@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"slices"
 	"strings"
 
@@ -111,13 +112,16 @@ type FacetMap map[string]int
 type Index struct {
 	Server     string
 	FacetLimit int
+	// Debug, when true, logs the constructed SOLR URL of every request to
+	// stderr before it is sent.
+	Debug bool
 }
 
 // Select allows to pass any parameter to select.
 func (index Index) Select(vs url.Values) (*SelectResponse, error) {
 	link := fmt.Sprintf("%s/select?%s", index.Server, vs.Encode())
 	resp := new(SelectResponse)
-	if err := decodeLink(link, resp); err != nil {
+	if err := index.decodeLink(link, resp); err != nil {
 		return nil, err
 	}
 	return resp, nil
@@ -153,7 +157,11 @@ func (index Index) FacetLink(query, facetField string) string {
 }
 
 // decodeLink fetches a link and unmarshals the response into a given value.
-func decodeLink(link string, value any) error {
+// When index.Debug is true the URL is logged to stderr before the fetch.
+func (index Index) decodeLink(link string, value any) error {
+	if index.Debug {
+		fmt.Fprintf(os.Stderr, "[solr] GET %s\n", link)
+	}
 	resp, err := http.Get(link)
 	if err != nil {
 		return err
@@ -169,14 +177,14 @@ func decodeLink(link string, value any) error {
 // SelectQuery runs a select query.
 func (index Index) SelectQuery(query string) (resp *SelectResponse, err error) {
 	resp = new(SelectResponse)
-	err = decodeLink(index.selectLink(query), resp)
+	err = index.decodeLink(index.selectLink(query), resp)
 	return
 }
 
 // FacetQuery runs a facet query.
 func (index Index) FacetQuery(query, facetField string) (resp *SelectResponse, err error) {
 	resp = new(SelectResponse)
-	err = decodeLink(index.FacetLink(query, facetField), resp)
+	err = index.decodeLink(index.FacetLink(query, facetField), resp)
 	return
 }
 
@@ -221,22 +229,59 @@ func (index Index) FacetKeys(query, field string) (result []string, err error) {
 	return slices.Collect(maps.Keys(fmap)), nil
 }
 
+// SchemaField captures the subset of per-field properties span-index needs.
+// The values reflect the field type defaults merged with any field-level
+// overrides (i.e. the schema API is queried with showDefaults=true).
+type SchemaField struct {
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Indexed     bool   `json:"indexed"`
+	Stored      bool   `json:"stored"`
+	DocValues   bool   `json:"docValues"`
+	TermVectors bool   `json:"termVectors"`
+	OmitNorms   bool   `json:"omitNorms"`
+	MultiValued bool   `json:"multiValued"`
+}
+
+// HasNorms reports whether norms are likely indexed for this field. Lucene
+// indexes norms unless the field type omits them; the schema API surfaces this
+// as omitNorms (true = no norms).
+func (f SchemaField) HasNorms() bool { return !f.OmitNorms }
+
+// CanCheckExistence reports whether Solr can answer "field has a value" /
+// "field is missing" queries on this field. Lucene's FieldExistsQuery (which
+// `field:*` and `field:[* TO *]` both rewrite to) requires docValues, norms,
+// or termVectors.
+func (f SchemaField) CanCheckExistence() bool {
+	return f.Indexed && (f.DocValues || f.HasNorms() || f.TermVectors)
+}
+
 // SchemaFields returns the list of field names defined in the Solr schema.
 func (index Index) SchemaFields() ([]string, error) {
-	link := fmt.Sprintf("%s/schema/fields?wt=json", index.Server)
-	var resp struct {
-		Fields []struct {
-			Name string `json:"name"`
-		} `json:"fields"`
-	}
-	if err := decodeLink(link, &resp); err != nil {
+	fields, err := index.SchemaFieldsFull()
+	if err != nil {
 		return nil, err
 	}
-	out := make([]string, 0, len(resp.Fields))
-	for _, f := range resp.Fields {
+	out := make([]string, 0, len(fields))
+	for _, f := range fields {
 		out = append(out, f.Name)
 	}
 	return out, nil
+}
+
+// SchemaFieldsFull returns the full per-field definitions, including the
+// flags that determine which queries are valid against each field. The
+// schema API is queried with showDefaults=true so that values inherited from
+// the field type are present on each field entry.
+func (index Index) SchemaFieldsFull() ([]SchemaField, error) {
+	link := fmt.Sprintf("%s/schema/fields?showDefaults=true&wt=json", index.Server)
+	var resp struct {
+		Fields []SchemaField `json:"fields"`
+	}
+	if err := index.decodeLink(link, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Fields, nil
 }
 
 // NumFound returns the size of the result set for a query.

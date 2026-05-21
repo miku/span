@@ -10,7 +10,7 @@ import (
 // runSelect handles "span-index select", which forwards a raw Solr query and
 // streams matching documents as one JSON object per line.
 func runSelect(args []string) error {
-	fs, server := newFlagSet("select")
+	fs, server, debug := newFlagSet("select")
 	q := fs.StringP("query", "q", "*:*", "Solr query")
 	rows := fs.Int("rows", 10, "max docs to return")
 	sort := fs.String("sort", "", "Solr sort spec, e.g. \"last_indexed desc\"")
@@ -39,7 +39,7 @@ func runSelect(args []string) error {
 	if *fl != "" {
 		vs.Set("fl", *fl)
 	}
-	resp, err := indexFor(*server).Select(vs)
+	resp, err := indexFor(*server, *debug).Select(vs)
 	if err != nil {
 		return err
 	}

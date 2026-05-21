@@ -44,7 +44,7 @@ type preparedDump struct {
 const dumpMagic = "span-index/compare/v1"
 
 func runCompare(args []string) error {
-	fs, server := newFlagSet("compare")
+	fs, server, debug := newFlagSet("compare")
 	file := fs.String("file", "", "JSONL file to compare against the index (zstd ok)")
 	sid := fs.String("sid", "", "scope index query to source_id; auto-detected if omitted and the file has one")
 	all := fs.Bool("all", false, "include ISILs that appear only in the index")
@@ -106,7 +106,7 @@ func runCompare(args []string) error {
 
 	vlog("query index source_id=%q", resolvedSID)
 	t1 := time.Now()
-	indexFacets, err := fetchIndexFacets(indexFor(*server), resolvedSID)
+	indexFacets, err := fetchIndexFacets(indexFor(*server, *debug), resolvedSID)
 	if err != nil {
 		return err
 	}

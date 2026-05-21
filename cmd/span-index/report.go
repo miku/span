@@ -41,7 +41,7 @@ var reports = map[string]struct {
 }
 
 func runReport(args []string) error {
-	fs, server := newFlagSet("report")
+	fs, server, debug := newFlagSet("report")
 	name := fs.String("name", "", "report name (use --list to enumerate)")
 	list := fs.Bool("list", false, "list available reports")
 	setExamples(fs,
@@ -78,7 +78,7 @@ func runReport(args []string) error {
 	if !ok {
 		return fmt.Errorf("unknown report %q", *name)
 	}
-	return r.run(indexFor(*server), fs.Args())
+	return r.run(indexFor(*server, *debug), fs.Args())
 }
 
 // --- issn report -------------------------------------------------------------

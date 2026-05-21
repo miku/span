@@ -82,6 +82,7 @@ func usage(w *os.File) {
 		def = v
 	}
 	fmt.Fprintln(w, "  -s, --server URL   SOLR server (default "+def+") [$SPAN_INDEX_SERVER]")
+	fmt.Fprintln(w, "      --debug        log every SOLR URL to stderr before the request")
 	fmt.Fprintln(w, "  -h, --help         show this help (or per-subcommand flags)")
 	fmt.Fprintln(w, "  -v, --version      print version")
 	fmt.Fprintln(w)
@@ -97,17 +98,18 @@ func usage(w *os.File) {
 }
 
 // newFlagSet returns a FlagSet that prints usage to stderr and exits on error.
-// The --server / -s flag for the SOLR server is registered automatically;
-// subcommands read its value via the returned *string. If SPAN_INDEX_SERVER
-// is set, it is used as the default value (the flag still overrides it).
-func newFlagSet(name string) (*pflag.FlagSet, *string) {
+// The --server / -s and --debug flags are registered automatically; subcommands
+// read their values via the returned pointers. If SPAN_INDEX_SERVER is set,
+// it is used as the default value for --server (the flag still overrides it).
+func newFlagSet(name string) (*pflag.FlagSet, *string, *bool) {
 	fs := pflag.NewFlagSet(name, pflag.ExitOnError)
 	def := defaultServer
 	if v := os.Getenv("SPAN_INDEX_SERVER"); v != "" {
 		def = v
 	}
 	server := fs.StringP("server", "s", def, "SOLR server URL [$SPAN_INDEX_SERVER]")
-	return fs, server
+	debug := fs.Bool("debug", false, "log every SOLR URL to stderr before the request")
+	return fs, server, debug
 }
 
 // setExamples appends an "Examples:" block to the FlagSet's -h output.
@@ -128,7 +130,7 @@ func setExamples(fs *pflag.FlagSet, examples ...string) {
 	}
 }
 
-// indexFor builds a solrutil.Index from a server string.
-func indexFor(server string) solrutil.Index {
-	return solrutil.Index{Server: solrutil.PrependHTTP(server)}
+// indexFor builds a solrutil.Index from a server string and a debug flag.
+func indexFor(server string, debug bool) solrutil.Index {
+	return solrutil.Index{Server: solrutil.PrependHTTP(server), Debug: debug}
 }

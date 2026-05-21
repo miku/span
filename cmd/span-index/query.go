@@ -77,7 +77,7 @@ var byFields = []struct {
 }
 
 func runQuery(args []string) error {
-	fs, server := newFlagSet("query")
+	fs, server, debug := newFlagSet("query")
 	qf := &queryFlags{}
 
 	// filters
@@ -117,7 +117,9 @@ func runQuery(args []string) error {
 		"span-index query --since 1.day.ago",
 		"span-index query --after 2026-01-01 --before 2026-02-01 --sid 49",
 		"span-index query --missing doi",
+		"span-index query --missing record_id --by-sid",
 		"span-index query --has issn --sid 49",
+		"span-index query --has issn --by-sid",
 		`span-index query --q "source_id:49 AND format:Article" --size`,
 	)
 
@@ -144,36 +146,28 @@ func runQuery(args []string) error {
 		}
 	}
 
-	// Validate mutual exclusion. Build a list of which breakdown switches were set.
-	chosen := []string{}
+	// --missing and --has are filters (composed via fq), not breakdowns; they
+	// may combine with --size or with a facet breakdown.
+	breakdowns := []string{}
 	if qf.size {
-		chosen = append(chosen, "--size")
+		breakdowns = append(breakdowns, "--size")
 	}
 	if qf.field != "" {
-		chosen = append(chosen, "--field")
-	}
-	if qf.missing != "" {
-		chosen = append(chosen, "--missing")
-	}
-	if qf.has != "" {
-		chosen = append(chosen, "--has")
+		breakdowns = append(breakdowns, "--field")
 	}
 	if qf.shortcut != "" {
-		chosen = append(chosen, "--"+qf.shortcut)
+		breakdowns = append(breakdowns, "--"+qf.shortcut)
 	}
 	if qf.byField != "" {
-		chosen = append(chosen, "--by-*")
+		breakdowns = append(breakdowns, "--by-*")
 	}
-
 	// --size + a --by-* / shortcut facet is allowed (both mean "facet on field"),
-	// the --size flag is purely cosmetic in that combination. Flag it as not a
-	// conflict.
+	// the --size flag is purely cosmetic in that combination.
 	if qf.size && (qf.shortcut != "" || qf.byField != "") {
-		// remove --size from chosen; the facet flag wins
-		chosen = filter(chosen, "--size")
+		breakdowns = filter(breakdowns, "--size")
 	}
-	if len(chosen) > 1 {
-		return fmt.Errorf("breakdown flags are mutually exclusive: %s", strings.Join(chosen, ", "))
+	if len(breakdowns) > 1 {
+		return fmt.Errorf("breakdown flags are mutually exclusive: %s", strings.Join(breakdowns, ", "))
 	}
 
 	// Build the filter query.
@@ -182,28 +176,39 @@ func runQuery(args []string) error {
 		return err
 	}
 
-	idx := indexFor(*server)
-	switch {
-	case qf.missing != "":
-		if err := checkField(idx, qf.missing); err != nil {
+	idx := indexFor(*server, *debug)
+
+	// Compose fq clauses from --missing / --has. Pre-validate fields against
+	// the schema so we fail fast with a useful message.
+	var fqs []string
+	if qf.missing != "" {
+		if err := checkExistenceQueryable(idx, qf.missing); err != nil {
 			return err
 		}
-		return printNumFoundFq(idx, q, fmt.Sprintf("-%s:[* TO *]", qf.missing))
-	case qf.has != "":
-		if err := checkField(idx, qf.has); err != nil {
-			return err
-		}
-		return printNumFoundFq(idx, q, fmt.Sprintf("%s:[* TO *]", qf.has))
-	case qf.field != "":
-		return printFacet(idx, q, qf.field, qf.limit)
-	case qf.shortField != "":
-		return printFacet(idx, q, qf.shortField, qf.limit)
-	case qf.byField != "":
-		return printFacet(idx, q, qf.byField, qf.limit)
-	default:
-		// --size or no breakdown flag: total count
-		return printNumFound(idx, q)
+		fqs = append(fqs, fmt.Sprintf("-%s:*", qf.missing))
 	}
+	if qf.has != "" {
+		if err := checkExistenceQueryable(idx, qf.has); err != nil {
+			return err
+		}
+		fqs = append(fqs, fmt.Sprintf("%s:*", qf.has))
+	}
+
+	// Pick the breakdown field, if any.
+	facetField := ""
+	switch {
+	case qf.field != "":
+		facetField = qf.field
+	case qf.shortField != "":
+		facetField = qf.shortField
+	case qf.byField != "":
+		facetField = qf.byField
+	}
+
+	if facetField != "" {
+		return printFacetFq(idx, q, fqs, facetField, qf.limit)
+	}
+	return printNumFoundFq(idx, q, fqs)
 }
 
 // buildQuery assembles a Solr query string from the filter flags. If --q was
@@ -252,48 +257,73 @@ func buildQuery(qf *queryFlags) (string, error) {
 	return strings.Join(clauses, " AND "), nil
 }
 
-func printNumFound(idx solrutil.Index, q string) error {
-	n, err := idx.NumFound(q)
-	if err != nil {
-		return err
-	}
-	fmt.Println(n)
-	return nil
-}
-
-// checkField verifies that name is defined in the Solr schema. On miss it
-// returns an error listing close matches (substring containment, case-insensitive),
-// or the full field list if none are close.
-func checkField(idx solrutil.Index, name string) error {
-	fields, err := idx.SchemaFields()
+// checkExistenceQueryable verifies that name is defined in the Solr schema
+// and that Solr can answer "field has a value / is missing" queries on it.
+// Lucene's FieldExistsQuery requires docValues, norms, or termVectors.
+func checkExistenceQueryable(idx solrutil.Index, name string) error {
+	fields, err := idx.SchemaFieldsFull()
 	if err != nil {
 		return fmt.Errorf("schema lookup failed: %w", err)
 	}
-	if slices.Contains(fields, name) {
-		return nil
-	}
-	var near []string
-	lname := strings.ToLower(name)
-	for _, f := range fields {
-		if strings.Contains(strings.ToLower(f), lname) {
-			near = append(near, f)
+	var field *solrutil.SchemaField
+	names := make([]string, 0, len(fields))
+	for i := range fields {
+		names = append(names, fields[i].Name)
+		if fields[i].Name == name {
+			field = &fields[i]
 		}
 	}
-	slices.Sort(fields)
-	if len(near) > 0 {
-		slices.Sort(near)
-		return fmt.Errorf("field %q is not in the schema; did you mean: %s", name, strings.Join(near, ", "))
+	if field == nil {
+		var near []string
+		lname := strings.ToLower(name)
+		for _, f := range names {
+			if strings.Contains(strings.ToLower(f), lname) {
+				near = append(near, f)
+			}
+		}
+		slices.Sort(names)
+		if len(near) > 0 {
+			slices.Sort(near)
+			return fmt.Errorf("field %q is not in the schema; did you mean: %s", name, strings.Join(near, ", "))
+		}
+		return fmt.Errorf("field %q is not in the schema (have %d fields: %s)", name, len(names), strings.Join(names, ", "))
 	}
-	return fmt.Errorf("field %q is not in the schema (have %d fields: %s)", name, len(fields), strings.Join(fields, ", "))
+	if !field.Indexed {
+		return fmt.Errorf("field %q (type %s) is not indexed; cannot run existence queries against it.\n%s",
+			name, field.Type, existenceCandidates(fields))
+	}
+	if !field.CanCheckExistence() {
+		return fmt.Errorf("field %q (type %s) has no docValues, norms, or termVectors; Solr cannot count missing/has values for it. Enable docValues=true on the field (or its field type) in the schema to make this query work.\n%s",
+			name, field.Type, existenceCandidates(fields))
+	}
+	return nil
 }
 
-// printNumFoundFq runs q with an extra filter query (fq). Using fq for the
-// negation avoids the pure-negative-query trap of Solr's standard parser when
-// expressing "field is missing".
-func printNumFoundFq(idx solrutil.Index, q, fq string) error {
+// existenceCandidates renders a one-line summary of fields that *can* be used
+// with --missing / --has, so the user knows what to try instead.
+func existenceCandidates(fields []solrutil.SchemaField) string {
+	var ok []string
+	for _, f := range fields {
+		if f.CanCheckExistence() {
+			ok = append(ok, f.Name)
+		}
+	}
+	if len(ok) == 0 {
+		return "no fields in this schema support missing/has queries"
+	}
+	slices.Sort(ok)
+	return fmt.Sprintf("fields that support missing/has queries (%d): %s", len(ok), strings.Join(ok, ", "))
+}
+
+// printNumFoundFq runs q with zero or more filter queries (fq) and prints the
+// resulting numFound. Filter queries are used for negations like
+// -field:* to sidestep the pure-negative-query trap of Solr's standard parser.
+func printNumFoundFq(idx solrutil.Index, q string, fqs []string) error {
 	vals := url.Values{}
 	vals.Add("q", q)
-	vals.Add("fq", fq)
+	for _, fq := range fqs {
+		vals.Add("fq", fq)
+	}
 	vals.Add("rows", "0")
 	vals.Add("wt", "json")
 	resp, err := idx.Select(vals)
@@ -304,11 +334,24 @@ func printNumFoundFq(idx solrutil.Index, q, fq string) error {
 	return nil
 }
 
-func printFacet(idx solrutil.Index, query, field string, limit int) error {
-	if limit > 0 {
-		idx.FacetLimit = limit
+// printFacetFq runs a facet on field over q with optional filter queries (fq).
+// Used so --by-* / --field / shortcut facets compose with --missing and --has.
+func printFacetFq(idx solrutil.Index, q string, fqs []string, field string, limit int) error {
+	vals := url.Values{}
+	vals.Add("q", q)
+	for _, fq := range fqs {
+		vals.Add("fq", fq)
 	}
-	resp, err := idx.FacetQuery(query, field)
+	vals.Add("facet", "true")
+	vals.Add("facet.field", field)
+	facetLimit := limit
+	if facetLimit <= 0 {
+		facetLimit = solrutil.DefaultFacetLimit
+	}
+	vals.Add("facet.limit", fmt.Sprintf("%d", facetLimit))
+	vals.Add("rows", "0")
+	vals.Add("wt", "json")
+	resp, err := idx.Select(vals)
 	if err != nil {
 		return err
 	}
