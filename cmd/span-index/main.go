@@ -77,7 +77,7 @@ func usage(w *os.File) {
 	}
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Flags common to all subcommands:")
-	fmt.Fprintln(w, "  -s, --server URL   SOLR server (default "+defaultServer+")")
+	fmt.Fprintln(w, "  -s, --server URL   SOLR server (default "+defaultServer+", or $SPAN_INDEX_SERVER)")
 	fmt.Fprintln(w, "  -h, --help         show this help (or per-subcommand flags)")
 	fmt.Fprintln(w, "  -v, --version      print version")
 	fmt.Fprintln(w)
@@ -94,10 +94,15 @@ func usage(w *os.File) {
 
 // newFlagSet returns a FlagSet that prints usage to stderr and exits on error.
 // The --server / -s flag for the SOLR server is registered automatically;
-// subcommands read its value via the returned *string.
+// subcommands read its value via the returned *string. If SPAN_INDEX_SERVER
+// is set, it is used as the default value (the flag still overrides it).
 func newFlagSet(name string) (*pflag.FlagSet, *string) {
 	fs := pflag.NewFlagSet(name, pflag.ExitOnError)
-	server := fs.StringP("server", "s", defaultServer, "SOLR server URL")
+	def := defaultServer
+	if v := os.Getenv("SPAN_INDEX_SERVER"); v != "" {
+		def = v
+	}
+	server := fs.StringP("server", "s", def, "SOLR server URL [$SPAN_INDEX_SERVER]")
 	return fs, server
 }
 
