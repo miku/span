@@ -26,6 +26,7 @@ type queryFlags struct {
 	format      string
 	institution string
 	since       string
+	until       string
 	after       string
 	before      string
 
@@ -88,6 +89,7 @@ func runQuery(args []string) error {
 	fs.StringVar(&qf.format, "format", "", "filter by format")
 	fs.StringVar(&qf.institution, "institution", "", "filter by institution (ISIL)")
 	fs.StringVar(&qf.since, "since", "", "filter last_indexed >= DATE (ISO or git-like, e.g. 1.day.ago)")
+	fs.StringVar(&qf.until, "until", "", "filter last_indexed <= DATE (ISO or git-like, e.g. 30.days.ago)")
 	fs.StringVar(&qf.after, "after", "", "filter publishDate > DATE")
 	fs.StringVar(&qf.before, "before", "", "filter publishDate < DATE")
 
@@ -115,6 +117,8 @@ func runQuery(args []string) error {
 		"span-index query --by-sid",
 		"span-index query --formats --sid 49",
 		"span-index query --since 1.day.ago",
+		"span-index query --until 30.days.ago --size",
+		"span-index query --until 2026-01-01 --sid 53 --size",
 		"span-index query --after 2026-01-01 --before 2026-02-01 --sid 49",
 		"span-index query --missing doi",
 		"span-index query --missing record_id --by-sid",
@@ -236,6 +240,13 @@ func buildQuery(qf *queryFlags) (string, error) {
 			return "", fmt.Errorf("--since: %w", err)
 		}
 		clauses = append(clauses, fmt.Sprintf("last_indexed:[%s TO *]", formatSolrDate(t)))
+	}
+	if qf.until != "" {
+		t, err := parseDate(qf.until)
+		if err != nil {
+			return "", fmt.Errorf("--until: %w", err)
+		}
+		clauses = append(clauses, fmt.Sprintf("last_indexed:[* TO %s]", formatSolrDate(t)))
 	}
 	if qf.after != "" {
 		t, err := parseDate(qf.after)

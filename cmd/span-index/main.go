@@ -1,11 +1,12 @@
 // span-index is a read-only client for the finc SOLR index.
 //
-// It exposes four subcommands:
+// It exposes five subcommands:
 //
 //	span-index query    composable filter + breakdown queries
 //	span-index select   raw SOLR -q query, JSON docs out
 //	span-index compare  diff per-ISIL counts between a JSONL file and the index
 //	span-index report   named multi-query reports (e.g. issn/date histograms)
+//	span-index cleanup  emit (to stdout, never executed) a delete-by-query for stale records
 //
 // Run "span-index <subcommand> -h" for flags. "span-index help" prints this list.
 package main
@@ -36,6 +37,7 @@ var subcommands = []subcommand{
 	{name: "select", short: "raw SOLR query, prints JSON docs", run: runSelect},
 	{name: "compare", short: "compare ISIL counts between a JSONL file and the index", run: runCompare},
 	{name: "report", short: "named multi-query reports", run: runReport},
+	{name: "cleanup", short: "emit (stdout only) a delete-by-query for records indexed before a date", run: runCleanup},
 }
 
 func main() {
@@ -91,10 +93,12 @@ func usage(w *os.File) {
 	fmt.Fprintln(w, "  span-index query --size --sid 49")
 	fmt.Fprintln(w, "  span-index query --formats --sid 49")
 	fmt.Fprintln(w, "  span-index query --since 1.day.ago")
+	fmt.Fprintln(w, "  span-index query --until 30.days.ago --size")
 	fmt.Fprintln(w, "  span-index query --after 2026-01-01 --before 2026-02-01")
 	fmt.Fprintln(w, `  span-index select -q "source_id:49 AND format:Article"`)
 	fmt.Fprintln(w, "  span-index compare --sid 49 --file file.ldj")
 	fmt.Fprintln(w, "  span-index report --name issn --sid 49")
+	fmt.Fprintln(w, "  span-index cleanup --until 2026-01-01 --sid 53")
 }
 
 // newFlagSet returns a FlagSet that prints usage to stderr and exits on error.
