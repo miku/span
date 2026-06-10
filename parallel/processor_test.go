@@ -96,6 +96,20 @@ func TestSimple(t *testing.T) {
 			},
 			err: nil,
 		},
+		{
+			about:    "last line without trailing separator is processed",
+			r:        strings.NewReader("a\nb"),
+			expected: "A\nB",
+			f:        func(_ int64, b []byte) ([]byte, error) { return bytes.ToUpper(b), nil },
+			err:      nil,
+		},
+		{
+			about:    "single line without trailing separator is processed",
+			r:        strings.NewReader("a"),
+			expected: "A",
+			f:        func(_ int64, b []byte) ([]byte, error) { return bytes.ToUpper(b), nil },
+			err:      nil,
+		},
 	}
 
 	for _, c := range cases {
@@ -110,5 +124,45 @@ func TestSimple(t *testing.T) {
 				t.Errorf("p.Run: got %v, want %v", buf.String(), c.expected)
 			}
 		})
+	}
+}
+
+// TestConcurrentErrors exercises the error path with many workers and small
+// batches; run with -race to verify error recording is synchronized.
+func TestConcurrentErrors(t *testing.T) {
+	var sb strings.Builder
+	for i := 0; i < 10000; i++ {
+		sb.WriteString("x\n")
+	}
+	p := NewProcessor(strings.NewReader(sb.String()), io.Discard, func(lineno int64, b []byte) ([]byte, error) {
+		if lineno%3 == 0 {
+			return nil, errFake1
+		}
+		return b, nil
+	})
+	p.BatchSize = 10
+	if err := p.Run(); err != errFake1 {
+		t.Errorf("p.Run: got %v, want %v", err, errFake1)
+	}
+}
+
+// TestAllLinesProcessed checks that every input line shows up in the output,
+// independent of batch boundaries and worker count.
+func TestAllLinesProcessed(t *testing.T) {
+	var sb strings.Builder
+	for i := 0; i < 5000; i++ {
+		sb.WriteString("x\n")
+	}
+	sb.WriteString("x") // no trailing newline
+	var buf bytes.Buffer
+	p := NewProcessor(strings.NewReader(sb.String()), &buf, func(_ int64, b []byte) ([]byte, error) {
+		return []byte("y"), nil
+	})
+	p.BatchSize = 7
+	if err := p.Run(); err != nil {
+		t.Fatalf("p.Run: %v", err)
+	}
+	if got := buf.Len(); got != 5001 {
+		t.Errorf("got %d lines, want 5001", got)
 	}
 }

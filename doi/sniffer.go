@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/miku/parallel"
 	"github.com/miku/span/container"
+	"github.com/miku/span/parallel"
 	"github.com/segmentio/encoding/json"
 )
 
@@ -61,7 +61,7 @@ func NewSniffer(r io.Reader, w io.Writer) *Sniffer {
 
 // Run sniffs out DOI and eventually updates a document in place.
 func (s *Sniffer) Run() error {
-	pp := parallel.NewProcessor(s.Reader, s.Writer, func(p []byte) ([]byte, error) {
+	pp := parallel.NewProcessor(s.Reader, s.Writer, func(_ int64, p []byte) ([]byte, error) {
 		var (
 			data   map[string]any
 			result []string
@@ -112,8 +112,12 @@ func (s *Sniffer) Run() error {
 			return []byte(s), nil
 		}
 	})
-	pp.NumWorkers = s.NumWorkers
-	pp.BatchSize = s.BatchSize
+	if s.NumWorkers > 0 {
+		pp.NumWorkers = s.NumWorkers
+	}
+	if s.BatchSize > 0 {
+		pp.BatchSize = s.BatchSize
+	}
 	return pp.Run()
 }
 

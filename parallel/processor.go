@@ -58,9 +58,10 @@ func (bb *BytesBatch) Add(b Record) {
 	bb.b = append(bb.b, b)
 }
 
-// Reset empties this batch.
+// Reset empties this batch, keeping the underlying array for reuse. This is
+// safe, because Slice returns a copy of the records.
 func (bb *BytesBatch) Reset() {
-	bb.b = nil
+	bb.b = bb.b[:0]
 }
 
 // Size returns the number of elements in the batch.
@@ -114,19 +115,36 @@ func (p *Processor) RunWorkers(numWorkers int) error {
 
 // Run starts the workers, crunching through the input.
 func (p *Processor) Run() error {
-	// wErr signals a worker or writer error. If an error occurs, the items in
-	// the queue are still process, just no items are added to the queue. There
-	// is only one way to toggle this, from false to true, so we don't care
-	// about synchronisation.
-	var wErr error
-	// The worker fetches items from a queue, executes f and sends the result to the out channel.
+	// procErr records the first worker or writer error. If an error occurs,
+	// items already in the queue are still processed, just no new batches are
+	// enqueued. Access is guarded by a mutex, the producer only checks it
+	// between batches.
+	var (
+		mu      sync.Mutex
+		procErr error
+	)
+	setErr := func(err error) {
+		mu.Lock()
+		if procErr == nil {
+			procErr = err
+		}
+		mu.Unlock()
+	}
+	getErr := func() error {
+		mu.Lock()
+		defer mu.Unlock()
+		return procErr
+	}
+	// The worker fetches items from a queue, executes f and sends the result
+	// to the out channel. On error, the result is dropped.
 	worker := func(queue chan []Record, out chan []byte, f TransformerFunc, wg *sync.WaitGroup) {
 		defer wg.Done()
 		for batch := range queue {
 			for _, record := range batch {
 				r, err := f(record.lineno, record.value)
 				if err != nil {
-					wErr = err
+					setErr(err)
+					continue
 				}
 				out <- r
 			}
@@ -137,11 +155,11 @@ func (p *Processor) Run() error {
 		bw := bufio.NewWriter(w)
 		for b := range bc {
 			if _, err := bw.Write(b); err != nil {
-				wErr = err
+				setErr(err)
 			}
 		}
 		if err := bw.Flush(); err != nil {
-			wErr = err
+			setErr(err)
 		}
 		done <- true
 	}
@@ -163,37 +181,41 @@ func (p *Processor) Run() error {
 		batchBytes int64
 	)
 	for {
-		b, err := br.ReadBytes(p.RecordSeparator)
-		if err == io.EOF {
+		b, readErr := br.ReadBytes(p.RecordSeparator)
+		if readErr != nil && readErr != io.EOF {
+			return readErr
+		}
+		// A final line without a trailing separator arrives together with
+		// io.EOF and is processed like any other line.
+		if !(p.SkipEmptyLines && len(bytes.TrimSpace(b)) == 0) {
+			batch.Add(Record{lineno: i, value: b})
+			batchBytes += int64(len(b))
+			i++
+			if batch.Size() == p.BatchSize || batchBytes > p.BatchMemoryLimit {
+				if batchBytes > p.BatchMemoryLimit {
+					log.Printf("trim batch to %d, exceeding memory limit %d", batch.Size(), batchBytes)
+				}
+				// To avoid checking on each line, we only check for worker or
+				// write errors here.
+				if getErr() != nil {
+					break
+				}
+				queue <- batch.Slice()
+				batch.Reset()
+				batchBytes = 0
+			}
+		}
+		if readErr == io.EOF {
 			break
 		}
-		if err != nil {
-			return err
-		}
-		if len(bytes.TrimSpace(b)) == 0 && p.SkipEmptyLines {
-			continue
-		}
-		batch.Add(Record{lineno: i, value: b})
-		batchBytes += int64(len(b))
-		if batch.Size() == p.BatchSize || batchBytes > p.BatchMemoryLimit {
-			if batchBytes > p.BatchMemoryLimit {
-				log.Printf("trim batch to %d, exceeding memory limit %d", batch.Size(), batchBytes)
-			}
-			// To avoid checking on each loop, we only check for worker or write errors here.
-			if wErr != nil {
-				break
-			}
-			queue <- batch.Slice()
-			batch.Reset()
-			batchBytes = 0
-		}
-		i++
 	}
-	queue <- batch.Slice()
-	batch.Reset()
+	if batch.Size() > 0 && getErr() == nil {
+		queue <- batch.Slice()
+		batch.Reset()
+	}
 	close(queue)
 	wg.Wait()
 	close(out)
 	<-done
-	return wErr
+	return getErr()
 }

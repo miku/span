@@ -17,7 +17,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.44
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/miku/clam v0.1.0
-	github.com/miku/parallel v0.1.3
 	github.com/miku/xmlstream v0.0.0-20190415141048-c7ce7c45f0e0
 	github.com/segmentio/encoding v0.5.4
 	github.com/sethgrid/pester v1.2.0
