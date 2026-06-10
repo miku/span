@@ -41,6 +41,9 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 		if err != nil {
 			return 0, err
 		}
+		// Parse dates once at load time, so the copies that end up in the
+		// lookup maps carry the cache into the hot tagging path.
+		entry.ParseDates()
 		*h = append(*h, entry)
 	}
 	return int64(wc.Count()), nil

@@ -215,6 +215,16 @@ func (entry *Entry) Covers(date, volume, issue string) error {
 	return entry.coversVolumeIssue(t, volume, issue)
 }
 
+// ParseDates eagerly populates the cached, parsed first and last issue dates.
+// Entries are copied into per-ISSN and per-title lookup maps and shared across
+// worker goroutines; parsing up front means every copy carries the cache
+// (instead of discarding lazily parsed dates with each copy) and no
+// unsynchronized lazy cache writes happen later.
+func (entry *Entry) ParseDates() {
+	entry.begin()
+	entry.end()
+}
+
 // begin parses left boundary of license interval, returns a date far in the
 // past if it is not defined. Should we stop here, if date parsing fails?
 func (entry *Entry) begin() time.Time {
@@ -335,21 +345,9 @@ func parseWithGranularity(s string) (t time.Time, g DateGranularity, err error) 
 		if err != nil {
 			continue
 		}
-		g = getGranularity(dfmt.layout)
-		return
+		return t, dfmt.granularity, nil
 	}
 	return t, g, ErrInvalidDate
-}
-
-// getGranularity returns the granularity for given date layout, if nothing
-// matches assume the finest granularity.
-func getGranularity(layout string) DateGranularity {
-	for _, dfmt := range datePatterns {
-		if dfmt.layout == layout {
-			return dfmt.granularity
-		}
-	}
-	return GranularityDay
 }
 
 // findInt return the first int that is found in s or 0 if there is no number.

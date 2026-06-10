@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/segmentio/encoding/json"
@@ -180,7 +181,7 @@ func (f *HoldingsFilter) covers(entry licensing.Entry, is finc.IntermediateSchem
 // information from that format to decide on attachment.
 func (f *HoldingsFilter) Apply(is finc.IntermediateSchema) bool {
 	// By default test serial number.
-	for _, issn := range append(is.ISSN, is.EISSN...) {
+	for _, issn := range slices.Concat(is.ISSN, is.EISSN) {
 		for _, key := range f.Names {
 			item := Cache[key]
 			for _, entry := range item.SerialNumberMap[issn] {
