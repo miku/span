@@ -26,7 +26,6 @@ import (
 	"github.com/miku/span/formats/elsevier"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/formats/genderopen"
-	"github.com/miku/span/formats/genios"
 	"github.com/miku/span/formats/hhbd"
 	"github.com/miku/span/formats/highwire"
 	"github.com/miku/span/formats/ieee"
@@ -56,36 +55,49 @@ var (
 	verbose     = flag.Bool("verbose", false, "be verbose")
 )
 
-// Factory creates things.
-type Factory func() any
+// Input kinds determine how the raw input stream is turned into records.
+const (
+	kindXML  = "xml"  // streamed XML elements
+	kindJSON = "json" // newline delimited JSON, processed in parallel
+	kindText = "text" // a single record from raw bytes
+	kindTar  = "tar"  // special-cased shipment archives
+)
 
-// FormatMap maps format name to pointer to format struct. TODO(miku): That
-// looks just wrong.
-var FormatMap = map[string]Factory{
-	"ceeol":         func() any { return new(ceeol.Article) },
-	"ceeol-marcxml": func() any { return new(ceeol.Record) },
-	"crossref":      func() any { return new(crossref.Document) },
-	"dblp":          func() any { return new(dblp.Article) },
-	"degruyter":     func() any { return new(degruyter.Article) },
-	"doaj":          func() any { return new(doaj.ArticleV1) },
-	"doaj-legacy":   func() any { return new(doaj.Response) },
-	"doaj-oai":      func() any { return new(doaj.Record) },
-	"dummy":         func() any { return new(dummy.Example) },
-	"genderopen":    func() any { return new(genderopen.Record) },
-	"genios":        func() any { return new(genios.Document) },
-	"hhbd":          func() any { return new(hhbd.Record) },
-	"highwire":      func() any { return new(highwire.Record) },
-	"ieee":          func() any { return new(ieee.Publication) },
-	"imslp":         func() any { return new(imslp.Data) },
-	"ios":           func() any { return new(ios.Article) },
-	"jstor":         func() any { return new(jstor.Article) },
-	"mediarep-dim":  func() any { return new(mediarep.Dim) },
-	"olms":          func() any { return new(olms.Record) },
-	"olms-mets":     func() any { return new(olms.MetsRecord) },
-	"ssoar":         func() any { return new(ssoar.Record) },
-	"thieme-nlm":    func() any { return new(thieme.Record) },
-	"zvdd":          func() any { return new(zvdd.DublicCoreRecord) },
-	"zvdd-mets":     func() any { return new(zvdd.MetsRecord) },
+// format couples the factory for a record type with the kind of input
+// processing the format requires. Single source of truth for -list,
+// existence checks and dispatch.
+type format struct {
+	kind string
+	new  func() any
+}
+
+// formats maps a format name to its definition. To add a format, add one
+// entry here.
+var formats = map[string]format{
+	"ceeol":         {kindXML, func() any { return new(ceeol.Article) }},
+	"ceeol-marcxml": {kindXML, func() any { return new(ceeol.Record) }},
+	"crossref":      {kindJSON, func() any { return new(crossref.Document) }},
+	"dblp":          {kindXML, func() any { return new(dblp.Article) }},
+	"degruyter":     {kindXML, func() any { return new(degruyter.Article) }},
+	"doaj":          {kindJSON, func() any { return new(doaj.ArticleV1) }},
+	"doaj-legacy":   {kindJSON, func() any { return new(doaj.Response) }},
+	"doaj-oai":      {kindXML, func() any { return new(doaj.Record) }},
+	"dummy":         {kindJSON, func() any { return new(dummy.Example) }},
+	"elsevier-tar":  {kindTar, nil},
+	"genderopen":    {kindXML, func() any { return new(genderopen.Record) }},
+	"hhbd":          {kindXML, func() any { return new(hhbd.Record) }},
+	"highwire":      {kindXML, func() any { return new(highwire.Record) }},
+	"ieee":          {kindXML, func() any { return new(ieee.Publication) }},
+	"imslp":         {kindText, func() any { return new(imslp.Data) }},
+	"ios":           {kindXML, func() any { return new(ios.Article) }},
+	"jstor":         {kindXML, func() any { return new(jstor.Article) }},
+	"mediarep-dim":  {kindXML, func() any { return new(mediarep.Dim) }},
+	"olms":          {kindXML, func() any { return new(olms.Record) }},
+	"olms-mets":     {kindXML, func() any { return new(olms.MetsRecord) }},
+	"ssoar":         {kindXML, func() any { return new(ssoar.Record) }},
+	"thieme-nlm":    {kindXML, func() any { return new(thieme.Record) }},
+	"zvdd":          {kindXML, func() any { return new(zvdd.DublicCoreRecord) }},
+	"zvdd-mets":     {kindXML, func() any { return new(zvdd.MetsRecord) }},
 }
 
 // IntermediateSchemaer wrap a basic conversion method.
@@ -93,13 +105,10 @@ type IntermediateSchemaer interface {
 	ToIntermediateSchema() (*finc.IntermediateSchema, error)
 }
 
-// processXML converts XML based formats, given a format name. It reads XML as
-// stream and converts record them to an intermediate schema (at the moment).
-func processXML(r io.Reader, w io.Writer, name string) error {
-	if _, ok := FormatMap[name]; !ok {
-		return fmt.Errorf("unknown format name: %s", name)
-	}
-	obj := FormatMap[name]()
+// processXML converts XML based formats, given a record factory. It reads XML
+// as stream and converts records to an intermediate schema (at the moment).
+func processXML(r io.Reader, w io.Writer, newRecord func() any) error {
+	obj := newRecord()
 	scanner := xmlstream.NewScanner(bufio.NewReader(r), obj)
 	// errors like invalid character entities happen, also ISO-8859, ...
 	scanner.Decoder.Strict = false
@@ -128,12 +137,9 @@ func processXML(r io.Reader, w io.Writer, name string) error {
 }
 
 // processJSON convert JSON based formats. Input is interpreted as newline delimited JSON.
-func processJSON(r io.Reader, w io.Writer, name string) error {
-	if _, ok := FormatMap[name]; !ok {
-		return fmt.Errorf("unknown format name: %s", name)
-	}
+func processJSON(r io.Reader, w io.Writer, newRecord func() any) error {
 	p := parallel.NewProcessor(r, w, func(_ int64, b []byte) ([]byte, error) {
-		v := FormatMap[name]()
+		v := newRecord()
 		if err := json.Unmarshal(b, v); err != nil {
 			return nil, err
 		}
@@ -163,12 +169,8 @@ func processJSON(r io.Reader, w io.Writer, name string) error {
 }
 
 // processText processes a single record from raw bytes.
-func processText(r io.Reader, w io.Writer, name string) error {
-	if _, ok := FormatMap[name]; !ok {
-		return fmt.Errorf("unknown format name: %s", name)
-	}
-	// Get the format.
-	data := FormatMap[name]()
+func processText(r io.Reader, w io.Writer, newRecord func() any) error {
+	data := newRecord()
 
 	// We need an unmarshaller first.
 	unmarshaler, ok := data.(encoding.TextUnmarshaler)
@@ -215,7 +217,7 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 	if *list {
-		for _, k := range slices.Sorted(maps.Keys(FormatMap)) {
+		for _, k := range slices.Sorted(maps.Keys(formats)) {
 			fmt.Println(k)
 		}
 		os.Exit(0)
@@ -244,45 +246,27 @@ func main() {
 		}
 		reader = io.MultiReader(files...)
 	}
-	switch *name {
-	// XXX: Configure this in one place.
-	case
-		"ceeol",
-		"ceeol-marcxml",
-		"dblp",
-		"degruyter",
-		"doaj-oai",
-		"genderopen",
-		"genios",
-		"hhbd",
-		"highwire",
-		"ieee",
-		"ios",
-		"jstor",
-		"mediarep-dim",
-		"olms",
-		"olms-mets",
-		"ssoar",
-		"thieme-nlm",
-		"thieme-tm",
-		"zvdd",
-		"zvdd-mets":
-		if err := processXML(reader, w, *name); err != nil {
+	if *name == "" {
+		log.Fatalf("input format required")
+	}
+	f, ok := formats[*name]
+	if !ok {
+		log.Fatalf("unknown format: %s", *name)
+	}
+	switch f.kind {
+	case kindXML:
+		if err := processXML(reader, w, f.new); err != nil {
 			log.Fatal(err)
 		}
-	case
-		"crossref",
-		"doaj",
-		"doaj-api",
-		"dummy":
-		if err := processJSON(reader, w, *name); err != nil {
+	case kindJSON:
+		if err := processJSON(reader, w, f.new); err != nil {
 			log.Fatal(err)
 		}
-	case "imslp":
-		if err := processText(reader, w, *name); err != nil {
+	case kindText:
+		if err := processText(reader, w, f.new); err != nil {
 			log.Fatal(err)
 		}
-	case "elsevier-tar":
+	case kindTar:
 		shipment, err := elsevier.NewShipment(reader)
 		if err != nil {
 			log.Fatal(err)
@@ -298,10 +282,7 @@ func main() {
 			}
 		}
 	default:
-		if *name == "" {
-			log.Fatalf("input format required")
-		}
-		log.Fatalf("unknown format: %s", *name)
+		log.Fatalf("unhandled input kind: %s", f.kind)
 	}
 	if *memProfile != "" {
 		f, err := os.Create(*memProfile)
