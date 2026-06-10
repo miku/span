@@ -266,12 +266,8 @@ func (w *TextileWriter) WriteHeader(header ...string) {
 		return
 	}
 	w.columns = len(header)
-	var decorated []string
-	for _, h := range header {
-		// https://www.redmine.org/projects/redmine/wiki/RedmineTextFormattingTextile#Tables
-		decorated = append(decorated, fmt.Sprintf("%s", h))
-	}
-	_, w.err = fmt.Fprintf(w.w, "|_. %s |\n", strings.Join(decorated, " |_. "))
+	// https://www.redmine.org/projects/redmine/wiki/RedmineTextFormattingTextile#Tables
+	_, w.err = fmt.Fprintf(w.w, "|_. %s |\n", strings.Join(header, " |_. "))
 }
 
 // WriteFields writes fields.

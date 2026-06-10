@@ -461,7 +461,7 @@ func (s Shipment) BatchConvert() ([]finc.IntermediateSchema, error) {
 		pii := ji.JournalIssueUniqueIds.Pii
 		si, ok := s.issues[pii]
 		if !ok {
-			log.Println(fmt.Sprintf("skipping, issue referenced %s, but not cached", pii))
+			log.Printf("skipping, issue referenced %s, but not cached", pii)
 			continue
 		}
 		for _, sec := range si.IssueBody.IssueSec {
@@ -471,7 +471,7 @@ func (s Shipment) BatchConvert() ([]finc.IntermediateSchema, error) {
 				article, ok := s.articles[ii.Pii]
 
 				if !ok {
-					log.Println(fmt.Sprintf("skipping, article referenced %s, but not cached", ii.Pii))
+					log.Printf("skipping, article referenced %s, but not cached", ii.Pii)
 					continue
 				}
 

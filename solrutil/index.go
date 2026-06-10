@@ -329,7 +329,7 @@ func (index Index) RandomCollection(sid string) (string, error) {
 		return "", err
 	}
 	if len(vals) == 0 {
-		return "", fmt.Errorf("source id %s has not collections", vals)
+		return "", fmt.Errorf("source id %s has no collections", sid)
 	}
 	return vals[rand.Intn(len(vals))], nil
 }

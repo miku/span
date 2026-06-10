@@ -22,6 +22,7 @@ require (
 	github.com/segmentio/encoding v0.5.4
 	github.com/sethgrid/pester v1.2.0
 	github.com/shantanubhadoria/go-roman v0.0.0-20180925203848-b6cf86aa5b76
+	github.com/spf13/pflag v1.0.10
 	golang.org/x/net v0.54.0
 	golang.org/x/text v0.37.0
 	mvdan.cc/xurls v1.1.0
@@ -37,7 +38,6 @@ require (
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
-	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.36.0 // indirect
