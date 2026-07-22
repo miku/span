@@ -27,7 +27,7 @@ TARGETS = \
 		  span-update-labels
 
 PKGNAME = span
-MAKEFLAGS := --jobs=$(shell nproc)
+MAKEFLAGS := --jobs=$(shell nproc 2>/dev/null || sysctl -n hw.physicalcpu)
 
 
 .PHONY: all
