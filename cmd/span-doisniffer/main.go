@@ -7,11 +7,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"runtime"
-	"strings"
 
-	"github.com/miku/span/doi"
+	"github.com/miku/span/internal/cmd/doisniffer"
 )
 
 var (
@@ -33,70 +31,15 @@ func main() {
 		fmt.Printf("makta %s %s\n", Version, Buildtime)
 		os.Exit(0)
 	}
-	ignore, err := stringToRegexpSlice(*ignoreKeys, ",")
-	if err != nil {
+	cfg := doisniffer.DefaultConfig()
+	cfg.SkipUnmatched = !*noSkipUnmatched
+	cfg.UpdateKey = *updateKey
+	cfg.IdentifierKey = *identifierKey
+	cfg.IgnoreKeys = *ignoreKeys
+	cfg.NumWorkers = *numWorkers
+	cfg.BatchSize = *batchSize
+
+	if err := doisniffer.Run(cfg, os.Stdin, os.Stdout); err != nil {
 		log.Fatal(err)
 	}
-	sniffer := &doi.Sniffer{
-		Reader:        os.Stdin,
-		Writer:        os.Stdout,
-		SkipUnmatched: !*noSkipUnmatched,
-		UpdateKey:     *updateKey,
-		IdentifierKey: *identifierKey,
-		MapSniffer: &doi.MapSniffer{
-			Pattern:    regexp.MustCompile(doi.PatDOI),
-			IgnoreKeys: ignore,
-		},
-		// Custom postprocessing, cannot be changed from flags.
-		PostProcess: func(s string) string {
-			s = strings.TrimSpace(s)
-			switch {
-			case strings.HasSuffix(s, "])"):
-				// ai-179-z4p6s    10.24072/pci.ecology.100076])
-				return s[:len(s)-2]
-			case strings.HasSuffix(s, "/epdf"):
-				return s[:len(s)-5]
-			case strings.HasSuffix(s, ")") && !strings.Contains(s, "("):
-				// ai-179-wynjb    10.1016/j.jenvp.2019.01.011)
-				return s[:len(s)-1]
-			case strings.HasSuffix(s, "]") && !strings.Contains(s, "["):
-				// ai-28-29f64b012591451f83832a41c64bed83  10.5329/RECADM.20090802005]
-				return s[:len(s)-1]
-			case hasAnySuffix(s, []string{".", ",", ":", "*", `”`, "'"}):
-				return s[:len(s)-1]
-			default:
-				return s
-			}
-		},
-		NumWorkers: *numWorkers,
-		BatchSize:  *batchSize,
-	}
-	if err := sniffer.Run(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-// hasAnySuffix returns true, if s has any one of the given suffixes.
-func hasAnySuffix(s string, suffixes []string) bool {
-	for _, suffix := range suffixes {
-		if strings.HasSuffix(s, suffix) {
-			return true
-		}
-	}
-	return false
-}
-
-// stringToRegexpSlice converts a string into a list of compiled patterns.
-func stringToRegexpSlice(s string, sep string) (result []*regexp.Regexp, err error) {
-	if len(s) == 0 {
-		return
-	}
-	for _, v := range strings.Split(s, sep) {
-		re, err := regexp.Compile(v)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, re)
-	}
-	return result, nil
 }

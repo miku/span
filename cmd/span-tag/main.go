@@ -8,34 +8,18 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"io"
-	"net/http"
-	"net/url"
+	"log"
 	"os"
 	"runtime"
 	"runtime/pprof"
-	"slices"
-	"strings"
-
-	json "github.com/segmentio/encoding/json"
-	"log"
 
 	"github.com/miku/span"
-	"github.com/miku/span/filter"
-	"github.com/miku/span/freeze"
-	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/parallel"
+	"github.com/miku/span/internal/cmd/tag"
 	"github.com/miku/span/solrutil"
-	"github.com/miku/span/strutil"
 )
-
-// LowPrio number, something that is larger than the number of data sources
-// currently.
-const LowPrio = 9999
 
 var (
 	config               = flag.String("c", "", "JSON config file for filters")
@@ -47,103 +31,11 @@ var (
 	unfreeze             = flag.String("unfreeze", "", "unfreeze filterconfig from a frozen file")
 	verbose              = flag.Bool("verbose", false, "verbose output")
 	server               = flag.String("server", "", "if not empty, query SOLR to deduplicate on-the-fly")
-	prefs                = flag.String("prefs", "85 55 89 60 50 105 34 101 53 49 28 48 121", "most preferred source id first, for deduplication")
+	prefs                = flag.String("prefs", tag.DefaultPrefs, "most preferred source id first, for deduplication")
 	ignoreSameIdentifier = flag.Bool("isi", false, "when doing deduplication, ignore matches in index with the same id")
 	dropDangling         = flag.Bool("D", false, "drop dangling documents that do not have any isil attached")
 	expand               = flag.String("expand", "", "JSON file mapping meta-ISILs to lists of ISILs to expand into")
 )
-
-// SelectResponse with reduced fields.
-type SelectResponse struct {
-	Response struct {
-		Docs []struct {
-			ID          string   `json:"id"`
-			Institution []string `json:"institution"`
-			SourceID    string   `json:"source_id"`
-		} `json:"docs"`
-		NumFound int64 `json:"numFound"`
-		Start    int64 `json:"start"`
-	} `json:"response"`
-	ResponseHeader struct {
-		Params struct {
-			Q  string `json:"q"`
-			Wt string `json:"wt"`
-		} `json:"params"`
-		QTime  int64
-		Status int64 `json:"status"`
-	} `json:"responseHeader"`
-}
-
-// preferencePosition returns the position of a given preference as int.
-// Smaller means preferred. If there is no match, return some higher number
-// (low prio).
-func preferencePosition(sid string) int {
-	fields := strings.Fields(*prefs)
-	for pos, v := range fields {
-		v = strings.TrimSpace(v)
-		if v == sid {
-			return pos
-		}
-	}
-	return LowPrio // Or anything higher than the number of sources.
-}
-
-// DroppableLabels returns a list of labels, that can be dropped with regard to
-// an index. If document has no DOI, there is nothing to return.
-func DroppableLabels(is finc.IntermediateSchema) (labels []string, err error) {
-	doi := strings.TrimSpace(is.DOI)
-	if doi == "" {
-		return
-	}
-	// We could search for the DOI directly, e.g. in url field, but currently
-	// the url field in VuFind is not indexed (https://is.gd/zEBoEx).
-	link := fmt.Sprintf(`%s/select?df=allfields&wt=json&q="%s"`, *server, url.QueryEscape(doi))
-	if *verbose {
-		log.Printf("[%s] fetching: %s", is.ID, link)
-	}
-	resp, err := http.Get(link)
-	if err != nil {
-		return labels, err
-	}
-	defer resp.Body.Close()
-	var (
-		sr  SelectResponse
-		buf bytes.Buffer // Keep response for debugging.
-		tee = io.TeeReader(resp.Body, &buf)
-	)
-	if err := json.NewDecoder(tee).Decode(&sr); err != nil {
-		log.Printf("[%s] failed link: %s", is.ID, link)
-		log.Printf("[%s] failed response: %s", is.ID, buf.String())
-		return labels, err
-	}
-	// ignored merely counts the number of docs, that had the same id in the index, for logging
-	var ignored int
-	for _, label := range is.Labels {
-		// For each label (ISIL), see, whether any match in SOLR has the same
-		// label (ISIL) as well.
-		for _, doc := range sr.Response.Docs {
-			if *ignoreSameIdentifier && doc.ID == is.ID {
-				ignored++
-				continue
-			}
-			if !slices.Contains(doc.Institution, label) {
-				continue
-			}
-			// The document (is) might be already in the index (same or other source).
-			if preferencePosition(is.SourceID) >= preferencePosition(doc.SourceID) {
-				// The prio position of the document is higher (means: lower prio). We may drop this label.
-				labels = append(labels, label)
-				break
-			} else {
-				log.Printf("%s (%s) has lower prio in index, but we cannot update index docs yet, skipping", is.ID, doi)
-			}
-		}
-	}
-	if ignored > 0 && *verbose {
-		log.Printf("[%s] ignored %d docs", is.ID, ignored)
-	}
-	return labels, nil
-}
 
 func main() {
 	flag.Parse()
@@ -167,49 +59,13 @@ func main() {
 	if *server != "" {
 		*server = solrutil.PrependHTTP(*server)
 	}
-	var (
-		// The configuration forest.
-		tagger filter.Tagger
-		reader io.Reader = os.Stdin
-	)
-	if *unfreeze != "" {
-		dir, filterconfig, err := freeze.UnfreezeFilterConfig(*unfreeze)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("[span-tag] unfroze filterconfig to: %s", filterconfig)
-		defer os.RemoveAll(dir)
-		*config = filterconfig
-	}
-	// Test, if we are given JSON directly.
-	err := json.Unmarshal([]byte(*config), &tagger)
+	tagger, cleanup, err := tag.LoadTagger(*config, *unfreeze, *expand, *verbose)
 	if err != nil {
-		// Fallback to parse config file.
-		f, err := os.Open(*config)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer f.Close()
-		if err := json.NewDecoder(f).Decode(&tagger); err != nil {
-			log.Fatal(err)
-		}
+		log.Fatal(err)
 	}
-	if *expand != "" {
-		var rules map[string][]string
-		if err := json.Unmarshal([]byte(*expand), &rules); err != nil {
-			b, err := os.ReadFile(*expand)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if err := json.Unmarshal(b, &rules); err != nil {
-				log.Fatal(err)
-			}
-		}
-		tagger.Expand(rules)
-		log.Printf("[span-tag] expanded %d meta-ISIL(s)", len(rules))
-	}
-	w := bufio.NewWriter(os.Stdout)
-	defer w.Flush()
+	defer cleanup()
+
+	var reader io.Reader = os.Stdin
 	if flag.NArg() > 0 {
 		var files []io.Reader
 		for _, filename := range flag.Args() {
@@ -222,44 +78,17 @@ func main() {
 		}
 		reader = io.MultiReader(files...)
 	}
-	// Processing function, tagging documents.
-	procfunc := func(_ int64, b []byte) ([]byte, error) {
-		var is finc.IntermediateSchema
-		if err := json.Unmarshal(b, &is); err != nil {
-			return b, err
-		}
-		tagged := tagger.Tag(is)
-		// We can save some space in the index, when we drop records w/o any
-		// isil attached.
-		if *dropDangling && len(tagged.Labels) == 0 {
-			return nil, nil
-		}
-		// Deduplicate against a SOLR.
-		if *server != "" {
-			droppable, err := DroppableLabels(tagged)
-			if err != nil {
-				return nil, err
-			}
-			if len(droppable) > 0 {
-				before := len(tagged.Labels)
-				tagged.Labels = strutil.RemoveEach(tagged.Labels, droppable)
-				if *verbose {
-					log.Printf("[%s] from %d to %d labels: %s",
-						is.ID, before, len(tagged.Labels), tagged.Labels)
-				}
-			}
-		}
-		bb, err := json.Marshal(tagged)
-		if err != nil {
-			return bb, err
-		}
-		bb = append(bb, '\n')
-		return bb, nil
+
+	cfg := tag.Config{
+		Server:               *server,
+		Prefs:                *prefs,
+		Verbose:              *verbose,
+		IgnoreSameIdentifier: *ignoreSameIdentifier,
+		DropDangling:         *dropDangling,
+		BatchSize:            *size,
+		NumWorkers:           *numWorkers,
 	}
-	p := parallel.NewProcessor(bufio.NewReader(reader), w, procfunc)
-	p.NumWorkers = *numWorkers
-	p.BatchSize = *size
-	if err := p.Run(); err != nil {
+	if err := tag.Run(cfg, tagger, reader, os.Stdout); err != nil {
 		log.Fatal(err)
 	}
 	if *memProfile != "" {
