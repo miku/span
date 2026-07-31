@@ -4,25 +4,21 @@
 package main
 
 import (
-	"bufio"
-	"github.com/segmentio/encoding/json"
 	"flag"
 	"fmt"
 	"io"
-	"os"
-	"runtime"
-
 	"log"
+	"os"
 
 	"github.com/miku/span"
-	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/parallel"
+	"github.com/miku/span/internal/cmd/redact"
 )
 
 func main() {
+	cfg := redact.DefaultConfig()
 	showVersion := flag.Bool("v", false, "prints current program version")
-	size := flag.Int("b", 20000, "batch size")
-	numWorkers := flag.Int("w", runtime.NumCPU(), "number of workers")
+	flag.IntVar(&cfg.BatchSize, "b", cfg.BatchSize, "batch size")
+	flag.IntVar(&cfg.NumWorkers, "w", cfg.NumWorkers, "number of workers")
 
 	flag.Parse()
 
@@ -46,32 +42,7 @@ func main() {
 		reader = io.MultiReader(files...)
 	}
 
-	w := bufio.NewWriter(os.Stdout)
-	defer w.Flush()
-
-	p := parallel.NewProcessor(bufio.NewReader(reader), w, func(_ int64, b []byte) ([]byte, error) {
-		is := finc.IntermediateSchema{}
-
-		if err := json.Unmarshal(b, &is); err != nil {
-			log.Printf("failed to unmarshal: %s", string(b))
-			return b, err
-		}
-
-		// Redact full text.
-		is.Fulltext = ""
-
-		bb, err := json.Marshal(is)
-		if err != nil {
-			return bb, err
-		}
-		bb = append(bb, '\n')
-		return bb, nil
-	})
-
-	p.NumWorkers = *numWorkers
-	p.BatchSize = *size
-
-	if err := p.Run(); err != nil {
+	if err := redact.Run(cfg, reader, os.Stdout); err != nil {
 		log.Fatal(err)
 	}
 }

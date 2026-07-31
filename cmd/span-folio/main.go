@@ -30,59 +30,15 @@
 // 14      ProductISIL
 // 15      DokumentURI
 // 16      DokumentLabel
-//
-// Notes:
-// {
-//   "errors": [
-//     {
-//       "message": "Error verifying user existence:
-//                      Error looking up user at url http://okapi-app-service-erm-staging:9130/users?query=username==user
-//                      Expected status code 200, got 400 :function count_estimate(unknown) does not exist",
-//       "type": "error",
-//       "code": "username.incorrect",
-//       "parameters": [
-//         {
-//           "key": "username",
-//           "value": "user"
-//         }
-//       ]
-//     }
-//   ]
-// }
-//
-// Current AMSL db schema.
-//
-// CREATE TABLE amsl (
-//                                 shard text not null,
-//                                 isil text not null,
-//                                 sid text not null,
-//                                 tcid text not null,
-//                                 mc text not null,
-//                                 hfuri text,
-//                                 hflabel text,
-//                                 hflink text,
-//                                 hfeval text,
-//                                 cfuri text,
-//                                 cflabel text,
-//                                 cflink text,
-//                                 cfelink text,
-//                                 pisil text,
-//                                 docuri text,
-//                                 doclabel text
-//                         );
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
-	"strings"
-	"text/tabwriter"
 
 	"github.com/miku/span/folio"
-	"github.com/miku/span/strutil"
+	spanfolio "github.com/miku/span/internal/cmd/folio"
 	"github.com/miku/span/xflag"
 	"github.com/sethgrid/pester"
 )
@@ -102,43 +58,20 @@ var (
 func main() {
 	flag.Var(&userPass, "u", "user:password for api")
 	flag.Parse()
-	api := folio.API{
+
+	api := &folio.API{
 		Base:   *muFolio,
 		Tenant: *tenant,
 		Client: pester.New(),
 	}
-	if userPass.User == "" || userPass.Password == "" {
-		log.Fatal("incomplete credentials")
+	cfg := spanfolio.Config{
+		User:     userPass.User,
+		Password: userPass.Password,
+		CQL:      *cqlQuery,
+		Limit:    *limit,
+		Raw:      *rawOutput,
 	}
-	if err := api.Authenticate(userPass.User, userPass.Password); err != nil {
+	if err := spanfolio.Run(cfg, api, os.Stdout); err != nil {
 		log.Fatal(err)
-	}
-	log.Println("[ok] auth")
-	opts := folio.MetadataCollectionsOpts{
-		CQL:   *cqlQuery,
-		Limit: *limit,
-	}
-	resp, err := api.MetadataCollections(opts)
-	if err != nil {
-		log.Fatal(err)
-	}
-	switch {
-	case *rawOutput:
-		for _, v := range resp.FincConfigMetadataCollections {
-			b, err := json.Marshal(v)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(string(b))
-		}
-	default:
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', 0)
-		defer w.Flush()
-		for _, entry := range resp.FincConfigMetadataCollections {
-			fmt.Fprintf(w, "%s\t%s\t%s\n",
-				strutil.Truncate(entry.Label, 40),
-				strutil.Truncate(strings.Join(entry.SolrMegaCollections, ", "), 40),
-				strutil.Truncate(entry.MdSource.Name, 40))
-		}
 	}
 }
