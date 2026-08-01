@@ -3,7 +3,7 @@
 .PP
 span\-import, span\-tag, span\-export, span\-check, span\-oa\-filter,
 span\-update\-labels, span\-crossref\-snapshot, span\-local\-data, span\-freeze,
-span\-review, span\-webhookd, span\-amsl\-discovery \- intermediate
+span\-review, span\-amsl\-discovery \- intermediate
 schema and integration tools
 .SH SYNOPSIS
 .PP
@@ -28,8 +28,6 @@ schema and integration tools
 \fB\fCspan\-freeze\fR \-o \fIfile\fP < \fIfile\fP
 .PP
 \fB\fCspan\-review\fR [\fB\fC\-server\fR \fIurl\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-c\fR \fIfile\fP] [\fB\fC\-a\fR] [\fB\fC\-t\fR] [\fB\fC\-ticket\fR \fInumber\fP]
-.PP
-\fB\fCspan\-webhookd\fR [\fB\fC\-addr\fR \fIhostport\fP] [\fB\fC\-logfile\fR \fIfile\fP] [\fB\fCrepo\-dir\fR \fIpath\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-token\fR \fItoken\fP] [\fB\fC\-trigger\-path\fR \fIpath\fP]
 .PP
 \fB\fCspan\-amsl\-discovery\fR \fB\fC\-live\fR \fIURL\fP [\fB\fC\-allow\-empty\fR] [\fB\fC\-verbose\fR]
 .PP
@@ -105,20 +103,11 @@ Set \fB\fCx.oa\fR to true for all records of a given source id. \fB\fCspan\-oa\-
 \fB\fC\-z\fR
 Input is gzip compressed. \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
-\fB\fC\-addr\fR \fIhostport\fP
-Hostport to listen on. \fB\fCspan\-webhookd\fR only.
-.TP
 \fB\fC\-logfile\fR \fIfile\fP
-Logfile to log to. \fB\fCspan\-webhookd\fR, \fB\fCspan\-import\fR only.
-.TP
-\fB\fC\-repo\-dir\fR \fIpath\fP
-Local repo clone. \fB\fCspan\-webhookd\fR only.
+Logfile to log to. \fB\fCspan\-import\fR only.
 .TP
 \fB\fC\-span\-config\fR \fIpath\fP
-Path to span config. \fB\fCspan\-review\fR, \fB\fCspan\-webhookd\fR only.
-.TP
-\fB\fC\-token\fR \fItoken\fP
-GitLab API token. \fB\fCspan\-webhookd\fR only.
+Path to span config. \fB\fCspan\-review\fR only.
 .TP
 \fB\fC\-a\fR
 Emit ascii table. \fB\fCspan\-review\fR only.
@@ -131,9 +120,6 @@ Location of SOLR, including scheme, host, port and core. \fB\fCspan\-review\fR o
 .TP
 \fB\fC\-ticket\fR \fIid\fP
 Post review results into a Redmine ticket. \fB\fCspan\-review\fR only.
-.TP
-\fB\fC\-trigger\-path\fR \fIpath\fP
-Path trigger (default "trigger"), \fB\fCspan\-webhookd\fR only.
 .TP
 \fB\fC\-base\fR \fIurl\fP
 API base URL (default "\[la]http://api.crossref.org/members"\[ra]), \fB\fCspan\-crossref\-members\fR only.
@@ -342,24 +328,8 @@ Similar to \fB\fCspan\-tag\fR, we can let the data flow into the index through p
 \fB\fCtaskcat AIIntermediateSchema | span\-tagger \-db amsl.db | span\-export | solrbulk \-server ...\fR
 .SH INDEX REVIEWS
 .PP
-Since 0.1.241 it is possible to run slightly automated SOLR index reviews. The
-two tools are \fB\fCspan\-review\fR for reviews and \fB\fCspan\-webhookd\fR for automatically
-running a review on commits in GitLab. These tools are experimental and might
-change in the future.
-.PP
-Start the webhook receiver:
-.IP
-\fB\fCspan\-webhookd\fR
-.PP
-Or use the service shipped with the distribution packages.
-.IP
-\fB\fCsystemctl start span\-webhookd.service\fR
-.PP
-The service requires \fB\fC/var/log/span\-webhookd.log\fR to be writable by \fB\fCdaemon\fR\&.
-.PP
-The default port is 8080 (change this in SPAN CONFIG). The server listens on
-all interfaces. The default URL is: \fB\fChttp://0.0.0.0:8080/trigger\fR\&. Enter this
-URL in GitLab \fIsettings/integrations\fP\&.
+Since 0.1.241 it is possible to run slightly automated SOLR index reviews via
+\fB\fCspan\-review\fR\&. This tool is experimental and might change in the future.
 .PP
 The review file location is hardcoded at the moment, \fB\fCdocs/review.yaml\fR\&.
 Example config file:
@@ -426,19 +396,15 @@ min\-count:
 .RE
 .SH SPAN CONFIG
 .PP
-The span config file is used by \fB\fCspan\-review\fR and \fB\fCspan\-webhookd\fR, since they
-access various external systems: SOLR, Redmine, GitLab, Nginx. Default location
-is \fB\fC~/.config/span/span.json\fR, with \fB\fC/etc/span/span.json\fR as fallback. The
-\fB\fCspan\-webhookd\fR service will not start, if no config file can be found.
+The span config file is used by \fB\fCspan\-review\fR, since it accesses various
+external systems: SOLR, Redmine. Default location is
+\fB\fC~/.config/span/span.json\fR, with \fB\fC/etc/span/span.json\fR as fallback.
 .PP
 .RS
 .nf
 {
-  "gitlab.token": "adszuDZZ778sdsiuDsd\-R4",
-  "whatislive.url": "http://example.com/whatislive",
   "redmine.baseurl": "https://projects.example.com",
-  "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e",
-  "port": 8080
+  "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e"
 }
 .fi
 .RE

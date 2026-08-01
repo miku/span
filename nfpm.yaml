@@ -137,20 +137,6 @@ contents:
     file_info:
       mode: 0644
 
-  # Systemd service
-  - src: packaging/span-webhookd.service
-    dst: /usr/lib/systemd/system/span-webhookd.service
-    file_info:
-      mode: 0644
-
-  # Log file
-  - dst: /var/log/span-webhookd.log
-    type: ghost
-    file_info:
-      mode: 0644
-      owner: daemon
-      group: daemon
-
 umask: 0o002
 
 deb:

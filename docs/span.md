@@ -6,7 +6,7 @@ NAME
 
 span-import, span-tag, span-export, span-check, span-oa-filter,
 span-update-labels, span-crossref-snapshot, span-local-data, span-freeze,
-span-review, span-webhookd, span-amsl-discovery - intermediate
+span-review, span-amsl-discovery - intermediate
 schema and integration tools
 
 SYNOPSIS
@@ -33,8 +33,6 @@ SYNOPSIS
 `span-freeze` -o *file* < *file*
 
 `span-review` [`-server` *url*] [`-span-config` *file*] [`-c` *file*] [`-a`] [`-t`] [`-ticket` *number*]
-
-`span-webhookd` [`-addr` *hostport*] [`-logfile` *file*] [`repo-dir` *path*] [`-span-config` *file*] [`-token` *token*] [`-trigger-path` *path*]
 
 `span-amsl-discovery` `-live` *URL* [`-allow-empty`] [`-verbose`]
 
@@ -115,20 +113,11 @@ This section is correct, but incomplete. Consult `-h` for further flags.
 `-z`
   Input is gzip compressed. `span-crossref-snapshot` only.
 
-`-addr` *hostport*
-  Hostport to listen on. `span-webhookd` only.
-
 `-logfile` *file*
-  Logfile to log to. `span-webhookd`, `span-import` only.
-
-`-repo-dir` *path*
-  Local repo clone. `span-webhookd` only.
+  Logfile to log to. `span-import` only.
 
 `-span-config` *path*
-  Path to span config. `span-review`, `span-webhookd` only.
-
-`-token` *token*
-  GitLab API token. `span-webhookd` only.
+  Path to span config. `span-review` only.
 
 `-a`
   Emit ascii table. `span-review` only.
@@ -141,9 +130,6 @@ This section is correct, but incomplete. Consult `-h` for further flags.
 
 `-ticket` *id*
   Post review results into a Redmine ticket. `span-review` only.
-
-`-trigger-path` *path*
-  Path trigger (default "trigger"), `span-webhookd` only.
 
 `-base` *url*
   API base URL (default "http://api.crossref.org/members"), `span-crossref-members` only.
@@ -349,24 +335,8 @@ Similar to `span-tag`, we can let the data flow into the index through pipes.
 INDEX REVIEWS
 -------------
 
-Since 0.1.241 it is possible to run slightly automated SOLR index reviews. The
-two tools are `span-review` for reviews and `span-webhookd` for automatically
-running a review on commits in GitLab. These tools are experimental and might
-change in the future.
-
-Start the webhook receiver:
-
-  `span-webhookd`
-
-Or use the service shipped with the distribution packages.
-
-  `systemctl start span-webhookd.service`
-
-The service requires `/var/log/span-webhookd.log` to be writable by `daemon`.
-
-The default port is 8080 (change this in SPAN CONFIG). The server listens on
-all interfaces. The default URL is: `http://0.0.0.0:8080/trigger`. Enter this
-URL in GitLab *settings/integrations*.
+Since 0.1.241 it is possible to run slightly automated SOLR index reviews via
+`span-review`. This tool is experimental and might change in the future.
 
 The review file location is hardcoded at the moment, `docs/review.yaml`.
 Example config file:
@@ -433,18 +403,14 @@ min-count:
 SPAN CONFIG
 -----------
 
-The span config file is used by `span-review` and `span-webhookd`, since they
-access various external systems: SOLR, Redmine, GitLab, Nginx. Default location
-is `~/.config/span/span.json`, with `/etc/span/span.json` as fallback. The
-`span-webhookd` service will not start, if no config file can be found.
+The span config file is used by `span-review`, since it accesses various
+external systems: SOLR, Redmine. Default location is
+`~/.config/span/span.json`, with `/etc/span/span.json` as fallback.
 
 ```
 {
-  "gitlab.token": "adszuDZZ778sdsiuDsd-R4",
-  "whatislive.url": "http://example.com/whatislive",
   "redmine.baseurl": "https://projects.example.com",
-  "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e",
-  "port": 8080
+  "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e"
 }
 ```
 

@@ -48,12 +48,6 @@ install -m 755 span-update-labels $RPM_BUILD_ROOT/usr/local/bin
 mkdir -p $RPM_BUILD_ROOT/usr/local/share/man/man1
 install -m 644 span.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/span.1
 
-mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system
-install -m 644 span-webhookd.service $RPM_BUILD_ROOT/usr/lib/systemd/system/span-webhookd.service
-
-mkdir -p $RPM_BUILD_ROOT/var/log
-touch $RPM_BUILD_ROOT/var/log/span-webhookd.log
-
 %post
 
 %clean
@@ -84,8 +78,6 @@ rm -rf %{_topdir}/BUILD/%{name}
 /usr/local/bin/span-tag
 /usr/local/bin/span-update-labels
 /usr/local/share/man/man1/span.1
-/usr/lib/systemd/system/span-webhookd.service
-%attr(0644, daemon, daemon) /var/log/span-webhookd.log
 
 %changelog
 * Mon Feb 18 2019 Martin Czygan
