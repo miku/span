@@ -47,7 +47,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -56,16 +55,12 @@ import (
 	"os"
 	"os/exec"
 	"runtime/pprof"
-	"strings"
-	"sync/atomic"
 
 	"github.com/klauspost/compress/zstd"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
-	"github.com/miku/span/formats/crossref"
-	"github.com/miku/span/parallel"
+	"github.com/miku/span/internal/cmd/crossrefcmd"
 	"github.com/miku/span/xio"
-	"github.com/segmentio/encoding/json"
 )
 
 // fallback awk script is used, if the filterline executable is not found;
@@ -98,28 +93,6 @@ var (
 	errCountThreshold = flag.Int64("E", 1, "number of json unmarshal errors to tolerate")
 	sortBufferSize    = flag.String("S", "25%", "passed to sort")
 )
-
-// writeFields writes a variable number of values separated by sep to a given
-// writer. Returns bytes written and error.
-func writeFields(w io.Writer, sep string, values ...any) (int, error) {
-	var ss = make([]string, len(values))
-	for i, v := range values {
-		switch v.(type) {
-		case int, int8, int16, int32, int64:
-			ss[i] = fmt.Sprintf("%d", v)
-		case uint, uint8, uint16, uint32, uint64:
-			ss[i] = fmt.Sprintf("%d", v)
-		case float32, float64:
-			ss[i] = fmt.Sprintf("%f", v)
-		case fmt.Stringer:
-			ss[i] = fmt.Sprintf("%s", v)
-		default:
-			ss[i] = fmt.Sprintf("%v", v)
-		}
-	}
-	s := fmt.Sprintln(strings.Join(ss, sep))
-	return io.WriteString(w, s)
-}
 
 func main() {
 	flag.Parse()
@@ -203,57 +176,15 @@ func main() {
 		log.Fatal(err)
 	}
 	var (
-		br      = bufio.NewReader(reader)
-		bw      = bufio.NewWriter(tf)
-		numErrs atomic.Int64 // error count across threads
+		br = bufio.NewReader(reader)
+		bw = bufio.NewWriter(tf)
 	)
-	pp := parallel.NewProcessor(br, bw, func(lineno int64, b []byte) ([]byte, error) {
-		var (
-			// This was a crossref.Document, but we only need a few fields.
-			doc struct {
-				DOI       string
-				Deposited crossref.DateField `json:"deposited"`
-				Indexed   crossref.DateField `json:"indexed"`
-			}
-			buf bytes.Buffer
-		)
-		if err := json.Unmarshal(b, &doc); err != nil {
-			// Encountered with a single document found,
-			// {"DOI":"10.15215\/aupress\/9781897425909.026","score":8.143441}
-			numErrs.Add(1)
-			if n := numErrs.Load(); n > *errCountThreshold {
-				return nil, err
-			} else {
-				log.Printf("skipping error (#err: %d <= max: %d): %v", n, *errCountThreshold, err)
-			}
-			return nil, nil
-		}
-		date, err := doc.Indexed.Date()
-		if err != nil {
-			// Encountered with a single document found,
-			// {"DOI":"10.15215\/aupress\/9781897425909.026","score":8.143441}
-			numErrs.Add(1)
-			if n := numErrs.Load(); n > *errCountThreshold {
-				return nil, err
-			} else {
-				log.Printf("skipping error (#err: %d <= max: %d): %v", n, *errCountThreshold, err)
-			}
-			return nil, nil
-		}
-		if _, ok := excludes[doc.DOI]; ok {
-			return nil, nil
-		}
-		if _, err := writeFields(&buf, "\t", lineno+1, date.Format("2006-01-02"), doc.DOI); err != nil {
-			return nil, err
-		}
-		return buf.Bytes(), nil
-	})
-	pp.BatchSize = *batchsize
 	slog.Info("starting extraction",
 		"prefix", "stage 1",
 		"batchsize", *batchsize,
 	)
-	if err := pp.Run(); err != nil {
+	stage1 := crossrefcmd.Stage1Config{BatchSize: *batchsize, ErrCountThreshold: *errCountThreshold}
+	if err := crossrefcmd.Stage1Extract(stage1, excludes, br, bw); err != nil {
 		log.Fatal(err)
 	}
 	if err := bw.Flush(); err != nil {
@@ -329,31 +260,9 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := os.Rename(output, *outputFile); err != nil {
-		if err := CopyFile(*outputFile, output, 0644); err != nil {
+		if err := crossrefcmd.CopyFile(*outputFile, output, 0644); err != nil {
 			log.Fatal(err)
 		}
 		os.Remove(output)
 	}
-}
-
-// CopyFile copies the contents from src to dst using io.Copy.  If dst does not
-// exist, CopyFile creates it with permissions perm; otherwise CopyFile
-// truncates it before writing. From: https://codereview.appspot.com/152180043
-func CopyFile(dst, src string, perm os.FileMode) (err error) {
-	in, err := os.Open(src)
-	if err != nil {
-		return
-	}
-	defer in.Close()
-	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
-	if err != nil {
-		return
-	}
-	defer func() {
-		if e := out.Close(); e != nil {
-			err = e
-		}
-	}()
-	_, err = io.Copy(out, in)
-	return
 }

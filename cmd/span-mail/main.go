@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/miku/span/mail"
+	"github.com/miku/span/internal/cmd/mailcmd"
 )
 
 var (
@@ -38,18 +38,16 @@ func main() {
 	var recipients stringSlice
 	flag.Var(&recipients, "t", "A To: header value (at least one required)")
 	flag.Parse()
-	if *sender == "" {
-		fmt.Fprintln(os.Stderr, "error: -f/--sender is required")
-		flag.Usage()
-		os.Exit(1)
+	cfg := mailcmd.Config{
+		From:       *sender,
+		To:         recipients,
+		Subject:    *subject,
+		SMTPServer: os.Getenv("SPAN_SMTP_SERVER"),
 	}
-	if *subject == "" {
-		fmt.Fprintln(os.Stderr, "error: -s/--subject is required")
-		flag.Usage()
-		os.Exit(1)
-	}
-	if len(recipients) == 0 {
-		fmt.Fprintln(os.Stderr, "error: at least one -t/--recipient is required")
+	// Preserve the original validation order: sender, subject, recipients,
+	// then textfile.
+	if err := cfg.Validate(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -63,22 +61,21 @@ func main() {
 		fmt.Fprintf(os.Stderr, "error reading body file %s: %v\n", *textfile, err)
 		os.Exit(1)
 	}
-	msg := &mail.Message{
-		From:       *sender,
-		To:         recipients,
-		Subject:    *subject,
-		Body:       string(bodyBytes),
-		Precedence: "bulk",
-	}
+	cfg.Body = string(bodyBytes)
 	if *output != "" {
-		if err := os.WriteFile(*output, msg.Bytes(), 0644); err != nil {
+		f, err := os.OpenFile(*output, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error writing output file %s: %v\n", *output, err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		if err := mailcmd.Run(cfg, f, nil); err != nil {
 			fmt.Fprintf(os.Stderr, "error writing output file %s: %v\n", *output, err)
 			os.Exit(1)
 		}
 		return
 	}
-	server := os.Getenv("SPAN_SMTP_SERVER")
-	if err := mail.Send(server+":25", nil, msg); err != nil {
+	if err := mailcmd.Run(cfg, nil, mailcmd.DefaultSender(cfg.SMTPServer)); err != nil {
 		fmt.Fprintf(os.Stderr, "error sending mail: %v\n", err)
 		os.Exit(1)
 	}

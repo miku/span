@@ -20,24 +20,20 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"time"
 
 	"github.com/klauspost/compress/zstd"
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
-	"github.com/miku/span/formats/crossref"
-	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/freeze"
-	"github.com/miku/span/parallel"
+	"github.com/miku/span/internal/cmd/crossrefcmd"
 	"github.com/segmentio/encoding/json"
 )
 
 var (
 	frozenFile  = flag.String("f", "", "frozen filterconfig zip file; if omitted, fetch from FOLIO API")
 	outputDir   = flag.String("o", ".", "output directory")
-	numWorkers  = flag.Int("w", runtime.NumCPU(), "number of workers")
+	numWorkers  = flag.Int("w", crossrefcmd.DefaultFastprocConfig().NumWorkers, "number of workers")
 	batchSize   = flag.Int("b", 10000, "batch size")
 	showVersion = flag.Bool("v", false, "show version")
 	expandFlag  = flag.String("expand", "", "JSON or file mapping meta-ISILs to lists of ISILs")
@@ -47,51 +43,6 @@ var (
 	cacheTTL    = flag.Duration("cache-ttl", 24*time.Hour, "filterconfig cache TTL")
 	forceFreeze = flag.Bool("force", false, "force re-download of filterconfig, ignoring cache")
 )
-
-// outputFilename derives the output filename from the input filename. Only
-// .json.zst input is supported.
-// feed-2-index-2026-03-02-2026-03-02.json.zst -> feed-2-index-2026-03-02-2026-03-02-solr-export-with-fullrecord.json.zst
-func outputFilename(inputPath string) string {
-	base := filepath.Base(inputPath)
-	name := strings.TrimSuffix(strings.TrimSuffix(base, ".zst"), ".json")
-	return name + "-solr-export-with-fullrecord.json.zst"
-}
-
-// resolveFilterconfig returns the path to a frozen filterconfig zip. If -f is
-// set, it returns that path. Otherwise it fetches from FOLIO with caching.
-func resolveFilterconfig() (string, error) {
-	if *frozenFile != "" {
-		return *frozenFile, nil
-	}
-	token := os.Getenv("OKAPI_TOKEN")
-	if token == "" {
-		return "", fmt.Errorf("either -f filterconfig.zip or OKAPI_TOKEN env var is required")
-	}
-	if *okapiURL == "" {
-		return "", fmt.Errorf("OKAPI_URL env var or -okapi-url flag is required")
-	}
-	var expandRules map[string][]string
-	if *expandFlag != "" {
-		var err error
-		expandRules, err = freeze.ParseExpandRules(*expandFlag)
-		if err != nil {
-			return "", fmt.Errorf("parse expand rules: %w", err)
-		}
-	}
-	return freeze.FetchOrCached(
-		freeze.FolioOpts{
-			OkapiURL: *okapiURL,
-			Tenant:   *tenant,
-			Token:    token,
-			Expand:   expandRules,
-			NoProxy:  *noProxy,
-		},
-		freeze.CacheOpts{
-			TTL:   *cacheTTL,
-			Force: *forceFreeze,
-		},
-	)
-}
 
 func main() {
 	flag.Usage = func() {
@@ -112,7 +63,16 @@ func main() {
 	inputFile := flag.Arg(0)
 
 	// Resolve filterconfig (from file or FOLIO API).
-	zipPath, err := resolveFilterconfig()
+	zipPath, err := crossrefcmd.ResolveFilterConfig(crossrefcmd.FilterConfigOpts{
+		FrozenFile: *frozenFile,
+		OkapiURL:   *okapiURL,
+		Tenant:     *tenant,
+		Token:      os.Getenv("OKAPI_TOKEN"),
+		ExpandFlag: *expandFlag,
+		NoProxy:    *noProxy,
+		CacheTTL:   *cacheTTL,
+		Force:      *forceFreeze,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -166,7 +126,7 @@ func main() {
 	defer zr.Close()
 
 	// Create output file (zstd compressed).
-	outName := filepath.Join(*outputDir, outputFilename(inputFile))
+	outName := filepath.Join(*outputDir, crossrefcmd.OutputFilename(inputFile))
 	outf, err := os.Create(outName)
 	if err != nil {
 		log.Fatalf("create output: %v", err)
@@ -178,37 +138,9 @@ func main() {
 	}
 	w := bufio.NewWriter(zw)
 
-	// Combined processing function: import -> tag -> export.
-	procfunc := func(_ int64, b []byte) ([]byte, error) {
-		// Stage 1: import (crossref -> intermediate schema).
-		var doc crossref.Document
-		if err := json.Unmarshal(b, &doc); err != nil {
-			return nil, fmt.Errorf("crossref unmarshal: %w", err)
-		}
-		is, err := doc.ToIntermediateSchema()
-		if err != nil {
-			if _, ok := err.(span.Skip); ok {
-				return nil, nil
-			}
-			return nil, fmt.Errorf("to intermediate schema: %w", err)
-		}
-		// Stage 2: tag (apply filter rules).
-		tagged := tagger.Tag(*is)
-		// Stage 3: export (intermediate schema -> solr).
-		var exporter finc.Solr5Vufind3
-		bb, err := exporter.Export(tagged, true)
-		if err != nil {
-			return nil, fmt.Errorf("export: %w", err)
-		}
-		bb = append(bb, '\n')
-		return bb, nil
-	}
-
-	p := parallel.NewProcessor(bufio.NewReader(zr), w, procfunc)
-	p.NumWorkers = *numWorkers
-	p.BatchSize = *batchSize
+	cfg := crossrefcmd.FastprocConfig{NumWorkers: *numWorkers, BatchSize: *batchSize}
 	log.Printf("processing %s -> %s (%d workers)", inputFile, outName, *numWorkers)
-	if err := p.Run(); err != nil {
+	if err := crossrefcmd.ProcessStream(cfg, &tagger, bufio.NewReader(zr), w); err != nil {
 		log.Fatalf("processing: %v", err)
 	}
 	if err := w.Flush(); err != nil {

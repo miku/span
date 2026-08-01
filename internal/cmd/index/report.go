@@ -1,4 +1,4 @@
-package main
+package index
 
 import (
 	"bufio"
@@ -113,16 +113,21 @@ func reportISSN(idx solrutil.Index, args []string) error {
 	result := make(chan string, *workers)
 	done := make(chan bool)
 	var wg sync.WaitGroup
+	st := newReportState()
 
 	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
-	go reportWriter(bw, result, done)
+	go reportWriter(bw, result, done, st)
 	for i := range *workers {
 		wg.Add(1)
 		name := fmt.Sprintf("worker-%02d", i)
-		go issnWorker(name, idx, queue, result, &wg, *verbose)
+		go issnWorker(name, idx, queue, result, &wg, *verbose, st)
 	}
 
+	// feedErr captures errors from the producer loop; the pipeline is always
+	// drained and torn down below regardless of where the error occurred.
+	var feedErr error
+feed:
 	for _, s := range sids {
 		var cs []string
 		if *collection != "" {
@@ -131,7 +136,8 @@ func reportISSN(idx solrutil.Index, args []string) error {
 			var err error
 			cs, err = idx.SourceCollections(s)
 			if err != nil {
-				return err
+				feedErr = err
+				break feed
 			}
 		}
 		for _, c := range cs {
@@ -140,14 +146,19 @@ func reportISSN(idx solrutil.Index, args []string) error {
 				return count > 0
 			})
 			if err != nil {
-				return err
+				feedErr = err
+				break feed
 			}
 			for _, batch := range partition(issns, *batchSize) {
 				items := make([]issnWork, len(batch))
 				for i, b := range batch {
 					items[i] = issnWork{sid: s, c: c, issn: b}
 				}
-				queue <- items
+				select {
+				case queue <- items:
+				case <-st.quit:
+					break feed
+				}
 			}
 		}
 	}
@@ -155,10 +166,42 @@ func reportISSN(idx solrutil.Index, args []string) error {
 	wg.Wait()
 	close(result)
 	<-done
-	return nil
+	if err := st.err(); err != nil {
+		return err
+	}
+	return feedErr
 }
 
-func issnWorker(name string, idx solrutil.Index, queue chan []issnWork, result chan string, wg *sync.WaitGroup, verbose bool) {
+// reportState coordinates error propagation across the concurrent issn report,
+// so a query failure in a worker aborts the run and surfaces as a returned
+// error instead of terminating the process.
+type reportState struct {
+	mu       sync.Mutex
+	firstErr error
+	quit     chan struct{}
+	quitOnce sync.Once
+}
+
+func newReportState() *reportState {
+	return &reportState{quit: make(chan struct{})}
+}
+
+func (s *reportState) fail(err error) {
+	s.mu.Lock()
+	if s.firstErr == nil {
+		s.firstErr = err
+	}
+	s.mu.Unlock()
+	s.quitOnce.Do(func() { close(s.quit) })
+}
+
+func (s *reportState) err() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.firstErr
+}
+
+func issnWorker(name string, idx solrutil.Index, queue chan []issnWork, result chan string, wg *sync.WaitGroup, verbose bool, st *reportState) {
 	defer wg.Done()
 	completed := 0
 	for batch := range queue {
@@ -167,15 +210,18 @@ func issnWorker(name string, idx solrutil.Index, queue chan []issnWork, result c
 			q := fmt.Sprintf(`source_id:%q AND mega_collection:%q AND issn:%q`, w.sid, w.c, w.issn)
 			count, err := idx.NumFound(q)
 			if err != nil {
-				log.Fatal(err)
+				st.fail(err)
+				return
 			}
 			fr, err := idx.FacetQuery(q, "publishDate")
 			if err != nil {
-				log.Fatal(err)
+				st.fail(err)
+				return
 			}
 			fmap, err := fr.Facets()
 			if err != nil {
-				log.Fatal(err)
+				st.fail(err)
+				return
 			}
 			b, err := json.Marshal(map[string]any{
 				"sid":   w.sid,
@@ -185,9 +231,14 @@ func issnWorker(name string, idx solrutil.Index, queue chan []issnWork, result c
 				"dates": fmap.Nonzero(),
 			})
 			if err != nil {
-				log.Fatal(err)
+				st.fail(err)
+				return
 			}
-			result <- string(b)
+			select {
+			case result <- string(b):
+			case <-st.quit:
+				return
+			}
 			completed++
 		}
 		if verbose {
@@ -196,10 +247,10 @@ func issnWorker(name string, idx solrutil.Index, queue chan []issnWork, result c
 	}
 }
 
-func reportWriter(w io.Writer, result chan string, done chan bool) {
+func reportWriter(w io.Writer, result chan string, done chan bool, st *reportState) {
 	for r := range result {
 		if _, err := io.WriteString(w, r+"\n"); err != nil {
-			log.Fatal(err)
+			st.fail(err)
 		}
 	}
 	done <- true

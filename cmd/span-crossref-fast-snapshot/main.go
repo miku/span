@@ -30,16 +30,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
-	"strings"
 
 	"github.com/miku/span/crossref"
+	"github.com/miku/span/internal/cmd/crossrefcmd"
 )
 
 var (
 	outputFile        = flag.String("o", crossref.DefaultOutputFile, "output file path, use .gz or .zst to enable compression")
 	batchSize         = flag.Int("n", 100000, "number of records to process in memory before writing to index")
-	workers           = flag.Int("w", runtime.NumCPU(), "number of worker goroutines for parallel processing")
+	workers           = flag.Int("w", crossrefcmd.DefaultFastSnapshotConfig().NumWorkers, "number of worker goroutines for parallel processing")
 	keepTempFiles     = flag.Bool("k", false, "keep temporary files (for debugging)")
 	verbose           = flag.Bool("v", false, "verbose output")
 	sortBufferSize    = flag.String("S", "25%", "sort buffer size")
@@ -66,14 +65,17 @@ func main() {
 	}
 	var excludes []string
 	if *excludesFile != "" {
-		b, err := os.ReadFile(*excludesFile)
+		f, err := os.Open(*excludesFile)
 		if err != nil {
 			log.Fatal(err)
 		}
-		var s = string(b)
-		excludes = strings.Split(s, "\n")
+		excludes, err = crossrefcmd.ParseExcludes(f)
+		f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	opts := crossref.SnapshotOptions{
+	cfg := crossrefcmd.FastSnapshotConfig{
 		InputFiles:        inputFiles,
 		OutputFile:        *outputFile,
 		BatchSize:         *batchSize,
@@ -87,7 +89,7 @@ func main() {
 		CacheDir:          *cacheDir,
 		CacheClear:        *cacheClear,
 	}
-	if err := crossref.CreateSnapshot(opts); err != nil {
+	if err := crossrefcmd.RunFastSnapshot(cfg, nil); err != nil {
 		log.Fatalf("error creating snapshot: %v", err)
 	}
 }
