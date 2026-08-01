@@ -9,6 +9,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -27,6 +28,13 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-report [options]\n\n")
+		fmt.Fprintf(os.Stderr, "Builds reporting subsets from a Solr index, e.g. per-ISSN publication counts\n")
+		fmt.Fprintf(os.Stderr, "over an interval for a collection. Output is CSV/TSV for downstream tools;\n")
+		fmt.Fprintf(os.Stderr, "use -list to see the available report types.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *listReports {

@@ -32,6 +32,12 @@ func main() {
 	flag.Var(&openAccessSourceIdentifiersFlags, "oasid",
 		"always set x.oa true for a given sid (repeatable)")
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-oa-filter [options] < input\n\n")
+		fmt.Fprintf(os.Stderr, "Marks records as open access (sets x.oa to true) when a given KBART holding\n")
+		fmt.Fprintf(os.Stderr, "file validates the record.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *showVersion {

@@ -20,6 +20,12 @@ func main() {
 	flag.IntVar(&cfg.BatchSize, "b", cfg.BatchSize, "batch size")
 	flag.IntVar(&cfg.NumWorkers, "w", cfg.NumWorkers, "number of workers")
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-redact [options] [file...]\n\n")
+		fmt.Fprintf(os.Stderr, "Redacts intermediate schema records by clearing the fulltext field. Like jq's\n")
+		fmt.Fprintf(os.Stderr, "del, but parallel and faster.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *showVersion {

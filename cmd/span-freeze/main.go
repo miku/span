@@ -45,6 +45,13 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-freeze [options] -o output.zip\n\n")
+		fmt.Fprintf(os.Stderr, "Freezes a filter configuration and every file it references into a single zip,\n")
+		fmt.Fprintf(os.Stderr, "so a tagging run can be reproduced offline. Reads a URL-bearing blob from stdin\n")
+		fmt.Fprintf(os.Stderr, "(legacy) or builds the config from the FOLIO API (-f).\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(span.AppVersion)

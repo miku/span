@@ -26,6 +26,12 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-doisniffer [options] < input\n\n")
+		fmt.Fprintf(os.Stderr, "Sniffs DOIs out of VuFind Solr JSON documents and, optionally, annotates each\n")
+		fmt.Fprintf(os.Stderr, "document with the DOI it found.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Printf("makta %s %s\n", Version, Buildtime)

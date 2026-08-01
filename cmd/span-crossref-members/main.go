@@ -28,6 +28,12 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-crossref-members [options]\n\n")
+		fmt.Fprintf(os.Stderr, "Paginates through the crossref members API and emits one JSON response per\n")
+		fmt.Fprintf(os.Stderr, "line. Useful for building DOI-prefix to publisher-name mappings.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *silent {

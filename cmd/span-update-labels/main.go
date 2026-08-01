@@ -22,6 +22,12 @@ func main() {
 	flag.IntVar(&cfg.BatchSize, "b", cfg.BatchSize, "batch size")
 	flag.IntVar(&cfg.NumWorkers, "w", cfg.NumWorkers, "number of workers")
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-update-labels [options] < input\n\n")
+		fmt.Fprintf(os.Stderr, "Updates each intermediate schema record's x.labels field from a TSV mapping of\n")
+		fmt.Fprintf(os.Stderr, "IDs to ISILs. The mapping is held in memory.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *showVersion {

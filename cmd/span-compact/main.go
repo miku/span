@@ -46,6 +46,13 @@ var (
 
 func main() {
 	log.SetFlags(0)
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-compact [options] [file]\n\n")
+		fmt.Fprintf(os.Stderr, "Deduplicates an NDJSON stream on a chosen field, keeping one record per key\n")
+		fmt.Fprintf(os.Stderr, "via a selectable strategy (first|last|random|min|max). Uses an external sort,\n")
+		fmt.Fprintf(os.Stderr, "so memory stays bounded even for 10M-100M record inputs.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(span.AppVersion)

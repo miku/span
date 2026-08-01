@@ -38,6 +38,13 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-tag [options] [file...]\n\n")
+		fmt.Fprintf(os.Stderr, "Runs a forest of filters (from a JSON config, -c, or a frozen filterconfig,\n")
+		fmt.Fprintf(os.Stderr, "-unfreeze) over every intermediate schema record to attach institution (ISIL)\n")
+		fmt.Fprintf(os.Stderr, "tags. Can optionally query Solr to deduplicate on the fly.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *version {
 		fmt.Println(span.AppVersion)

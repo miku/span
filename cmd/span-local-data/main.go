@@ -4,6 +4,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -13,6 +14,12 @@ import (
 func main() {
 	cfg := localdata.DefaultConfig()
 	flag.IntVar(&cfg.BatchSize, "b", cfg.BatchSize, "batch size")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-local-data [options] < input\n\n")
+		fmt.Fprintf(os.Stderr, "Extracts selected fields from a JSON stream, similar to jq but faster for this\n")
+		fmt.Fprintf(os.Stderr, "narrow task.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if err := localdata.Run(cfg, os.Stdin, os.Stdout); err != nil {

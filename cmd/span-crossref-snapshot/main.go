@@ -95,6 +95,13 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-crossref-snapshot [options] file\n\n")
+		fmt.Fprintf(os.Stderr, "Given a single file of crossref works API messages, writes a smaller file\n")
+		fmt.Fprintf(os.Stderr, "keeping only the most recent version of each DOI. Runs as a three-stage,\n")
+		fmt.Fprintf(os.Stderr, "two-pass external process.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *verbose {
 		slog.SetLogLoggerLevel(slog.LevelDebug)

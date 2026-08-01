@@ -70,6 +70,13 @@ func (z *zstdReadCloser) Close() error {
 }
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-compare-file [options] [file]\n\n")
+		fmt.Fprintf(os.Stderr, "Compares per-ISIL (institution) record counts between a local JSONL file\n")
+		fmt.Fprintf(os.Stderr, "(solr export format, optionally zstd) and a Solr index, emitting a table of\n")
+		fmt.Fprintf(os.Stderr, "ISIL, file count, index count, difference and percentage change.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *version {
 		fmt.Println(span.AppVersion)

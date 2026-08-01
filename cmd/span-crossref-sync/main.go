@@ -86,6 +86,13 @@ func cleanup() error {
 func main() {
 	flag.Var(&syncStart, "s", "start date for harvest")
 	flag.Var(&syncEnd, "e", "end date for harvest")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-crossref-sync [options]\n\n")
+		fmt.Fprintf(os.Stderr, "Downloads and caches raw crossref works API messages over a date range, one\n")
+		fmt.Fprintf(os.Stderr, "compressed file per interval. Designed to run independently, e.g. as a daily\n")
+		fmt.Fprintf(os.Stderr, "cron job.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if _, err := os.Stat(*cacheDir); os.IsNotExist(err) {
 		if err := os.MkdirAll(*cacheDir, 0755); err != nil {

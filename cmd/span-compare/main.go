@@ -11,6 +11,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -35,6 +36,13 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-compare [options]\n\n")
+		fmt.Fprintf(os.Stderr, "Renders a table of ISIL/SID record counts for two Solr indices side by side.\n")
+		fmt.Fprintf(os.Stderr, "Can use the hidden whatislive endpoint (-e) to discover the live/non-live\n")
+		fmt.Fprintf(os.Stderr, "server pair automatically.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	cfg := compare.Config{

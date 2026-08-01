@@ -34,6 +34,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -57,6 +58,12 @@ var (
 
 func main() {
 	flag.Var(&userPass, "u", "user:password for api")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-folio [options]\n\n")
+		fmt.Fprintf(os.Stderr, "Talks to the FOLIO API to fetch ISIL, metadata collections and related\n")
+		fmt.Fprintf(os.Stderr, "attachment information for a tenant. Work in progress.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	api := &folio.API{

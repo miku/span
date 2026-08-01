@@ -29,6 +29,12 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-import [options] [file...]\n\n")
+		fmt.Fprintf(os.Stderr, "Reshapes raw metadata from various source formats into the intermediate\n")
+		fmt.Fprintf(os.Stderr, "schema. Use -list to see the available input formats.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(span.AppVersion)

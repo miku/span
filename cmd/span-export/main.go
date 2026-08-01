@@ -31,6 +31,12 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: span-export [options] [file...]\n\n")
+		fmt.Fprintf(os.Stderr, "Converts intermediate schema records into a destination format, mostly Solr\n")
+		fmt.Fprintf(os.Stderr, "import documents. Use -list to see the available output formats.\n\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *showVersion {
 		fmt.Println(span.AppVersion)
