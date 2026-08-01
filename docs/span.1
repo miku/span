@@ -1,9 +1,9 @@
 .TH SPAN 1 "JULY 2016" "Leipzig University Library" "Manuals"
 .SH NAME
 .PP
-span\-import, span\-tag, span\-export, span\-check, span\-oa\-filter,
+span\-import, span\-tag, span\-export, span\-oa\-filter,
 span\-update\-labels, span\-crossref\-snapshot, span\-local\-data, span\-freeze,
-span\-review, span\-amsl\-discovery \- intermediate
+span\-amsl\-discovery \- intermediate
 schema and integration tools
 .SH SYNOPSIS
 .PP
@@ -15,8 +15,6 @@ schema and integration tools
 .PP
 \fB\fCspan\-export\fR [\fB\fC\-o\fR \fIoutput\-format\fP] < \fIfile\fP
 .PP
-\fB\fCspan\-check\fR [\fB\fC\-verbose\fR] < \fIfile\fP
-.PP
 \fB\fCspan\-oa\-filter\fR [\fB\fC\-f\fR \fIfile\fP] [\fB\fC\-fc\fR \fIfile\fP] [\fB\fC\-xsid\fR \fIstring\fP] [\fB\fC\-oasid\fR \fIstring\fP] < \fIfile\fP
 .PP
 \fB\fCspan\-update\-labels\fR [\fB\fC\-f\fR \fIfile\fP, \fB\fC\-s\fR \fIseparator\fP] < \fIfile\fP
@@ -26,8 +24,6 @@ schema and integration tools
 \fB\fCspan\-local\-data\fR < \fIfile\fP
 .PP
 \fB\fCspan\-freeze\fR \-o \fIfile\fP < \fIfile\fP
-.PP
-\fB\fCspan\-review\fR [\fB\fC\-server\fR \fIurl\fP] [\fB\fC\-span\-config\fR \fIfile\fP] [\fB\fC\-c\fR \fIfile\fP] [\fB\fC\-a\fR] [\fB\fC\-t\fR] [\fB\fC\-ticket\fR \fInumber\fP]
 .PP
 \fB\fCspan\-amsl\-discovery\fR \fB\fC\-live\fR \fIURL\fP [\fB\fC\-allow\-empty\fR] [\fB\fC\-verbose\fR]
 .PP
@@ -53,19 +49,19 @@ Output format or file. \fB\fCspan\-export\fR, \fB\fCspan\-freeze\fR, \fB\fCspan\
 .TP
 \fB\fC\-c\fR \fIconfig\-string\fP or \fIconfig\-file\fP
 Configuration string or path to configuration file. \fB\fCspan\-tag\fR example in
-EXAMPLE for a CONFIGURATION FILE. \fB\fCspan\-review\fR details in INDEX REVIEW.
+EXAMPLE for a CONFIGURATION FILE.
 .TP
 \fB\fC\-list\fR
 List supported formats. \fB\fCspan\-import\fR, \fB\fCspan\-export\fR only.
 .TP
 \fB\fC\-verbose\fR
-More output. \fB\fCspan\-check\fR, \fB\fCspan\-import\fR only.
+More output. \fB\fCspan\-import\fR only.
 .TP
 \fB\fC\-b\fR \fIN\fP
-Batch size. \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-import\fR, \fB\fCspan\-export\fR, \fB\fCspan\-crossref\-snapshot\fR only.
+Batch size. \fB\fCspan\-tag\fR, \fB\fCspan\-import\fR, \fB\fCspan\-export\fR, \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
 \fB\fC\-w\fR \fIN\fP
-Number of workers (defaults to CPU count). \fB\fCspan\-tag\fR, \fB\fCspan\-check\fR, \fB\fCspan\-export\fR only.
+Number of workers (defaults to CPU count). \fB\fCspan\-tag\fR, \fB\fCspan\-export\fR only.
 .TP
 \fB\fC\-cpuprofile\fR \fIpprof\-file\fP
 Profiling. \fB\fCspan\-import\fR, \fB\fCspan\-tag\fR, \fB\fCspan\-crossref\-snapshot\fR only.
@@ -105,21 +101,6 @@ Input is gzip compressed. \fB\fCspan\-crossref\-snapshot\fR only.
 .TP
 \fB\fC\-logfile\fR \fIfile\fP
 Logfile to log to. \fB\fCspan\-import\fR only.
-.TP
-\fB\fC\-span\-config\fR \fIpath\fP
-Path to span config. \fB\fCspan\-review\fR only.
-.TP
-\fB\fC\-a\fR
-Emit ascii table. \fB\fCspan\-review\fR only.
-.TP
-\fB\fC\-t\fR
-Emit textile table for redmine. \fB\fCspan\-review\fR only.
-.TP
-\fB\fC\-server\fR \fIurl\fP
-Location of SOLR, including scheme, host, port and core. \fB\fCspan\-review\fR only.
-.TP
-\fB\fC\-ticket\fR \fIid\fP
-Post review results into a Redmine ticket. \fB\fCspan\-review\fR only.
 .TP
 \fB\fC\-base\fR \fIurl\fP
 API base URL (default "\[la]http://api.crossref.org/members"\[ra]), \fB\fCspan\-crossref\-members\fR only.
@@ -326,88 +307,6 @@ various cases are condensed into a single \fB\fCswitch\fR statement.
 Similar to \fB\fCspan\-tag\fR, we can let the data flow into the index through pipes.
 .IP
 \fB\fCtaskcat AIIntermediateSchema | span\-tagger \-db amsl.db | span\-export | solrbulk \-server ...\fR
-.SH INDEX REVIEWS
-.PP
-Since 0.1.241 it is possible to run slightly automated SOLR index reviews via
-\fB\fCspan\-review\fR\&. This tool is experimental and might change in the future.
-.PP
-The review file location is hardcoded at the moment, \fB\fCdocs/review.yaml\fR\&.
-Example config file:
-.PP
-.RS
-.nf
-# Review configuration, refs #12756.
-#
-# Proposed workflow:
-#
-# 1. Edit this file via GitLab at
-# https://git.sc.uni\-leipzig.de/miku/span/blob/master/docs/review.yaml. Add,
-# edit or remove rules, update ticket number. If done, commit.
-# 2. A trigger will run an index review based on these rules.
-# 3. Find the results in your ticket, in case the ticket number was valid.
-
-# The solr server to query, including scheme, port and collection, e.g.
-# "http://localhost:8983/solr/biblio". If "auto", then the current testing solr
-# server will be figured out automatically.
-solr: "auto"
-
-# The ticket number of update. Set this to "NA" or anything non\-numeric to
-# suppress ticket updates.
-ticket: "NA"
-
-# If set to "fail" an empty result set will be marked as failure.
-# Otherwise a empty result set will \- most of the time \- not be considered a violation.
-zero\-results\-policy: "fail"
-
-# Allowed keys: [Query, Facet\-Field, Value, ...] checks if all values of field
-# contain only given values.
-allowed\-keys:
-    \- ["source_id:30", "format", "eBook", "ElectronicArticle"]
-    \- ["source_id:30", "format_de15", "Book, eBook", "Article, E\-Article"]
-    \- ["source_id:48", "language", "German", "English"]
-    \- ["source_id:49", "facet_avail", "Online", "Free"]
-    \- ["source_id:55", "facet_avail", "Online", "Free"]
-
-# All records: [Query, Facet\-Field, Value, ...] checks if all record contain
-# only the given values.
-all\-records:
-    \- ["source_id:28", "format", "ElectronicArticle"]
-    \- ["source_id:28", "format_de15", "Article, E\-Article"]
-    \- ["source_id:28", "facet_avail", "Online", "Free"]
-    \- ["source_id:28", "access_facet", "Electronic Resources"]
-    \- ["source_id:28", "mega_collection", "DOAJ Directory of Open Access Journals"]
-    \- ["source_id:28", "finc_class_facet", "not assigned"]
-    \- ["source_id:30", "facet_avail", "Online", "Free"]
-    \- ["source_id:30", "access_facet", "Electronic Resources"]
-    \- ["source_id:30", "mega_collection", "SSOAR Social Science Open Access Repository"]
-
-# MinRatio: Query, Facet\-Field, Value, Ratio (Percent), checks if the given
-# value appears in a given percentage of documents.
-min\-ratio:
-    \- ["source_id:49", "facet_avail", "Free", 0.8]
-    \- ["source_id:55", "facet_avail", "Free", 2.2]
-    \- ["source_id:105", "facet_avail", "Free", 0.5]
-
-# MinCount: Query, Facet\-Field, Value, Min Count. Checks, if the given value
-# appears at least a fixed number of times.
-min\-count:
-    \- ["source_id:89", "facet_avail", "Free", 50]
-.fi
-.RE
-.SH SPAN CONFIG
-.PP
-The span config file is used by \fB\fCspan\-review\fR, since it accesses various
-external systems: SOLR, Redmine. Default location is
-\fB\fC~/.config/span/span.json\fR, with \fB\fC/etc/span/span.json\fR as fallback.
-.PP
-.RS
-.nf
-{
-  "redmine.baseurl": "https://projects.example.com",
-  "redmine.apitoken": "d41d8cd98f00b204e9800998ecf8427e"
-}
-.fi
-.RE
 .SH FILES
 .PP
 Assets (mostly string to string mappings) are compiled into the executable. To
