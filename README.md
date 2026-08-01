@@ -59,8 +59,10 @@ additions.  Notable, since 2021, the previous scripts used to fetch daily
 metadata updates from [crossref](https://api.crossref.org) has been put into a
 standalone tool, `span-crossref-sync`, which merely adds some retry logic and
 consistent file naming to the API harvest. In 2024, `span-webhookd`,
-`span-check`, `span-review`, `span-tagger` are gone. A [faster crossref snapshot
-tool](https://github.com/miku/span/blob/29d0af845102464475e1d3b9aba779895847c32e/cmd/span-crossref-fast-snapshot/main.go) was implemented in 2025.
+`span-check`, `span-review`, `span-tagger` are gone (and `span-compare` in
+2026). A [faster crossref snapshot
+tool](https://github.com/miku/span/blob/29d0af845102464475e1d3b9aba779895847c32e/cmd/span-crossref-fast-snapshot/main.go) was implemented in 2025, and in 2026
+`span-crossref-fastproc` grew a two-lane pipeline for live SOLR indexing.
 
 ## Documentation
 
@@ -98,4 +100,10 @@ input from stdin as well, allowing for one-off things like:
 ```shell
 $ metha-cat http://oai.web | span-import -i name | span-tag -c amsl | span-export | solrbulk
 ```
+
+For crossref, two make targets compose these tools into live SOLR indexing:
+`make fast-lane` (frequent, additive upsert of the latest slice) and `make
+full-lane` (periodic dedup, full reindex, and stale-record sweep). See the
+`INDEXING PIPELINES` section of the [manual](docs/span.md) for details and the
+tunable variables.
 

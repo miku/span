@@ -1,5 +1,5 @@
-// span-crossref-fastproc takes a raw crossref daily data slice (zstd
-// compressed) and produces a solr-importable file by running the equivalent
+// span-crossref-fastproc takes one or more raw crossref daily data slices (zstd
+// compressed) and produces solr-importable output by running the equivalent
 // of: span-import -i crossref | span-tag -unfreeze filterconfig.zip |
 // span-export -with-fullrecord.
 //
@@ -7,10 +7,15 @@
 // directly from FOLIO API (via OKAPI_URL and OKAPI_TOKEN env vars), with
 // automatic caching.
 //
+// With "-o DIR" (the default), each input is written to DIR as a zstd file
+// named after the input. With "-o -", all inputs are streamed uncompressed to
+// stdout, e.g. for piping straight into solrbulk.
+//
 // Usage:
 //
-//	span-crossref-fastproc -o /output/dir feed-2-index-2026-03-02-2026-03-02.json.zst
-//	span-crossref-fastproc -f filterconfig.zip feed-2-index-2026-03-02-2026-03-02.json.zst
+//	span-crossref-fastproc -o /output/dir slice-2026-03-02.json.zst
+//	span-crossref-fastproc -f filterconfig.zip slice-a.json.zst slice-b.json.zst
+//	span-crossref-fastproc -o - slice-2026-03-02.json.zst | solrbulk -server ...
 package main
 
 import (
@@ -25,14 +30,12 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
-	"github.com/miku/span/freeze"
 	"github.com/miku/span/internal/cmd/crossrefcmd"
-	"github.com/segmentio/encoding/json"
 )
 
 var (
 	frozenFile  = flag.String("f", "", "frozen filterconfig zip file; if omitted, fetch from FOLIO API")
-	outputDir   = flag.String("o", ".", "output directory")
+	outputDir   = flag.String("o", ".", "output directory, or - for uncompressed stdout")
 	numWorkers  = flag.Int("w", crossrefcmd.DefaultFastprocConfig().NumWorkers, "number of workers")
 	batchSize   = flag.Int("b", 10000, "batch size")
 	showVersion = flag.Bool("v", false, "show version")
@@ -46,8 +49,8 @@ var (
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: span-crossref-fastproc [options] INPUT.json.zst\n\n")
-		fmt.Fprintf(os.Stderr, "Converts a raw crossref daily slice into a solr-importable file.\n")
+		fmt.Fprintf(os.Stderr, "usage: span-crossref-fastproc [options] INPUT.json.zst [INPUT.json.zst ...]\n\n")
+		fmt.Fprintf(os.Stderr, "Converts raw crossref daily slices into solr-importable output.\n")
 		fmt.Fprintf(os.Stderr, "Filterconfig is fetched from FOLIO (OKAPI_URL, OKAPI_TOKEN) or supplied via -f.\n\n")
 		flag.PrintDefaults()
 	}
@@ -60,10 +63,10 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	inputFile := flag.Arg(0)
 
-	// Resolve filterconfig (from file or FOLIO API).
-	zipPath, err := crossrefcmd.ResolveFilterConfig(crossrefcmd.FilterConfigOpts{
+	// Resolve and load the filterconfig once, then reuse the tagger across all
+	// input slices.
+	tagger, cleanup, err := crossrefcmd.BuildTagger(crossrefcmd.FilterConfigOpts{
 		FrozenFile: *frozenFile,
 		OkapiURL:   *okapiURL,
 		Tenant:     *tenant,
@@ -76,78 +79,56 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer cleanup()
 
-	// Unfreeze filterconfig.
-	dir, filterconfig, err := freeze.UnfreezeFilterConfig(zipPath)
-	if err != nil {
-		log.Fatalf("unfreeze: %v", err)
-	}
-	defer os.RemoveAll(dir)
-	log.Printf("unfroze filterconfig to: %s", filterconfig)
+	cfg := crossrefcmd.FastprocConfig{NumWorkers: *numWorkers, BatchSize: *batchSize}
 
-	// Parse filter config into tagger.
-	var tagger filter.Tagger
-	f, err := os.Open(filterconfig)
-	if err != nil {
-		log.Fatalf("open filterconfig: %v", err)
-	}
-	if err := json.NewDecoder(f).Decode(&tagger); err != nil {
-		f.Close()
-		log.Fatalf("parse filterconfig: %v", err)
-	}
-	f.Close()
-
-	// Handle expand rules (for pre-supplied zip files; FOLIO mode expands during freeze).
-	if *frozenFile != "" && *expandFlag != "" {
-		var rules map[string][]string
-		if err := json.Unmarshal([]byte(*expandFlag), &rules); err != nil {
-			b, err := os.ReadFile(*expandFlag)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if err := json.Unmarshal(b, &rules); err != nil {
-				log.Fatal(err)
+	if *outputDir == "-" {
+		// Stream all inputs uncompressed to stdout (for piping into solrbulk).
+		w := bufio.NewWriter(os.Stdout)
+		for _, inputFile := range flag.Args() {
+			log.Printf("processing %s -> stdout (%d workers)", inputFile, *numWorkers)
+			if err := crossrefcmd.ProcessFile(cfg, tagger, inputFile, w); err != nil {
+				log.Fatalf("processing %s: %v", inputFile, err)
 			}
 		}
-		tagger.Expand(rules)
-		log.Printf("expanded %d meta-ISIL(s)", len(rules))
+		if err := w.Flush(); err != nil {
+			log.Fatalf("flush: %v", err)
+		}
+		return
 	}
 
-	// Open input (zstd compressed).
-	inf, err := os.Open(inputFile)
-	if err != nil {
-		log.Fatalf("open input: %v", err)
+	for _, inputFile := range flag.Args() {
+		outName := filepath.Join(*outputDir, crossrefcmd.OutputFilename(inputFile))
+		if err := processToFile(cfg, tagger, inputFile, outName); err != nil {
+			log.Fatalf("processing %s: %v", inputFile, err)
+		}
 	}
-	defer inf.Close()
-	zr, err := zstd.NewReader(inf)
-	if err != nil {
-		log.Fatalf("zstd reader: %v", err)
-	}
-	defer zr.Close()
+}
 
-	// Create output file (zstd compressed).
-	outName := filepath.Join(*outputDir, crossrefcmd.OutputFilename(inputFile))
+// processToFile writes the solr records for a single input to a zstd-compressed
+// file at outName.
+func processToFile(cfg crossrefcmd.FastprocConfig, tagger *filter.Tagger, inputFile, outName string) error {
 	outf, err := os.Create(outName)
 	if err != nil {
-		log.Fatalf("create output: %v", err)
+		return fmt.Errorf("create output: %w", err)
 	}
 	defer outf.Close()
 	zw, err := zstd.NewWriter(outf)
 	if err != nil {
-		log.Fatalf("zstd writer: %v", err)
+		return fmt.Errorf("zstd writer: %w", err)
 	}
 	w := bufio.NewWriter(zw)
-
-	cfg := crossrefcmd.FastprocConfig{NumWorkers: *numWorkers, BatchSize: *batchSize}
-	log.Printf("processing %s -> %s (%d workers)", inputFile, outName, *numWorkers)
-	if err := crossrefcmd.ProcessStream(cfg, &tagger, bufio.NewReader(zr), w); err != nil {
-		log.Fatalf("processing: %v", err)
+	log.Printf("processing %s -> %s (%d workers)", inputFile, outName, cfg.NumWorkers)
+	if err := crossrefcmd.ProcessFile(cfg, tagger, inputFile, w); err != nil {
+		return err
 	}
 	if err := w.Flush(); err != nil {
-		log.Fatalf("flush: %v", err)
+		return err
 	}
 	if err := zw.Close(); err != nil {
-		log.Fatalf("close zstd writer: %v", err)
+		return fmt.Errorf("close zstd writer: %w", err)
 	}
 	log.Printf("done: %s", outName)
+	return nil
 }

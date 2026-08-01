@@ -428,6 +428,54 @@ If we could generate smaller updates (daily, weekly) per source (or
 collection), then a live-updater could be feasible, albeit generating extra
 load on server (https://i.imgur.com/fkQNGIr.png).
 
+INDEXING PIPELINES
+------------------
+
+Two composable pipelines feed the same live SOLR, wired up as make targets (see
+the Makefile for the tunable variables). Both need solrbulk(1) on PATH and a
+filterconfig, supplied as a frozen zip (`FILTERCONFIG`) or fetched from FOLIO
+via the `OKAPI_URL` and `OKAPI_TOKEN` environment variables.
+
+The *fast lane* harvests the most recent crossref slice and upserts it into the
+index. It is additive only and runs often, e.g. as a daily cron:
+
+    $ make fast-lane
+
+which is roughly:
+
+    $ span-crossref-sync -c CACHE -P PREFIX -i d -s DATE -e DATE -q
+    $ span-crossref-fastproc CACHE/PREFIX-index-DATE-DATE.json.zst -o - | solrbulk -server SOLR
+
+Because crossref is append-mostly, upserting the daily slice keeps the index
+current without a full rebuild. The fast lane never deletes; disappearances are
+reconciled by the full lane.
+
+The *full lane* deduplicates the whole cached corpus to the latest version per
+DOI, reindexes it, then removes records the reindex did not touch. It runs
+periodically, e.g. weekly:
+
+    $ make full-lane
+
+which is roughly:
+
+    $ span-crossref-sync -c CACHE -P PREFIX -i d -s SINCE -e UNTIL -q
+    $ span-crossref-fast-snapshot -o CACHE/snapshot.json.zst CACHE/PREFIX-index-*.json.zst
+    $ span-crossref-fastproc CACHE/snapshot.json.zst -o - | solrbulk -server SOLR
+    $ span-index cleanup -s SOLR --sid 49 --until PASS_START | sh
+
+The final step is the garbage collector the fast lane cannot be: after a full
+pass every live crossref record has a fresh `last_indexed`, so anything older
+than the pass start is stale. `span-index cleanup` only prints the
+delete-by-query (scoped to the crossref source id and bounded by time) - review
+it, then pipe to sh to execute. Incremental upserts and this `last_indexed`
+sweep are mutually exclusive: the sweep is only correct after a pass that
+touches every live record, which is why deletes belong to the full lane.
+
+Override any variable on the command line, e.g.:
+
+    $ make fast-lane SOLR=http://10.0.0.1:8983/solr/biblio DATE=2026-07-31
+    $ make full-lane FILTERCONFIG=/etc/span/filterconfig.zip
+
 BUGS
 ----
 

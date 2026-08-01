@@ -1,13 +1,17 @@
 package crossrefcmd
 
 import (
+	"bufio"
 	"fmt"
 	"io"
+	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/klauspost/compress/zstd"
 	"github.com/miku/span"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/formats/crossref"
@@ -57,6 +61,11 @@ type FilterConfigOpts struct {
 // ResolveFilterConfig returns the path to a frozen filterconfig zip. If
 // opts.FrozenFile is set, it returns that path. Otherwise it fetches from
 // FOLIO with caching.
+//
+// Expansion (opts.ExpandFlag) is intentionally not applied here: it is applied
+// to the in-memory tagger in BuildTagger. Baking it into the fetched config
+// would make the cached zip depend on the expand rules, which the FOLIO cache
+// key does not capture.
 func ResolveFilterConfig(opts FilterConfigOpts) (string, error) {
 	if opts.FrozenFile != "" {
 		return opts.FrozenFile, nil
@@ -67,20 +76,11 @@ func ResolveFilterConfig(opts FilterConfigOpts) (string, error) {
 	if opts.OkapiURL == "" {
 		return "", fmt.Errorf("OKAPI_URL env var or -okapi-url flag is required")
 	}
-	var expandRules map[string][]string
-	if opts.ExpandFlag != "" {
-		var err error
-		expandRules, err = freeze.ParseExpandRules(opts.ExpandFlag)
-		if err != nil {
-			return "", fmt.Errorf("parse expand rules: %w", err)
-		}
-	}
 	return freeze.FetchOrCached(
 		freeze.FolioOpts{
 			OkapiURL: opts.OkapiURL,
 			Tenant:   opts.Tenant,
 			Token:    opts.Token,
-			Expand:   expandRules,
 			NoProxy:  opts.NoProxy,
 		},
 		freeze.CacheOpts{
@@ -88,6 +88,47 @@ func ResolveFilterConfig(opts FilterConfigOpts) (string, error) {
 			Force: opts.Force,
 		},
 	)
+}
+
+// BuildTagger resolves the filterconfig (frozen file or FOLIO), loads it into a
+// Tagger and applies any meta-ISIL expansion rules. Expansion is always applied
+// to the in-memory tagger, so the frozen-file and FOLIO paths behave
+// identically and the FOLIO cache stays independent of the expand rules. The
+// returned cleanup removes the temporary directory the config was unfrozen
+// into; callers should defer it.
+func BuildTagger(opts FilterConfigOpts) (tagger *filter.Tagger, cleanup func(), err error) {
+	zipPath, err := ResolveFilterConfig(opts)
+	if err != nil {
+		return nil, nil, err
+	}
+	dir, filterconfig, err := freeze.UnfreezeFilterConfig(zipPath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("unfreeze: %w", err)
+	}
+	cleanup = func() { os.RemoveAll(dir) }
+	log.Printf("unfroze filterconfig to: %s", filterconfig)
+	f, err := os.Open(filterconfig)
+	if err != nil {
+		cleanup()
+		return nil, nil, fmt.Errorf("open filterconfig: %w", err)
+	}
+	tagger = new(filter.Tagger)
+	if err := json.NewDecoder(f).Decode(tagger); err != nil {
+		f.Close()
+		cleanup()
+		return nil, nil, fmt.Errorf("parse filterconfig: %w", err)
+	}
+	f.Close()
+	if opts.ExpandFlag != "" {
+		rules, err := freeze.ParseExpandRules(opts.ExpandFlag)
+		if err != nil {
+			cleanup()
+			return nil, nil, fmt.Errorf("parse expand rules: %w", err)
+		}
+		tagger.Expand(rules)
+		log.Printf("expanded %d meta-ISIL(s)", len(rules))
+	}
+	return tagger, cleanup, nil
 }
 
 // ProcessStream runs the equivalent of "span-import -i crossref | span-tag
@@ -123,4 +164,20 @@ func ProcessStream(cfg FastprocConfig, tagger *filter.Tagger, r io.Reader, w io.
 	p.NumWorkers = cfg.NumWorkers
 	p.BatchSize = cfg.BatchSize
 	return p.Run()
+}
+
+// ProcessFile opens a zstd-compressed crossref slice at inputPath and streams
+// the resulting solr records to w (see ProcessStream).
+func ProcessFile(cfg FastprocConfig, tagger *filter.Tagger, inputPath string, w io.Writer) error {
+	inf, err := os.Open(inputPath)
+	if err != nil {
+		return fmt.Errorf("open input: %w", err)
+	}
+	defer inf.Close()
+	zr, err := zstd.NewReader(inf)
+	if err != nil {
+		return fmt.Errorf("zstd reader: %w", err)
+	}
+	defer zr.Close()
+	return ProcessStream(cfg, tagger, bufio.NewReader(zr), w)
 }

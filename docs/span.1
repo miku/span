@@ -435,6 +435,73 @@ Reindex with
 If we could generate smaller updates (daily, weekly) per source (or
 collection), then a live\-updater could be feasible, albeit generating extra
 load on server (\[la]https://i.imgur.com/fkQNGIr.png\[ra]).
+.SH INDEXING PIPELINES
+.PP
+Two composable pipelines feed the same live SOLR, wired up as make targets (see
+the Makefile for the tunable variables). Both need
+.BR solrbulk (1)
+on PATH and a filterconfig, supplied as a frozen zip (\fB\fCFILTERCONFIG\fR) or fetched
+from FOLIO via the \fB\fCOKAPI_URL\fR and \fB\fCOKAPI_TOKEN\fR environment variables.
+.PP
+The \fIfast lane\fP harvests the most recent crossref slice and upserts it into the
+index. It is additive only and runs often, e.g. as a daily cron:
+.PP
+.RS
+.nf
+$ make fast\-lane
+.fi
+.RE
+.PP
+which is roughly:
+.PP
+.RS
+.nf
+$ span\-crossref\-sync \-c CACHE \-P PREFIX \-i d \-s DATE \-e DATE \-q
+$ span\-crossref\-fastproc CACHE/PREFIX\-index\-DATE\-DATE.json.zst \-o \- | solrbulk \-server SOLR
+.fi
+.RE
+.PP
+Because crossref is append\-mostly, upserting the daily slice keeps the index
+current without a full rebuild. The fast lane never deletes; disappearances are
+reconciled by the full lane.
+.PP
+The \fIfull lane\fP deduplicates the whole cached corpus to the latest version per
+DOI, reindexes it, then removes records the reindex did not touch. It runs
+periodically, e.g. weekly:
+.PP
+.RS
+.nf
+$ make full\-lane
+.fi
+.RE
+.PP
+which is roughly:
+.PP
+.RS
+.nf
+$ span\-crossref\-sync \-c CACHE \-P PREFIX \-i d \-s SINCE \-e UNTIL \-q
+$ span\-crossref\-fast\-snapshot \-o CACHE/snapshot.json.zst CACHE/PREFIX\-index\-*.json.zst
+$ span\-crossref\-fastproc CACHE/snapshot.json.zst \-o \- | solrbulk \-server SOLR
+$ span\-index cleanup \-s SOLR \-\-sid 49 \-\-until PASS_START | sh
+.fi
+.RE
+.PP
+The final step is the garbage collector the fast lane cannot be: after a full
+pass every live crossref record has a fresh \fB\fClast_indexed\fR, so anything older
+than the pass start is stale. \fB\fCspan\-index cleanup\fR only prints the
+delete\-by\-query (scoped to the crossref source id and bounded by time) \- review
+it, then pipe to sh to execute. Incremental upserts and this \fB\fClast_indexed\fR
+sweep are mutually exclusive: the sweep is only correct after a pass that
+touches every live record, which is why deletes belong to the full lane.
+.PP
+Override any variable on the command line, e.g.:
+.PP
+.RS
+.nf
+$ make fast\-lane SOLR=http://10.0.0.1:8983/solr/biblio DATE=2026\-07\-31
+$ make full\-lane FILTERCONFIG=/etc/span/filterconfig.zip
+.fi
+.RE
 .SH BUGS
 .PP
 Please report bugs to \[la]https://github.com/miku/span/issues\[ra]\&.

@@ -108,6 +108,56 @@ names: assets/crossref/names.ndj
 assets/crossref/names.ndj: span-crossref-members
 	span-crossref-members | jq -rc '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > $@
 
+# Live indexing pipelines. Two lanes feed the same live SOLR:
+#
+#   fast-lane  additive daily upsert of the latest crossref slice (frequent)
+#   full-lane  dedup + full reindex over the cached corpus, then sweep stale
+#              docs (periodic; the GC pass the fast lane cannot do)
+#
+# Override any variable on the command line, e.g.:
+#   make fast-lane SOLR=http://10.0.0.1:8983/solr/biblio DATE=2026-07-31
+#
+# Requires solrbulk (https://github.com/miku/solrbulk) on PATH. The filterconfig
+# comes from FILTERCONFIG (a frozen zip); if empty, span-crossref-fastproc
+# fetches it from FOLIO via the OKAPI_URL and OKAPI_TOKEN environment variables.
+SOLR           ?= http://localhost:8983/solr/biblio
+SOLRBULK       ?= solrbulk
+CROSSREF_CACHE ?= /data/finc/crossref
+PREFIX         ?= feed-1-
+FILTER         ?= index
+CROSSREF_SID   ?= 49
+FILTERCONFIG   ?=
+FASTPROC_FC     = $(if $(FILTERCONFIG),-f $(FILTERCONFIG),)
+# fast lane: a single day (default: yesterday, UTC).
+DATE  ?= $(shell date -u -d 'yesterday' +%F 2>/dev/null || date -u -v-1d +%F)
+# full lane: a window [SINCE, UNTIL] to top up (default: last 30 days, UTC).
+SINCE ?= $(shell date -u -d '30 days ago' +%F 2>/dev/null || date -u -v-30d +%F)
+UNTIL ?= $(DATE)
+
+# Fast lane: harvest yesterday's crossref slice and upsert it into the live
+# index. Additive only (no deletes) - safe because crossref is append-mostly.
+.PHONY: fast-lane
+fast-lane: span-crossref-sync span-crossref-fastproc
+	./span-crossref-sync -c $(CROSSREF_CACHE) -P $(PREFIX) -f $(FILTER) -p zstd -i d -s $(DATE) -e $(DATE) -q
+	./span-crossref-fastproc $(FASTPROC_FC) -o - \
+		$(CROSSREF_CACHE)/$(PREFIX)$(FILTER)-$(DATE)-$(DATE).json.zst | \
+		$(SOLRBULK) -server $(SOLR) -verbose
+
+# Full lane: top up recent slices, dedup the whole cached corpus to the latest
+# version per DOI, reindex it, then print a delete-by-query for records the
+# reindex did not touch (last_indexed older than the pass start). The sweep is
+# printed for review, not executed - pipe it to sh once you trust it.
+.PHONY: full-lane
+full-lane: span-crossref-sync span-crossref-fast-snapshot span-crossref-fastproc span-index
+	@START=$$(date -u +%Y-%m-%dT%H:%M:%SZ); echo "pass start: $$START"; \
+	./span-crossref-sync -c $(CROSSREF_CACHE) -P $(PREFIX) -f $(FILTER) -p zstd -i d -s $(SINCE) -e $(UNTIL) -q && \
+	./span-crossref-fast-snapshot -o $(CROSSREF_CACHE)/snapshot.json.zst \
+		$(CROSSREF_CACHE)/$(PREFIX)$(FILTER)-*.json.zst && \
+	./span-crossref-fastproc $(FASTPROC_FC) -o - $(CROSSREF_CACHE)/snapshot.json.zst | \
+		$(SOLRBULK) -server $(SOLR) -verbose && \
+	echo "reindex done; review the sweep below, then re-run piped to sh to delete:" && \
+	./span-index cleanup -s $(SOLR) --sid $(CROSSREF_SID) --until $$START
+
 .PHONY: update-version
 update-version:
 	sed -i -e 's@^Version:.*@Version: $(VERSION)@' packaging/deb/span/DEBIAN/control
