@@ -2,7 +2,6 @@ SHELL = /bin/bash
 VERSION := 0.2.35
 TARGETS = \
 		  span-compact \
-		  span-compare \
 		  span-compare-file \
           span-crossref-members \
 		  span-crossref-fast-snapshot \

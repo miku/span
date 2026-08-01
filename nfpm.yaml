@@ -26,11 +26,6 @@ contents:
     file_info:
       mode: 0755
 
-  - src: span-compare
-    dst: /usr/local/bin/span-compare
-    file_info:
-      mode: 0755
-
   - src: span-compare-file
     dst: /usr/local/bin/span-compare-file
     file_info:
