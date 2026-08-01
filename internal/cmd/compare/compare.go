@@ -1,6 +1,5 @@
 // Package compare implements the core of span-compare: it renders a table with
-// ISIL/SID counts of two SOLR indices side by side. It can parse the hidden
-// whatislive endpoint to find live, non-live pairs.
+// ISIL/SID counts of two SOLR indices side by side.
 package compare
 
 import (
@@ -165,9 +164,7 @@ type Config struct {
 	AMSLLiveServer   string
 	LiveServer       string
 	NonliveServer    string
-	WhatIsLive       bool
 	LiveLinkTemplate string
-	SpanConfigFile   string
 	Textile          bool
 	FocusInstitution string
 }
@@ -308,26 +305,6 @@ func Run(cfg Config, w io.Writer) error {
 		}
 		SourceNames = names
 		log.Printf("fetched %d names", len(SourceNames))
-	}
-
-	if cfg.WhatIsLive {
-		// Fallback configuration.
-		if _, err := os.Stat(cfg.SpanConfigFile); os.IsNotExist(err) {
-			cfg.SpanConfigFile = "/etc/span/span.json"
-		}
-		if _, err := os.Stat(cfg.SpanConfigFile); os.IsNotExist(err) {
-			return err
-		}
-		var err error
-		cfg.LiveServer, err = solrutil.FindLiveSolrServer(cfg.SpanConfigFile)
-		if err != nil {
-			return err
-		}
-		cfg.NonliveServer, err = solrutil.FindNonliveSolrServer(cfg.SpanConfigFile)
-		if err != nil {
-			return err
-		}
-		log.Printf("live=%s, nonlive=%s", cfg.LiveServer, cfg.NonliveServer)
 	}
 
 	live := solrutil.Index{Server: prependHTTP(cfg.LiveServer)}

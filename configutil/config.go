@@ -14,5 +14,4 @@ type Config struct {
 	WebhookdHostPort string `yaml:"webhookd.listen" env:"SPAN_WEBHOOKD_LISTEN" env-default:"0.0.0.0:8080"`
 	WebhookdLogfile  string `yaml:"webhookd.logfile" env:"SPAN_WEBHOOKD_LOGFILE"`
 	WebhookdPath     string `yaml:"webhookd.path" env:"SPAN_WEBHOOKD_PATH" env-default:"trigger"`
-	WhatIsLiveURL    string `yaml:"whatislive.url" env:"SPAN_WHATISLIVE_URL"`
 }
