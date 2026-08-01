@@ -86,11 +86,6 @@ contents:
     file_info:
       mode: 0755
 
-  - src: span-hcov
-    dst: /usr/local/bin/span-hcov
-    file_info:
-      mode: 0755
-
   - src: span-import
     dst: /usr/local/bin/span-import
     file_info:

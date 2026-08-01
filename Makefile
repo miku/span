@@ -14,7 +14,6 @@ TARGETS = \
 		  span-export \
           span-folio \
 		  span-freeze \
-		  span-hcov \
 		  span-index \
 		  span-import \
 		  span-mail \
