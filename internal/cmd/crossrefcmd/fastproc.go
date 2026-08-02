@@ -71,7 +71,7 @@ func ResolveFilterConfig(opts FilterConfigOpts) (string, error) {
 		return opts.FrozenFile, nil
 	}
 	if opts.Token == "" {
-		return "", fmt.Errorf("either -f filterconfig.zip or OKAPI_TOKEN env var is required")
+		return "", fmt.Errorf("either -f filterconfig.zip or OKAPI_TOKEN env is required")
 	}
 	if opts.OkapiURL == "" {
 		return "", fmt.Errorf("OKAPI_URL env var or -okapi-url flag is required")
