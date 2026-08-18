@@ -19,6 +19,9 @@ const (
 	DefaultRefType        = "EJOUR"
 	Collection            = "CEEOL Central and Eastern European Online Library"
 	TechnicalCollectionID = "sid-53-col-ceeol"
+
+	// BaseURL is prepended to ArticleURL values that only contain a path.
+	BaseURL = "https://www.ceeol.com"
 )
 
 // Article from CEEOL, refs #9398.
@@ -53,6 +56,21 @@ type Article struct {
 
 func normalizeString(s string) string {
 	return strings.TrimSpace(strings.ToLower(s))
+}
+
+// absoluteURL returns an absolute link to an article. Depending on the
+// snapshot, ArticleURL contains either a full URL, which is passed through
+// unchanged, or just a path, like "/search/article-detail?id=6765", which gets
+// BaseURL prepended.
+func absoluteURL(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return ""
+	}
+	if strings.HasPrefix(s, "http://") || strings.HasPrefix(s, "https://") {
+		return s
+	}
+	return BaseURL + "/" + strings.TrimLeft(s, "/")
 }
 
 // ToIntermediateSchema converts an article to intermediate schema.
@@ -114,7 +132,9 @@ func (article *Article) ToIntermediateSchema() (*finc.IntermediateSchema, error)
 		return nil, fmt.Errorf("ceeol: invalid date: %w", err)
 	}
 	output.Subjects = article.SubjectTerms
-	output.URL = append(output.URL, article.ArticleURL)
+	if u := absoluteURL(article.ArticleURL); u != "" {
+		output.URL = append(output.URL, u)
+	}
 	output.RecordID = article.UniqueID
 	output.ID = fmt.Sprintf("ai-%s-%s", SourceIdentifier, article.UniqueID)
 	output.SourceID = SourceIdentifier
