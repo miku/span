@@ -16,107 +16,107 @@ disable_globbing: false
 
 contents:
   # Binaries
-  - src: span-compact
+  - src: build/span-compact
     dst: /usr/local/bin/span-compact
     file_info:
       mode: 0755
 
-  - src: span-compare-file
+  - src: build/span-compare-file
     dst: /usr/local/bin/span-compare-file
     file_info:
       mode: 0755
 
-  - src: span-crossref-fast-snapshot
+  - src: build/span-crossref-fast-snapshot
     dst: /usr/local/bin/span-crossref-fast-snapshot
     file_info:
       mode: 0755
 
-  - src: span-crossref-fastproc
+  - src: build/span-crossref-fastproc
     dst: /usr/local/bin/span-crossref-fastproc
     file_info:
       mode: 0755
 
-  - src: span-crossref-members
+  - src: build/span-crossref-members
     dst: /usr/local/bin/span-crossref-members
     file_info:
       mode: 0755
 
-  - src: span-crossref-snapshot
+  - src: build/span-crossref-snapshot
     dst: /usr/local/bin/span-crossref-snapshot
     file_info:
       mode: 0755
 
-  - src: span-crossref-sync
+  - src: build/span-crossref-sync
     dst: /usr/local/bin/span-crossref-sync
     file_info:
       mode: 0755
 
-  - src: span-crossref-table
+  - src: build/span-crossref-table
     dst: /usr/local/bin/span-crossref-table
     file_info:
       mode: 0755
 
-  - src: span-doisniffer
+  - src: build/span-doisniffer
     dst: /usr/local/bin/span-doisniffer
     file_info:
       mode: 0755
 
-  - src: span-export
+  - src: build/span-export
     dst: /usr/local/bin/span-export
     file_info:
       mode: 0755
 
-  - src: span-folio
+  - src: build/span-folio
     dst: /usr/local/bin/span-folio
     file_info:
       mode: 0755
 
-  - src: span-freeze
+  - src: build/span-freeze
     dst: /usr/local/bin/span-freeze
     file_info:
       mode: 0755
 
-  - src: span-import
+  - src: build/span-import
     dst: /usr/local/bin/span-import
     file_info:
       mode: 0755
 
-  - src: span-index
+  - src: build/span-index
     dst: /usr/local/bin/span-index
     file_info:
       mode: 0755
 
-  - src: span-local-data
+  - src: build/span-local-data
     dst: /usr/local/bin/span-local-data
     file_info:
       mode: 0755
 
-  - src: span-mail
+  - src: build/span-mail
     dst: /usr/local/bin/span-mail
     file_info:
       mode: 0755
 
-  - src: span-oa-filter
+  - src: build/span-oa-filter
     dst: /usr/local/bin/span-oa-filter
     file_info:
       mode: 0755
 
-  - src: span-redact
+  - src: build/span-redact
     dst: /usr/local/bin/span-redact
     file_info:
       mode: 0755
 
-  - src: span-report
+  - src: build/span-report
     dst: /usr/local/bin/span-report
     file_info:
       mode: 0755
 
-  - src: span-tag
+  - src: build/span-tag
     dst: /usr/local/bin/span-tag
     file_info:
       mode: 0755
 
-  - src: span-update-labels
+  - src: build/span-update-labels
     dst: /usr/local/bin/span-update-labels
     file_info:
       mode: 0755

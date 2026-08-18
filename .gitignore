@@ -67,3 +67,5 @@ df.h5
 *.db
 
 .beads/.beads-credential-key
+
+build/

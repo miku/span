@@ -34,12 +34,15 @@ all: $(TARGETS)
 test:
 	go test -v -cover ./...
 
+LDFLAGS = -s -w -X github.com/miku/span.AppVersion=$(VERSION)
+
 $(TARGETS): %: $(wildcard cmd/%/*.go)
-	go build -ldflags "-s -w -X github.com/miku/span.AppVersion=$(VERSION)" -o $@ ./cmd/$@
+	go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/$@
 
 .PHONY: clean
 clean:
 	rm -f $(TARGETS)
+	rm -rf build/
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
 	rm -rf ./packaging/deb/$(PKGNAME)/usr
@@ -59,12 +62,21 @@ bench:
 # nfpm-based packaging (preferred).
 SEMVER := $(shell echo $(VERSION) | sed 's/^v//')
 
+# Cross-compiled linux/amd64 binaries used for packaging (deb/rpm), kept in a
+# separate directory so they never overwrite the native dev binaries above and
+# the host platform (e.g. macOS arm64) does not leak into the package.
+BUILD_TARGETS = $(addprefix build/,$(TARGETS))
+
+$(BUILD_TARGETS): build/%:
+	@mkdir -p build
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/$*
+
 .PHONY: deb
-deb: all
+deb: $(BUILD_TARGETS)
 	SEMVER=$(SEMVER) GOARCH=amd64 nfpm package -p deb -f nfpm.yaml
 
 .PHONY: rpm
-rpm: all
+rpm: $(BUILD_TARGETS)
 	SEMVER=$(SEMVER) GOARCH=amd64 nfpm package -p rpm -f nfpm.yaml
 
 # Docs related, https://github.com/sunaku/md2man
