@@ -16,11 +16,6 @@ disable_globbing: false
 
 contents:
   # Binaries
-  - src: span-amsl-discovery
-    dst: /usr/local/bin/span-amsl-discovery
-    file_info:
-      mode: 0755
-
   - src: span-compact
     dst: /usr/local/bin/span-compact
     file_info:
