@@ -24,8 +24,7 @@ TARGETS = \
 		  span-update-labels
 
 PKGNAME = span
-MAKEFLAGS := --jobs=$(shell nproc 2>/dev/null || sysctl -n hw.physicalcpu)
-
+MAKEFLAGS := --jobs=$(shell nproc 2>/dev/null || sysctl -n hw.physicalcpu)
 
 .PHONY: all
 all: $(TARGETS)
@@ -35,8 +34,9 @@ test:
 	go test -v -cover ./...
 
 LDFLAGS = -s -w -X github.com/miku/span.AppVersion=$(VERSION)
+GOFILES := $(shell find . -name '*.go' -not -path './.git/*' -not -path './build/*') go.mod go.sum
 
-$(TARGETS): %: $(wildcard cmd/%/*.go)
+$(TARGETS): %: $(GOFILES)
 	go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/$@
 
 .PHONY: clean
@@ -50,10 +50,12 @@ clean:
 	rm -f *.000
 	rm -f *.001
 
-# Code quality and performance.
+# Code quality and performance. staticcheck is pinned in the go.mod tool block,
+# so this needs no separately installed binary and matches CI.
 .PHONY: lint
 lint:
-	golanglint-ci run ./...
+	go vet ./...
+	go tool staticcheck ./...
 
 .PHONY: bench
 bench:
@@ -67,7 +69,7 @@ SEMVER := $(shell echo $(VERSION) | sed 's/^v//')
 # the host platform (e.g. macOS arm64) does not leak into the package.
 BUILD_TARGETS = $(addprefix build/,$(TARGETS))
 
-$(BUILD_TARGETS): build/%:
+$(BUILD_TARGETS): build/%: $(GOFILES)
 	@mkdir -p build
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/$*
 
