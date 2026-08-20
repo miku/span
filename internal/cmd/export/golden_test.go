@@ -15,9 +15,9 @@ import (
 )
 
 // Golden tests for the export formats, the other end of the hub. The input is
-// testdata/input.is, a stream of intermediate schema records produced by the
-// reshape golden tests, so a change to a source format shows up here too --
-// this is the shape of the documents that reach the index.
+// testdata/input.is, the concatenation of every reshape golden file, so a
+// change to a source format shows up here too -- this is the shape of the
+// documents that reach the index.
 //
 //	testdata/input.is                 intermediate schema records
 //	testdata/golden.<format>.ndjson   what each exporter makes of them
@@ -25,19 +25,38 @@ import (
 // Regenerate after an intended change with:
 //
 //	go test ./internal/cmd/export -run TestGolden -update
+//
+// which rebuilds input.is from the reshape goldens first, so adding a source
+// format sample there automatically widens the coverage here.
 
 var update = flag.Bool("update", false, "update golden files in testdata/")
 
 const (
 	testdataDir = "testdata"
 	inputFile   = "testdata/input.is"
+
+	// reshapeGoldens is where the source side keeps its converted records.
+	// Reaching across packages for testdata is unusual, but the alternative
+	// is a hand-maintained copy that silently goes stale whenever a format
+	// gains a sample.
+	reshapeGoldens = "../reshape/testdata/*/golden.ndjson"
 )
+
+// excludedFromInput names reshape goldens that must not feed the export tests.
+// dummy is the minimal example format and emits no finc.id, which every real
+// record has.
+var excludedFromInput = map[string]bool{"dummy": true}
 
 // exportFormats are the format names to pin, including the solr5vu3v12 alias,
 // which is solr5vu3 with the fullrecord field populated.
 var exportFormats = []string{"formeta", "solr5vu3", "solr5vu3v12"}
 
 func TestGolden(t *testing.T) {
+	if *update {
+		if err := os.WriteFile(inputFile, buildInput(t), 0644); err != nil {
+			t.Fatalf("write %s: %v", inputFile, err)
+		}
+	}
 	for _, name := range exportFormats {
 		t.Run(name, func(t *testing.T) {
 			got := export(t, name)
@@ -58,6 +77,47 @@ func TestGolden(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestInputIsCurrent fails if a source format gained or changed a sample
+// without the export side being regenerated, so downstream coverage cannot
+// quietly fall behind the reshape goldens.
+func TestInputIsCurrent(t *testing.T) {
+	want := buildInput(t)
+	got, err := os.ReadFile(inputFile)
+	if err != nil {
+		t.Fatalf("%v; run: go test ./internal/cmd/export -run TestGolden -update", err)
+	}
+	if !bytes.Equal(got, want) {
+		t.Errorf("%s is stale against %s (%d records on disk, %d in the reshape goldens); "+
+			"run: go test ./internal/cmd/export -run TestGolden -update",
+			inputFile, reshapeGoldens, len(splitLines(got)), len(splitLines(want)))
+	}
+}
+
+// buildInput concatenates the reshape golden files, in glob order, which is
+// sorted by format name.
+func buildInput(t *testing.T) []byte {
+	t.Helper()
+	paths, err := filepath.Glob(reshapeGoldens)
+	if err != nil {
+		t.Fatalf("glob %s: %v", reshapeGoldens, err)
+	}
+	if len(paths) == 0 {
+		t.Fatalf("no reshape goldens at %s", reshapeGoldens)
+	}
+	var buf bytes.Buffer
+	for _, path := range paths {
+		if excludedFromInput[filepath.Base(filepath.Dir(path))] {
+			continue
+		}
+		b, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read %s: %v", path, err)
+		}
+		buf.Write(b)
+	}
+	return buf.Bytes()
 }
 
 // TestGoldenCoversEveryExporter fails if an exporter is added to the registry
