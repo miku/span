@@ -49,7 +49,6 @@ var formatsWithoutSample = map[string]string{
 	"ieee":          "need an IEEE publication XML sample",
 	"imslp":         "need an IMSLP data sample (single text record)",
 	"ios":           "need an IOS Press article XML sample",
-	"jstor":         "need a JSTOR article XML sample",
 	"mediarep-dim":  "need a mediarep DIM sample",
 	"olms":          "need an OLMS oai_dc sample",
 	"olms-mets":     "need an OLMS METS sample",
