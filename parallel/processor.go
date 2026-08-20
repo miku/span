@@ -32,6 +32,13 @@ import (
 	"sync"
 )
 
+// outputFlushSize is how much converted output a worker accumulates before
+// handing it to the writer. It trades channel handoffs against memory in
+// flight, which is bounded by roughly 2*NumWorkers times this value: one
+// buffer per worker being filled, plus the buffered out channel. Records are
+// never split across a flush.
+const outputFlushSize = 1 << 20
+
 // Record groups a value and a corresponding line number.
 type Record struct {
 	lineno int64
@@ -135,10 +142,19 @@ func (p *Processor) Run() error {
 		defer mu.Unlock()
 		return procErr
 	}
-	// The worker fetches items from a queue, executes f and sends the result
-	// to the out channel. On error, the result is dropped.
+	// The worker fetches items from a queue, executes f and sends the results
+	// to the out channel. Results are accumulated into a buffer and sent in
+	// one piece: roughly one handoff per outputFlushSize of output rather
+	// than one per record, which is what input batching is for. On error,
+	// that one result is dropped.
 	worker := func(queue chan []Record, out chan []byte, f TransformerFunc, wg *sync.WaitGroup) {
 		defer wg.Done()
+		// The buffer is handed to the writer, so a new one is allocated after
+		// each flush rather than reused.
+		newBuf := func() *bytes.Buffer {
+			return bytes.NewBuffer(make([]byte, 0, outputFlushSize+outputFlushSize/8))
+		}
+		buf := newBuf()
 		for batch := range queue {
 			for _, record := range batch {
 				r, err := f(record.lineno, record.value)
@@ -146,8 +162,19 @@ func (p *Processor) Run() error {
 					setErr(err)
 					continue
 				}
-				out <- r
+				buf.Write(r)
+				// Flush on size, not on batch boundaries: a batch is a count
+				// of records, so buffering a whole one would make memory in
+				// flight scale with BatchSize times the size of a converted
+				// record, which for SOLR documents is a lot.
+				if buf.Len() >= outputFlushSize {
+					out <- buf.Bytes()
+					buf = newBuf()
+				}
 			}
+		}
+		if buf.Len() > 0 {
+			out <- buf.Bytes()
 		}
 	}
 	// The writer collects and buffers writes.
@@ -163,9 +190,13 @@ func (p *Processor) Run() error {
 		}
 		done <- true
 	}
+	// out is buffered so that a worker finishing a batch does not block on the
+	// single writer goroutine. queue stays unbuffered on purpose: buffering it
+	// would let the producer enqueue further batches before it notices a
+	// transform error, widening the partial output a failed run leaves behind.
 	var (
 		queue = make(chan []Record)
-		out   = make(chan []byte)
+		out   = make(chan []byte, p.NumWorkers)
 		done  = make(chan bool)
 		wg    sync.WaitGroup
 	)
