@@ -58,8 +58,11 @@ skip rather than fail, so the suite stays green while the list shrinks.
 
 `internal/cmd/export/testdata` holds the other end: `input.is` is the
 concatenation of the golden files here, and each exporter's output is pinned
-against it. Regenerate `input.is` whenever the golden files here change:
+against it. Adding a sample here therefore widens the export coverage too, but
+the two need to be regenerated in order:
 
-    cat internal/cmd/reshape/testdata/{crossref,doaj-legacy,degruyter,hhbd,zvdd-mets}/golden.ndjson \
-      > internal/cmd/export/testdata/input.is
-    go test ./internal/cmd/export -run TestGolden -update
+    go test ./internal/cmd/reshape -run TestGolden -update
+    go test ./internal/cmd/export  -run TestGolden -update
+
+The second command rebuilds `input.is` from these goldens itself; `TestInputIsCurrent`
+fails if it was forgotten.
