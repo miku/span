@@ -39,7 +39,6 @@ const testdataDir = "testdata"
 // suite stays green while the list shrinks. A format not listed here must have
 // testdata, which keeps new formats from being added without one.
 var formatsWithoutSample = map[string]string{
-	"ceeol":         "need a CEEOL article XML sample",
 	"ceeol-marcxml": "need a CEEOL MARCXML sample",
 	"dblp":          "need a dblp.xml <article> sample",
 	"doaj":          "need a DOAJ API v1 article sample (ndjson)",
