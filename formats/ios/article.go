@@ -80,7 +80,7 @@ func (article *Article) Languages() []string {
 			}
 		}
 	}
-	return set.Values()
+	return set.SortedValues()
 }
 
 // ToIntermediateSchema converts an article into an internal schema. There are a

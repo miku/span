@@ -95,7 +95,7 @@ func (article *Article) Languages() []string {
 			}
 		}
 	}
-	return set.Values()
+	return set.SortedValues()
 }
 
 // ReviewedProduct returns the string of the reviewed thing in a best-effort way.

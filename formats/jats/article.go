@@ -462,7 +462,7 @@ func (article *Article) Languages() []string {
 		set.Add(lang)
 	}
 
-	return set.Values()
+	return set.SortedValues()
 }
 
 func clipString(s string, length int) string {

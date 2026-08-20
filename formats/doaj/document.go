@@ -252,7 +252,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, l := range doc.Index.Language {
 		languages.Add(LanguageMap.Lookup(l, "und"))
 	}
-	output.Languages = languages.Values()
+	output.Languages = languages.SortedValues()
 
 	output.RefType = DefaultRefType
 	return output, nil

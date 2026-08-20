@@ -240,7 +240,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	for _, l := range record.Metadata.Dc.Language {
 		languages.Add(LanguageMap.Lookup(l, "und"))
 	}
-	output.Languages = languages.Values()
+	output.Languages = languages.SortedValues()
 	output.Format = "ElectronicArticle"
 	output.Genre = "article"
 	output.RefType = "EJOUR"

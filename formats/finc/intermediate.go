@@ -175,22 +175,24 @@ func NewIntermediateSchema() *IntermediateSchema {
 	return &IntermediateSchema{Version: IntermediateSchemaVersion}
 }
 
-// ISSNList returns a deduplicated list of all ISSN and EISSN.
+// ISSNList returns a deduplicated, sorted list of all ISSN and EISSN. Sorted,
+// because the result reaches the index verbatim and must not vary between runs.
 func (is *IntermediateSchema) ISSNList() []string {
 	set := make(map[string]struct{})
 	for _, issn := range append(is.ISSN, is.EISSN...) {
 		set[issn] = struct{}{}
 	}
-	return slices.Collect(maps.Keys(set))
+	return slices.Sorted(maps.Keys(set))
 }
 
-// ISBNList returns a deduplicated list of all ISBN and EISBN.
+// ISBNList returns a deduplicated, sorted list of all ISBN and EISBN. Sorted,
+// for the same reason as ISSNList.
 func (is *IntermediateSchema) ISBNList() []string {
 	set := make(map[string]struct{})
 	for _, isbn := range append(is.ISBN, is.EISBN...) {
 		set[isbn] = struct{}{}
 	}
-	return slices.Collect(maps.Keys(set))
+	return slices.Sorted(maps.Keys(set))
 }
 
 // Allfields returns a combination of various fields.

@@ -1,0 +1,26 @@
+<Records xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<record><header status=""><identifier>oai:digi.ub.uni-heidelberg.de:2579</identifier><datestamp>2015-01-21T12:50:36Z</datestamp></header><metadata><oai_dc:dc xmlns:dcterms='http://purl.org/dc/dcterms/' xmlns:oai_dc='http://www.openarchives.org/OAI/2.0/oai_dc/' xmlns:europeana='http://www.europeana.eu/schemas/ese/' xmlns:dc='http://purl.org/dc/elements/1.1/'>
+<dc:creator>Johann Wilhelm (Pfalz, Kurfürst)</dc:creator>
+<dc:title>Ordnung Des Hoch-Fürstlichen Gülich- und Bergischen Hoffgerichts zu Düsseldorff: Sambt denen an gemeltem Hoffgericht nach und nach publicirten gemeinen Bescheiden</dc:title>
+<dc:date>[um 1695] [VD17 1:018019V]</dc:date>
+<dcterms:issued>[um 1695] [VD17 1:018019V]</dcterms:issued>
+<dc:identifier>http://digi.ub.uni-heidelberg.de/diglit/drwjuelichZO1697a</dc:identifier>
+<dc:identifier>urn:nbn:de:bsz:16-diglit-25799</dc:identifier>
+<dc:language>de</dc:language>
+<dc:type>Monograph</dc:type>
+<dc:ispartof>Druckschriften</dc:ispartof>
+<dc:ispartof>Heidelberger historische Bestände — digital: Rechtsquellen der frühen Neuzeit</dc:ispartof>
+</oai_dc:dc></metadata><about></about></record>
+<record><header status=""><identifier>oai:digi.ub.uni-heidelberg.de:2583</identifier><datestamp>2015-01-21T12:51:57Z</datestamp></header><metadata><oai_dc:dc xmlns:oai_dc='http://www.openarchives.org/OAI/2.0/oai_dc/' xmlns:dcterms='http://purl.org/dc/dcterms/' xmlns:europeana='http://www.europeana.eu/schemas/ese/' xmlns:dc='http://purl.org/dc/elements/1.1/'>
+<dc:creator>Wolfgang Lazius</dc:creator>
+<dc:title>Historische Beschreibung der Weitberümbten, Kayserlichen Hauptstatt Wienn</dc:title>
+<dc:date>1619 [VD17-23:233236L]</dc:date>
+<dcterms:issued>1619 [VD17-23:233236L]</dcterms:issued>
+<dc:identifier>http://digi.ub.uni-heidelberg.de/diglit/drwlazius</dc:identifier>
+<dc:identifier>urn:nbn:de:bsz:16-diglit-25839</dc:identifier>
+<dc:language>de</dc:language>
+<dc:type>Monograph</dc:type>
+<dc:ispartof>Druckschriften</dc:ispartof>
+<dc:ispartof>Heidelberger historische Bestände — digital: Rechtsquellen der frühen Neuzeit</dc:ispartof>
+</oai_dc:dc></metadata><about></about></record>
+</Records>

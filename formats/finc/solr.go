@@ -165,7 +165,7 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 			classes.Add(class)
 		}
 	}
-	s.FincClassFacet = classes.Values()
+	s.FincClassFacet = classes.SortedValues()
 
 	var sanitized string
 	switch {
