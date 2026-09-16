@@ -57,14 +57,6 @@ type FolioConfig struct {
 	NoProxy  bool
 }
 
-// DefaultFolioConfig returns the default FOLIO configuration.
-func DefaultFolioConfig() FolioConfig {
-	return FolioConfig{
-		Tenant: "de15",
-		Limit:  100000,
-	}
-}
-
 // RunLegacy reads a blob from r, extracts and downloads all URLs found in it,
 // and writes them into a zip (written to w) alongside the original blob.
 func RunLegacy(cfg LegacyConfig, client HTTPGetter, r io.Reader, w io.Writer) error {

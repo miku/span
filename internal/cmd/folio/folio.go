@@ -31,14 +31,6 @@ type Config struct {
 	Raw      bool
 }
 
-// DefaultConfig returns the default configuration.
-func DefaultConfig() Config {
-	return Config{
-		CQL:   `(selectedBy=("*"))`,
-		Limit: 100000,
-	}
-}
-
 // Run authenticates against the FOLIO API, fetches metadata collections and
 // renders them to w.
 func Run(cfg Config, client Client, w io.Writer) error {

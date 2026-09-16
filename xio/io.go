@@ -8,37 +8,10 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
-
-	spanatomic "github.com/miku/span/atomic"
-	"github.com/sethgrid/pester"
 )
-
-// CountReader counts the number of bytes read.
-type CountReader struct {
-	count int64
-	r     io.Reader
-}
-
-// NewCountReader function for create new ReaderCounter.
-func NewCountReader(r io.Reader) *CountReader {
-	return &CountReader{r: r}
-}
-
-// Read keeps count.
-func (c *CountReader) Read(buf []byte) (int, error) {
-	n, err := c.r.Read(buf)
-	atomic.AddInt64(&c.count, int64(n))
-	return n, err
-}
-
-// Count function returns bytes read so far.
-func (c *CountReader) Count() int64 {
-	return atomic.LoadInt64(&c.count)
-}
 
 // LinkReader implements io.Reader for a URL.
 type LinkReader struct {
@@ -213,33 +186,6 @@ func (r *ZipOrPlainLinkReader) Read(p []byte) (int, error) {
 	return r.buf.Read(p)
 }
 
-// SavedReaders takes a list of readers and persists their content in a temporary file.
-type SavedReaders struct {
-	Readers []io.Reader
-	f       *os.File
-}
-
-// Save saves all readers to a temporary file and returns the filename.
-func (r *SavedReaders) Save() (filename string, err error) {
-	r.f, err = os.CreateTemp("", "span-")
-	if err != nil {
-		return
-	}
-	if _, err = io.Copy(r.f, io.MultiReader(r.Readers...)); err != nil {
-		return
-	}
-	if err = r.f.Close(); err != nil {
-		return
-	}
-	filename = r.f.Name()
-	return
-}
-
-// Remove remove any left over temporary file.
-func (r *SavedReaders) Remove() {
-	_ = os.Remove(r.f.Name())
-}
-
 // ReadLines returns a list of trimmed lines in a file. Empty lines are skipped.
 func ReadLines(filename string) (lines []string, err error) {
 	file, err := os.Open(filename)
@@ -314,32 +260,6 @@ func (w *WriteCounter) Count() uint64 {
 	return atomic.LoadUint64(&w.count)
 }
 
-// AtomicDownload retrieves a link and saves its content atomically in
-// filename. TODO(martin): should live in an io related package.
-func AtomicDownload(link, filename string) error {
-	resp, err := pester.Get(link)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	return spanatomic.WriteFile(filename, b, 0644)
-}
-
-// SetFromFilename fills an initialized map as set with items from line in
-// filename, with newlines stripped.
-func SetFromFilename(filename string, m map[string]struct{}) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	return LoadSet(f, m)
-}
-
 // LoadSet reads the content of from a reader and creates a set from each line.
 func LoadSet(r io.Reader, m map[string]struct{}) error {
 	br := bufio.NewReader(r)
@@ -354,16 +274,4 @@ func LoadSet(r io.Reader, m map[string]struct{}) error {
 		m[strings.TrimSpace(v)] = struct{}{}
 	}
 	return nil
-}
-
-// UserHomeDir returns the home directory of the user.
-func UserHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
 }

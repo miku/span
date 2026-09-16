@@ -305,20 +305,6 @@ func (entry *Entry) containsDateTime(t time.Time, g DateGranularity) error {
 	return nil
 }
 
-// containsDate return nil, if the given date (as string), lies between this
-// entries issue dates. The empty string is interpreted as being inside all
-// intervals.
-func (entry *Entry) containsDate(s string) (err error) {
-	if s == "" {
-		return nil
-	}
-	t, g, err := parseWithGranularity(s)
-	if err != nil {
-		return err
-	}
-	return entry.containsDateTime(t, g)
-}
-
 // NormalizeSerialNumber tries to transform the input into 1234-575X standard form.
 func NormalizeSerialNumber(s string) string {
 	s = strings.ToUpper(strings.TrimSpace(s))

@@ -21,12 +21,8 @@
 package container
 
 import (
-	"bufio"
-	"fmt"
-	"io"
 	"maps"
 	"slices"
-	"strings"
 )
 
 // MapDefault provides defaults for string map lookups with defaults.
@@ -65,27 +61,6 @@ func NewStringSet(s ...string) *StringSet {
 		ss.Add(item)
 	}
 	return ss
-}
-
-// NewStringSetReader reads from reader linewise, each line corresponding to
-// one item in set.
-func NewStringSetReader(r io.Reader) (*StringSet, error) {
-	var (
-		ss = &StringSet{Set: make(map[string]struct{})}
-		br = bufio.NewReader(r)
-	)
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		line = strings.TrimSpace(line)
-		ss.Add(line)
-	}
-	return ss, nil
 }
 
 // Add adds a string to a set, returns true if added, false it it already existed (noop).
@@ -136,21 +111,4 @@ func (set *StringSet) Difference(other *StringSet) *StringSet {
 		}
 	}
 	return diff
-}
-
-// Define a type named "StringSlice" as a slice of strings.
-// Useful for repeated command line flags.
-type StringSlice []string
-
-// Now, for our new type, implement the two methods of
-// the flag.Value interface...
-// The first method is String() string
-func (i *StringSlice) String() string {
-	return fmt.Sprintf("%s", *i)
-}
-
-// The second method is Set(value string) error
-func (i *StringSlice) Set(value string) error {
-	*i = append(*i, value)
-	return nil
 }

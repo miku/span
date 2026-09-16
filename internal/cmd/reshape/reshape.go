@@ -9,7 +9,6 @@ import (
 	"io"
 	"log"
 	"maps"
-	"runtime"
 	"slices"
 
 	"github.com/miku/span"
@@ -95,14 +94,6 @@ type Config struct {
 	BatchSize  int
 	NumWorkers int
 	Verbose    bool
-}
-
-// DefaultConfig returns the default configuration.
-func DefaultConfig() Config {
-	return Config{
-		BatchSize:  10000,
-		NumWorkers: runtime.NumCPU(),
-	}
 }
 
 // IntermediateSchemaer wrap a basic conversion method.

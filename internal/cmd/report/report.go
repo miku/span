@@ -32,16 +32,6 @@ type Config struct {
 	BatchSize  int
 }
 
-// DefaultConfig returns the default configuration.
-func DefaultConfig() Config {
-	return Config{
-		Server:     "http://localhost:8983/solr/biblio",
-		ReportName: "basic",
-		NumWorker:  32,
-		BatchSize:  1,
-	}
-}
-
 // normalizeISSN since SOLR returns the lowercased version without dash.
 func normalizeISSN(s string) string {
 	s = strings.ToUpper(s)

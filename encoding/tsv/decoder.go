@@ -27,11 +27,6 @@ func NewDecoder(r io.Reader) *Decoder {
 	return &Decoder{r: xio.NewSkipReader(bufio.NewReader(r)), Separator: "\t"}
 }
 
-// NewDecoderSeparator creates a new decoder with a given separator.
-func NewDecoderSeparator(r io.Reader, sep string) *Decoder {
-	return &Decoder{r: xio.NewSkipReader(bufio.NewReader(r)), Separator: sep}
-}
-
 // readHeader attempts to read the first row and store the column names. If the
 // header has been already set manually, the values won't be overwritten.
 func (dec *Decoder) readHeader() (err error) {

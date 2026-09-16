@@ -82,14 +82,6 @@ type Config struct {
 	OpenAccessSids   []string
 }
 
-// DefaultConfig returns the default configuration.
-func DefaultConfig() Config {
-	return Config{
-		BatchSize:        5000,
-		BatchMemoryLimit: 209715200,
-	}
-}
-
 // oaApplier decides whether a record is open access based on a holdings filter.
 // It is satisfied by *filter.HoldingsFilter and can be stubbed in tests.
 type oaApplier interface {

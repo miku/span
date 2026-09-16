@@ -48,6 +48,20 @@ func TestISSNList(t *testing.T) {
 	}
 }
 
+// containsDate returns nil, if the given date (as string) lies between this
+// entries issue dates. The empty string is inside all intervals. Test helper
+// covering parseWithGranularity and containsDateTime together.
+func (entry *Entry) containsDate(s string) error {
+	if s == "" {
+		return nil
+	}
+	t, g, err := parseWithGranularity(s)
+	if err != nil {
+		return err
+	}
+	return entry.containsDateTime(t, g)
+}
+
 func TestContainsDate(t *testing.T) {
 	var cases = []struct {
 		entry Entry

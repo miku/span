@@ -3,12 +3,7 @@ package kbart
 import (
 	"bufio"
 	"os"
-	"regexp"
-	"strings"
 	"testing"
-
-	"github.com/miku/span/container"
-	"github.com/miku/span/licensing"
 )
 
 var (
@@ -42,33 +37,6 @@ func loadHoldings(s skipper) *Holdings {
 	return holdings
 }
 
-func TestFilter(t *testing.T) {
-	holdings := loadHoldings(t)
-
-	// Test filter.
-	entries := holdings.Filter(func(e licensing.Entry) bool {
-		return strings.Contains(strings.ToLower(e.TitleURL), "wiso")
-	})
-	want := 702
-	if len(entries) != want {
-		t.Errorf("Filter: got %v, want %v", len(entries), want)
-	}
-
-	// Test database name extraction.
-	p := regexp.MustCompile(`[A-Z]{3,4}`)
-	names := container.NewStringSet()
-	for _, e := range entries {
-		matches := p.FindAllString(e.TitleURL, -1)
-		for _, m := range matches {
-			names.Add(m)
-		}
-	}
-	want = 534
-	if len(names.Values()) != want {
-		t.Errorf("Filter: got %v, want %v", len(names.Values()), want)
-	}
-}
-
 func TestSerialNumberMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.SerialNumberMap()
@@ -98,33 +66,6 @@ func BenchmarkLookupViaSerialNumberMap(b *testing.B) {
 		_ = len(v) // Dummyop.
 	}
 }
-
-func BenchmarkLookupViaFilter(b *testing.B) {
-	holdings := loadHoldings(b)
-	b.ResetTimer()
-
-	issn := "2079-8245"
-	f := func(e licensing.Entry) bool {
-		if e.PrintIdentifier == issn || e.OnlineIdentifier == issn {
-			return true
-		}
-		return false
-	}
-
-	for i := 0; i < b.N; i++ {
-		holdings.Filter(f)
-	}
-}
-
-// === RUN   TestFilter
-// --- PASS: TestFilter (4.29s)
-// === RUN   TestSerialNumberMap
-// --- PASS: TestSerialNumberMap (0.45s)
-// BenchmarkSerialNumberMap-4                      2           514861084   ns/op
-// BenchmarkLookupViaSerialNumberMap-4             100000000          21.5 ns/op
-// BenchmarkLookupViaFilter-4                      100          13340319   ns/op
-// PASS
-// ok    github.com/miku/span/licensing/kbart    12.653s
 
 func TestWisoDatabaseMap(t *testing.T) {
 	holdings := loadHoldings(t)

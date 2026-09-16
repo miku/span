@@ -389,14 +389,6 @@ type Shipment struct {
 	articles map[string]Article
 }
 
-// String describes the shipment briefly.
-func (s Shipment) String() string {
-	return fmt.Sprintf("<Shipment origin=%s, issues=%d, articles=%d>",
-		s.origin,
-		len(s.dataset.DatasetContent.JournalIssue),
-		len(s.dataset.DatasetContent.JournalItem))
-}
-
 // NewShipment creates a new bag of data from a given tarfile.
 func NewShipment(r io.Reader) (Shipment, error) {
 

@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/segmentio/encoding/json"
-	"github.com/sethgrid/pester"
 )
 
 var ErrEmptyToken = errors.New("empty token")
@@ -32,14 +31,6 @@ type API struct {
 	Tenant string // e.g. "de_15"
 	Client Doer
 	Token  string
-}
-
-func New() *API {
-	return &API{
-		Base:   "https://okapi.example.org",
-		Tenant: "de_15",
-		Client: pester.New(),
-	}
 }
 
 // ensureClient sets up a default http client, if none has been set.
@@ -173,13 +164,13 @@ type FincConfigMetadataCollection struct {
 		CreatedDate string `json:"createdDate"`
 		UpdatedDate string `json:"updatedDate"`
 	} `json:"metadata"`
-	MetadataAvailable   string   `json:"metadataAvailable"`
-	PermittedFor        []string `json:"permittedFor"`
-	SelectedBy          []string `json:"selectedBy"`
-	SolrMegaCollections []string       `json:"solrMegaCollections"`
-	Tickets             []string       `json:"tickets"`
-	UsageRestricted     string         `json:"usageRestricted"`
-	FilteredBy          []FilterEntry  `json:"filteredBy"`
+	MetadataAvailable   string        `json:"metadataAvailable"`
+	PermittedFor        []string      `json:"permittedFor"`
+	SelectedBy          []string      `json:"selectedBy"`
+	SolrMegaCollections []string      `json:"solrMegaCollections"`
+	Tickets             []string      `json:"tickets"`
+	UsageRestricted     string        `json:"usageRestricted"`
+	FilteredBy          []FilterEntry `json:"filteredBy"`
 }
 
 // FilterEntry describes a filter applied to a collection for a specific ISIL.

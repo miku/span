@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/klauspost/compress/zstd"
@@ -86,38 +85,6 @@ func CompressType(filename string, ty string) (string, error) {
 		return "", err
 	}
 	return tf.Name(), nil
-}
-
-// Compress and return path to compressed file.
-func Compress(filename string) (string, error) {
-	return CompressType(filename, "gzip")
-}
-
-// WriteFile writes the data to a temp file and atomically move if everything else succeeds.
-func WriteFile(filename string, data []byte, perm os.FileMode) error {
-	dir, name := path.Split(filename)
-	f, err := os.CreateTemp(dir, name)
-	if err != nil {
-		return err
-	}
-	_, err = f.Write(data)
-	if err == nil {
-		err = f.Sync()
-	}
-	if closeErr := f.Close(); err == nil {
-		err = closeErr
-	}
-	if permErr := os.Chmod(f.Name(), perm); err == nil {
-		err = permErr
-	}
-	if err == nil {
-		err = os.Rename(f.Name(), filename)
-	}
-	// Any err should result in full cleanup.
-	if err != nil {
-		os.Remove(f.Name())
-	}
-	return err
 }
 
 // Move moves a file from a source path to a destination path

@@ -1,6 +1,6 @@
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+//	Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
+//	                  The Finc Authors, http://finc.info
+//	                  Martin Czygan, <martin.czygan@uni-leipzig.de>
 //
 // This file is part of some open source application.
 //
@@ -18,15 +18,10 @@
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 //
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
 package assetutil
 
 import (
-	"bufio"
-	"bytes"
-	"io"
 	"regexp"
-	"strings"
 
 	"github.com/segmentio/encoding/json"
 
@@ -74,33 +69,6 @@ func MustLoadRegexpMap(path string) RegexpMap {
 		remap.Entries = append(remap.Entries, RegexpMapEntry{Pattern: regexp.MustCompile(k), Value: v})
 	}
 	return remap
-}
-
-// MustLoadStringSet load one or more paths containing lines into a string set.
-func MustLoadStringSet(paths ...string) *container.StringSet {
-	s := container.NewStringSet()
-	for _, path := range paths {
-		b, err := span.Static.ReadFile(path)
-		if err != nil {
-			panic(err)
-		}
-		rdr := bufio.NewReader(bytes.NewReader(b))
-		for {
-			line, err := rdr.ReadString('\n')
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				panic(err)
-			}
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-			s.Add(line)
-		}
-	}
-	return s
 }
 
 // MustLoadStringMap loads a JSON file from an asset path and parses it into a

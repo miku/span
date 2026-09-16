@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"io"
 	"os"
-	"strings"
 	"testing"
 )
 
@@ -75,27 +74,5 @@ func TestZipContentReader(t *testing.T) {
 	want, got := "a\nb\n", buf.String()
 	if want != got {
 		t.Errorf("ZipContentReader: got %v, want %v", got, want)
-	}
-}
-
-func TestSavedReaders(t *testing.T) {
-	sr := SavedReaders{Readers: []io.Reader{
-		strings.NewReader("Hello"),
-		strings.NewReader("World"),
-	}}
-	fn, err := sr.Save()
-	if err != nil {
-		t.Error(err.Error())
-	}
-	b, err := os.ReadFile(fn)
-	if err != nil {
-		t.Error(err.Error())
-	}
-	if string(b) != "HelloWorld" {
-		t.Errorf("SavedReaders: got %v, want HelloWorld", string(b))
-	}
-	sr.Remove()
-	if _, err := os.Stat(fn); err == nil {
-		t.Errorf("SavedReaders: file exists, but should be deleted: %v", fn)
 	}
 }

@@ -116,15 +116,3 @@ func (h *Holdings) WisoDatabaseMap() map[string][]licensing.Entry {
 	}
 	return result
 }
-
-// Filter finds entries with certain characteristics. This will be very slow
-// for KBART files with thousands of entries.
-func (h *Holdings) Filter(f func(licensing.Entry) bool) []licensing.Entry {
-	cache := make(map[licensing.Entry]bool)
-	for _, e := range *h {
-		if f(e) {
-			cache[e] = true
-		}
-	}
-	return slices.Collect(maps.Keys(cache))
-}

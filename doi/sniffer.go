@@ -31,34 +31,6 @@ type Sniffer struct {
 	NumWorkers     int
 }
 
-// NewSniffer sets up a new sniffer with defaults keys matching the current
-// SOLR schema. Can process around 20K docs/s.
-func NewSniffer(r io.Reader, w io.Writer) *Sniffer {
-	return &Sniffer{
-		Reader:        r,
-		Writer:        w,
-		IdentifierKey: "id",
-		UpdateKey:     "doi_str_mv",
-		MapSniffer: &MapSniffer{
-			Pattern: regexp.MustCompile(PatDOI),
-			IgnoreKeys: []*regexp.Regexp{
-				regexp.MustCompile(`barcode`),
-				regexp.MustCompile(`dewey`),
-			},
-		},
-		PostProcess: func(s string) string {
-			switch {
-			case strings.HasSuffix(s, "/epdf"):
-				return s[:len(s)-5]
-			case strings.HasSuffix(s, ".") || strings.HasSuffix(s, "*"):
-				return s[:len(s)-1]
-			default:
-				return s
-			}
-		},
-	}
-}
-
 // Run sniffs out DOI and eventually updates a document in place.
 func (s *Sniffer) Run() error {
 	pp := parallel.NewProcessor(s.Reader, s.Writer, func(_ int64, p []byte) ([]byte, error) {

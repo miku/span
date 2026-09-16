@@ -125,20 +125,6 @@ type LineNumberEntry struct {
 // the line numbers to extract and the number of lines in that file.
 type LineNumbersMap map[string]*LineNumberEntry
 
-// DefaultSnapshotOptions returns default options.
-func DefaultSnapshotOptions() SnapshotOptions {
-	return SnapshotOptions{
-		OutputFile:     DefaultOutputFile,
-		TempDir:        os.TempDir(),
-		BatchSize:      100_000,
-		NumWorkers:     runtime.NumCPU(),
-		SortBufferSize: "25%", // Note: this should not be >50% as we are using this in parallel for two sort invocations.
-		KeepTempFiles:  false,
-		Verbose:        false,
-		CacheEnabled:   true,
-	}
-}
-
 // FilterFunc can filter a record
 type FilterFunc func(_ Record) bool
 

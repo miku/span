@@ -50,11 +50,6 @@ type BytesBatch struct {
 	b []Record
 }
 
-// NewBytesBatch creates a new BytesBatch with a given capacity.
-func NewBytesBatch() *BytesBatch {
-	return NewBytesBatchCapacity(0)
-}
-
 // NewBytesBatchCapacity creates a new BytesBatch with a given capacity.
 func NewBytesBatchCapacity(cap int) *BytesBatch {
 	return &BytesBatch{b: make([]Record, 0, cap)}
