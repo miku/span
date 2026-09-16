@@ -321,6 +321,13 @@ reshape/export golden tests, and makes the next step smaller.
    dependency removed.
 2. **Repo hygiene** (§7): move `docs` binaries and unused `fixtures` out,
    remove legacy packaging, fix stale docs. −110 MB checkout.
+   Done 2026-09-16: `fixtures/` gone (`frozen.zip`, `z.zip`, `kbart.txt.gz`
+   moved to `testdata/` next to their tests), `docs/` 48 MB → 1.1 MB,
+   `packaging/`, `reports/`, `scripts/`, `docs/soctl.md` removed, dated notes
+   moved from `docs/` to `notes/`, lane docs no longer mention make targets,
+   CI runs vet + staticcheck + `go test -race`. The kbart tests had been
+   skipping for years (fixture was gitignored); they now run, with expected
+   counts corrected to what the tracked file contains (checked with grep).
 3. **Delete duplicate commands** (§2 table): `span-report`,
    `span-compare-file`.
 4. **Fold helper packages** (§4): `container`, `strutil`, `dateutil`,

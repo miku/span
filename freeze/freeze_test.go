@@ -19,7 +19,7 @@ func filenames(des []os.DirEntry) (result []string) {
 }
 
 func TestUnfreezeFilterConfig(t *testing.T) {
-	dir, blob, err := UnfreezeFilterConfig("../fixtures/frozen.zip")
+	dir, blob, err := UnfreezeFilterConfig("testdata/frozen.zip")
 	if err != nil {
 		t.Errorf("expected err nil, got %v", err)
 	}

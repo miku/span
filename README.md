@@ -101,9 +101,8 @@ input from stdin as well, allowing for one-off things like:
 $ metha-cat http://oai.web | span-import -i name | span-tag -c amsl | span-export | solrbulk
 ```
 
-For crossref, two make targets compose these tools into live SOLR indexing:
-`make fast-lane` (frequent, additive upsert of the latest slice) and `make
-full-lane` (periodic dedup, full reindex, and stale-record sweep). See the
-`INDEXING PIPELINES` section of the [manual](docs/span.md) for details and the
-tunable variables.
+For crossref, two pipelines compose these tools into live SOLR indexing: a
+fast lane (frequent, additive upsert of the latest slice) and a full lane
+(periodic dedup, full reindex, and stale-record sweep). See the `INDEXING
+PIPELINES` section of the [manual](docs/span.md) for the commands.
 

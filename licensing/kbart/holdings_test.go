@@ -2,14 +2,15 @@ package kbart
 
 import (
 	"bufio"
+	"compress/gzip"
 	"os"
 	"testing"
 )
 
 var (
-	// $ sha1sum fixtures/kbart.txt
-	// d072bc9cef32ffbeaecc4c8c97562a1b9e47468c  fixtures/kbart.txt
-	fixture  = "../../fixtures/kbart.txt"
+	// $ gzip -dc testdata/kbart.txt.gz | sha1sum
+	// d072bc9cef32ffbeaecc4c8c97562a1b9e47468c  -
+	fixture  = "testdata/kbart.txt.gz"
 	holdings *Holdings
 )
 
@@ -28,9 +29,14 @@ func loadHoldings(s skipper) *Holdings {
 			s.Skipf("fixture: %v", err)
 		}
 		defer file.Close()
+		zr, err := gzip.NewReader(file)
+		if err != nil {
+			s.Skipf("fixture: %v", err)
+		}
+		defer zr.Close()
 
 		holdings = new(Holdings)
-		if _, err := holdings.ReadFrom(bufio.NewReader(file)); err != nil {
+		if _, err := holdings.ReadFrom(bufio.NewReader(zr)); err != nil {
 			s.Skipf("fixture: %v", err)
 		}
 	}
@@ -40,7 +46,7 @@ func loadHoldings(s skipper) *Holdings {
 func TestSerialNumberMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.SerialNumberMap()
-	want := 84089
+	want := 37830
 	if len(m) != want {
 		t.Errorf("SerialNumberMap: got %v, want %v", len(m), want)
 	}
@@ -70,7 +76,7 @@ func BenchmarkLookupViaSerialNumberMap(b *testing.B) {
 func TestWisoDatabaseMap(t *testing.T) {
 	holdings := loadHoldings(t)
 	m := holdings.WisoDatabaseMap()
-	want := 534
+	want := 511
 	if len(m) != want {
 		t.Errorf("WisoDatabaseMap: got %v, want %v", len(m), want)
 	}

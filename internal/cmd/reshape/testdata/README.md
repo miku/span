@@ -34,6 +34,9 @@ the test before regenerating is usually the faster way to see what moved.
 
 ## Provenance
 
+The `fixtures/` directory was removed in 2026-09; see git history for the
+original files.
+
 | format | source |
 |---|---|
 | `crossref` | first 5 lines of `fixtures/crossref.ldj` |

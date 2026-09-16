@@ -45,7 +45,6 @@ clean:
 	rm -rf build/
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
-	rm -rf ./packaging/deb/$(PKGNAME)/usr
 	rm -f coverage.out
 	rm -f *.000
 	rm -f *.001
@@ -104,9 +103,4 @@ names: assets/crossref/names.ndj
 # Primary and other names.
 assets/crossref/names.ndj: span-crossref-members
 	span-crossref-members | jq -rc '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > $@
-
-.PHONY: update-version
-update-version:
-	sed -i -e 's@^Version:.*@Version: $(VERSION)@' packaging/deb/span/DEBIAN/control
-	sed -i -e 's@^Version:.*@Version:    $(VERSION)@' packaging/rpm/span.spec
 

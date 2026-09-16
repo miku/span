@@ -67,7 +67,7 @@ func TestFileReader(t *testing.T) {
 
 func TestZipContentReader(t *testing.T) {
 	var buf bytes.Buffer
-	_, err := io.Copy(&buf, &ZipContentReader{Filename: "../fixtures/z.zip"})
+	_, err := io.Copy(&buf, &ZipContentReader{Filename: "testdata/z.zip"})
 	if err != nil {
 		t.Error(err.Error())
 	}

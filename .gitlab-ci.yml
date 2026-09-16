@@ -1,28 +1,20 @@
-# https://git.sc.uni-leipzig.de/miku/span/-/ci/lint
-
-# The first thing is to choose what Docker image will be used to run the CI.
-# Head to the Docker Hub to choose the right image for your project.
-
 image: golang:1.25.7-trixie
-
-# cache:
-#   paths:
-#     - /apt-cache
-#     - /go/src/github.com
-#     - /go/src/golang.org
-#     - /go/src/google.golang.org
-#     - /go/src/gopkg.in
 
 stages:
   - test
 
 unit_tests:
   stage: test
+  variables:
+    HTTP_PROXY: proxy.uni-leipzig.de:3128
+    HTTPS_PROXY: proxy.uni-leipzig.de:3128
   before_script:
     - go version
-  script:
+    # zstd is used by the crossref snapshot code under test
     - DEBIAN_FRONTEND=noninteractive apt-get update --yes && apt-get install --yes zstd
-    - HTTP_PROXY=proxy.uni-leipzig.de:3128 HTTPS_PROXY=proxy.uni-leipzig.de:3128 curl -v https://heise.de > /dev/null
-    - HTTP_PROXY=proxy.uni-leipzig.de:3128 HTTPS_PROXY=proxy.uni-leipzig.de:3128 make test
+  script:
+    - go vet ./...
+    - go tool staticcheck ./...
+    - go test -race ./...
   tags:
     - docker
