@@ -67,7 +67,7 @@ Found with `deadcode ./...`. Nothing outside tests reaches any of these.
   `folio.New`, `elsevier.Shipment.String`.
 * Eleven `DefaultConfig()` functions in `internal/cmd/*` that nothing calls.
   Five were used nowhere and are deleted. The other six (`compact`,
-  `comparefile`, `crossrefcmd` members/stage1, `export`, `tag`) are only
+  `comparefile` (gone with step 3), `crossrefcmd` members/stage1, `export`, `tag`) are only
   used by tests to build configs. They stay until §3 makes the flag setup read
   its defaults from them.
 
@@ -330,6 +330,15 @@ reshape/export golden tests, and makes the next step smaller.
    counts corrected to what the tracked file contains (checked with grep).
 3. **Delete duplicate commands** (§2 table): `span-report`,
    `span-compare-file`.
+   Done 2026-09-16: both removed (cmd, internal package, Makefile, nfpm);
+   no references in siskin. Reports: `json`/`fast`/`faster` produced the
+   same lines as `span-index report --name issn` (and `fast`/`faster`
+   silently dropped the last batch of every partition); `basic` only logged
+   counts, `--name issn --sid --collection` covers it. Compare: ported the
+   two things `span-index compare` lacked, stdin input (no `--file` or
+   `--file -`) and `--sid` filtering the *file* records too, not just the
+   index query (the cache key includes the sid; a multi-source dump is
+   rejected with `--sid`). Tests moved to `internal/cmd/index`.
 4. **Fold helper packages** (§4): `container`, `strutil`, `dateutil`,
    `xflag`, `doi`, `encoding/tsv`, `atomic`/`safefile`, `xio`. One package
    per commit; each is a move + import rewrite.

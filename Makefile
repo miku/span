@@ -2,7 +2,6 @@ SHELL = /bin/bash
 VERSION := 0.2.37
 TARGETS = \
 		  span-compact \
-		  span-compare-file \
           span-crossref-members \
 		  span-crossref-fast-snapshot \
 		  span-crossref-fastproc \
@@ -19,7 +18,6 @@ TARGETS = \
 		  span-local-data \
 		  span-oa-filter \
 		  span-redact \
-		  span-report \
 		  span-tag \
 		  span-update-labels
 

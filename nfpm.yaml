@@ -21,11 +21,6 @@ contents:
     file_info:
       mode: 0755
 
-  - src: build/span-compare-file
-    dst: /usr/local/bin/span-compare-file
-    file_info:
-      mode: 0755
-
   - src: build/span-crossref-fast-snapshot
     dst: /usr/local/bin/span-crossref-fast-snapshot
     file_info:
@@ -103,11 +98,6 @@ contents:
 
   - src: build/span-redact
     dst: /usr/local/bin/span-redact
-    file_info:
-      mode: 0755
-
-  - src: build/span-report
-    dst: /usr/local/bin/span-report
     file_info:
       mode: 0755
 

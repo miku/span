@@ -45,8 +45,8 @@ const dumpMagic = "span-index/compare/v1"
 
 func runCompare(args []string) error {
 	fs, server, debug := newFlagSet("compare")
-	file := fs.String("file", "", "JSONL file to compare against the index (zstd ok)")
-	sid := fs.String("sid", "", "scope index query to source_id; auto-detected if omitted and the file has one")
+	file := fs.String("file", "", "JSONL file to compare against the index (zstd ok); stdin if empty or -")
+	sid := fs.String("sid", "", "only count file records and index docs with this source_id; auto-detected if omitted and the file has one")
 	all := fs.Bool("all", false, "include ISILs that appear only in the index")
 	empty := fs.Bool("empty", false, "include rows where both file and index are 0")
 	textile := fs.Bool("textile", false, "render the comparison as a Textile table")
@@ -57,14 +57,12 @@ func runCompare(args []string) error {
 		"span-index compare --file 49.ldj",
 		"span-index compare --file 49.ldj.zst --sid 49",
 		"span-index compare --file 49.ldj --all --textile",
+		"zstdcat 49.ldj.zst | span-index compare --sid 49",
 		"span-index compare --file 49.ldj --dump > 49.dump   # prepare once",
 		"span-index compare --file 49.dump                   # reuse prepared dump",
 	)
 	if err := fs.Parse(args); err != nil {
 		return err
-	}
-	if *file == "" {
-		return fmt.Errorf("--file is required")
 	}
 	vlog := func(format string, args ...any) {
 		if *verbose {
@@ -74,7 +72,15 @@ func runCompare(args []string) error {
 
 	// Load: detect prepared dump vs raw JSONL by magic prefix.
 	t0 := time.Now()
-	fc, err := loadFileCounts(*file, !*noCache, vlog)
+	var (
+		fc  *fileCounts
+		err error
+	)
+	if *file == "" || *file == "-" {
+		fc, err = readFileCounts(os.Stdin, *sid, vlog)
+	} else {
+		fc, err = loadFileCounts(*file, *sid, !*noCache, vlog)
+	}
 	if err != nil {
 		return err
 	}
@@ -122,10 +128,23 @@ func runCompare(args []string) error {
 	return nil
 }
 
+// readFileCounts reads a prepared dump or raw (uncompressed) JSONL from r,
+// without caching. If sid is set, only records with that source_id are counted.
+func readFileCounts(r io.Reader, sid string, vlog func(string, ...any)) (*fileCounts, error) {
+	br := bufio.NewReader(r)
+	head, _ := br.Peek(len(dumpMagic))
+	if string(head) == dumpMagic {
+		vlog("reading prepared dump from stdin")
+		return readDumpSID(br, sid)
+	}
+	return countFileISIL(br, sid)
+}
+
 // loadFileCounts reads either a prepared dump or a raw JSONL stream and
-// returns aggregated ISIL counts. Caching is keyed by a fast file fingerprint.
+// returns aggregated ISIL counts. If sid is set, only records with that
+// source_id are counted. Caching is keyed by a fast file fingerprint and sid.
 // vlog receives verbose-only progress; it may be nil.
-func loadFileCounts(path string, useCache bool, vlog func(string, ...any)) (*fileCounts, error) {
+func loadFileCounts(path, sid string, useCache bool, vlog func(string, ...any)) (*fileCounts, error) {
 	if vlog == nil {
 		vlog = func(string, ...any) {}
 	}
@@ -138,7 +157,7 @@ func loadFileCounts(path string, useCache bool, vlog func(string, ...any)) (*fil
 	head, _ := br.Peek(len(dumpMagic))
 	if string(head) == dumpMagic {
 		vlog("reading prepared dump %s", path)
-		fc, err := readDump(br)
+		fc, err := readDumpSID(br, sid)
 		f.Close()
 		return fc, err
 	}
@@ -148,6 +167,12 @@ func loadFileCounts(path string, useCache bool, vlog func(string, ...any)) (*fil
 	fp, err := fileFingerprint(path)
 	if err != nil {
 		return nil, err
+	}
+	if sid != "" {
+		// Filtered counts must not share a cache entry with unfiltered ones.
+		h := fnv.New64a()
+		io.WriteString(h, sid)
+		fp = fmt.Sprintf("%s-%016x", fp, h.Sum64())
 	}
 	cachePath := compareCachePath(fp)
 	if useCache {
@@ -166,7 +191,7 @@ func loadFileCounts(path string, useCache bool, vlog func(string, ...any)) (*fil
 		return nil, err
 	}
 	defer r.Close()
-	fc, err := countFileISIL(r)
+	fc, err := countFileISIL(r, sid)
 	if err != nil {
 		return nil, err
 	}
@@ -298,6 +323,20 @@ func readDump(r io.Reader) (*fileCounts, error) {
 	return fc, nil
 }
 
+// readDumpSID reads a prepared dump. A dump holds aggregated counts, so it
+// cannot be filtered afterwards: with sid set, the dump must contain exactly
+// that source.
+func readDumpSID(r io.Reader, sid string) (*fileCounts, error) {
+	fc, err := readDump(r)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := fc.Sources[sid]; sid != "" && (!ok || len(fc.Sources) != 1) {
+		return nil, fmt.Errorf("dump contains %d source(s), cannot scope to --sid %s; create the dump with --sid", len(fc.Sources), sid)
+	}
+	return fc, nil
+}
+
 // --- file readers ------------------------------------------------------------
 
 func openReader(filename string) (io.ReadCloser, error) {
@@ -344,9 +383,10 @@ type workerResult struct {
 	errors  int64
 }
 
-// countFileISIL reads a JSONL stream and returns per-ISIL counts. JSON parsing
-// runs in parallel; lines are batched to keep channel overhead off the hot path.
-func countFileISIL(r io.Reader) (*fileCounts, error) {
+// countFileISIL reads a JSONL stream and returns per-ISIL counts. If sid is set,
+// records with a different source_id are ignored. JSON parsing runs in
+// parallel; lines are batched to keep channel overhead off the hot path.
+func countFileISIL(r io.Reader, sid string) (*fileCounts, error) {
 	numWorkers := runtime.NumCPU()
 	if numWorkers < 1 {
 		numWorkers = 1
@@ -370,6 +410,9 @@ func countFileISIL(r io.Reader) (*fileCounts, error) {
 					var rec record
 					if err := json.Unmarshal(line, &rec); err != nil {
 						local.errors++
+						continue
+					}
+					if sid != "" && rec.SourceID != sid {
 						continue
 					}
 					local.sources[rec.SourceID] = struct{}{}
