@@ -21,6 +21,7 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/miku/span/solrutil"
 	"github.com/segmentio/encoding/json"
+	"github.com/spf13/cobra"
 )
 
 // fileCounts holds the result of scanning a JSONL file. It is the unit of
@@ -43,8 +44,9 @@ type preparedDump struct {
 
 const dumpMagic = "span-index/compare/v1"
 
-func runCompare(args []string) error {
-	fs, server, debug := newFlagSet("compare")
+func newCompareCmd(c *common) *cobra.Command {
+	cmd := &cobra.Command{Use: "compare", Short: "Compare ISIL counts between a JSONL file and the index", Args: cobra.NoArgs}
+	fs := cmd.Flags()
 	file := fs.String("file", "", "JSONL file to compare against the index (zstd ok); stdin if empty or -")
 	sid := fs.String("sid", "", "only count file records and index docs with this source_id; auto-detected if omitted and the file has one")
 	all := fs.Bool("all", false, "include ISILs that appear only in the index")
@@ -53,79 +55,79 @@ func runCompare(args []string) error {
 	dump := fs.Bool("dump", false, "write parsed file counts to stdout (no index query)")
 	noCache := fs.Bool("no-cache", false, "skip the local prepared-data cache")
 	verbose := fs.Bool("verbose", false, "log stage progress and timings to stderr")
-	setExamples(fs,
-		"span-index compare --file 49.ldj",
-		"span-index compare --file 49.ldj.zst --sid 49",
-		"span-index compare --file 49.ldj --all --textile",
-		"zstdcat 49.ldj.zst | span-index compare --sid 49",
-		"span-index compare --file 49.ldj --dump > 49.dump   # prepare once",
-		"span-index compare --file 49.dump                   # reuse prepared dump",
+	cmd.Example = examples(
+		"span index compare --file 49.ldj",
+		"span index compare --file 49.ldj.zst --sid 49",
+		"span index compare --file 49.ldj --all --textile",
+		"zstdcat 49.ldj.zst | span index compare --sid 49",
+		"span index compare --file 49.ldj --dump > 49.dump   # prepare once",
+		"span index compare --file 49.dump                   # reuse prepared dump",
 	)
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
-	vlog := func(format string, args ...any) {
-		if *verbose {
-			log.Printf(format, args...)
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		vlog := func(format string, args ...any) {
+			if *verbose {
+				log.Printf(format, args...)
+			}
 		}
-	}
 
-	// Load: detect prepared dump vs raw JSONL by magic prefix.
-	t0 := time.Now()
-	var (
-		fc  *fileCounts
-		err error
-	)
-	if *file == "" || *file == "-" {
-		fc, err = readFileCounts(os.Stdin, *sid, vlog)
-	} else {
-		fc, err = loadFileCounts(*file, *sid, !*noCache, vlog)
-	}
-	if err != nil {
-		return err
-	}
-	vlog("load done in %s", time.Since(t0).Round(time.Millisecond))
-	log.Printf("file: %d records, %d distinct ISILs, %d source(s)", fc.Total, len(fc.Counts), len(fc.Sources))
-
-	if *dump {
-		return writeDump(os.Stdout, fc)
-	}
-	if fc.Total == 0 {
-		return fmt.Errorf("no records found in file")
-	}
-
-	// Determine source id scope.
-	resolvedSID := *sid
-	if resolvedSID == "" && len(fc.Sources) == 1 {
-		for s := range fc.Sources {
-			resolvedSID = s
+		// Load: detect prepared dump vs raw JSONL by magic prefix.
+		t0 := time.Now()
+		var (
+			fc  *fileCounts
+			err error
+		)
+		if *file == "" || *file == "-" {
+			fc, err = readFileCounts(os.Stdin, *sid, vlog)
+		} else {
+			fc, err = loadFileCounts(*file, *sid, !*noCache, vlog)
 		}
-		log.Printf("auto-detected source_id: %s", resolvedSID)
-	} else if resolvedSID == "" && len(fc.Sources) > 1 {
-		var ss []string
-		for s := range fc.Sources {
-			ss = append(ss, s)
+		if err != nil {
+			return err
 		}
-		slices.Sort(ss)
-		log.Printf("warning: multiple source_ids in file: %v; pass --sid to scope", ss)
-	}
+		vlog("load done in %s", time.Since(t0).Round(time.Millisecond))
+		log.Printf("file: %d records, %d distinct ISILs, %d source(s)", fc.Total, len(fc.Counts), len(fc.Sources))
 
-	vlog("query index source_id=%q", resolvedSID)
-	t1 := time.Now()
-	indexFacets, err := fetchIndexFacets(indexFor(*server, *debug), resolvedSID)
-	if err != nil {
-		return err
-	}
-	vlog("index returned %d ISILs in %s", len(indexFacets), time.Since(t1).Round(time.Millisecond))
+		if *dump {
+			return writeDump(os.Stdout, fc)
+		}
+		if fc.Total == 0 {
+			return fmt.Errorf("no records found in file")
+		}
 
-	isils := mergeISILs(fc.Counts, indexFacets, *all)
-	vlog("render %d rows", len(isils))
-	if *textile {
-		printTextile(isils, fc.Counts, indexFacets, *empty)
-	} else {
-		printCompareTab(isils, fc.Counts, indexFacets, *empty)
+		// Determine source id scope.
+		resolvedSID := *sid
+		if resolvedSID == "" && len(fc.Sources) == 1 {
+			for s := range fc.Sources {
+				resolvedSID = s
+			}
+			log.Printf("auto-detected source_id: %s", resolvedSID)
+		} else if resolvedSID == "" && len(fc.Sources) > 1 {
+			var ss []string
+			for s := range fc.Sources {
+				ss = append(ss, s)
+			}
+			slices.Sort(ss)
+			log.Printf("warning: multiple source_ids in file: %v; pass --sid to scope", ss)
+		}
+
+		vlog("query index source_id=%q", resolvedSID)
+		t1 := time.Now()
+		indexFacets, err := fetchIndexFacets(c.index(), resolvedSID)
+		if err != nil {
+			return err
+		}
+		vlog("index returned %d ISILs in %s", len(indexFacets), time.Since(t1).Round(time.Millisecond))
+
+		isils := mergeISILs(fc.Counts, indexFacets, *all)
+		vlog("render %d rows", len(isils))
+		if *textile {
+			printTextile(isils, fc.Counts, indexFacets, *empty)
+		} else {
+			printCompareTab(isils, fc.Counts, indexFacets, *empty)
+		}
+		return nil
 	}
-	return nil
+	return cmd
 }
 
 // readFileCounts reads a prepared dump or raw (uncompressed) JSONL from r,

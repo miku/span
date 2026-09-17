@@ -9,6 +9,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/miku/span/solrutil"
+	"github.com/spf13/cobra"
 )
 
 // queryFlags captures every flag known to the `query` subcommand. Flags are
@@ -31,13 +32,13 @@ type queryFlags struct {
 	before      string
 
 	// breakdowns
-	size      bool
-	byField   string // value of --by-<NAME>; empty means none
-	field     string // explicit --field for facet
-	missing   string
-	has       string
-	limit     int
-	shortcut  string // name of the shortcut flag (e.g. "formats")
+	size       bool
+	byField    string // value of --by-<NAME>; empty means none
+	field      string // explicit --field for facet
+	missing    string
+	has        string
+	limit      int
+	shortcut   string // name of the shortcut flag (e.g. "formats")
 	shortField string // resolved facet field for the shortcut
 }
 
@@ -77,8 +78,9 @@ var byFields = []struct {
 	{"by-year", "publishDate"},
 }
 
-func runQuery(args []string) error {
-	fs, server, debug := newFlagSet("query")
+func newQueryCmd(c *common) *cobra.Command {
+	cmd := &cobra.Command{Use: "query", Short: "Filter and breakdown queries against the index", Args: cobra.NoArgs}
+	fs := cmd.Flags()
 	qf := &queryFlags{}
 
 	// filters
@@ -111,108 +113,108 @@ func runQuery(args []string) error {
 		byBools[b.flag] = fs.Bool(b.flag, false, "facet by "+b.field)
 	}
 
-	setExamples(fs,
-		"span-index query --size",
-		"span-index query --size --sid 49",
-		"span-index query --by-sid",
-		"span-index query --formats --sid 49",
-		"span-index query --since 1.day.ago",
-		"span-index query --until 30.days.ago --size",
-		"span-index query --until 2026-01-01 --sid 53 --size",
-		"span-index query --after 2026-01-01 --before 2026-02-01 --sid 49",
-		"span-index query --missing doi",
-		"span-index query --missing record_id --by-sid",
-		"span-index query --has issn --sid 49",
-		"span-index query --has issn --by-sid",
-		`span-index query --q "source_id:49 AND format:Article" --size`,
+	cmd.Example = examples(
+		"span index query --size",
+		"span index query --size --sid 49",
+		"span index query --by-sid",
+		"span index query --formats --sid 49",
+		"span index query --since 1.day.ago",
+		"span index query --until 30.days.ago --size",
+		"span index query --until 2026-01-01 --sid 53 --size",
+		"span index query --after 2026-01-01 --before 2026-02-01 --sid 49",
+		"span index query --missing doi",
+		"span index query --missing record_id --by-sid",
+		"span index query --has issn --sid 49",
+		"span index query --has issn --by-sid",
+		`span index query --q "source_id:49 AND format:Article" --size`,
 	)
 
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 
-	// Resolve the breakdown. Reject duplicates within each group.
-	for _, sc := range shortcutFacets {
-		if *shortBools[sc.flag] {
-			if qf.shortcut != "" {
-				return fmt.Errorf("multiple shortcut facet flags given: --%s and --%s", qf.shortcut, sc.flag)
+		// Resolve the breakdown. Reject duplicates within each group.
+		for _, sc := range shortcutFacets {
+			if *shortBools[sc.flag] {
+				if qf.shortcut != "" {
+					return fmt.Errorf("multiple shortcut facet flags given: --%s and --%s", qf.shortcut, sc.flag)
+				}
+				qf.shortcut = sc.flag
+				qf.shortField = sc.field
 			}
-			qf.shortcut = sc.flag
-			qf.shortField = sc.field
 		}
-	}
-	for _, b := range byFields {
-		if *byBools[b.flag] {
-			if qf.byField != "" {
-				return fmt.Errorf("multiple --by-* flags given")
+		for _, b := range byFields {
+			if *byBools[b.flag] {
+				if qf.byField != "" {
+					return fmt.Errorf("multiple --by-* flags given")
+				}
+				qf.byField = b.field
 			}
-			qf.byField = b.field
 		}
-	}
 
-	// --missing and --has are filters (composed via fq), not breakdowns; they
-	// may combine with --size or with a facet breakdown.
-	breakdowns := []string{}
-	if qf.size {
-		breakdowns = append(breakdowns, "--size")
-	}
-	if qf.field != "" {
-		breakdowns = append(breakdowns, "--field")
-	}
-	if qf.shortcut != "" {
-		breakdowns = append(breakdowns, "--"+qf.shortcut)
-	}
-	if qf.byField != "" {
-		breakdowns = append(breakdowns, "--by-*")
-	}
-	// --size + a --by-* / shortcut facet is allowed (both mean "facet on field"),
-	// the --size flag is purely cosmetic in that combination.
-	if qf.size && (qf.shortcut != "" || qf.byField != "") {
-		breakdowns = filter(breakdowns, "--size")
-	}
-	if len(breakdowns) > 1 {
-		return fmt.Errorf("breakdown flags are mutually exclusive: %s", strings.Join(breakdowns, ", "))
-	}
+		// --missing and --has are filters (composed via fq), not breakdowns; they
+		// may combine with --size or with a facet breakdown.
+		breakdowns := []string{}
+		if qf.size {
+			breakdowns = append(breakdowns, "--size")
+		}
+		if qf.field != "" {
+			breakdowns = append(breakdowns, "--field")
+		}
+		if qf.shortcut != "" {
+			breakdowns = append(breakdowns, "--"+qf.shortcut)
+		}
+		if qf.byField != "" {
+			breakdowns = append(breakdowns, "--by-*")
+		}
+		// --size + a --by-* / shortcut facet is allowed (both mean "facet on field"),
+		// the --size flag is purely cosmetic in that combination.
+		if qf.size && (qf.shortcut != "" || qf.byField != "") {
+			breakdowns = filter(breakdowns, "--size")
+		}
+		if len(breakdowns) > 1 {
+			return fmt.Errorf("breakdown flags are mutually exclusive: %s", strings.Join(breakdowns, ", "))
+		}
 
-	// Build the filter query.
-	q, err := buildQuery(qf)
-	if err != nil {
-		return err
-	}
-
-	idx := indexFor(*server, *debug)
-
-	// Compose fq clauses from --missing / --has. Pre-validate fields against
-	// the schema so we fail fast with a useful message.
-	var fqs []string
-	if qf.missing != "" {
-		if err := checkExistenceQueryable(idx, qf.missing); err != nil {
+		// Build the filter query.
+		q, err := buildQuery(qf)
+		if err != nil {
 			return err
 		}
-		fqs = append(fqs, fmt.Sprintf("-%s:*", qf.missing))
-	}
-	if qf.has != "" {
-		if err := checkExistenceQueryable(idx, qf.has); err != nil {
-			return err
+
+		idx := c.index()
+
+		// Compose fq clauses from --missing / --has. Pre-validate fields against
+		// the schema so we fail fast with a useful message.
+		var fqs []string
+		if qf.missing != "" {
+			if err := checkExistenceQueryable(idx, qf.missing); err != nil {
+				return err
+			}
+			fqs = append(fqs, fmt.Sprintf("-%s:*", qf.missing))
 		}
-		fqs = append(fqs, fmt.Sprintf("%s:*", qf.has))
-	}
+		if qf.has != "" {
+			if err := checkExistenceQueryable(idx, qf.has); err != nil {
+				return err
+			}
+			fqs = append(fqs, fmt.Sprintf("%s:*", qf.has))
+		}
 
-	// Pick the breakdown field, if any.
-	facetField := ""
-	switch {
-	case qf.field != "":
-		facetField = qf.field
-	case qf.shortField != "":
-		facetField = qf.shortField
-	case qf.byField != "":
-		facetField = qf.byField
-	}
+		// Pick the breakdown field, if any.
+		facetField := ""
+		switch {
+		case qf.field != "":
+			facetField = qf.field
+		case qf.shortField != "":
+			facetField = qf.shortField
+		case qf.byField != "":
+			facetField = qf.byField
+		}
 
-	if facetField != "" {
-		return printFacetFq(idx, q, fqs, facetField, qf.limit)
+		if facetField != "" {
+			return printFacetFq(idx, q, fqs, facetField, qf.limit)
+		}
+		return printNumFoundFq(idx, q, fqs)
 	}
-	return printNumFoundFq(idx, q, fqs)
+	return cmd
 }
 
 // buildQuery assembles a Solr query string from the filter flags. If --q was

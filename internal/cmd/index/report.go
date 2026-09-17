@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"net/url"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/spf13/pflag"
-
 	"github.com/miku/span/solrutil"
 	"github.com/segmentio/encoding/json"
+	"github.com/spf13/cobra"
 )
 
-// reportFn implements a named report. It owns its own flag.FlagSet so each
-// report can take whatever arguments it needs.
-type reportFn func(idx solrutil.Index, args []string) error
+// reportFn implements a named report.
+type reportFn func(idx solrutil.Index, o reportOpts) error
 
 // reports is the registry. Add new reports by appending here.
 var reports = map[string]struct {
@@ -40,45 +40,59 @@ var reports = map[string]struct {
 	},
 }
 
-func runReport(args []string) error {
-	fs, server, debug := newFlagSet("report")
-	name := fs.String("name", "", "report name (use --list to enumerate)")
-	list := fs.Bool("list", false, "list available reports")
-	setExamples(fs,
-		"span-index report --list",
-		"span-index report --name collections",
-		"span-index report --name recent --rows 20",
-		"span-index report --name issn --sid 49",
-		"span-index report --name issn --sid 49 --collection \"DOAJ Directory of Open Access Journals\" --verbose",
+// reportOpts holds the flags of all named reports; each report reads the ones
+// it needs.
+type reportOpts struct {
+	sid, collection string
+	workers, bs     int
+	verbose         bool
+	rows            int
+}
+
+func newReportCmd(c *common) *cobra.Command {
+	var (
+		name string
+		list bool
+		o    reportOpts
 	)
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
-	if *list {
-		// Stable, sorted order.
-		names := make([]string, 0, len(reports))
-		for n := range reports {
-			names = append(names, n)
-		}
-		// minor: avoid pulling in slices for one sort call here
-		for i := 1; i < len(names); i++ {
-			for j := i; j > 0 && names[j-1] > names[j]; j-- {
-				names[j-1], names[j] = names[j], names[j-1]
+	cmd := &cobra.Command{
+		Use:   "report",
+		Short: "Named multi-query reports",
+		Args:  cobra.NoArgs,
+		Example: examples(
+			"span index report --list",
+			"span index report --name collections",
+			"span index report --name recent --rows 20",
+			"span index report --name issn --sid 49",
+			`span index report --name issn --sid 49 --collection "DOAJ Directory of Open Access Journals" --verbose`,
+		),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if list {
+				for _, n := range slices.Sorted(maps.Keys(reports)) {
+					fmt.Printf("%-12s  %s\n", n, reports[n].desc)
+				}
+				return nil
 			}
-		}
-		for _, n := range names {
-			fmt.Printf("%-12s  %s\n", n, reports[n].desc)
-		}
-		return nil
+			if name == "" {
+				return fmt.Errorf("--name is required (try --list)")
+			}
+			r, ok := reports[name]
+			if !ok {
+				return fmt.Errorf("unknown report %q", name)
+			}
+			return r.run(c.index(), o)
+		},
 	}
-	if *name == "" {
-		return fmt.Errorf("--name is required (try --list)")
-	}
-	r, ok := reports[*name]
-	if !ok {
-		return fmt.Errorf("unknown report %q", *name)
-	}
-	return r.run(indexFor(*server, *debug), fs.Args())
+	fs := cmd.Flags()
+	fs.StringVar(&name, "name", "", "report name (use --list to enumerate)")
+	fs.BoolVar(&list, "list", false, "list available reports")
+	fs.StringVar(&o.sid, "sid", "", "issn: limit to source_id (default: all sources)")
+	fs.StringVar(&o.collection, "collection", "", "issn: limit to mega_collection")
+	fs.IntVar(&o.workers, "workers", 32, "issn: concurrent index queries")
+	fs.IntVar(&o.bs, "bs", 1, "issn: ISSNs per batch")
+	fs.BoolVar(&o.verbose, "verbose", false, "issn: log per-batch progress to stderr")
+	fs.IntVar(&o.rows, "rows", 10, "recent: rows to return")
+	return cmd
 }
 
 // --- issn report -------------------------------------------------------------
@@ -87,20 +101,11 @@ type issnWork struct {
 	sid, c, issn string
 }
 
-func reportISSN(idx solrutil.Index, args []string) error {
-	fs := pflag.NewFlagSet("report issn", pflag.ExitOnError)
-	sid := fs.String("sid", "", "limit to source_id (default: all sources)")
-	collection := fs.String("collection", "", "limit to mega_collection")
-	workers := fs.Int("workers", 32, "concurrent index queries")
-	batchSize := fs.Int("bs", 1, "ISSNs per batch")
-	verbose := fs.Bool("verbose", false, "log per-batch progress to stderr")
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
+func reportISSN(idx solrutil.Index, o reportOpts) error {
 
 	var sids []string
-	if *sid != "" {
-		sids = []string{*sid}
+	if o.sid != "" {
+		sids = []string{o.sid}
 	} else {
 		var err error
 		sids, err = idx.SourceIdentifiers()
@@ -110,7 +115,7 @@ func reportISSN(idx solrutil.Index, args []string) error {
 	}
 
 	queue := make(chan []issnWork)
-	result := make(chan string, *workers)
+	result := make(chan string, o.workers)
 	done := make(chan bool)
 	var wg sync.WaitGroup
 	st := newReportState()
@@ -118,10 +123,10 @@ func reportISSN(idx solrutil.Index, args []string) error {
 	bw := bufio.NewWriter(os.Stdout)
 	defer bw.Flush()
 	go reportWriter(bw, result, done, st)
-	for i := range *workers {
+	for i := range o.workers {
 		wg.Add(1)
 		name := fmt.Sprintf("worker-%02d", i)
-		go issnWorker(name, idx, queue, result, &wg, *verbose, st)
+		go issnWorker(name, idx, queue, result, &wg, o.verbose, st)
 	}
 
 	// feedErr captures errors from the producer loop; the pipeline is always
@@ -130,8 +135,8 @@ func reportISSN(idx solrutil.Index, args []string) error {
 feed:
 	for _, s := range sids {
 		var cs []string
-		if *collection != "" {
-			cs = []string{*collection}
+		if o.collection != "" {
+			cs = []string{o.collection}
 		} else {
 			var err error
 			cs, err = idx.SourceCollections(s)
@@ -149,7 +154,7 @@ feed:
 				feedErr = err
 				break feed
 			}
-			for _, batch := range partition(issns, *batchSize) {
+			for _, batch := range partition(issns, o.bs) {
 				items := make([]issnWork, len(batch))
 				for i, b := range batch {
 					items[i] = issnWork{sid: s, c: c, issn: b}
@@ -287,11 +292,7 @@ func partition(ss []string, size int) [][]string {
 
 // --- simpler reports ---------------------------------------------------------
 
-func reportCollections(idx solrutil.Index, args []string) error {
-	fs := pflag.NewFlagSet("report collections", pflag.ExitOnError)
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
+func reportCollections(idx solrutil.Index, _ reportOpts) error {
 	sids, err := idx.SourceIdentifiers()
 	if err != nil {
 		return err
@@ -310,15 +311,10 @@ func reportCollections(idx solrutil.Index, args []string) error {
 	return nil
 }
 
-func reportRecent(idx solrutil.Index, args []string) error {
-	fs := pflag.NewFlagSet("report recent", pflag.ExitOnError)
-	rows := fs.Int("rows", 10, "rows to return")
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
+func reportRecent(idx solrutil.Index, o reportOpts) error {
 	vs := url.Values{}
 	vs.Set("q", "*:*")
-	vs.Set("rows", fmt.Sprint(*rows))
+	vs.Set("rows", fmt.Sprint(o.rows))
 	vs.Set("sort", "last_indexed desc")
 	vs.Set("fl", "id,source_id,title,last_indexed")
 	vs.Set("wt", "json")

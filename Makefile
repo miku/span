@@ -1,31 +1,35 @@
 SHELL = /bin/bash
 VERSION := 0.2.37
-TARGETS = \
-		  span-compact \
-          span-crossref-members \
-		  span-crossref-fast-snapshot \
-		  span-crossref-fastproc \
-		  span-crossref-snapshot \
-          span-crossref-sync \
-		  span-crossref-table \
-		  span-doisniffer \
-		  span-export \
-          span-folio \
-		  span-freeze \
-		  span-index \
-		  span-import \
-		  span-mail \
-		  span-local-data \
-		  span-oa-filter \
-		  span-redact \
-		  span-tag \
-		  span-update-labels
+# One binary. The names span used to install are symlinks to it: it reads the
+# name it was invoked under and runs the matching command, which keeps every
+# existing script working. Keep LEGACY in sync with internal/cli (tested).
+TARGET = span
+LEGACY = \
+	span-compact \
+	span-crossref-fast-snapshot \
+	span-crossref-fastproc \
+	span-crossref-members \
+	span-crossref-snapshot \
+	span-crossref-sync \
+	span-crossref-table \
+	span-doisniffer \
+	span-export \
+	span-folio \
+	span-freeze \
+	span-import \
+	span-index \
+	span-local-data \
+	span-mail \
+	span-oa-filter \
+	span-redact \
+	span-tag \
+	span-update-labels
 
 PKGNAME = span
 MAKEFLAGS := --jobs=$(shell nproc 2>/dev/null || sysctl -n hw.physicalcpu)
 
 .PHONY: all
-all: $(TARGETS)
+all: $(TARGET) $(LEGACY)
 
 .PHONY: test
 test:
@@ -34,12 +38,17 @@ test:
 LDFLAGS = -s -w -X github.com/miku/span.AppVersion=$(VERSION)
 GOFILES := $(shell find . -name '*.go' -not -path './.git/*' -not -path './build/*') go.mod go.sum
 
-$(TARGETS): %: $(GOFILES)
-	go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/$@
+$(TARGET): $(GOFILES)
+	go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/span
+
+# The same links the packages install, so a working copy behaves like an
+# installed span.
+$(LEGACY): $(TARGET)
+	ln -sf $(TARGET) $@
 
 .PHONY: clean
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGET) $(LEGACY)
 	rm -rf build/
 	rm -f $(PKGNAME)_*deb
 	rm -f $(PKGNAME)-*rpm
@@ -61,21 +70,19 @@ bench:
 # nfpm-based packaging (preferred).
 SEMVER := $(shell echo $(VERSION) | sed 's/^v//')
 
-# Cross-compiled linux/amd64 binaries used for packaging (deb/rpm), kept in a
-# separate directory so they never overwrite the native dev binaries above and
+# Cross-compiled linux/amd64 binary used for packaging (deb/rpm), kept in a
+# separate directory so it never overwrites the native dev binary above and
 # the host platform (e.g. macOS arm64) does not leak into the package.
-BUILD_TARGETS = $(addprefix build/,$(TARGETS))
-
-$(BUILD_TARGETS): build/%: $(GOFILES)
+build/span: $(GOFILES)
 	@mkdir -p build
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/$*
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $@ ./cmd/span
 
 .PHONY: deb
-deb: $(BUILD_TARGETS)
+deb: build/span
 	SEMVER=$(SEMVER) GOARCH=amd64 nfpm package -p deb -f nfpm.yaml
 
 .PHONY: rpm
-rpm: $(BUILD_TARGETS)
+rpm: build/span
 	SEMVER=$(SEMVER) GOARCH=amd64 nfpm package -p rpm -f nfpm.yaml
 
 # Docs related, https://github.com/sunaku/md2man
@@ -91,14 +98,14 @@ clean-docs:
 members: assets/crossref/members.json
 	@echo "Note: Run rm $< manually to rebuild."
 
-assets/crossref/members.json: span-crossref-members
-	span-crossref-members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("^[[:space:]]+"; "") | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
+assets/crossref/members.json: span
+	./span crossref members | jq -rc '.message.items[].prefix[] | {(.value | tostring): .name | gsub("^[[:space:]]+"; "") | gsub("[[:space:]]+$$"; "")}' | jq -s add > $@
 
 .PHONY: names
 names: assets/crossref/names.ndj
 	@echo "Note: Run rm $< manually to rebuild."
 
 # Primary and other names.
-assets/crossref/names.ndj: span-crossref-members
-	span-crossref-members | jq -rc '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > $@
+assets/crossref/names.ndj: span
+	./span crossref members | jq -rc '.message.items[]| {"primary": .["primary-name"], "names": .["names"]}' > $@
 

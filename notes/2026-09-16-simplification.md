@@ -121,39 +121,16 @@ undo with git, but ask the people who run the index first.
 
 ## 3. One binary, stdlib-only dispatch
 
-The 2026-03 plan proposed cobra. **Don't add it.** `internal/cmd/index/main.go`
-already has the needed pattern in about 60 lines: a
-`[]subcommand{name, short, run}` table, `help`, `version`. Promote that to
-`cmd/span/main.go`:
+We want to move to a single-binary deployment, but want to keep backwards
+compatibility; there is a pattern for that, use symlink and let the single
+binary "span" deterine how it was called. We had a similar transition with
+@~/code/miku/metha (which went from nine binaries prefixed `metha-` to a single
+`metha` and allows for backwards compatibility with shims).
 
-```
-span import | export | tag | redact | oa-filter | update-labels | doisniffer
-span freeze
-span index  query | select | compare | report | cleanup
-span crossref  sync | snapshot | fastproc | members | table
-span compact
-```
+We hope to consolidate more code by using a single binary. We can use cobra, as
+it is well understood and widely used; it is ok to have this dependency, as it
+can help to have a good cli UX.
 
-Rules for every subcommand (write them down once in the package doc):
-
-1. `func run(args []string, stdin io.Reader, stdout io.Writer) error`, with its
-   own `flag.FlagSet`. No package-level flag vars, no `log.Fatal`, no
-   `os.Exit`. This also fixes the known bug where `defer
-   pprof.StopCPUProfile()` is skipped by `log.Fatal`.
-2. `main` does the shared work **once**: `-cpuprofile`/`-memprofile`,
-   `-v`, turning `[file...]` args into a reader (decompressing `.gz`/`.zst`
-   by extension; today every siskin task writes `<(zstd -cd ...)`), and
-   the exit code.
-3. One flag library. Right now `flag` (20 mains) and `pflag` (`span-index`)
-   are mixed. Pick stdlib `flag` and drop `pflag`; `span-index` only uses
-   `StringP` for `-s/--server`, and stdlib flags accept both `-s` and `--s`.
-
-Backwards compatibility: install `span-import` etc. as symlinks and dispatch
-on `filepath.Base(os.Args[0])` (the busybox pattern). siskin keeps working
-unchanged, and nfpm lists one binary plus symlinks.
-
-What goes away: 21 `main.go` files (≈2,000 lines → ≈150), 21 Makefile
-targets, 21 nfpm entries, the `update-version` sed target.
 
 ---
 
@@ -257,7 +234,7 @@ With §1–§5 done, these become unnecessary:
 |---|---|
 | `google/go-cmp` | one test; `reflect.DeepEqual` or `slices.Equal` |
 | `jinzhu/now` | `dateutil` inlined |
-| `spf13/pflag` | stdlib `flag` |
+| ~~`spf13/pflag`~~ | stays: cobra (§3) depends on it |
 | `dchest/safefile` | one atomic-write helper |
 | `sethgrid/pester` | one HTTP client with retry |
 | `miku/clam` | in-process compression, `exec.Command` |
@@ -347,6 +324,22 @@ reshape/export golden tests, and makes the next step smaller.
 6. **Single `span` binary** (§3) with symlinks for old names. Makefile and
    nfpm get simpler. Check with siskin by running its pipeline commands
    through the symlinks.
+   Done 2026-09-17 (ahead of 4 and 5): `cmd/span` + `internal/cli` (cobra),
+   19 `cmd/span-*` mains gone, one 16 MB binary. The old names are symlinks
+   (Makefile, nfpm) and dispatch on argv[0], e.g. `span-crossref-sync` →
+   `span crossref sync`. Stdlib-style flags keep working: under a legacy name,
+   `-unfreeze` is rewritten to `--unfreeze` and `--o` to `-o` before pflag
+   sees them. Single-letter flags stay as shorthands, and each one also got
+   a long name (`-o/--output`). A test parses siskin's actual invocations and
+   checks that the Makefile and nfpm names match the dispatch table.
+   `import | tag | export` output is byte-identical to the old binaries.
+   `span-index` subcommands are real cobra commands now. This also fixed
+   `report --rows/--sid/...`, which had always failed with "unknown flag".
+   `xflag` deleted. Mains return errors instead of calling `log.Fatal`, so
+   deferred cleanup runs. Behaviour changes: exit code 1 (not 2) for usage
+   errors, `crossref sync -i bogus` is an error instead of a silent no-op,
+   and `-v` is version everywhere except `crossref fast-snapshot`, where it
+   stays verbose. `spf13/pflag` stays, since cobra needs it.
 7. **Confirm and prune** (§2, second half): unused formats, crossref snapshot
    variant, mail/local-data/folio. This needs input from operations; do it last.
 

@@ -15,101 +15,88 @@ license: MIT
 disable_globbing: false
 
 contents:
-  # Binaries
-  - src: build/span-compact
+  - src: build/span
+    dst: /usr/local/bin/span
+    file_info:
+      mode: 0755
+
+  # The names span installed as separate binaries until now, as symlinks to
+  # the one binary. It dispatches on the name it was invoked under.
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-compact
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-crossref-fast-snapshot
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-crossref-fast-snapshot
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-crossref-fastproc
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-crossref-fastproc
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-crossref-members
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-crossref-members
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-crossref-snapshot
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-crossref-snapshot
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-crossref-sync
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-crossref-sync
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-crossref-table
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-crossref-table
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-doisniffer
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-doisniffer
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-export
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-export
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-folio
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-folio
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-freeze
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-freeze
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-import
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-import
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-index
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-index
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-local-data
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-local-data
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-mail
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-mail
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-oa-filter
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-oa-filter
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-redact
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-redact
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-tag
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-tag
-    file_info:
-      mode: 0755
+    type: symlink
 
-  - src: build/span-update-labels
+  - src: /usr/local/bin/span
     dst: /usr/local/bin/span-update-labels
-    file_info:
-      mode: 0755
+    type: symlink
 
   # Man page
   - src: docs/span.1
