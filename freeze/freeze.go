@@ -19,8 +19,8 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
-	"github.com/dchest/safefile"
 	"github.com/miku/span/folio"
+	"github.com/miku/span/internal/atomicfile"
 	"github.com/segmentio/encoding/json"
 	"github.com/sethgrid/pester"
 )
@@ -202,6 +202,22 @@ func buildFilterConfig(collections []folio.FincConfigMetadataCollection, okapiUR
 	return filterConfig, urlSet
 }
 
+// NewHTTPClient returns the client used to download referenced files. With
+// noProxy, it ignores the system proxy settings.
+func NewHTTPClient(noProxy bool) *http.Client {
+	if !noProxy {
+		return http.DefaultClient
+	}
+	return &http.Client{
+		Transport: &http.Transport{
+			Proxy:                 nil,
+			DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ResponseHeaderTimeout: 30 * time.Second,
+		},
+	}
+}
+
 // Fetch fetches a filterconfig from FOLIO and writes a frozen zip to outputPath.
 func Fetch(opts FolioOpts, outputPath string) error {
 	if opts.Token == "" {
@@ -213,19 +229,7 @@ func Fetch(opts FolioOpts, outputPath string) error {
 	if opts.Limit <= 0 {
 		opts.Limit = 100000
 	}
-	var httpClient *http.Client
-	if opts.NoProxy {
-		httpClient = &http.Client{
-			Transport: &http.Transport{
-				Proxy:                 nil,
-				DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
-				TLSHandshakeTimeout:   10 * time.Second,
-				ResponseHeaderTimeout: 30 * time.Second,
-			},
-		}
-	} else {
-		httpClient = http.DefaultClient
-	}
+	httpClient := NewHTTPClient(opts.NoProxy)
 	pesterClient := pester.New()
 	if opts.NoProxy {
 		pesterClient.Transport = httpClient.Transport
@@ -255,7 +259,7 @@ func Fetch(opts FolioOpts, outputPath string) error {
 		return fmt.Errorf("marshal filterconfig: %w", err)
 	}
 	// Create output zip.
-	file, err := safefile.Create(outputPath, 0644)
+	file, err := atomicfile.Create(outputPath, 0644)
 	if err != nil {
 		return fmt.Errorf("create output: %w", err)
 	}

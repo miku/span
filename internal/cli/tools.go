@@ -5,16 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
-	"net/http"
 	"os"
 	"runtime"
 	"strings"
-	"time"
 
-	"github.com/dchest/safefile"
 	"github.com/klauspost/compress/zstd"
 	"github.com/miku/span/folio"
+	"github.com/miku/span/freeze"
+	"github.com/miku/span/internal/atomicfile"
 	"github.com/miku/span/internal/cmd/compact"
 	"github.com/miku/span/internal/cmd/doisniffer"
 	spanfolio "github.com/miku/span/internal/cmd/folio"
@@ -252,22 +250,12 @@ Output zip structure:
 				fcfg.Expand = legacy.Expand
 				return freezecmd.RunFolio(fcfg, output)
 			}
-			client := http.DefaultClient
-			if fcfg.NoProxy {
-				client = &http.Client{
-					Transport: &http.Transport{
-						Proxy:                 nil,
-						DialContext:           (&net.Dialer{Timeout: 30 * time.Second}).DialContext,
-						TLSHandshakeTimeout:   10 * time.Second,
-						ResponseHeaderTimeout: 30 * time.Second,
-					},
-				}
-			}
-			file, err := safefile.Create(output, 0644)
+			file, err := atomicfile.Create(output, 0644)
 			if err != nil {
 				return err
 			}
 			defer file.Close()
+			client := freeze.NewHTTPClient(fcfg.NoProxy)
 			if err := freezecmd.RunLegacy(legacy, client, cmd.InOrStdin(), file); err != nil {
 				return err
 			}

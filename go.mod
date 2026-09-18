@@ -7,7 +7,6 @@ require (
 	github.com/adrg/xdg v0.5.3
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/beevik/etree v1.8.0
-	github.com/dchest/safefile v0.0.0-20151022103144-855e8d98f185
 	github.com/goodsign/monday v1.0.2
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/klauspost/compress v1.20.0

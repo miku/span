@@ -20,8 +20,8 @@ import (
 	"github.com/klauspost/compress/zstd"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
-	"github.com/miku/span/atomic"
 	"github.com/miku/span/filter"
+	"github.com/miku/span/internal/atomicfile"
 	"github.com/miku/span/internal/cmd/crossrefcmd"
 	"github.com/sethgrid/pester"
 	"github.com/spf13/cobra"
@@ -469,14 +469,17 @@ cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api
 				}
 				return nil
 			}
-			var w io.Writer = cmd.OutOrStdout()
+			var (
+				w   io.Writer = cmd.OutOrStdout()
+				out *atomicfile.File
+			)
 			if outputFile != "" {
-				f, err := atomic.New(outputFile, 0644)
-				if err != nil {
+				var err error
+				if out, err = atomicfile.Create(outputFile, 0644); err != nil {
 					return err
 				}
-				defer f.Close()
-				w = f
+				defer out.Close()
+				w = out
 			}
 			c := make(chan os.Signal, 1)
 			signal.Notify(c, os.Interrupt)
@@ -506,6 +509,9 @@ cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api
 				if err := copyDecompressed(w, cachePath, compressProgram); err != nil {
 					return err
 				}
+			}
+			if out != nil {
+				return out.Commit()
 			}
 			return nil
 		},
@@ -552,21 +558,26 @@ func syncWindow(sync *crossrefcmd.Sync, iv crossrefcmd.Interval, cachePath, comp
 		log.Printf("already synced: %s", cachePath)
 		return nil
 	}
-	cacheFile, err := atomic.New(cachePath, 0644)
+	f, err := atomicfile.Create(cachePath, 0644)
 	if err != nil {
 		return err
 	}
-	if err := sync.WriteWindow(cacheFile, iv.Start, iv.End); err != nil {
+	defer f.Close()
+	var w io.WriteCloser
+	if compressProgram == "zstd" {
+		if w, err = zstd.NewWriter(f); err != nil {
+			return err
+		}
+	} else {
+		w = gzip.NewWriter(f)
+	}
+	if err := sync.WriteWindow(w, iv.Start, iv.End); err != nil {
 		return err
 	}
-	if err := cacheFile.Close(); err != nil {
+	if err := w.Close(); err != nil {
 		return err
 	}
-	compressed, err := atomic.CompressType(cachePath, compressProgram)
-	if err != nil {
-		return err
-	}
-	if err := atomic.Move(compressed, cachePath); err != nil {
+	if err := f.Commit(); err != nil {
 		return err
 	}
 	log.Printf("synced to %s", cachePath)

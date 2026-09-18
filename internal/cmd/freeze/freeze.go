@@ -114,19 +114,23 @@ func RunLegacy(cfg LegacyConfig, client HTTPGetter, r io.Reader, w io.Writer) er
 		h.Write([]byte(u))
 		name := fmt.Sprintf("%s/%x", NameDir, h.Sum(nil))
 		resp, err := client.Get(u)
-		if err != nil || resp.StatusCode >= 400 {
+		if err == nil && resp.StatusCode >= 400 {
+			resp.Body.Close()
+			err = fmt.Errorf("HTTP %s", resp.Status)
+		}
+		if err != nil {
 			if cfg.BestEffort {
 				log.Printf("[%04d %s] %v", i, u, err)
 				continue
 			}
-			return fmt.Errorf("failed to fetch resource: %v", err)
+			return fmt.Errorf("failed to fetch %s: %w", u, err)
 		}
-		defer resp.Body.Close()
 		f, err := zw.Create(name)
-		if err != nil {
-			return err
+		if err == nil {
+			_, err = io.Copy(f, resp.Body)
 		}
-		if _, err := io.Copy(f, resp.Body); err != nil {
+		resp.Body.Close()
+		if err != nil {
 			return err
 		}
 		mapping[u] = name
