@@ -322,6 +322,32 @@ reshape/export golden tests, and makes the next step smaller.
 4. **Fold helper packages** (§4): `container`, `strutil`, `dateutil`,
    `xflag`, `doi`, `encoding/tsv`, `atomic`/`safefile`, `xio`. One package
    per commit; each is a move + import rewrite.
+   Done 2026-09-18 (branch `fewer-helper-packages`, one commit per package):
+   the top level is now exactly the target list. −740 lines of Go;
+   `jinzhu/now`, `google/go-cmp` and `dchest/safefile` dropped.
+   `StringSet` became `slices.Sort` + `slices.Compact` (or a plain map in
+   `filter`). Assets load through one generic `span.MustLoadAsset[T]`, and
+   lookups with a default are `cmp.Or(m[k], def)` (no asset maps to "").
+   Intervals are computed with `time.Date` and match the old code on 14M
+   random intervals in three time zones. `crossref sync -s/-e` take
+   `YYYY-MM-DD` only, which is what siskin passes. `doi.Sniffer` was folded into
+   `doisniffer.Run`. The KBART decoder lives in `kbart` and resolves header
+   columns once. The `xio` readers became `fetch` + `unzipOrPlain` in
+   `filter`, and the holdings cache is checked before reading or fetching (it used
+   to leak two fds per cached file). `internal/atomicfile` is the single
+   atomic-write helper (`Commit`, deferred `Close` discards). `crossref sync`
+   compresses straight into the cache file, and `freeze.NewHTTPClient` builds
+   the no-proxy client. `formeta` moved into `formats/finc`, `mail` into
+   `mailcmd`, pending §2. `go fix` modernizers applied. Tests that used
+   httpbin.org now use `httptest`. Checked: `import | tag | export` for
+   all reshape testdata formats and `tag` over `frozen.zip` holdings are
+   byte-identical to master, and `doisniffer` in all modes.
+   Kept as is, but they look like bugs: KBART, ISSN/ISBN and DOI list readers drop a
+   last line without trailing newline; a KBART row with an empty first
+   column shifts left (lines are trimmed); `doisniffer` never finds DOI in
+   JSON arrays (`[]any`, not `[]string`) and never fills an existing empty
+   `doi_str_mv`. `deadcode` now reports the `solrutil` review/facet methods
+   that only `span-report` used.
 5. **One way per task** (§5): HTTP client, stdlib flags, JSON decision,
    `JSONLines` helper with `errors.As` Skip.
 6. **Single `span` binary** (§3) with symlinks for old names. Makefile and
