@@ -17,9 +17,7 @@ import (
 	"regexp"
 	"slices"
 
-	"github.com/miku/span/encoding/tsv"
 	"github.com/miku/span/licensing"
-	"github.com/miku/span/xio"
 )
 
 // Holdings contains a list of entries about licenced or available content. In
@@ -30,11 +28,11 @@ type Holdings []licensing.Entry
 // ReadFrom create holdings struct from a reader. Expects tab separated content with
 // a single header row. TODO: This is not exactly what ReadFrom is for.
 func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
-	var wc xio.WriteCounter
-	dec := tsv.NewDecoder(io.TeeReader(r, &wc))
+	cr := &countingReader{r: r}
+	dec := newDecoder(cr)
 	for {
 		var entry licensing.Entry
-		err := dec.Decode(&entry)
+		err := dec.decode(&entry)
 		if err == io.EOF {
 			break
 		}
@@ -46,7 +44,19 @@ func (h *Holdings) ReadFrom(r io.Reader) (int64, error) {
 		entry.ParseDates()
 		*h = append(*h, entry)
 	}
-	return int64(wc.Count()), nil
+	return cr.n, nil
+}
+
+// countingReader counts the bytes read through it.
+type countingReader struct {
+	r io.Reader
+	n int64
+}
+
+func (c *countingReader) Read(p []byte) (int, error) {
+	n, err := c.r.Read(p)
+	c.n += int64(n)
+	return n, err
 }
 
 // SerialNumberMap creates a map from ISSN to associated licensing entries.
