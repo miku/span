@@ -434,7 +434,7 @@ func processFilesParallel(inputFiles []string, numWorkers int, processor func(st
 	var wg sync.WaitGroup
 	wg.Add(numWorkers)
 	errCh := make(chan error, numWorkers)
-	for i := 0; i < numWorkers; i++ {
+	for range numWorkers {
 		go func() {
 			defer wg.Done()
 			for filename := range filesCh {

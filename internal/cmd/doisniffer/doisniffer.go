@@ -148,7 +148,7 @@ func stringToRegexpSlice(s string, sep string) (result []*regexp.Regexp, err err
 	if len(s) == 0 {
 		return
 	}
-	for _, v := range strings.Split(s, sep) {
+	for v := range strings.SplitSeq(s, sep) {
 		re, err := regexp.Compile(v)
 		if err != nil {
 			return nil, err

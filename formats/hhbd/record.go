@@ -148,7 +148,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 
 	// Authors.
-	for _, creator := range strings.Split(record.Metadata.Dc.Creator.Text, ";") {
+	for creator := range strings.SplitSeq(record.Metadata.Dc.Creator.Text, ";") {
 		creator = strings.TrimSpace(creator)
 		if len(creator) == 0 {
 			continue

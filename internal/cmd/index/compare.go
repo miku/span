@@ -389,10 +389,7 @@ type workerResult struct {
 // records with a different source_id are ignored. JSON parsing runs in
 // parallel; lines are batched to keep channel overhead off the hot path.
 func countFileISIL(r io.Reader, sid string) (*fileCounts, error) {
-	numWorkers := runtime.NumCPU()
-	if numWorkers < 1 {
-		numWorkers = 1
-	}
+	numWorkers := max(runtime.NumCPU(), 1)
 	const batchSize = 262144
 	var (
 		batches = make(chan [][]byte, numWorkers)

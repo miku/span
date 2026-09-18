@@ -30,7 +30,7 @@ func DefaultConfig() Config {
 // SplitTrim splits a string s on a separator and trims whitespace off the
 // resulting parts.
 func SplitTrim(s, sep string) (result []string) {
-	for _, r := range strings.Split(s, sep) {
+	for r := range strings.SplitSeq(s, sep) {
 		result = append(result, strings.TrimSpace(r))
 	}
 	return

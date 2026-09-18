@@ -1,6 +1,8 @@
 package filter
 
 import (
+	"slices"
+
 	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/formats/finc"
@@ -14,12 +16,7 @@ type DOIFilter struct {
 
 // Apply applies the filter.
 func (f *DOIFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.Values {
-		if v == is.DOI {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(f.Values, is.DOI)
 }
 
 // UnmarshalJSON turns a config fragment into a filter.

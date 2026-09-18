@@ -218,8 +218,7 @@ func (r Record) Languages() (langs []string) {
 			langs = append(langs, v)
 			continue
 		}
-		parts := strings.Split(v, "/")
-		for _, p := range parts {
+		for p := range strings.SplitSeq(v, "/") {
 			if len(p) == 3 {
 				langs = append(langs, p)
 				continue

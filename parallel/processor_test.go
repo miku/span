@@ -133,7 +133,7 @@ func TestSimple(t *testing.T) {
 // batches; run with -race to verify error recording is synchronized.
 func TestConcurrentErrors(t *testing.T) {
 	var sb strings.Builder
-	for i := 0; i < 10000; i++ {
+	for range 10000 {
 		sb.WriteString("x\n")
 	}
 	p := NewProcessor(strings.NewReader(sb.String()), io.Discard, func(lineno int64, b []byte) ([]byte, error) {
@@ -152,7 +152,7 @@ func TestConcurrentErrors(t *testing.T) {
 // independent of batch boundaries and worker count.
 func TestAllLinesProcessed(t *testing.T) {
 	var sb strings.Builder
-	for i := 0; i < 5000; i++ {
+	for range 5000 {
 		sb.WriteString("x\n")
 	}
 	sb.WriteString("x") // no trailing newline
@@ -176,7 +176,7 @@ func TestAllLinesProcessed(t *testing.T) {
 func TestBatchedOutputKeepsEveryRecord(t *testing.T) {
 	const numRecords = 5000
 	var sb strings.Builder
-	for i := 0; i < numRecords; i++ {
+	for i := range numRecords {
 		fmt.Fprintf(&sb, "%d\n", i)
 	}
 	for _, numWorkers := range []int{1, 2, 8, 16} {
@@ -191,13 +191,13 @@ func TestBatchedOutputKeepsEveryRecord(t *testing.T) {
 					t.Fatalf("p.Run: %v", err)
 				}
 				seen := make(map[string]int)
-				for _, line := range strings.Split(strings.TrimSuffix(buf.String(), "\n"), "\n") {
+				for line := range strings.SplitSeq(strings.TrimSuffix(buf.String(), "\n"), "\n") {
 					seen[line]++
 				}
 				if len(seen) != numRecords {
 					t.Fatalf("got %d distinct records, want %d", len(seen), numRecords)
 				}
-				for i := 0; i < numRecords; i++ {
+				for i := range numRecords {
 					if n := seen[strconv.Itoa(i)]; n != 1 {
 						t.Fatalf("record %d appears %d times, want 1", i, n)
 					}
@@ -213,7 +213,7 @@ func TestBatchedOutputKeepsEveryRecord(t *testing.T) {
 func TestSingleWorkerPreservesOrder(t *testing.T) {
 	const numRecords = 1000
 	var sb strings.Builder
-	for i := 0; i < numRecords; i++ {
+	for i := range numRecords {
 		fmt.Fprintf(&sb, "%d\n", i)
 	}
 	var buf bytes.Buffer
@@ -233,7 +233,7 @@ func TestSingleWorkerPreservesOrder(t *testing.T) {
 func benchInput(numRecords int) string {
 	var sb strings.Builder
 	line := strings.Repeat("x", 250)
-	for i := 0; i < numRecords; i++ {
+	for i := range numRecords {
 		fmt.Fprintf(&sb, "%06d%s\n", i, line)
 	}
 	return sb.String()

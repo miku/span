@@ -218,17 +218,14 @@ func emit(r io.Reader, w io.Writer) error {
 	)
 	for sc.Scan() {
 		row := sc.Bytes()
-		i := bytes.IndexByte(row, '\t')
-		if i < 0 {
+		key, rest, ok := bytes.Cut(row, []byte{'\t'})
+		if !ok {
 			continue
 		}
-		key := row[:i]
-		rest := row[i+1:]
-		j := bytes.IndexByte(rest, '\t')
-		if j < 0 {
+		_, doc, ok := bytes.Cut(rest, []byte{'\t'})
+		if !ok {
 			continue
 		}
-		doc := rest[j+1:]
 		if first || !bytes.Equal(key, cur) {
 			if _, err := bw.Write(doc); err != nil {
 				return err

@@ -1,6 +1,8 @@
 package filter
 
 import (
+	"slices"
+
 	"github.com/segmentio/encoding/json"
 
 	"github.com/miku/span/formats/finc"
@@ -13,12 +15,7 @@ type SourceFilter struct {
 
 // Apply filter.
 func (f *SourceFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, v := range f.Values {
-		if v == is.SourceID {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(f.Values, is.SourceID)
 }
 
 // UnmarshalJSON turns a config fragment into a filter.

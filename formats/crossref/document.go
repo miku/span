@@ -28,6 +28,7 @@ import (
 	"html"
 	"log"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -317,10 +318,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if len(output.ArticleTitle) == 0 {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_ATITLE %s", output.ID)}
 	}
-	for _, title := range ArticleTitleBlocker {
-		if output.ArticleTitle == title {
-			return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.ID)}
-		}
+	if slices.Contains(ArticleTitleBlocker, output.ArticleTitle) {
+		return output, span.Skip{Reason: fmt.Sprintf("BLOCKED_ATITLE %s", output.ID)}
 	}
 	for _, p := range ArticleTitleCleanerPatterns {
 		output.ArticleTitle = p.ReplaceAllString(output.ArticleTitle, "")
@@ -379,10 +378,8 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		"test",
 		"crossref-test",
 	}
-	for _, s := range publisherBlacklist {
-		if doc.Publisher == s {
-			return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_COLLECTION %s", output.ID)}
-		}
+	if slices.Contains(publisherBlacklist, doc.Publisher) {
+		return output, span.Skip{Reason: fmt.Sprintf("BLACKLISTED_COLLECTION %s", output.ID)}
 	}
 	if doc.Publisher == "" {
 		output.MegaCollections = []string{"X-U (CrossRef)"}

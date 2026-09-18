@@ -133,7 +133,7 @@ type IntermediateSchema struct {
 
 	// TODO(miku): we do not need both dates
 	RawDate string    `json:"rft.date,omitempty"`
-	Date    time.Time `json:"x.date,omitempty"`
+	Date    time.Time `json:"x.date"`
 
 	Season     string `json:"rft.ssn,omitempty"`
 	Series     string `json:"rft.series,omitempty"`
@@ -229,7 +229,7 @@ func (is *IntermediateSchema) Allfields() string {
 	var buf bytes.Buffer
 	for _, f := range fields {
 		for _, value := range f {
-			for _, token := range strings.Fields(value) {
+			for token := range strings.FieldsSeq(value) {
 				buf.WriteString(fmt.Sprintf("%s ", strings.TrimSpace(token)))
 			}
 		}
