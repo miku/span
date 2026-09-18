@@ -1,4 +1,4 @@
-package formeta
+package finc
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/segmentio/encoding/json"
 )
 
-func TestEncoding(t *testing.T) {
+func TestFormetaEncoding(t *testing.T) {
 	var cases = []struct {
 		about string
 		in    any
@@ -16,7 +16,7 @@ func TestEncoding(t *testing.T) {
 		err   error
 	}{
 		{"empty string", "", "", nil},
-		{"single char rejected", "x", "", ErrValueNotAllowed},
+		{"single char rejected", "x", "", ErrFormetaValueNotAllowed},
 		{"simple struct", struct{ A string }{A: "B"}, `{ A: 'B',  }`, nil},
 		{"single quote in value", struct{ A string }{A: "B 'A"}, `{ A: 'B \'A',  }`, nil},
 		{"string slice", struct{ A []string }{A: []string{"B", "C"}}, `{ A: 'B', A: 'C',  }`, nil},
@@ -29,7 +29,7 @@ func TestEncoding(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.about, func(t *testing.T) {
-			b, err := Marshal(c.in)
+			b, err := marshalFormeta(c.in)
 			if err != c.err {
 				t.Errorf("Marshal got error %v, want %v", err, c.err)
 			}
@@ -53,7 +53,7 @@ type TestPeak struct {
 	Camps    []TestPosition
 }
 
-func TestNested(t *testing.T) {
+func TestFormetaNested(t *testing.T) {
 	p := TestPeak{
 		Name: "пик Сталина",
 		Location: TestPosition{
@@ -72,7 +72,7 @@ func TestNested(t *testing.T) {
 
 	want := `{ name: 'пик Сталина', Location { Longitude: 38.916667, Latitude: 72.016667,  } Ascent: '0001-01-01T00:00:00Z', Variants: 'Ismoil Somoni Peak', Variants: 'Қуллаи Исмоили Сомонӣ', Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  } Camps { Longitude: 38.916667, Latitude: 72.016667,  }  }`
 
-	b, err := Marshal(p)
+	b, err := marshalFormeta(p)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -81,7 +81,7 @@ func TestNested(t *testing.T) {
 	}
 }
 
-func TestDanglingCR(t *testing.T) {
+func TestFormetaDanglingCR(t *testing.T) {
 	var cases = []struct {
 		about string
 		in    string
@@ -104,7 +104,7 @@ func TestDanglingCR(t *testing.T) {
 			if err := json.Unmarshal([]byte(c.in), &v); err != nil {
 				t.Fatal(err)
 			}
-			b, err := Marshal(v)
+			b, err := marshalFormeta(v)
 			if err != c.err {
 				t.Errorf("got error %v, want %v", err, c.err)
 			}
@@ -115,7 +115,7 @@ func TestDanglingCR(t *testing.T) {
 	}
 }
 
-func BenchmarkMarshal(b *testing.B) {
+func BenchmarkFormeta(b *testing.B) {
 	benchmarks := []struct {
 		name string
 		in   any
@@ -132,13 +132,13 @@ func BenchmarkMarshal(b *testing.B) {
 	for _, bm := range benchmarks {
 		b.Run(bm.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				_, _ = Marshal(bm.in)
+				_, _ = marshalFormeta(bm.in)
 			}
 		})
 	}
 }
 
-func BenchmarkMarshalString(b *testing.B) {
+func BenchmarkFormetaString(b *testing.B) {
 	inputs := []string{
 		"simple",
 		"with 'quotes' and \\backslashes",
@@ -148,7 +148,7 @@ func BenchmarkMarshalString(b *testing.B) {
 		b.Run(fmt.Sprintf("len=%d", len(in)), func(b *testing.B) {
 			v := struct{ A string }{A: in}
 			for i := 0; i < b.N; i++ {
-				_, _ = Marshal(v)
+				_, _ = marshalFormeta(v)
 			}
 		})
 	}

@@ -1,5 +1,4 @@
-// Package mail provides simple email composition and sending via SMTP.
-package mail
+package mailcmd
 
 import (
 	"bytes"

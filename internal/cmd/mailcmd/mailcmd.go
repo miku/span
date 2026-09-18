@@ -5,8 +5,6 @@ package mailcmd
 import (
 	"fmt"
 	"io"
-
-	"github.com/miku/span/mail"
 )
 
 // Config holds the fields needed to compose a message. Body is the already-read
@@ -22,12 +20,12 @@ type Config struct {
 
 // Sender sends a composed message. It is injected so Run can be tested without
 // touching the network; the default sender talks SMTP.
-type Sender func(msg *mail.Message) error
+type Sender func(msg *Message) error
 
 // DefaultSender sends the message via SMTP to server:25 with no auth.
 func DefaultSender(server string) Sender {
-	return func(msg *mail.Message) error {
-		return mail.Send(server+":25", nil, msg)
+	return func(msg *Message) error {
+		return Send(server+":25", nil, msg)
 	}
 }
 
@@ -44,9 +42,9 @@ func (c Config) Validate() error {
 	return nil
 }
 
-// message builds a mail.Message from the config.
-func (c Config) message() *mail.Message {
-	return &mail.Message{
+// message builds a Message from the config.
+func (c Config) message() *Message {
+	return &Message{
 		From:       c.From,
 		To:         c.To,
 		Subject:    c.Subject,

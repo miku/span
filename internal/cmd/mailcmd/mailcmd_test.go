@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"strings"
 	"testing"
-
-	"github.com/miku/span/mail"
 )
 
 func TestValidate(t *testing.T) {
@@ -54,8 +52,8 @@ func TestRunWritesMessage(t *testing.T) {
 
 func TestRunSends(t *testing.T) {
 	cfg := Config{From: "a@x", To: []string{"b@x"}, Subject: "s", Body: "b"}
-	var got *mail.Message
-	send := func(m *mail.Message) error { got = m; return nil }
+	var got *Message
+	send := func(m *Message) error { got = m; return nil }
 	if err := Run(cfg, nil, send); err != nil {
 		t.Fatal(err)
 	}
