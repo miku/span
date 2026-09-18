@@ -20,7 +20,6 @@ import (
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/freeze"
 	"github.com/miku/span/parallel"
-	"github.com/miku/span/strutil"
 
 	json "github.com/segmentio/encoding/json"
 )
@@ -142,7 +141,9 @@ func Run(cfg Config, tagger filter.Tagger, r io.Reader, w io.Writer) error {
 			}
 			if len(droppable) > 0 {
 				before := len(tagged.Labels)
-				tagged.Labels = strutil.RemoveEach(tagged.Labels, droppable)
+				tagged.Labels = slices.DeleteFunc(tagged.Labels, func(label string) bool {
+					return slices.Contains(droppable, label)
+				})
 				if cfg.Verbose {
 					log.Printf("[%s] from %d to %d labels: %s",
 						is.ID, before, len(tagged.Labels), tagged.Labels)

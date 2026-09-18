@@ -53,3 +53,18 @@ func TestDocumentCombinedTitle(t *testing.T) {
 		})
 	}
 }
+
+func TestUnescapeTrim(t *testing.T) {
+	var tests = []struct {
+		in  string
+		out string
+	}{
+		{in: "Hello", out: "Hello"},
+		{in: " Hello &#x000F6; ", out: "Hello ö"},
+	}
+	for _, tt := range tests {
+		if got := unescapeTrim(tt.in); got != tt.out {
+			t.Errorf("unescapeTrim(%q): got %q, want %q", tt.in, got, tt.out)
+		}
+	}
+}

@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/segmentio/encoding/json"
@@ -8,7 +9,6 @@ import (
 	"log"
 
 	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/strutil"
 	"github.com/miku/span/xio"
 )
 
@@ -61,7 +61,7 @@ func (f *ISBNFilter) UnmarshalJSON(p []byte) error {
 			// Valid ISBN can contain x, normalize to uppercase.
 			line = strings.ToUpper(line)
 			// Sniff ISBNs.
-			isbns := strutil.ISBNPattern.FindAllString(line, -1)
+			isbns := isbnPattern.FindAllString(line, -1)
 			if len(isbns) == 0 {
 				log.Printf("isbn: warning: no ISBNs found on line: %s", line)
 			}
@@ -77,3 +77,6 @@ func (f *ISBNFilter) UnmarshalJSON(p []byte) error {
 	log.Printf("isbn: collected %d ISBN", len(f.Values))
 	return nil
 }
+
+// isbnPattern matches an ISBN, with or without prefix.
+var isbnPattern = regexp.MustCompile(`(?i)(ISBN)?[\d\s\-]+X?`)

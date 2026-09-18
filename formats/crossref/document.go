@@ -25,6 +25,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"html"
 	"log"
 	"regexp"
 	"strconv"
@@ -33,7 +34,6 @@ import (
 
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/strutil"
 )
 
 const (
@@ -182,8 +182,8 @@ func (pi *PageInfo) PageCount() int {
 func (doc *Document) Authors() (authors []finc.Author) {
 	for _, ra := range doc.Author {
 		authors = append(authors, finc.Author{
-			FirstName: AuthorReplacer.Replace(strutil.UnescapeTrim(ra.Given)),
-			LastName:  AuthorReplacer.Replace(strutil.UnescapeTrim(ra.Family)),
+			FirstName: AuthorReplacer.Replace(unescapeTrim(ra.Given)),
+			LastName:  AuthorReplacer.Replace(unescapeTrim(ra.Family)),
 		})
 	}
 	return authors
@@ -245,14 +245,14 @@ func (doc *Document) CombinedTitle() string {
 	switch {
 	case len(doc.Title) > 0:
 		// refs. #21429
-		t := strutil.UnescapeTrim(strings.Join(doc.Title, " "))
+		t := unescapeTrim(strings.Join(doc.Title, " "))
 		if len(doc.Subtitle) > 0 && !strings.Contains(t, doc.Subtitle[0]) && !strings.Contains(t, ":") {
-			st := strutil.UnescapeTrim(strings.Join(doc.Subtitle, " "))
+			st := unescapeTrim(strings.Join(doc.Subtitle, " "))
 			return fmt.Sprintf("%s : %s", t, st)
 		}
 		return t
 	case len(doc.Subtitle) > 0:
-		st := strutil.UnescapeTrim(strings.Join(doc.Subtitle, " "))
+		st := unescapeTrim(strings.Join(doc.Subtitle, " "))
 		return st
 	default:
 		return ""
@@ -262,7 +262,7 @@ func (doc *Document) CombinedTitle() string {
 // FindShortTitle returns the first main title only.
 func (doc *Document) FindShortTitle() (s string) {
 	if len(doc.Title) > 0 {
-		s = strutil.UnescapeTrim(doc.Title[0])
+		s = unescapeTrim(doc.Title[0])
 	}
 	return
 }
@@ -345,7 +345,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	output.URL = append(output.URL, doc.URL)
 	output.Volume = strings.TrimLeft(doc.Volume, "0")
 	if len(doc.ContainerTitle) > 0 {
-		output.JournalTitle = strutil.UnescapeTrim(doc.ContainerTitle[0])
+		output.JournalTitle = unescapeTrim(doc.ContainerTitle[0])
 	} else {
 		return output, span.Skip{Reason: fmt.Sprintf("NO_JTITLE %s", output.ID)}
 	}
@@ -354,7 +354,7 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.ArticleTitle = fmt.Sprintf("%s: %s", output.JournalTitle, output.ArticleTitle)
 	}
 	if len(doc.Subtitle) > 0 {
-		output.ArticleSubtitle = strutil.UnescapeTrim(doc.Subtitle[0])
+		output.ArticleSubtitle = unescapeTrim(doc.Subtitle[0])
 	}
 	output.Authors = doc.Authors()
 	// TODO(miku): do we need a config for these things?
@@ -387,10 +387,15 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	if doc.Publisher == "" {
 		output.MegaCollections = []string{"X-U (CrossRef)"}
 	} else {
-		publisher := strutil.UnescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
+		publisher := unescapeTrim(strings.Replace(doc.Publisher, "\n", " ", -1))
 		output.MegaCollections = []string{fmt.Sprintf("%s (CrossRef)", publisher)}
 	}
 	// refs. #13613
 	output.Abstract = doc.Abstract
 	return output, nil
+}
+
+// unescapeTrim unescapes HTML character references and trims space.
+func unescapeTrim(s string) string {
+	return strings.TrimSpace(html.UnescapeString(s))
 }

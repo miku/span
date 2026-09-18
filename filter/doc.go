@@ -11,15 +11,13 @@
 //
 // [1] https://en.wikipedia.org/wiki/Binary_expression_tree#Boolean_expressions
 //
-//
 // The simplest filter is one, that says *yes* to all records:
 //
-//     {"DE-X": {"any": {}}}
+//	{"DE-X": {"any": {}}}
 //
 // On the command line:
 //
-//     $ span-tag -c '{"DE-X": {"any": {}}}' < input.ldj > output.ldj
-//
+//	$ span-tag -c '{"DE-X": {"any": {}}}' < input.ldj > output.ldj
 //
 // Another slightly more complex example: Here, the ISIL "DE-14" is attached to a
 // record, if the following conditions are met: There are two alternatives, each
@@ -30,82 +28,81 @@
 // urls" AND "the record belongs to any one of the given collections", THEN
 // "attach DE-14".
 //
-// {
-//   "DE-14": {
-//     "or": [
-//       {
-//         "and": [
-//           {
-//             "source": [
-//               "55"
-//             ]
-//           },
-//           {
-//             "holdings": {
-//               "urls": [
-//                 "http://www.jstor.org/kbart/collections/asii",
-//                 "http://www.jstor.org/kbart/collections/as"
-//               ]
-//             }
-//           }
-//         ]
-//       },
-//       {
-//         "and": [
-//           {
-//             "source": [
-//               "49"
-//             ]
-//           },
-//           {
-//             "holdings": {
-//               "urls": [
-//                 "https://example.com/KBART_DE14",
-//                 "https://example.com/KBART_FREEJOURNALS"
-//               ]
-//             }
-//           },
-//           {
-//             "collection": [
-//               "Turkish Family Physicans Association (CrossRef)",
-//               "Helminthological Society (CrossRef)",
-//               "International Association of Physical Chemists (IAPC) (CrossRef)",
-//               "The Society for Antibacterial and Antifungal Agents, Japan (CrossRef)",
-//               "Fundacao CECIERJ (CrossRef)"
-//             ]
-//           }
-//         ]
-//       }
-//     ]
-//   }
-// }
+//	{
+//	  "DE-14": {
+//	    "or": [
+//	      {
+//	        "and": [
+//	          {
+//	            "source": [
+//	              "55"
+//	            ]
+//	          },
+//	          {
+//	            "holdings": {
+//	              "urls": [
+//	                "http://www.jstor.org/kbart/collections/asii",
+//	                "http://www.jstor.org/kbart/collections/as"
+//	              ]
+//	            }
+//	          }
+//	        ]
+//	      },
+//	      {
+//	        "and": [
+//	          {
+//	            "source": [
+//	              "49"
+//	            ]
+//	          },
+//	          {
+//	            "holdings": {
+//	              "urls": [
+//	                "https://example.com/KBART_DE14",
+//	                "https://example.com/KBART_FREEJOURNALS"
+//	              ]
+//	            }
+//	          },
+//	          {
+//	            "collection": [
+//	              "Turkish Family Physicans Association (CrossRef)",
+//	              "Helminthological Society (CrossRef)",
+//	              "International Association of Physical Chemists (IAPC) (CrossRef)",
+//	              "The Society for Antibacterial and Antifungal Agents, Japan (CrossRef)",
+//	              "Fundacao CECIERJ (CrossRef)"
+//	            ]
+//	          }
+//	        ]
+//	      }
+//	    ]
+//	  }
+//	}
 //
 // If is relatively easy to add a new filter. Imagine we want to build a filter that only allows records
 // that have the word "awesome" in their title.
 //
 // We first define a new type:
 //
-//     type AwesomeFilter struct{}
+//	type AwesomeFilter struct{}
 //
 // We then implement the Apply method:
 //
-//     func (f *AwesomeFilter) Apply(is finc.IntermediateSchema) bool {
-//         return strings.Contains(strings.ToLower(is.ArticleTitle), "awesome")
-//     }
+//	func (f *AwesomeFilter) Apply(is finc.IntermediateSchema) bool {
+//	    return strings.Contains(strings.ToLower(is.ArticleTitle), "awesome")
+//	}
 //
 // That is all. We need to register the filter, so we can use it in the configuration file.
 // Add an entry to filterRegistry in filter.go:
 //
-//     var filterRegistry = map[string]func() Filter{
-//         ...
-//         "awesome": func() Filter { return &AwesomeFilter{} },
-//         ...
-//     }
+//	var filterRegistry = map[string]func() Filter{
+//	    ...
+//	    "awesome": func() Filter { return &AwesomeFilter{} },
+//	    ...
+//	}
 //
 // We can then use the filter in the JSON configuration:
 //
-//     {"DE-X": {"awesome": {}}}
-//
+//	{"DE-X": {"awesome": {}}}
 //
 // Further readings: http://theory.stanford.edu/~sergei/papers/sigmod10-index.pdf
 package filter

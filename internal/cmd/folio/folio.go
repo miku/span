@@ -12,7 +12,6 @@ import (
 	"text/tabwriter"
 
 	"github.com/miku/span/folio"
-	"github.com/miku/span/strutil"
 )
 
 // Client is the subset of the FOLIO API used by this command. It is satisfied
@@ -69,9 +68,17 @@ func render(resp *folio.MetadataCollectionsResponse, raw bool, w io.Writer) erro
 	tw := tabwriter.NewWriter(w, 0, 0, 1, ' ', 0)
 	for _, entry := range resp.FincConfigMetadataCollections {
 		fmt.Fprintf(tw, "%s\t%s\t%s\n",
-			strutil.Truncate(entry.Label, 40),
-			strutil.Truncate(strings.Join(entry.SolrMegaCollections, ", "), 40),
-			strutil.Truncate(entry.MdSource.Name, 40))
+			truncate(entry.Label, 40),
+			truncate(strings.Join(entry.SolrMegaCollections, ", "), 40),
+			truncate(entry.MdSource.Name, 40))
 	}
 	return tw.Flush()
+}
+
+// truncate shortens s to at most n bytes, marking a cut with an ellipsis.
+func truncate(s string, n int) string {
+	if len(s) < n {
+		return s
+	}
+	return s[:n] + "..."
 }

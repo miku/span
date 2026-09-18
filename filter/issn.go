@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/segmentio/encoding/json"
@@ -8,7 +9,6 @@ import (
 	"log"
 
 	"github.com/miku/span/formats/finc"
-	"github.com/miku/span/strutil"
 	"github.com/miku/span/xio"
 )
 
@@ -60,7 +60,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			// Valid ISSN can contain x, normalize to uppercase.
 			line = strings.ToUpper(line)
 			// Sniff ISSNs.
-			issns := strutil.ISSNPattern.FindAllString(line, -1)
+			issns := issnPattern.FindAllString(line, -1)
 			if len(issns) == 0 {
 				log.Printf("issn: warning: no ISSNs found on line: %s", line)
 			}
@@ -76,3 +76,6 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	log.Printf("issn: collected %d ISSN", len(f.Values))
 	return nil
 }
+
+// issnPattern matches a standard ISSN.
+var issnPattern = regexp.MustCompile(`[0-9]{4,4}-[0-9]{3,3}[0-9X]`)
