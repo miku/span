@@ -158,6 +158,9 @@ reusable job.
 Target top level: `formats/`, `filter/`, `licensing/`, `parallel/`,
 `crossref/`, `freeze/`, `folio/`, `solrutil/`, `internal/cmd/`, `cmd/span/`.
 
+In this iteration, we should look into modern Go stdlib features, generics,
+test utils, that were not available, when this code was first written.
+
 ### `langutil.go`: 15,960 → about 50 lines + data
 
 * `ISO639NameToThreeLower` can be computed exactly from `ISO639NameToThree`
