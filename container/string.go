@@ -20,11 +20,6 @@
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
 package container
 
-import (
-	"maps"
-	"slices"
-)
-
 // MapDefault provides defaults for string map lookups with defaults.
 type MapDefault map[string]string
 
@@ -47,68 +42,4 @@ func (m MapSliceDefault) Lookup(key string, def []string) []string {
 		return def
 	}
 	return val
-}
-
-// StringSet is map disguised as set.
-type StringSet struct {
-	Set map[string]struct{}
-}
-
-// NewStringSet returns an empty string set. XXX: Make the zero value usable.
-func NewStringSet(s ...string) *StringSet {
-	ss := &StringSet{Set: make(map[string]struct{})}
-	for _, item := range s {
-		ss.Add(item)
-	}
-	return ss
-}
-
-// Add adds a string to a set, returns true if added, false it it already existed (noop).
-func (set *StringSet) Add(ss ...string) {
-	for _, s := range ss {
-		set.Set[s] = struct{}{}
-	}
-}
-
-// Contains returns true if given string is in the set, false otherwise.
-func (set *StringSet) Contains(s string) bool {
-	_, found := set.Set[s]
-	return found
-}
-
-// Size returns current number of elements in the set.
-func (set *StringSet) Size() int {
-	return len(set.Set)
-}
-
-// Values returns the set values as a string slice.
-func (set *StringSet) Values() []string {
-	return slices.Collect(maps.Keys(set.Set))
-}
-
-// SortedValues returns the set values as a sorted string slice.
-func (set *StringSet) SortedValues() []string {
-	return slices.Sorted(maps.Keys(set.Set))
-}
-
-// Intersection returns the intersection of two string sets.
-func (set *StringSet) Intersection(other *StringSet) *StringSet {
-	isect := NewStringSet()
-	for k := range set.Set {
-		if other.Contains(k) {
-			isect.Add(k)
-		}
-	}
-	return isect
-}
-
-// Difference returns all items, that are in set but not in other.
-func (set *StringSet) Difference(other *StringSet) *StringSet {
-	diff := NewStringSet()
-	for k := range set.Set {
-		if !other.Contains(k) {
-			diff.Add(k)
-		}
-	}
-	return diff
 }

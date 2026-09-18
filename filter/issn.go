@@ -7,7 +7,6 @@ import (
 
 	"log"
 
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/strutil"
 	"github.com/miku/span/xio"
@@ -15,18 +14,13 @@ import (
 
 // ISSNFilter allows records with a certain ISSN.
 type ISSNFilter struct {
-	Values *container.StringSet
+	Values map[string]struct{}
 }
 
 // Apply applies ISSN filter on intermediate schema, no distinction between ISSN
 // and EISSN.
 func (f *ISSNFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, issn := range append(is.ISSN, is.EISSN...) {
-		if f.Values.Contains(issn) {
-			return true
-		}
-	}
-	return false
+	return containsAny(f.Values, is.ISSN) || containsAny(f.Values, is.EISSN)
 }
 
 // UnmarshalJSON turns a config fragment into a filter.
@@ -41,7 +35,7 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.Values = container.NewStringSet()
+	f.Values = make(map[string]struct{})
 	// workaround as span-freeze replacing urls with "file://" protocol and
 	// http.Get does not recognize that protocol
 	if strings.HasPrefix(s.ISSN.Link, "file://") {
@@ -66,18 +60,19 @@ func (f *ISSNFilter) UnmarshalJSON(p []byte) error {
 			// Valid ISSN can contain x, normalize to uppercase.
 			line = strings.ToUpper(line)
 			// Sniff ISSNs.
-			issns := container.NewStringSet()
-			for _, s := range strutil.ISSNPattern.FindAllString(line, -1) {
-				issns.Add(s)
-			}
-			if issns.Size() == 0 {
+			issns := strutil.ISSNPattern.FindAllString(line, -1)
+			if len(issns) == 0 {
 				log.Printf("issn: warning: no ISSNs found on line: %s", line)
 			}
-			f.Values.Add(issns.Values()...)
+			for _, issn := range issns {
+				f.Values[issn] = struct{}{}
+			}
 		}
 	}
 	// Add any ISSN given as string in configuration.
-	f.Values.Add(s.ISSN.Values...)
-	log.Printf("issn: collected %d ISSN", f.Values.Size())
+	for _, issn := range s.ISSN.Values {
+		f.Values[issn] = struct{}{}
+	}
+	log.Printf("issn: collected %d ISSN", len(f.Values))
 	return nil
 }

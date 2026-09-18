@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -11,7 +12,6 @@ import (
 	"github.com/kennygrant/sanitize"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/miku/span"
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"golang.org/x/text/language"
 )
@@ -23,7 +23,7 @@ var (
 
 var (
 	// Restricts the possible languages for detection.
-	acceptedLanguages = container.NewStringSet("deu", "eng", "fra", "ita", "spa")
+	acceptedLanguages = []string{"deu", "eng", "fra", "ita", "spa"}
 
 	// Candidate patterns for parsing publishing dates.
 	datePatterns = []string{
@@ -433,12 +433,12 @@ func (article *Article) Date() (t time.Time) {
 // found in abstract and fulltext. Note: This is slow.
 // Skip detection on too short strings.
 func (article *Article) Languages() []string {
-	set := container.NewStringSet()
+	var langs []string
 
 	if article.Front.Article.Abstract.Lang != "" {
 		base, err := language.ParseBase(article.Front.Article.Abstract.Lang)
 		if err == nil {
-			set.Add(base.ISO3())
+			langs = append(langs, base.ISO3())
 		}
 	}
 
@@ -456,13 +456,14 @@ func (article *Article) Languages() []string {
 		if err != nil || lang == "und" {
 			continue
 		}
-		if !acceptedLanguages.Contains(lang) {
+		if !slices.Contains(acceptedLanguages, lang) {
 			continue
 		}
-		set.Add(lang)
+		langs = append(langs, lang)
 	}
 
-	return set.SortedValues()
+	slices.Sort(langs)
+	return slices.Compact(langs)
 }
 
 func clipString(s string, length int) string {

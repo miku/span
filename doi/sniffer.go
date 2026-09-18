@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"slices"
 	"strings"
 
-	"github.com/miku/span/container"
 	"github.com/miku/span/parallel"
 	"github.com/segmentio/encoding/json"
 )
@@ -100,7 +100,7 @@ type MapSniffer struct {
 }
 
 func (s *MapSniffer) SearchMap(doc map[string]any) []string {
-	ss := container.NewStringSet()
+	var found []string
 	for k, v := range doc {
 		if anyMatchString(s.IgnoreKeys, k) {
 			continue
@@ -108,19 +108,20 @@ func (s *MapSniffer) SearchMap(doc map[string]any) []string {
 		switch w := v.(type) {
 		case string:
 			if m := s.Pattern.FindString(w); m != "" {
-				ss.Add(m)
+				found = append(found, m)
 			}
 		case []string:
 			for _, e := range w {
 				if m := s.Pattern.FindString(e); m != "" {
-					ss.Add(m)
+					found = append(found, m)
 				}
 			}
 		default:
 			continue
 		}
 	}
-	return ss.SortedValues()
+	slices.Sort(found)
+	return slices.Compact(found)
 }
 
 // anyMatchString is like MatchString but for a list of pattern.

@@ -1,8 +1,8 @@
 // Package doaj maps DOAJ metadata to intermediate schema.
 //
-//  Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
-//                    The Finc Authors, http://finc.info
-//                    Martin Czygan, <martin.czygan@uni-leipzig.de>
+//	Copyright 2015 by Leipzig University Library, http://ub.uni-leipzig.de
+//	                  The Finc Authors, http://finc.info
+//	                  Martin Czygan, <martin.czygan@uni-leipzig.de>
 //
 // This file is part of some open source application.
 //
@@ -20,20 +20,19 @@
 // along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 //
 // @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
-//
 package doaj
 
 import (
 	"fmt"
 	"html"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/miku/span"
 	"github.com/miku/span/assetutil"
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -235,24 +234,26 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
-	subjects := container.NewStringSet()
+	var subjects []string
 	for _, s := range doc.Index.SchemaCode {
 		class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NotAssigned)
 		if class != finc.NotAssigned {
-			subjects.Add(class)
+			subjects = append(subjects, class)
 		}
 	}
-	if subjects.Size() == 0 {
+	if len(subjects) == 0 {
 		output.Subjects = []string{finc.NotAssigned}
 	} else {
-		output.Subjects = subjects.SortedValues()
+		slices.Sort(subjects)
+		output.Subjects = slices.Compact(subjects)
 	}
 
-	languages := container.NewStringSet()
+	var languages []string
 	for _, l := range doc.Index.Language {
-		languages.Add(LanguageMap.Lookup(l, "und"))
+		languages = append(languages, LanguageMap.Lookup(l, "und"))
 	}
-	output.Languages = languages.SortedValues()
+	slices.Sort(languages)
+	output.Languages = slices.Compact(languages)
 
 	output.RefType = DefaultRefType
 	return output, nil

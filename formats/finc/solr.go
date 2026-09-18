@@ -3,12 +3,12 @@ package finc
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/segmentio/encoding/json"
 
 	"github.com/kennygrant/sanitize"
-	"github.com/miku/span/container"
 )
 
 // Solr5Vufind3 is the basic solr 5 schema as of 2016-04-14. It is based on
@@ -159,13 +159,12 @@ func (s *Solr5Vufind3) convert(is IntermediateSchema, withFullrecord bool) error
 		}
 	}
 
-	classes := container.NewStringSet()
+	var classes []string
 	for _, s := range is.Subjects {
-		for _, class := range SubjectMapping.Lookup(s, []string{}) {
-			classes.Add(class)
-		}
+		classes = append(classes, SubjectMapping.Lookup(s, nil)...)
 	}
-	s.FincClassFacet = classes.SortedValues()
+	slices.Sort(classes)
+	s.FincClassFacet = slices.Compact(classes)
 
 	var sanitized string
 	switch {

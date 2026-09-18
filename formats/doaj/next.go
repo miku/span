@@ -3,12 +3,12 @@ package doaj
 import (
 	"fmt"
 	"html"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -165,28 +165,30 @@ func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		}
 	}
 
-	subjects := container.NewStringSet()
+	var subjects []string
 	for _, s := range doc.Bibjson.Subject {
 		class := LCCPatterns.LookupDefault(s.Code, finc.NotAssigned)
 		if class != finc.NotAssigned {
-			subjects.Add(class)
+			subjects = append(subjects, class)
 		}
 	}
-	if subjects.Size() == 0 {
+	if len(subjects) == 0 {
 		output.Subjects = []string{finc.NotAssigned}
 	} else {
-		output.Subjects = subjects.SortedValues()
+		slices.Sort(subjects)
+		output.Subjects = slices.Compact(subjects)
 	}
 
-	languages := container.NewStringSet()
+	var languages []string
 	for _, l := range doc.Bibjson.Journal.Language {
 		detected := span.LanguageIdentifier(l)
 		if detected == "" {
 			detected = "und"
 		}
-		languages.Add(detected)
+		languages = append(languages, detected)
 	}
-	output.Languages = languages.SortedValues()
+	slices.Sort(languages)
+	output.Languages = slices.Compact(languages)
 	output.OpenAccess = true
 
 	output.RefType = DefaultRefType

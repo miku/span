@@ -11,11 +11,10 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/miku/span/container"
 )
 
 // DateGranularity indicates how complete a date is.
@@ -135,20 +134,16 @@ type Entry struct {
 // ISSNList returns a list of unique, normalized ISSN (1234-567X) from various
 // entry fields.
 func (entry *Entry) ISSNList() []string {
-	var (
-		issns    = container.NewStringSet()
-		idfields = []string{entry.PrintIdentifier, entry.OnlineIdentifier}
-	)
-	for _, issn := range idfields {
+	var issns []string
+	for _, issn := range []string{entry.PrintIdentifier, entry.OnlineIdentifier} {
 		s := NormalizeSerialNumber(issn)
 		if issnPattern.MatchString(s) {
-			issns.Add(s)
+			issns = append(issns, s)
 		}
 	}
-	for _, issn := range FindSerialNumbers(entry.AllSerialNumbers) {
-		issns.Add(issn)
-	}
-	return issns.SortedValues()
+	issns = append(issns, FindSerialNumbers(entry.AllSerialNumbers)...)
+	slices.Sort(issns)
+	return slices.Compact(issns)
 }
 
 // CoversDate checks whether the given date falls within the entry's date

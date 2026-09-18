@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"html"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -185,7 +185,7 @@ func (record Record) Pages() string {
 
 // Subjects returns a mapped (https://git.io/fjesG) list of LCSH subjects.
 func (record Record) Subjects() []string {
-	subjects := container.NewStringSet()
+	var subjects []string
 	for _, v := range record.Metadata.Dc.Subject {
 		if v.Type != "dcterms:LCSH" {
 			continue
@@ -196,10 +196,11 @@ func (record Record) Subjects() []string {
 		}
 		class := LCCPatterns.LookupDefault(v.Text, finc.NotAssigned)
 		if class != finc.NotAssigned {
-			subjects.Add(class)
+			subjects = append(subjects, class)
 		}
 	}
-	return subjects.SortedValues()
+	slices.Sort(subjects)
+	return slices.Compact(subjects)
 }
 
 // ToIntermediateSchema converts OAI record to intermediate schema.
@@ -236,11 +237,12 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 		output.Pages = ""
 	}
 
-	languages := container.NewStringSet()
+	var languages []string
 	for _, l := range record.Metadata.Dc.Language {
-		languages.Add(LanguageMap.Lookup(l, "und"))
+		languages = append(languages, LanguageMap.Lookup(l, "und"))
 	}
-	output.Languages = languages.SortedValues()
+	slices.Sort(languages)
+	output.Languages = slices.Compact(languages)
 	output.Format = "ElectronicArticle"
 	output.Genre = "article"
 	output.RefType = "EJOUR"

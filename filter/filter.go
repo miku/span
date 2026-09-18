@@ -160,3 +160,22 @@ func unmarshalFilterList(raw []json.RawMessage) (filters []Filter, err error) {
 	}
 	return
 }
+
+// newSet returns a set containing the given values.
+func newSet(vs ...string) map[string]struct{} {
+	set := make(map[string]struct{}, len(vs))
+	for _, v := range vs {
+		set[v] = struct{}{}
+	}
+	return set
+}
+
+// containsAny reports whether any of vs is in set.
+func containsAny(set map[string]struct{}, vs []string) bool {
+	for _, v := range vs {
+		if _, ok := set[v]; ok {
+			return true
+		}
+	}
+	return false
+}

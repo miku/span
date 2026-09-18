@@ -5,14 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/segmentio/encoding/json"
 )
 
 func TestISSNFilterApply(t *testing.T) {
 	f := &ISSNFilter{
-		Values: container.NewStringSet("1234-5678", "2345-6789", "0000-000X"),
+		Values: newSet("1234-5678", "2345-6789", "0000-000X"),
 	}
 	var tests = []struct {
 		about  string
@@ -54,13 +53,13 @@ func TestISSNFilterUnmarshalJSONList(t *testing.T) {
 	if err := json.Unmarshal([]byte(s), &f); err != nil {
 		t.Fatalf("unmarshal: %v", err)
 	}
-	if !f.Values.Contains("1234-5678") {
+	if _, ok := f.Values["1234-5678"]; !ok {
 		t.Error("expected 1234-5678 in filter values")
 	}
-	if !f.Values.Contains("2345-6789") {
+	if _, ok := f.Values["2345-6789"]; !ok {
 		t.Error("expected 2345-6789 in filter values")
 	}
-	if f.Values.Contains("0000-0000") {
+	if _, ok := f.Values["0000-0000"]; ok {
 		t.Error("unexpected 0000-0000 in filter values")
 	}
 }
@@ -125,12 +124,12 @@ func TestISSNFilterUnmarshalJSONFile(t *testing.T) {
 				t.Fatalf("unmarshal: %v", err)
 			}
 			for _, want := range test.expected {
-				if !f.Values.Contains(want) {
+				if _, ok := f.Values[want]; !ok {
 					t.Errorf("expected %q in filter values", want)
 				}
 			}
-			if test.expected == nil && f.Values.Size() != 0 {
-				t.Errorf("expected empty filter, got %d values", f.Values.Size())
+			if test.expected == nil && len(f.Values) != 0 {
+				t.Errorf("expected empty filter, got %d values", len(f.Values))
 			}
 		})
 	}

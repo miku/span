@@ -28,11 +28,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/formats/jats"
 	"golang.org/x/text/language"
@@ -86,16 +86,17 @@ func (article *Article) Authors() []finc.Author {
 
 // Languages returns a list of language in 3-letter format.
 func (article *Article) Languages() []string {
-	set := container.NewStringSet()
+	var langs []string
 	for _, cm := range article.Front.Article.CustomMetaGroup.CustomMeta {
 		if cm.Name.Value == "lang" {
 			base, err := language.ParseBase(cm.Value.Value)
 			if err == nil {
-				set.Add(base.ISO3())
+				langs = append(langs, base.ISO3())
 			}
 		}
 	}
-	return set.SortedValues()
+	slices.Sort(langs)
+	return slices.Compact(langs)
 }
 
 // ReviewedProduct returns the string of the reviewed thing in a best-effort way.

@@ -7,7 +7,6 @@ import (
 
 	"log"
 
-	"github.com/miku/span/container"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/strutil"
 	"github.com/miku/span/xio"
@@ -15,18 +14,13 @@ import (
 
 // ISBNFilter allows records with a certain ISBN.
 type ISBNFilter struct {
-	Values *container.StringSet
+	Values map[string]struct{}
 }
 
 // Apply applies ISBN filter on intermediate schema, no distinction between
 // print or electronic ISBN.
 func (f *ISBNFilter) Apply(is finc.IntermediateSchema) bool {
-	for _, isbn := range is.ISBN {
-		if f.Values.Contains(isbn) {
-			return true
-		}
-	}
-	return false
+	return containsAny(f.Values, is.ISBN)
 }
 
 // UnmarshalJSON turns a config fragment into a filter.
@@ -41,7 +35,7 @@ func (f *ISBNFilter) UnmarshalJSON(p []byte) error {
 	if err := json.Unmarshal(p, &s); err != nil {
 		return err
 	}
-	f.Values = container.NewStringSet()
+	f.Values = make(map[string]struct{})
 	// workaround as span-freeze replacing urls with "file://" protocol and
 	// http.Get does not recognize that protocol
 	if strings.HasPrefix(s.ISBN.Link, "file://") {
@@ -67,18 +61,19 @@ func (f *ISBNFilter) UnmarshalJSON(p []byte) error {
 			// Valid ISBN can contain x, normalize to uppercase.
 			line = strings.ToUpper(line)
 			// Sniff ISBNs.
-			isbns := container.NewStringSet()
-			for _, s := range strutil.ISBNPattern.FindAllString(line, -1) {
-				isbns.Add(s)
-			}
-			if isbns.Size() == 0 {
+			isbns := strutil.ISBNPattern.FindAllString(line, -1)
+			if len(isbns) == 0 {
 				log.Printf("isbn: warning: no ISBNs found on line: %s", line)
 			}
-			f.Values.Add(isbns.Values()...)
+			for _, isbn := range isbns {
+				f.Values[isbn] = struct{}{}
+			}
 		}
 	}
 	// Add any ISBN given as string in configuration.
-	f.Values.Add(s.ISBN.Values...)
-	log.Printf("isbn: collected %d ISBN", f.Values.Size())
+	for _, isbn := range s.ISBN.Values {
+		f.Values[isbn] = struct{}{}
+	}
+	log.Printf("isbn: collected %d ISBN", len(f.Values))
 	return nil
 }
