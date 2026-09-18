@@ -1,6 +1,7 @@
 package doaj
 
 import (
+	"cmp"
 	"encoding/xml"
 	"fmt"
 	"html"
@@ -194,7 +195,7 @@ func (record Record) Subjects() []string {
 		if len(v.Text) > 1 && !strings.Contains(v.Text, "-") {
 			continue
 		}
-		class := LCCPatterns.LookupDefault(v.Text, finc.NotAssigned)
+		class := LCCPatterns.lookup(v.Text, finc.NotAssigned)
 		if class != finc.NotAssigned {
 			subjects = append(subjects, class)
 		}
@@ -239,7 +240,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	var languages []string
 	for _, l := range record.Metadata.Dc.Language {
-		languages = append(languages, LanguageMap.Lookup(l, "und"))
+		languages = append(languages, cmp.Or(LanguageMap[l], "und"))
 	}
 	slices.Sort(languages)
 	output.Languages = slices.Compact(languages)

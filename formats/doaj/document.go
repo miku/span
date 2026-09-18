@@ -23,6 +23,7 @@
 package doaj
 
 import (
+	"cmp"
 	"fmt"
 	"html"
 	"regexp"
@@ -32,7 +33,6 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -45,8 +45,8 @@ const (
 )
 
 var (
-	LCCPatterns = assetutil.MustLoadRegexpMap("assets/finc/lcc.json")
-	LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
+	LCCPatterns = mustLoadRegexpMap("assets/finc/lcc.json")
+	LanguageMap = span.MustLoadAsset[map[string]string]("assets/doaj/language-iso-639-3.json")
 	DOIPattern  = regexp.MustCompile(`10[.][a-zA-Z0-9]+/[\S]*$`)
 )
 
@@ -236,7 +236,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	var subjects []string
 	for _, s := range doc.Index.SchemaCode {
-		class := LCCPatterns.LookupDefault(strings.Replace(s, "LCC:", "", -1), finc.NotAssigned)
+		class := LCCPatterns.lookup(strings.Replace(s, "LCC:", "", -1), finc.NotAssigned)
 		if class != finc.NotAssigned {
 			subjects = append(subjects, class)
 		}
@@ -250,7 +250,7 @@ func (doc Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	var languages []string
 	for _, l := range doc.Index.Language {
-		languages = append(languages, LanguageMap.Lookup(l, "und"))
+		languages = append(languages, cmp.Or(LanguageMap[l], "und"))
 	}
 	slices.Sort(languages)
 	output.Languages = slices.Compact(languages)

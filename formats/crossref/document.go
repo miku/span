@@ -21,6 +21,7 @@
 package crossref
 
 import (
+	"cmp"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -31,7 +32,6 @@ import (
 	"time"
 
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/strutil"
 )
@@ -50,9 +50,9 @@ var (
 	DefaultFormat = "ElectronicArticle"
 
 	// Load assets
-	Formats  = assetutil.MustLoadStringMap("assets/crossref/formats.json")
-	Genres   = assetutil.MustLoadStringMap("assets/crossref/genres.json")
-	RefTypes = assetutil.MustLoadStringMap("assets/crossref/reftypes.json")
+	Formats  = span.MustLoadAsset[map[string]string]("assets/crossref/formats.json")
+	Genres   = span.MustLoadAsset[map[string]string]("assets/crossref/genres.json")
+	RefTypes = span.MustLoadAsset[map[string]string]("assets/crossref/reftypes.json")
 
 	// AuthorReplacer is a special cleaner for author names.
 	AuthorReplacer = strings.NewReplacer("#", "", "--", "", "*", "", "|", "", "&NA;", "", "\u0026NA;", "", "\u0026", "")
@@ -101,7 +101,7 @@ type Document struct {
 	} `json:"author"`
 	ContainerTitle []string `json:"container-title"`
 	ContentDomain  struct {
-		CrossmarkRestriction bool          `json:"crossmark-restriction"`
+		CrossmarkRestriction bool  `json:"crossmark-restriction"`
 		Domain               []any `json:"domain"`
 	} `json:"content-domain"`
 	Created             DateField `json:"created"`
@@ -138,26 +138,26 @@ type Document struct {
 		IntendedApplication string `json:"intended-application"`
 		URL                 string
 	} `json:"link"`
-	Member          string        `json:"member"`
-	OriginalTitle   []any `json:"original-title"`
-	Page            string        `json:"page"`
-	Prefix          string        `json:"prefix"`
-	PublishedPrint  DateField     `json:"published-print"`
-	Publisher       string        `json:"publisher"`
-	ReferenceCount  int64         `json:"reference-count"`
-	ReferencesCount int64         `json:"references-count"`
+	Member          string    `json:"member"`
+	OriginalTitle   []any     `json:"original-title"`
+	Page            string    `json:"page"`
+	Prefix          string    `json:"prefix"`
+	PublishedPrint  DateField `json:"published-print"`
+	Publisher       string    `json:"publisher"`
+	ReferenceCount  int64     `json:"reference-count"`
+	ReferencesCount int64     `json:"references-count"`
 	Relation        struct {
 	} `json:"relation"`
-	Score               float64     `json:"score"`
-	ShortContainerTitle []string    `json:"short-container-title"`
-	ShortTitle          any `json:"short-title"`
-	Source              string      `json:"source"`
-	Subject             []string    `json:"subject"`
-	Subtitle            []string    `json:"subtitle"`
-	Title               []string    `json:"title"`
-	Type                string      `json:"type"`
-	URL                 string      `json:"URL"`
-	Volume              string      `json:"volume"`
+	Score               float64  `json:"score"`
+	ShortContainerTitle []string `json:"short-container-title"`
+	ShortTitle          any      `json:"short-title"`
+	Source              string   `json:"source"`
+	Subject             []string `json:"subject"`
+	Subtitle            []string `json:"subtitle"`
+	Title               []string `json:"title"`
+	Type                string   `json:"type"`
+	URL                 string   `json:"URL"`
+	Volume              string   `json:"volume"`
 }
 
 // PageInfo holds various page related data.
@@ -331,14 +331,14 @@ func (doc *Document) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	}
 	output.RecordID = doc.DOI
 	output.DOI = doc.DOI // refs #6312 and #10923, most // URL seem valid
-	output.Format = Formats.Lookup(doc.Type, DefaultFormat)
-	output.Genre = Genres.Lookup(doc.Type, "unknown")
+	output.Format = cmp.Or(Formats[doc.Type], DefaultFormat)
+	output.Genre = cmp.Or(Genres[doc.Type], "unknown")
 	output.ISBN = doc.ISBN
 	output.ISSN = doc.ISSN
 	output.Issue = strings.TrimLeft(doc.Issue, "0")
 	output.Languages = doc.FindLanguages()
 	output.Publishers = append(output.Publishers, doc.Publisher)
-	output.RefType = RefTypes.Lookup(doc.Type, "GEN")
+	output.RefType = cmp.Or(RefTypes[doc.Type], "GEN")
 	output.SourceID = SourceID
 	output.Subjects = doc.Subject
 	output.Type = doc.Type

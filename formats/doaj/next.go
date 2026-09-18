@@ -167,7 +167,7 @@ func (doc ArticleV1) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	var subjects []string
 	for _, s := range doc.Bibjson.Subject {
-		class := LCCPatterns.LookupDefault(s.Code, finc.NotAssigned)
+		class := LCCPatterns.lookup(s.Code, finc.NotAssigned)
 		if class != finc.NotAssigned {
 			subjects = append(subjects, class)
 		}

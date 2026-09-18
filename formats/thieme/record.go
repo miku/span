@@ -1,6 +1,7 @@
 package thieme
 
 import (
+	"cmp"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/kennygrant/sanitize"
 	"github.com/miku/span"
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 )
 
@@ -28,7 +28,7 @@ func leftPad(s string, padStr string, overallLen int) string {
 }
 
 // LanguageMap maps two letter codes and full names to three letter codes.
-var LanguageMap = assetutil.MustLoadStringMap("assets/doaj/language-iso-639-3.json")
+var LanguageMap = span.MustLoadAsset[map[string]string]("assets/doaj/language-iso-639-3.json")
 
 // Record was generated 2018-02-15 13:37:41 by tir on hayiti.
 type Record struct {
@@ -314,7 +314,7 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 
 	// refs #12965
 	if article.Lang != "" {
-		output.Languages = append(output.Languages, LanguageMap.Lookup(strings.ToUpper(article.Lang), "und"))
+		output.Languages = append(output.Languages, cmp.Or(LanguageMap[strings.ToUpper(article.Lang)], "und"))
 	}
 
 	return output, nil

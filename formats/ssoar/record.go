@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goodsign/monday"
 	"log"
+
+	"github.com/goodsign/monday"
 
 	"github.com/miku/span"
 	"github.com/miku/span/formats/finc"

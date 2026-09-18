@@ -1,10 +1,11 @@
 // Package dummy is just a minimal example.
 //
 // $ echo '{"title": "Sample Title"}' | ./span-import -i dummy | jq .
-// {
-//   "rft.atitle": "Sample Title",
-//   "version": "0.9"
-// }
+//
+//	{
+//	  "rft.atitle": "Sample Title",
+//	  "version": "0.9"
+//	}
 package dummy
 
 import "github.com/miku/span/formats/finc"

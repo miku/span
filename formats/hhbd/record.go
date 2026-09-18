@@ -1,6 +1,7 @@
 package hhbd
 
 import (
+	"cmp"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
@@ -12,15 +13,14 @@ import (
 
 	"github.com/miku/span"
 
-	"github.com/miku/span/assetutil"
 	"github.com/miku/span/formats/finc"
 )
 
 var (
 	datePattern = regexp.MustCompile(`[012][0-9][0-9][0-9]`)
-	Formats     = assetutil.MustLoadStringMap("assets/hhbd/formats.json")
-	Genres      = assetutil.MustLoadStringMap("assets/hhbd/genres.json")
-	RefTypes    = assetutil.MustLoadStringMap("assets/hhbd/reftypes.json")
+	Formats     = span.MustLoadAsset[map[string]string]("assets/hhbd/formats.json")
+	Genres      = span.MustLoadAsset[map[string]string]("assets/hhbd/genres.json")
+	RefTypes    = span.MustLoadAsset[map[string]string]("assets/hhbd/reftypes.json")
 )
 
 func uniqueStrings(s []string) []string {
@@ -131,10 +131,10 @@ func (record Record) ToIntermediateSchema() (*finc.IntermediateSchema, error) {
 	// XXX: Guess.
 	if len(record.Metadata.Dc.Ispartof) > 0 {
 		// XXX: Don't just take the first, find the most suitable value.
-		output.Format = Formats.Lookup(record.Metadata.Dc.Ispartof[0].Text, "Manuscript")
+		output.Format = cmp.Or(Formats[record.Metadata.Dc.Ispartof[0].Text], "Manuscript")
 	}
-	output.Genre = Genres.Lookup(record.Metadata.Dc.Type.Text, "unknown")
-	output.RefType = RefTypes.Lookup(record.Metadata.Dc.Type.Text, "GEN")
+	output.Genre = cmp.Or(Genres[record.Metadata.Dc.Type.Text], "unknown")
+	output.RefType = cmp.Or(RefTypes[record.Metadata.Dc.Type.Text], "GEN")
 
 	// Date.
 	date, err := record.date()
