@@ -23,7 +23,6 @@ import (
 	"github.com/miku/span/atomic"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/internal/cmd/crossrefcmd"
-	"github.com/miku/span/xio"
 	"github.com/sethgrid/pester"
 	"github.com/spf13/cobra"
 )
@@ -307,13 +306,12 @@ func runCrossrefSnapshot(inputFile, outputFile, excludeFile string, compressed b
 	}
 	excludes := make(map[string]struct{})
 	if excludeFile != "" {
-		file, err := os.Open(excludeFile)
+		b, err := os.ReadFile(excludeFile)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
-		if err := xio.LoadSet(file, excludes); err != nil {
-			return err
+		for line := range strings.Lines(string(b)) {
+			excludes[strings.TrimSpace(line)] = struct{}{}
 		}
 		slog.Debug("excludes", "count", len(excludes))
 	}

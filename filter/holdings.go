@@ -1,8 +1,7 @@
 package filter
 
 import (
-	"archive/zip"
-	"io"
+	"bytes"
 	"os"
 	"slices"
 	"strings"
@@ -14,7 +13,6 @@ import (
 	"github.com/miku/span/formats/finc"
 	"github.com/miku/span/licensing"
 	"github.com/miku/span/licensing/kbart"
-	"github.com/miku/span/xio"
 )
 
 // CacheValue groups holdings and cache for fast lookups.
@@ -31,49 +29,59 @@ type CacheValue struct {
 // (rows from KBART) by ISSN, wiso database name or title.
 type HoldingsCache map[string]CacheValue
 
-// register reads a holding file from a reader and caches it under the given
-// key. If the given reader is also an io.Close, close it.
-func (c *HoldingsCache) register(key string, r io.Reader) error {
-	if _, ok := (*c)[key]; ok {
+// cached reports whether key is already in the cache.
+func (c HoldingsCache) cached(key string) bool {
+	_, ok := c[key]
+	if ok {
 		log.Printf("[holdings] already cached: %s", key)
-		return nil
+	}
+	return ok
+}
+
+// register parses a holding file, which may be zipped, and caches it under
+// the given key.
+func (c HoldingsCache) register(key string, b []byte) error {
+	b, err := unzipOrPlain(b)
+	if err != nil {
+		return err
 	}
 	h := new(kbart.Holdings)
-	if _, err := h.ReadFrom(r); err != nil {
+	if _, err := h.ReadFrom(bytes.NewReader(b)); err != nil {
 		return err
 	}
 	// Precompute shortcuts to entries.
-	(*c)[key] = CacheValue{
+	c[key] = CacheValue{
 		SerialNumberMap: h.SerialNumberMap(),
 		WisoDatabaseMap: h.WisoDatabaseMap(),
 		TitleMap:        h.TitleMap(),
-	}
-	if rc, ok := r.(io.Closer); ok {
-		return rc.Close()
 	}
 	return nil
 }
 
 // putFile parses a holding file and adds it to the cache.
-func (c *HoldingsCache) putFile(filename string) error {
-	_, err := zip.OpenReader(filename)
-	if err != nil {
-		file, err := os.Open(filename)
-		if err != nil {
-			return err
-		}
-		log.Printf("[holdings] read: %s", filename)
-		return c.register(filename, file)
+func (c HoldingsCache) putFile(filename string) error {
+	if c.cached(filename) {
+		return nil
 	}
-	r := &xio.ZipContentReader{Filename: filename}
-	log.Printf("[holdings] read (zip): %s", filename)
-	return c.register(filename, r)
+	log.Printf("[holdings] read: %s", filename)
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return c.register(filename, b)
 }
 
 // putLink parses a holding file from a link and adds it to the cache.
-func (c *HoldingsCache) putLink(link string) error {
+func (c HoldingsCache) putLink(link string) error {
+	if c.cached(link) {
+		return nil
+	}
 	log.Printf("[holdings] fetch: %s", link)
-	return c.register(link, &xio.ZipOrPlainLinkReader{Link: link})
+	b, err := fetch(link)
+	if err != nil {
+		return err
+	}
+	return c.register(link, b)
 }
 
 // Cache caches holdings information.
