@@ -2,6 +2,8 @@ package doisniffer
 
 import (
 	"bytes"
+	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -80,5 +82,59 @@ func TestRunSkipsUnmatched(t *testing.T) {
 	}
 	if strings.TrimSpace(buf.String()) != "" {
 		t.Errorf("expected unmatched doc to be skipped, got: %q", buf.String())
+	}
+}
+
+func TestSearchMap(t *testing.T) {
+	var cases = []struct {
+		about      string
+		doc        map[string]any
+		ignoreKeys []*regexp.Regexp
+		doi        []string
+	}{
+		{
+			"nothing to find",
+			map[string]any{"a": "b"},
+			nil,
+			nil,
+		},
+		{
+			"a single field",
+			map[string]any{"a": "10.5617/osla.8504"},
+			nil,
+			[]string{"10.5617/osla.8504"},
+		},
+		{
+			"extra chars",
+			map[string]any{"a": "some value: 10.5617/osla.8504"},
+			nil,
+			[]string{"10.5617/osla.8504"},
+		},
+		{
+			"only the first is discovered",
+			map[string]any{"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503"},
+			nil,
+			[]string{"10.5617/osla.8504"},
+		},
+		{
+			"ignore key",
+			map[string]any{"a": "some value: 10.5617/osla.8504 and 10.5617/osla.8503"},
+			[]*regexp.Regexp{regexp.MustCompile(`a`)},
+			nil,
+		},
+		{
+			"find in list",
+			map[string]any{"a": []string{"some value: 10.5617/osla.8504"}},
+			nil,
+			[]string{"10.5617/osla.8504"},
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.about, func(t *testing.T) {
+			result := searchMap(c.doc, patDOI, c.ignoreKeys)
+			if !slices.Equal(result, c.doi) {
+				t.Errorf("got %v, want %v", result, c.doi)
+			}
+		})
 	}
 }

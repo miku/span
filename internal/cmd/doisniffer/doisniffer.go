@@ -3,12 +3,15 @@
 package doisniffer
 
 import (
+	"fmt"
 	"io"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 
-	"github.com/miku/span/doi"
+	"github.com/miku/span/parallel"
+	"github.com/segmentio/encoding/json"
 )
 
 // Config holds the tunables for a doisniffer run.
@@ -33,29 +36,78 @@ func DefaultConfig() Config {
 	}
 }
 
+// patDOI matches a DOI.
+var patDOI = regexp.MustCompile("10[.][0-9]{2,6}/[^ \"\u001f\u001e]{3,}")
+
 // Run reads SOLR JSON documents from r, sniffs out DOI and writes the
-// (optionally updated) documents to w.
+// (optionally updated) documents to w. Without an update key, it writes the
+// document identifier and the DOI found, tab separated.
 func Run(cfg Config, r io.Reader, w io.Writer) error {
 	ignore, err := stringToRegexpSlice(cfg.IgnoreKeys, ",")
 	if err != nil {
 		return err
 	}
-	sniffer := &doi.Sniffer{
-		Reader:        r,
-		Writer:        w,
-		SkipUnmatched: cfg.SkipUnmatched,
-		UpdateKey:     cfg.UpdateKey,
-		IdentifierKey: cfg.IdentifierKey,
-		MapSniffer: &doi.MapSniffer{
-			Pattern:    regexp.MustCompile(doi.PatDOI),
-			IgnoreKeys: ignore,
-		},
-		// Custom postprocessing, cannot be changed from flags.
-		PostProcess: postProcess,
-		NumWorkers:  cfg.NumWorkers,
-		BatchSize:   cfg.BatchSize,
+	pp := parallel.NewProcessor(r, w, func(_ int64, p []byte) ([]byte, error) {
+		var doc map[string]any
+		if err := json.Unmarshal(p, &doc); err != nil {
+			return nil, err
+		}
+		var found []string
+		for _, v := range searchMap(doc, patDOI, ignore) {
+			found = append(found, postProcess(v))
+		}
+		if cfg.SkipUnmatched && len(found) == 0 {
+			return nil, nil
+		}
+		if cfg.UpdateKey == "" {
+			id, ok := doc[cfg.IdentifierKey]
+			if !ok {
+				return nil, fmt.Errorf("missing identifier key: %s", cfg.IdentifierKey)
+			}
+			return fmt.Appendf(nil, "%s\t%s\n", id, strings.Join(found, "\t")), nil
+		}
+		// Never overwrite an existing value.
+		if _, ok := doc[cfg.UpdateKey]; !ok && len(found) > 0 {
+			doc[cfg.UpdateKey] = found
+		}
+		b, err := json.Marshal(doc)
+		if err != nil {
+			return nil, err
+		}
+		return append(b, '\n'), nil
+	})
+	if cfg.NumWorkers > 0 {
+		pp.NumWorkers = cfg.NumWorkers
 	}
-	return sniffer.Run()
+	if cfg.BatchSize > 0 {
+		pp.BatchSize = cfg.BatchSize
+	}
+	return pp.Run()
+}
+
+// searchMap returns the sorted, unique first matches of pattern in the string
+// values of doc, skipping keys that match any of ignore.
+func searchMap(doc map[string]any, pattern *regexp.Regexp, ignore []*regexp.Regexp) []string {
+	var found []string
+	for k, v := range doc {
+		if slices.ContainsFunc(ignore, func(re *regexp.Regexp) bool { return re.MatchString(k) }) {
+			continue
+		}
+		switch w := v.(type) {
+		case string:
+			if m := pattern.FindString(w); m != "" {
+				found = append(found, m)
+			}
+		case []string:
+			for _, e := range w {
+				if m := pattern.FindString(e); m != "" {
+					found = append(found, m)
+				}
+			}
+		}
+	}
+	slices.Sort(found)
+	return slices.Compact(found)
 }
 
 // postProcess cleans up a sniffed DOI by trimming a handful of trailing
