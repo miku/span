@@ -17,12 +17,10 @@ import (
 	"time"
 
 	"github.com/adrg/xdg"
-	"github.com/araddon/dateparse"
 	"github.com/klauspost/compress/zstd"
 	gzip "github.com/klauspost/pgzip"
 	"github.com/miku/clam"
 	"github.com/miku/span/atomic"
-	"github.com/miku/span/dateutil"
 	"github.com/miku/span/filter"
 	"github.com/miku/span/internal/cmd/crossrefcmd"
 	"github.com/miku/span/xio"
@@ -404,13 +402,13 @@ func runCrossrefSnapshot(inputFile, outputFile, excludeFile string, compressed b
 	return nil
 }
 
-// dateValue is a flag holding a date, parsed leniently.
+// dateValue is a flag holding a date in YYYY-MM-DD format.
 type dateValue struct{ t *time.Time }
 
-func (d dateValue) String() string { return d.t.Format("2006-01-02") }
+func (d dateValue) String() string { return d.t.Format(time.DateOnly) }
 func (d dateValue) Type() string   { return "date" }
 func (d dateValue) Set(s string) error {
-	t, err := dateparse.ParseStrict(s)
+	t, err := time.Parse(time.DateOnly, s)
 	if err != nil {
 		return err
 	}
@@ -436,7 +434,7 @@ func newCrossrefSyncCmd() *cobra.Command {
 		intervals       = "d"
 		compressProgram = "gzip"
 		prefix          = "default-"
-		start           = dateutil.MustParse("2021-01-01")
+		start           = time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 		end             = time.Now().Add(-24 * time.Hour)
 	)
 	cmd := &cobra.Command{
@@ -456,14 +454,14 @@ cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api
 			client.RetryOnHTTP429 = true
 			client.Timeout = timeout
 			sync.Client = client
-			var ivs []dateutil.Interval
+			var ivs []crossrefcmd.Interval
 			switch intervals {
 			case "d", "D", "daily":
-				ivs = dateutil.Daily(start, end)
+				ivs = crossrefcmd.Daily(start, end)
 			case "w", "W", "weekly":
-				ivs = dateutil.Weekly(start, end)
+				ivs = crossrefcmd.Weekly(start, end)
 			case "m", "M", "monthly":
-				ivs = dateutil.Monthly(start, end)
+				ivs = crossrefcmd.Monthly(start, end)
 			default:
 				return fmt.Errorf("invalid interval: %q", intervals)
 			}
@@ -551,7 +549,7 @@ func removeTempFiles(dir string) error {
 
 // syncWindow harvests one interval into a compressed file at cachePath,
 // unless it exists already.
-func syncWindow(sync *crossrefcmd.Sync, iv dateutil.Interval, cachePath, compressProgram string) error {
+func syncWindow(sync *crossrefcmd.Sync, iv crossrefcmd.Interval, cachePath, compressProgram string) error {
 	if _, err := os.Stat(cachePath); err == nil {
 		log.Printf("already synced: %s", cachePath)
 		return nil
