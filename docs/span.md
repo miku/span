@@ -34,7 +34,7 @@ SYNOPSIS
 
 `span-crossref-members` [`-base` *URL*] [`-offset` *N*] [`-rows` *N*] [`-q`] [`-sleep` *duration*]
 
-`span-crossref-sync` [`-P` *prefix*] [`-i` *interval] [`-p` *compress-program*] [`-s` *date*] [`-e` *date*] [`-E` *numerrors*]
+`span-crossref-sync` [`-P` *prefix*] [`-i` *interval] [`-p` *compress-program*] [`-s` *date*] [`-e` *date*] [`-max-resumes` *N*]
 
 
 DESCRIPTION
@@ -445,6 +445,12 @@ index. It is additive only and runs often, e.g. daily:
 Because crossref is append-mostly, upserting the daily slice keeps the index
 current without a full rebuild. The fast lane never deletes; disappearances are
 reconciled by the full lane.
+
+A window is harvested sorted by index date into *FILE*.partial, with a
+checkpoint in *FILE*.checkpoint after each page. Failed requests (e.g. HTTP
+429) or a killed process do not lose progress: the harvest resumes with a fresh
+cursor at the last record written, in the same run or the next. Only one sync
+per cache directory and prefix runs at a time.
 
 The *full lane* deduplicates the whole cached corpus to the latest version per
 DOI, reindexes it, then removes records the reindex did not touch. It runs

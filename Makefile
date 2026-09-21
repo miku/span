@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-VERSION := 0.3.1
+VERSION := 0.3.2
 # One binary. The names span used to install are symlinks to it: it reads the
 # name it was invoked under and runs the matching command, which keeps every
 # existing script working. Keep LEGACY in sync with internal/cli (tested).

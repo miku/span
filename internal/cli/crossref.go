@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"log"
 	"log/slog"
 	"os"
@@ -14,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/adrg/xdg"
@@ -422,13 +422,14 @@ func newCrossrefSyncCmd() *cobra.Command {
 			ApiEmail:    "martin.czygan@uni-leipzig.de",
 			UserAgent:   "span-crossref-sync/dev (https://github.com/miku/span)",
 			Rows:        1000,
-			Mode:        "s",
-			MaxRetries:  10,
+			MaxResumes:  20,
 		}
 		cacheDir        = path.Join(xdg.CacheHome, "span/crossref-sync")
 		debug, quiet    bool
 		outputFile      string
 		timeout         = 60 * time.Second
+		maxRetries      = 10
+		mode            = "s"
 		intervals       = "d"
 		compressProgram = "gzip"
 		prefix          = "default-"
@@ -440,15 +441,20 @@ func newCrossrefSyncCmd() *cobra.Command {
 		Short: "Download and cache raw crossref works API messages",
 		Long: `Downloads and caches raw crossref works API messages over a date range, one
 compressed file per interval. Designed to run independently, e.g. as a daily
-cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api/`,
+cron job; only one sync per cache directory and prefix runs at a time.
+Interrupted or failed harvests resume from a checkpoint, kept next to the
+partial file in the cache directory.
+See: https://www.crossref.org/documentation/retrieve-metadata/rest-api/`,
 		Example: `  span crossref sync -p zstd -P feed-1- -i d --verbose -t 30m -s 2022-01-01 -c /data/finc/crossref/`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := os.MkdirAll(cacheDir, 0755); err != nil {
 				return err
 			}
 			client := pester.New()
-			client.Backoff = pester.ExponentialBackoff
-			client.MaxRetries = sync.MaxRetries
+			// Keep waits short, as cursors expire after a few minutes; longer
+			// outages are handled by resuming from a checkpoint.
+			client.Backoff = func(i int) time.Duration { return min(pester.ExponentialBackoff(i), 30*time.Second) }
+			client.MaxRetries = maxRetries
 			client.RetryOnHTTP429 = true
 			client.Timeout = timeout
 			sync.Client = client
@@ -463,30 +469,47 @@ cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api
 			default:
 				return fmt.Errorf("invalid interval: %q", intervals)
 			}
-			if debug {
+			switch {
+			case debug:
 				for _, iv := range ivs {
 					fmt.Fprintln(cmd.OutOrStdout(), iv)
 				}
 				return nil
+			case mode == "t" || mode == "tabs":
+				for _, iv := range ivs {
+					total, err := sync.Count(iv.Start, iv.End)
+					if err != nil {
+						return err
+					}
+					fmt.Fprintf(cmd.OutOrStdout(), "%s\t%d\n", iv.Start.Format(time.DateOnly), total)
+				}
+				return nil
+			case mode != "s" && mode != "sync":
+				return fmt.Errorf("use tabs (t) or sync (s) mode")
 			}
+			unlock, err := lockCache(cacheDir, prefix)
+			if err != nil {
+				return err
+			}
+			defer unlock()
 			var (
 				w   io.Writer = cmd.OutOrStdout()
 				out *atomicfile.File
 			)
 			if outputFile != "" {
-				var err error
 				if out, err = atomicfile.Create(outputFile, 0644); err != nil {
 					return err
 				}
 				defer out.Close()
 				w = out
 			}
+			// Partial harvests stay in place, to be resumed on the next run.
 			c := make(chan os.Signal, 1)
-			signal.Notify(c, os.Interrupt)
+			signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 			go func() {
 				<-c
-				if err := removeTempFiles(cacheDir); err != nil {
-					log.Fatalf("cleanup: %v", err)
+				if out != nil {
+					out.Close()
 				}
 				os.Exit(1)
 			}()
@@ -519,16 +542,17 @@ cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api
 	f := cmd.Flags()
 	f.StringVarP(&cacheDir, "cache-dir", "c", cacheDir, "cache directory")
 	f.StringVarP(&sync.ApiEndpoint, "api", "a", sync.ApiEndpoint, "works api")
-	f.StringVarP(&sync.ApiFilter, "filter", "f", sync.ApiFilter, "filter")
+	f.StringVarP(&sync.ApiFilter, "filter", "f", sync.ApiFilter, "date filter: index, deposit or created")
 	f.StringVarP(&sync.ApiEmail, "email", "m", sync.ApiEmail, "email address")
-	f.IntVarP(&sync.Rows, "rows", "r", sync.Rows, "number of docs per request")
+	f.IntVarP(&sync.Rows, "rows", "r", sync.Rows, "number of docs per request (max 1000)")
 	f.StringVar(&sync.UserAgent, "ua", sync.UserAgent, "user agent string")
 	f.BoolVar(&debug, "debug", false, "print out intervals")
 	f.BoolVar(&sync.Verbose, "verbose", false, "be verbose")
 	f.StringVarP(&outputFile, "output", "o", "", "output filename (stdout, otherwise)")
 	f.DurationVarP(&timeout, "timeout", "t", timeout, "connection timeout")
-	f.IntVarP(&sync.MaxRetries, "max-retries", "x", sync.MaxRetries, "max retries")
-	f.StringVar(&sync.Mode, "mode", sync.Mode, "t=tabs, s=sync")
+	f.IntVarP(&maxRetries, "max-retries", "x", maxRetries, "max retries per request")
+	f.IntVar(&sync.MaxResumes, "max-resumes", sync.MaxResumes, "max consecutive resumes without progress, waiting up to 30m in between")
+	f.StringVar(&mode, "mode", mode, "t=tabs (count only), s=sync")
 	f.StringVarP(&intervals, "interval", "i", intervals, "intervals: d=daily, w=weekly, m=monthly")
 	f.StringVarP(&compressProgram, "compress-program", "p", compressProgram, "compress program: gzip or zstd")
 	f.StringVarP(&prefix, "prefix", "P", prefix, "a tag to distinguish between different runs, filename prefix")
@@ -538,17 +562,31 @@ cron job. See: https://www.crossref.org/documentation/retrieve-metadata/rest-api
 	return cmd
 }
 
-// removeTempFiles removes leftover temporary files from the cache directory.
-func removeTempFiles(dir string) error {
-	return filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return err
+// lockCache ensures only one sync runs per cache directory and prefix, as
+// concurrent runs compete for the same windows and the API rate limit. It
+// also removes temporary files left by killed runs of earlier versions.
+func lockCache(dir, prefix string) (unlock func() error, err error) {
+	f, err := os.OpenFile(filepath.Join(dir, prefix+"sync.lock"), os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		return nil, err
+	}
+	if err := syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
+		f.Close()
+		return nil, fmt.Errorf("another sync with prefix %q is running in %s: %w", prefix, dir, err)
+	}
+	stale, err := filepath.Glob(filepath.Join(dir, prefix+"*.json.*-tmp-*"))
+	if err != nil {
+		f.Close()
+		return nil, err
+	}
+	for _, name := range stale {
+		log.Printf("removing stale temporary file: %s", name)
+		if err := os.Remove(name); err != nil {
+			f.Close()
+			return nil, err
 		}
-		if !strings.Contains(path, "-tmp-") {
-			return nil
-		}
-		return os.Remove(path)
-	})
+	}
+	return f.Close, nil
 }
 
 // syncWindow harvests one interval into a compressed file at cachePath,
@@ -558,26 +596,11 @@ func syncWindow(sync *crossrefcmd.Sync, iv crossrefcmd.Interval, cachePath, comp
 		log.Printf("already synced: %s", cachePath)
 		return nil
 	}
-	f, err := atomicfile.Create(cachePath, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	var w io.WriteCloser
+	compress := func(w io.Writer) (io.WriteCloser, error) { return gzip.NewWriter(w), nil }
 	if compressProgram == "zstd" {
-		if w, err = zstd.NewWriter(f); err != nil {
-			return err
-		}
-	} else {
-		w = gzip.NewWriter(f)
+		compress = func(w io.Writer) (io.WriteCloser, error) { return zstd.NewWriter(w) }
 	}
-	if err := sync.WriteWindow(w, iv.Start, iv.End); err != nil {
-		return err
-	}
-	if err := w.Close(); err != nil {
-		return err
-	}
-	if err := f.Commit(); err != nil {
+	if err := sync.HarvestWindow(cachePath, compress, iv.Start, iv.End); err != nil {
 		return err
 	}
 	log.Printf("synced to %s", cachePath)
