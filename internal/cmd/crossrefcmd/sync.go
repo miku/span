@@ -193,7 +193,7 @@ func (s *Sync) pass(file *os.File, compress Compressor, ck *checkpoint, ckPath, 
 			return n, err
 		}
 		if s.Verbose {
-			log.Printf("from: %s, total: %d, seen: %d, written: %d", from, total, seen, n)
+			log.Printf("from: %s, total: %d, seen: %d (%0.2f%%), written: %d", from, total, seen, pct(seen, total), n)
 		}
 		if len(items) == 0 || wr.Message.NextCursor == "" || seen >= total {
 			if seen < total {
@@ -203,6 +203,14 @@ func (s *Sync) pass(file *os.File, compress Compressor, ck *checkpoint, ckPath, 
 		}
 		vs.Set("cursor", wr.Message.NextCursor)
 	}
+}
+
+// pct returns k as a percentage of n, or 0 if n is 0.
+func pct(k, n int64) float64 {
+	if n == 0 {
+		return 0
+	}
+	return float64(k) / float64(n) * 100
 }
 
 // appendPage writes the records of a page not yet written as one compressed

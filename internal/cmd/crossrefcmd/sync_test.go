@@ -236,3 +236,24 @@ func TestCount(t *testing.T) {
 		t.Errorf("got %s", d.queries[0])
 	}
 }
+
+func TestPct(t *testing.T) {
+	cases := []struct {
+		a, b int64
+		r    float64
+	}{
+		{0, 0, 0},
+		{5, 0, 0},
+		{1, 100, 1.0},
+		{100, 100, 100.0},
+		{99, 100, 99},
+		{3, 1, 300},
+		{1, 3, 33.33333333333333},
+	}
+
+	for _, tc := range cases {
+		if got := pct(tc.a, tc.b); got != tc.r {
+			t.Errorf("pct(%v, %v) = %v, want %v", tc.a, tc.b, got, tc.r)
+		}
+	}
+}
